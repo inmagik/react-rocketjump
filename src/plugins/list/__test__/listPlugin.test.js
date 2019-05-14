@@ -297,6 +297,7 @@ describe('List Plugin', () => {
     expect(getList(state)).toBe(state.data.list)
     expect(getCount(state)).toBe(99)
     expect(getNumPages(state)).toBe(10)
+    expect(getNumPages(state)).toBe(10)
     expect(hasNext(state)).toBe(true)
     expect(hasPrev(state)).toBe(false)
     expect(getNext(state)).toBe(state.data.pagination.next)
@@ -338,10 +339,45 @@ describe('List Plugin', () => {
     expect(fallbackReducer).toBeCalledWith(null, action)
   })
 
-  it('should get angry if no pagesize is provided', () => {
-    expect(() =>
-      rjList({ pagination: nextPreviousPaginationAdapter })
-    ).toThrow()
+  it('should get angry if no pagesize is provided and not passed to getNumPages', () => {
+    const { makeSelectors, reducer } = rj(
+      rjList({
+        pagination: limitOffsetPaginationAdapter,
+      }),
+      {
+        effect: () => Promise.resolve(1),
+      }
+    )()
+
+    const { getNumPages } = makeSelectors()
+
+    const state = {
+      loading: false,
+      error: null,
+      data: null,
+    }
+
+    const action = {
+      type: SUCCESS,
+      payload: {
+        params: [{ limit: 10 }],
+        data: {
+          next: '/my-api?limit=10&offset=10',
+          previous: null,
+          count: 100,
+          results: [
+            {
+              id: 1312,
+              name: 'Mallory',
+            },
+          ],
+        },
+      },
+    }
+
+    const nextState = reducer(state, action)
+
+    expect(() => getNumPages(nextState)).toThrow()
   })
 
   it('should get angry if no pagination is provided', () => {
@@ -837,6 +873,7 @@ describe('List Plugin', () => {
     expect(getList(nextState)).toBe(action.payload.data.results)
     expect(getCount(nextState)).toBe(100)
     expect(getNumPages(nextState)).toBe(10)
+    expect(getNumPages(nextState, 50)).toBe(2)
     expect(hasNext(nextState)).toBe(true)
     expect(hasPrev(nextState)).toBe(false)
     expect(getNext(nextState)).toEqual({ limit: 10, offset: 10 })

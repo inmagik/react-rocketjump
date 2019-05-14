@@ -60,9 +60,15 @@ const makeListSelectors = (getData, pageSize) => {
     return data === null ? null : data.pagination.count
   }
 
-  const getNumPages = state => {
+  const getNumPages = (state, overridePageSize = pageSize) => {
+    if (overridePageSize === undefined) {
+      throw new Error(
+        '[reactRj - rjList] Please pass a pageSize argument to getNumPages' +
+          'selector or define a default page size (config.pageSize)'
+      )
+    }
     const count = getCount(state)
-    return count === null ? null : Math.ceil(count / pageSize)
+    return count === null ? null : Math.ceil(count / overridePageSize)
   }
 
   const hasNext = state => {
@@ -107,10 +113,6 @@ const rjList = (config = {}) => {
   if (!config.pagination)
     throw new Error(
       '[reactRj - rjList] Please define a pagination adapter (config.pagination)'
-    )
-  if (!config.pageSize)
-    throw new Error(
-      '[reactRj - rjList] Please define the page size (config.pageSize)'
     )
   const dataReducer = makeListDataReducer(
     config.pagination,
