@@ -1,0 +1,10 @@
+{
+  "docs": {
+    "Why React-Rocketjump?": ["motivation"],
+    "Getting Started": ["installation", "quickstart", "concepts"],
+    "API": ["api_rj"]
+  },
+  "docs-other": {
+    "First Category": ["doc4", "doc5"]
+  }
+}
