@@ -40,7 +40,6 @@ export function useReduxReducer(reducer) {
   return [state, dispatch]
 }
 
-
 export function useCreateRjState(rjStateOrPartial) {
   const extraConfig = useContext(ConfigureRjContext)
   // NOTE: use useMemo if U want to change rjRunnableState

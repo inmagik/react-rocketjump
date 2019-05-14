@@ -1,5 +1,10 @@
 import { useMemo } from 'react'
-import { useRxSubject, useReduxReducer, useConstant, useCreateRjState } from './hooks'
+import {
+  useRxSubject,
+  useReduxReducer,
+  useConstant,
+  useCreateRjState,
+} from './hooks'
 import bindActionCreators from './bindActionCreators'
 
 const defaultMapActions = a => a

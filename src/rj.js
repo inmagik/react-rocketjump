@@ -17,7 +17,11 @@ function makeRecursionRjs(
   let hasEffectConfigured = !isLastRjInvocation
   let rjsOrConfigs = [...partialRjsOrConfigs]
   // Extends only from ConfigureRj
-  if (extraConfig !== null && typeof extraConfig === 'object' && extraConfig.__rjtype === $TYPE_RJ_EXTREA_CONFIG) {
+  if (
+    extraConfig !== null &&
+    typeof extraConfig === 'object' &&
+    extraConfig.__rjtype === $TYPE_RJ_EXTREA_CONFIG
+  ) {
     rjsOrConfigs.push(extraConfig)
   }
   rjsOrConfigs = rjsOrConfigs.map(config => {

@@ -50,7 +50,6 @@ const makeListDataReducer = (
 
 // Selectors for a list
 const makeListSelectors = (getData, pageSize) => {
-
   const getList = state => {
     const data = getData(state)
     return data === null ? null : data.list
@@ -105,9 +104,19 @@ const makeListSelectors = (getData, pageSize) => {
 
 // RJ List
 const rjList = (config = {}) => {
-  if (!config.pagination) throw new Error('[reactRj - rjList] Please define a pagination adapter (config.pagination)');
-  if (!config.pageSize) throw new Error('[reactRj - rjList] Please define the page size (config.pageSize)')
-  const dataReducer = makeListDataReducer(config.pagination, config.customListReducer, config.customPaginationReducer)
+  if (!config.pagination)
+    throw new Error(
+      '[reactRj - rjList] Please define a pagination adapter (config.pagination)'
+    )
+  if (!config.pageSize)
+    throw new Error(
+      '[reactRj - rjList] Please define the page size (config.pageSize)'
+    )
+  const dataReducer = makeListDataReducer(
+    config.pagination,
+    config.customListReducer,
+    config.customPaginationReducer
+  )
   return rj(
     rjListInsert({ path: 'data.list' }),
     rjListUpdate({ path: 'data.list' }),
@@ -124,11 +133,11 @@ const rjList = (config = {}) => {
         } else {
           return oldReducer(state, action)
         }
-      }
-    })
+      },
+    }
+  )
 }
 
 export default rjList
-
 
 export * from './pagination'

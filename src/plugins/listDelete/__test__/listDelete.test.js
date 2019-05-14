@@ -1,16 +1,11 @@
-import { rj } from "../../.."
-import rjListDelete from "..";
+import { rj } from '../../..'
+import rjListDelete from '..'
 
 describe('List DeletePlugin', () => {
-
   it('adds a deleteItem action', () => {
-
-    const { actionCreators } = rj(
-      rjListDelete(),
-      {
-        effect: () => Promise.resolve(1)
-      }
-    )()
+    const { actionCreators } = rj(rjListDelete(), {
+      effect: () => Promise.resolve(1),
+    })()
 
     expect(actionCreators).toHaveProperty('deleteItem')
 
@@ -21,53 +16,44 @@ describe('List DeletePlugin', () => {
     expect(action).toEqual({
       type: 'RJ_LIST_DELETE',
       item: {
-        id: 1
-      }
+        id: 1,
+      },
     })
   })
 
   it('patches reducer only to manage delete operations', () => {
-
-    const jestReducer = jest.fn((state, args, oldReducer) => oldReducer(state, args))
+    const jestReducer = jest.fn((state, args, oldReducer) =>
+      oldReducer(state, args)
+    )
 
     const spy = rj({
-      reducer: oldReducer => (state, action) => jestReducer(state, action, oldReducer)
+      reducer: oldReducer => (state, action) =>
+        jestReducer(state, action, oldReducer),
     })
 
-    const { reducer } = rj(
-      spy,
-      rjListDelete(),
-      {
-        effect: () => Promise.resolve()
-      }
-    )()
+    const { reducer } = rj(spy, rjListDelete(), {
+      effect: () => Promise.resolve(),
+    })()
 
     const prevState = {
       pending: false,
       error: null,
-      data: null
+      data: null,
     }
 
     reducer(prevState, { type: 'RJ_LIST_DELETE' })
 
-    expect(jestReducer).not.toBeCalled();
+    expect(jestReducer).not.toBeCalled()
 
-    reducer(prevState, { type: 'CUSTOM' });
+    reducer(prevState, { type: 'CUSTOM' })
 
-    expect(jestReducer).toBeCalled();
-
-
-
-
+    expect(jestReducer).toBeCalled()
   })
 
   it('deletes items', () => {
-    const { reducer } = rj(
-      rjListDelete(),
-      {
-        effect: () => Promise.resolve()
-      }
-    )()
+    const { reducer } = rj(rjListDelete(), {
+      effect: () => Promise.resolve(),
+    })()
 
     const prevState = {
       pending: false,
@@ -75,20 +61,23 @@ describe('List DeletePlugin', () => {
       data: [
         {
           id: 1,
-          name: 'Alice'
+          name: 'Alice',
         },
         {
           id: 2,
-          name: 'Bob'
+          name: 'Bob',
         },
         {
           id: 3,
-          name: 'Eve'
-        }
-      ]
+          name: 'Eve',
+        },
+      ],
     }
 
-    let nextState = reducer(prevState, { type: 'RJ_LIST_DELETE', item: { id: 1 } })
+    let nextState = reducer(prevState, {
+      type: 'RJ_LIST_DELETE',
+      item: { id: 1 },
+    })
 
     expect(nextState).toEqual({
       pending: false,
@@ -96,24 +85,20 @@ describe('List DeletePlugin', () => {
       data: [
         {
           id: 2,
-          name: 'Bob'
+          name: 'Bob',
         },
         {
           id: 3,
-          name: 'Eve'
-        }
-      ]
-    });
-
+          name: 'Eve',
+        },
+      ],
+    })
   })
 
   it('can operate with a custom path', () => {
-    const { reducer } = rj(
-      rjListDelete({ path: 'data.custom.path.to.list' }),
-      {
-        effect: () => Promise.resolve()
-      }
-    )()
+    const { reducer } = rj(rjListDelete({ path: 'data.custom.path.to.list' }), {
+      effect: () => Promise.resolve(),
+    })()
 
     const prevState = {
       pending: false,
@@ -125,24 +110,27 @@ describe('List DeletePlugin', () => {
               list: [
                 {
                   id: 1,
-                  name: 'Alice'
+                  name: 'Alice',
                 },
                 {
                   id: 2,
-                  name: 'Bob'
+                  name: 'Bob',
                 },
                 {
                   id: 3,
-                  name: 'Eve'
-                }
-              ]
-            }
-          }
-        }
-      }
+                  name: 'Eve',
+                },
+              ],
+            },
+          },
+        },
+      },
     }
 
-    let nextState = reducer(prevState, { type: 'RJ_LIST_DELETE', item: { id: 1 } })
+    let nextState = reducer(prevState, {
+      type: 'RJ_LIST_DELETE',
+      item: { id: 1 },
+    })
 
     expect(nextState).toEqual({
       pending: false,
@@ -154,36 +142,34 @@ describe('List DeletePlugin', () => {
               list: [
                 {
                   id: 2,
-                  name: 'Bob'
+                  name: 'Bob',
                 },
                 {
                   id: 3,
-                  name: 'Eve'
-                }
-              ]
-            }
-          }
-        }
-      }
+                  name: 'Eve',
+                },
+              ],
+            },
+          },
+        },
+      },
     })
   })
 
   it('can use custom identity function', () => {
     const { reducer } = rj(
-      rjListDelete({ identity: (action, listItem) => listItem === action.item }),
+      rjListDelete({
+        identity: (action, listItem) => listItem === action.item,
+      }),
       {
-        effect: () => Promise.resolve()
+        effect: () => Promise.resolve(),
       }
     )()
 
     const prevState = {
       pending: false,
       error: null,
-      data: [
-        1,
-        2,
-        3
-      ]
+      data: [1, 2, 3],
     }
 
     let nextState = reducer(prevState, { type: 'RJ_LIST_DELETE', item: 2 })
@@ -191,10 +177,7 @@ describe('List DeletePlugin', () => {
     expect(nextState).toEqual({
       pending: false,
       error: null,
-      data: [
-        1,
-        3
-      ]
+      data: [1, 3],
     })
   })
 
@@ -204,9 +187,12 @@ describe('List DeletePlugin', () => {
     console.warn = spy
 
     const { reducer } = rj(
-      rjListDelete({ path: 'data.list', identity: (action, listItem) => listItem === action.item }),
+      rjListDelete({
+        path: 'data.list',
+        identity: (action, listItem) => listItem === action.item,
+      }),
       {
-        effect: () => Promise.resolve()
+        effect: () => Promise.resolve(),
       }
     )()
 
@@ -214,20 +200,13 @@ describe('List DeletePlugin', () => {
       pending: false,
       error: null,
       data: {
-        pagination: {
-
-        },
-        list: [
-          1,
-          2,
-          3
-        ]
-      }
+        pagination: {},
+        list: [1, 2, 3],
+      },
     }
 
     reducer(prevState, { type: 'RJ_LIST_DELETE', item: 2 })
 
     expect(spy).toBeCalled()
   })
-
 })

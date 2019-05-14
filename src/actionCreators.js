@@ -1,6 +1,5 @@
 import { RUN, CLEAN, EFFECT_ACTION } from './actionTypes'
 
-
 /**
  * Mark an action as an effect action
  * When an action is marked as an "effect action"
@@ -21,10 +20,13 @@ const makeEffectAction = action => {
 function withMeta(meta) {
   const out = makeEffectAction({
     ...this,
-    meta: typeof meta === 'function' ? meta(this.meta) : {
-      ...this.meta,
-      ...meta
-    }
+    meta:
+      typeof meta === 'function'
+        ? meta(this.meta)
+        : {
+            ...this.meta,
+            ...meta,
+          },
   })
   out.extend = extend.bind(out)
   out.withMeta = withMeta.bind(out)
@@ -41,11 +43,11 @@ function extend(extensions) {
     ...this,
     meta: {
       ...this.meta,
-      ...extensions.meta
+      ...extensions.meta,
     },
     callbacks: {
       onSuccess: extensions.callbacks && extensions.callbacks.onSuccess,
-      onFailure: extensions.callbacks && extensions.callbacks.onFailure
+      onFailure: extensions.callbacks && extensions.callbacks.onFailure,
     },
   })
   out.extend = extend.bind(out)
@@ -81,7 +83,6 @@ function makeLibraryAction(type, ...params) {
 export function run(...params) {
   return makeLibraryAction(RUN, ...params)
 }
-
 
 export function clean(...params) {
   return makeLibraryAction(CLEAN, ...params)

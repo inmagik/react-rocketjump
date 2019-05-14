@@ -1,6 +1,6 @@
 import { omit } from '../../helpers'
 import { rj } from '../../index'
-import { PENDING, SUCCESS, FAILURE, CLEAN } from '../../actionTypes';
+import { PENDING, SUCCESS, FAILURE, CLEAN } from '../../actionTypes'
 
 const defaultKeyMaker = action => (action.meta ? action.meta.id : null)
 const defaultDataTransform = arg => arg
@@ -9,7 +9,7 @@ const handlePendingItem = (prevState, action) => ({
   ...prevState,
   error: null,
   pending: true,
-  data: (prevState && prevState.data) || null
+  data: (prevState && prevState.data) || null,
 })
 
 const handleSuccessItem = (prevState, action, dataTransform) => ({
@@ -28,7 +28,7 @@ const makeMapReducer = (
   keyMaker = defaultKeyMaker,
   dataTransform,
   keepCompleted = true,
-  fallbackReducer,
+  fallbackReducer
 ) => {
   return (prevState, action) => {
     const key = keyMaker(action)
@@ -52,7 +52,11 @@ const makeMapReducer = (
         if (keepCompleted) {
           return {
             ...prevState,
-            [key]: handleSuccessItem(prevState[key], action, dataTransform || defaultDataTransform),
+            [key]: handleSuccessItem(
+              prevState[key],
+              action,
+              dataTransform || defaultDataTransform
+            ),
           }
         } else {
           return omit(prevState, [key])
@@ -73,29 +77,25 @@ const makeMapReducer = (
 }
 
 const makeMapSelectors = () => {
-
-  const getMapPendings =
-    state =>
-      Object.keys(state).reduce(
-        (r, key) => (state[key].pending ? { ...r, [key]: true } : r),
-        {}
-      )
+  const getMapPendings = state =>
+    Object.keys(state).reduce(
+      (r, key) => (state[key].pending ? { ...r, [key]: true } : r),
+      {}
+    )
 
   const getMapLoadings = getMapPendings
 
-  const getMapFailures =
-    state =>
-      Object.keys(state).reduce((r, key) => {
-        const error = state[key].error
-        return error !== null ? { ...r, [key]: error } : r
-      }, {})
+  const getMapFailures = state =>
+    Object.keys(state).reduce((r, key) => {
+      const error = state[key].error
+      return error !== null ? { ...r, [key]: error } : r
+    }, {})
 
-  const getMapData =
-    state =>
-      Object.keys(state).reduce((r, key) => {
-        const data = state[key].data
-        return data !== null ? { ...r, [key]: data } : r
-      }, {})
+  const getMapData = state =>
+    Object.keys(state).reduce((r, key) => {
+      const data = state[key].data
+      return data !== null ? { ...r, [key]: data } : r
+    }, {})
 
   return {
     getMapLoadings,
@@ -119,7 +119,10 @@ const rjMap = (mapConfig = {}) =>
         oldReducer
       ),
     selectors: () => makeMapSelectors(),
-    takeEffect: ["groupBy", typeof mapConfig.key === 'function' ? mapConfig.key : defaultKeyMaker],
+    takeEffect: [
+      'groupBy',
+      typeof mapConfig.key === 'function' ? mapConfig.key : defaultKeyMaker,
+    ],
   })
 
 export default rjMap

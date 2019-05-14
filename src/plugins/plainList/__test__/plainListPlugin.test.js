@@ -1,21 +1,17 @@
-import { rj } from "../../.."
-import rjList from ".."
-import { SUCCESS } from "../../../actionTypes";
+import { rj } from '../../..'
+import rjList from '..'
+import { SUCCESS } from '../../../actionTypes'
 
 describe('List Plugin', () => {
   it('should make a list reducer', () => {
-
-    const { reducer } = rj(
-      rjList(),
-      {
-        effect: () => Promise.resolve(1)
-      }
-    )()
+    const { reducer } = rj(rjList(), {
+      effect: () => Promise.resolve(1),
+    })()
 
     const prevState = {
       data: null,
       pending: false,
-      error: null
+      error: null,
     }
 
     const action = {
@@ -57,18 +53,14 @@ describe('List Plugin', () => {
           id: 7,
           name: 'Eve',
         },
-      ]
+      ],
     })
   })
 
   it('should append items when meta append', () => {
-
-    const { reducer } = rj(
-      rjList(),
-      {
-        effect: () => Promise.resolve(1)
-      }
-    )()
+    const { reducer } = rj(rjList(), {
+      effect: () => Promise.resolve(1),
+    })()
 
     let state = {
       data: [
@@ -78,7 +70,7 @@ describe('List Plugin', () => {
         },
       ],
       pending: false,
-      error: null
+      error: null,
     }
 
     const action = {
@@ -99,7 +91,7 @@ describe('List Plugin', () => {
             name: 'Eve',
           },
         ],
-      }
+      },
     }
 
     state = reducer(state, action)
@@ -130,7 +122,7 @@ describe('List Plugin', () => {
     state = {
       data: null,
       pending: false,
-      error: null
+      error: null,
     }
 
     state = reducer(state, action)
@@ -156,13 +148,9 @@ describe('List Plugin', () => {
   })
 
   it('should prepend items when meta prepend', () => {
-
-    const { reducer } = rj(
-      rjList(),
-      {
-        effect: () => Promise.resolve(1)
-      }
-    )()
+    const { reducer } = rj(rjList(), {
+      effect: () => Promise.resolve(1),
+    })()
 
     let state = {
       data: [
@@ -172,7 +160,7 @@ describe('List Plugin', () => {
         },
       ],
       pending: false,
-      error: null
+      error: null,
     }
 
     const action = {
@@ -193,7 +181,7 @@ describe('List Plugin', () => {
             name: 'Eve',
           },
         ],
-      }
+      },
     }
 
     state = reducer(state, action)
@@ -224,7 +212,7 @@ describe('List Plugin', () => {
     state = {
       data: null,
       pending: false,
-      error: null
+      error: null,
     }
 
     state = reducer(state, action)
@@ -250,18 +238,11 @@ describe('List Plugin', () => {
   })
 
   it('should make selectors for list', () => {
+    const { makeSelectors } = rj(rjList(), {
+      effect: () => Promise.resolve(1),
+    })()
 
-    const { makeSelectors } = rj(
-      rjList(),
-      {
-        effect: () => Promise.resolve(1)
-      }
-    )()
-
-    const {
-      getList,
-      getCount,
-    } = makeSelectors()
+    const { getList, getCount } = makeSelectors()
 
     const state = {
       loading: false,
@@ -286,20 +267,16 @@ describe('List Plugin', () => {
   })
 
   it('should use fallback reducer', () => {
+    const fallbackReducer = jest.fn((state, action) => state)
 
-    const fallbackReducer = jest.fn((state, action) => state);
+    const otherPlugin = () =>
+      rj({
+        reducer: () => fallbackReducer,
+      })
 
-    const otherPlugin = () => rj({
-      reducer: () => fallbackReducer
-    })
-
-    const { reducer } = rj(
-      otherPlugin(),
-      rjList(),
-      {
-        effect: () => Promise.resolve(1)
-      }
-    )()
+    const { reducer } = rj(otherPlugin(), rjList(), {
+      effect: () => Promise.resolve(1),
+    })()
 
     const prevState = null
 
@@ -314,21 +291,14 @@ describe('List Plugin', () => {
     reducer(prevState, action)
 
     expect(fallbackReducer).toBeCalledWith(null, action)
-
   })
 
   it('should not break with null state', () => {
-    const { makeSelectors } = rj(
-      rjList(),
-      {
-        effect: () => Promise.resolve(1)
-      }
-    )()
+    const { makeSelectors } = rj(rjList(), {
+      effect: () => Promise.resolve(1),
+    })()
 
-    const {
-      getList,
-      getCount,
-    } = makeSelectors()
+    const { getList, getCount } = makeSelectors()
 
     const state = {
       loading: false,
@@ -340,27 +310,26 @@ describe('List Plugin', () => {
   })
 
   it('should allow custom list reducer', () => {
-
     const customReducer = jest.fn((oldList, action) => {
       return action.payload.data.filter(item => item.name.startsWith('A'))
     })
 
     const { reducer } = rj(
       rjList({
-        customListReducer: customReducer
+        customListReducer: customReducer,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
     const prevState = {
       data: {
         list: [],
-        pagination: null
+        pagination: null,
       },
       pending: false,
-      error: null
+      error: null,
     }
 
     const action = {
@@ -381,7 +350,7 @@ describe('List Plugin', () => {
             name: 'Eve',
           },
         ],
-      }
+      },
     }
 
     const nextState = reducer(prevState, action)
@@ -396,9 +365,7 @@ describe('List Plugin', () => {
           id: 23,
           name: 'Alice',
         },
-      ]
+      ],
     })
-
   })
-
 })

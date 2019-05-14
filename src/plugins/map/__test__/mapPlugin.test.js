@@ -2,18 +2,13 @@ import { rj } from '../../..'
 import rjMap from '..'
 import { PENDING, SUCCESS, FAILURE, CLEAN, RUN } from '../../../actionTypes'
 import { omit } from '../../../helpers'
-import { Subject } from 'rxjs';
-
+import { Subject } from 'rxjs'
 
 describe('Map Plugin', () => {
-
   it('should make map reducer', () => {
-    const { reducer } = rj(
-      rjMap(),
-      {
-        effect: () => Promise.resolve(1)
-      }
-    )()
+    const { reducer } = rj(rjMap(), {
+      effect: () => Promise.resolve(1),
+    })()
 
     let state = reducer(
       {},
@@ -111,7 +106,7 @@ describe('Map Plugin', () => {
 
     state = reducer(state, {
       type: PENDING,
-      meta: { id: 23 }
+      meta: { id: 23 },
     })
 
     expect(state).toEqual({
@@ -120,9 +115,9 @@ describe('Map Plugin', () => {
         error: null,
         data: {
           id: 23,
-          name: 'Alice'
-        }
-      }
+          name: 'Alice',
+        },
+      },
     })
 
     state = reducer(state, {
@@ -137,9 +132,9 @@ describe('Map Plugin', () => {
         error: null,
         data: {
           id: 23,
-          name: 'Mallory'
-        }
-      }
+          name: 'Mallory',
+        },
+      },
     })
 
     state = reducer(state, {
@@ -148,11 +143,9 @@ describe('Map Plugin', () => {
     })
 
     expect(state).toEqual({})
-
   })
 
   it('should bubble up unknown actions', () => {
-
     const log = []
 
     const spy = jest.fn((state, action, fallback) => {
@@ -160,17 +153,15 @@ describe('Map Plugin', () => {
       return fallback(state, action)
     })
 
-    const spyRj = () => rj({
-      reducer: oldReducer => (state, action) => spy(state, action, oldReducer)
-    })
+    const spyRj = () =>
+      rj({
+        reducer: oldReducer => (state, action) =>
+          spy(state, action, oldReducer),
+      })
 
-    const { reducer } = rj(
-      spyRj(),
-      rjMap(),
-      {
-        effect: () => Promise.resolve(1)
-      }
-    )()
+    const { reducer } = rj(spyRj(), rjMap(), {
+      effect: () => Promise.resolve(1),
+    })()
 
     reducer(
       {},
@@ -184,18 +175,11 @@ describe('Map Plugin', () => {
   })
 
   it('should make map selectors', () => {
-    const {
-      reducer,
-      makeSelectors
-    } = rj(rjMap(), {
-      effect: () => Promise.resolve(1)
+    const { reducer, makeSelectors } = rj(rjMap(), {
+      effect: () => Promise.resolve(1),
     })()
 
-    const {
-      getMapPendings,
-      getMapFailures,
-      getMapData,
-    } = makeSelectors()
+    const { getMapPendings, getMapFailures, getMapData } = makeSelectors()
 
     let state = reducer(
       {},
@@ -270,10 +254,8 @@ describe('Map Plugin', () => {
   })
 
   it('should make map action creators', () => {
-    const {
-      actionCreators
-    } = rj(rjMap(), {
-      effect: () => Promise.resolve(1)
+    const { actionCreators } = rj(rjMap(), {
+      effect: () => Promise.resolve(1),
     })()
 
     expect(actionCreators).toHaveProperty('runKey')
@@ -285,7 +267,7 @@ describe('Map Plugin', () => {
       meta: { id: 23 },
       callbacks: {
         onSuccess: undefined,
-        onFailure: undefined
+        onFailure: undefined,
       },
     })
 
@@ -295,7 +277,7 @@ describe('Map Plugin', () => {
       meta: { id: 23 },
       callbacks: {
         onSuccess: undefined,
-        onFailure: undefined
+        onFailure: undefined,
       },
     })
   })
@@ -309,29 +291,25 @@ describe('Map Plugin', () => {
 
     const mockCallback = jest.fn()
 
-    const {
-      actionCreators,
-      makeRxObservable
-    } = rj(rjMap(), {
+    const { actionCreators, makeRxObservable } = rj(rjMap(), {
       effect: mockApi,
     })()
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
 
-    subject.next(omit(actionCreators.runKey(23), ['withMeta', 'extend']));
-    subject.next(omit(actionCreators.runKey(32), ['withMeta', 'extend']));
-    subject.next(omit(actionCreators.runKey(23), ['withMeta', 'extend']));
+    subject.next(omit(actionCreators.runKey(23), ['withMeta', 'extend']))
+    subject.next(omit(actionCreators.runKey(32), ['withMeta', 'extend']))
+    subject.next(omit(actionCreators.runKey(23), ['withMeta', 'extend']))
 
     mockApi.mock.results[2].value.then(() => {
-
       expect(mockCallback).toBeCalledTimes(8)
 
       expect(mockCallback).nthCalledWith(1, {
         type: RUN,
         payload: { params: [23] },
         meta: { id: 23 },
-        callbacks: { onSuccess: undefined, onFailure: undefined }
+        callbacks: { onSuccess: undefined, onFailure: undefined },
       })
 
       expect(mockCallback).nthCalledWith(2, {
@@ -343,7 +321,7 @@ describe('Map Plugin', () => {
         type: RUN,
         payload: { params: [32] },
         meta: { id: 32 },
-        callbacks: { onSuccess: undefined, onFailure: undefined }
+        callbacks: { onSuccess: undefined, onFailure: undefined },
       })
 
       expect(mockCallback).nthCalledWith(4, {
@@ -355,7 +333,7 @@ describe('Map Plugin', () => {
         type: RUN,
         payload: { params: [23] },
         meta: { id: 23 },
-        callbacks: { onSuccess: undefined, onFailure: undefined }
+        callbacks: { onSuccess: undefined, onFailure: undefined },
       })
 
       expect(mockCallback).nthCalledWith(6, {
@@ -376,167 +354,169 @@ describe('Map Plugin', () => {
       })
 
       done()
-
     })
   })
 
   it('should remove completed elements if told to do so', () => {
-    const {
-      reducer
-    } = rj(rjMap({ keepCompleted: false }), {
+    const { reducer } = rj(rjMap({ keepCompleted: false }), {
       effect: () => Promise.resolve(1),
     })()
 
-
-    let state = reducer({}, {
-      type: PENDING,
-      payload: { params: [1] },
-      meta: { id: 1 }
-    })
+    let state = reducer(
+      {},
+      {
+        type: PENDING,
+        payload: { params: [1] },
+        meta: { id: 1 },
+      }
+    )
 
     expect(state).toEqual({
       '1': {
         pending: true,
         error: null,
-        data: null
-      }
+        data: null,
+      },
     })
 
     state = reducer(state, {
       type: SUCCESS,
       payload: { params: [1], data: {} },
-      meta: { id: 1 }
+      meta: { id: 1 },
     })
 
     expect(state).toEqual({})
 
-    state = reducer({}, {
-      type: PENDING,
-      payload: { params: [2] },
-      meta: { id: 2 }
-    })
+    state = reducer(
+      {},
+      {
+        type: PENDING,
+        payload: { params: [2] },
+        meta: { id: 2 },
+      }
+    )
 
     expect(state).toEqual({
       '2': {
         pending: true,
         error: null,
-        data: null
-      }
+        data: null,
+      },
     })
 
     state = reducer(state, {
       type: FAILURE,
       payload: 'Error',
-      meta: { id: 2 }
+      meta: { id: 2 },
     })
 
     expect(state).toEqual({
       '2': {
         pending: false,
         error: 'Error',
-        data: null
-      }
+        data: null,
+      },
     })
-
-
-
   })
 
   it('should use a custom keymaker function', () => {
-
     const { reducer } = rj(
       rjMap({
-        key: action => action.meta.name
+        key: action => action.meta.name,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
-    let state = reducer({}, {
-      type: PENDING,
-      meta: { name: 'Alice' }
-    })
+    let state = reducer(
+      {},
+      {
+        type: PENDING,
+        meta: { name: 'Alice' },
+      }
+    )
 
     expect(state).toEqual({
       Alice: {
         pending: true,
         data: null,
-        error: null
-      }
+        error: null,
+      },
     })
 
     state = reducer(state, {
       type: SUCCESS,
       payload: { params: [], data: { secret: 'secret' } },
-      meta: { name: 'Alice' }
+      meta: { name: 'Alice' },
     })
 
     expect(state).toEqual({
       Alice: {
         pending: false,
         data: { secret: 'secret' },
-        error: null
-      }
+        error: null,
+      },
     })
-
   })
 
   it('does not break with corner-case states', () => {
-    const { reducer } = rj(
-      rjMap(),
-      {
-        effect: () => Promise.resolve(1)
-      }
-    )()
+    const { reducer } = rj(rjMap(), {
+      effect: () => Promise.resolve(1),
+    })()
 
     let state = reducer(null, {
       type: PENDING,
-      meta: { id: 1 }
+      meta: { id: 1 },
     })
 
     expect(state).toEqual({
       '1': {
         pending: true,
         data: null,
-        error: null
-      }
+        error: null,
+      },
     })
 
-    state = reducer({}, {
-      type: PENDING,
-      meta: { id: 1 }
-    })
+    state = reducer(
+      {},
+      {
+        type: PENDING,
+        meta: { id: 1 },
+      }
+    )
 
     expect(state).toEqual({
       '1': {
         pending: true,
         data: null,
-        error: null
-      }
+        error: null,
+      },
     })
-
   })
 
   it('should be able to take a custom data transform function', () => {
     const { reducer } = rj(
       rjMap({
-        dataTransform: data => ({ ...data, name: data.name.toUpperCase() })
+        dataTransform: data => ({ ...data, name: data.name.toUpperCase() }),
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
     let state = reducer(null, {
       type: PENDING,
-      meta: { id: 1 }
+      meta: { id: 1 },
     })
 
     state = reducer(state, {
       type: SUCCESS,
-      payload: { params: [1], data: { id: 1, name: 'Alice', surname: 'Johns' }},
-      meta: { id: 1 }
+      payload: {
+        params: [1],
+        data: { id: 1, name: 'Alice', surname: 'Johns' },
+      },
+      meta: { id: 1 },
     })
 
     expect(state).toEqual({
@@ -546,10 +526,9 @@ describe('Map Plugin', () => {
         data: {
           id: 1,
           name: 'ALICE',
-          surname: 'Johns'
-        }
-      }
+          surname: 'Johns',
+        },
+      },
     })
-
   })
 })

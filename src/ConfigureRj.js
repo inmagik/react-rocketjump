@@ -10,7 +10,6 @@ export default function ConfigureRj({
   selectors,
   callEffect,
 }) {
-
   const extraConfig = useMemo(() => {
     const injectExtraConfig = {
       reducer,
@@ -19,7 +18,9 @@ export default function ConfigureRj({
       selectors,
       callEffect,
     }
-    Object.defineProperty(injectExtraConfig, '__rjtype', { value: $TYPE_RJ_EXTREA_CONFIG })
+    Object.defineProperty(injectExtraConfig, '__rjtype', {
+      value: $TYPE_RJ_EXTREA_CONFIG,
+    })
     return injectExtraConfig
   }, [callEffect, reducer, composeReducer, actions, selectors])
 

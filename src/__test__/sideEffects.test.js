@@ -1,18 +1,19 @@
 import { rj } from '..'
-import { Subject } from 'rxjs';
+import { Subject } from 'rxjs'
 import { PENDING, SUCCESS, FAILURE, CLEAN } from '../actionTypes'
-import { RUN, TAKE_EFFECT_EVERY, TAKE_EFFECT_GROUP_BY } from '../createMakeRxObservable'
+import {
+  RUN,
+  TAKE_EFFECT_EVERY,
+  TAKE_EFFECT_GROUP_BY,
+} from '../createMakeRxObservable'
 
 describe('RJ side effect model', () => {
-
   it('should run an async api and dispatch PENDING and SUCCESS actions when resolved', done => {
     const mockApiResult = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
     const mockCallback = jest.fn()
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockApi,
     })()
 
@@ -23,18 +24,17 @@ describe('RJ side effect model', () => {
       type: RUN,
       payload: { params: [] },
       meta: {},
-      callbacks: {}
+      callbacks: {},
     })
 
     mockApi.mock.results[0].value.then(() => {
-
       expect(mockCallback).toBeCalledTimes(3)
 
       expect(mockCallback).nthCalledWith(1, {
         type: RUN,
         payload: { params: [] },
         meta: {},
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(2, {
@@ -59,9 +59,7 @@ describe('RJ side effect model', () => {
     const mockBadApi = jest.fn(() => Promise.reject('Something bad happened'))
     const mockCallback = jest.fn()
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockBadApi,
     })()
 
@@ -72,18 +70,17 @@ describe('RJ side effect model', () => {
       type: RUN,
       payload: { params: [] },
       meta: {},
-      callbacks: {}
+      callbacks: {},
     })
 
     mockBadApi.mock.results[0].value.catch(() => {
-
       expect(mockCallback).toBeCalledTimes(3)
 
       expect(mockCallback).nthCalledWith(1, {
         type: RUN,
         payload: { params: [] },
         meta: {},
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(2, {
@@ -94,7 +91,7 @@ describe('RJ side effect model', () => {
       expect(mockCallback).nthCalledWith(3, {
         type: FAILURE,
         meta: {},
-        payload: 'Something bad happened'
+        payload: 'Something bad happened',
       })
 
       done()
@@ -105,9 +102,7 @@ describe('RJ side effect model', () => {
     const mockApi = jest.fn().mockResolvedValueOnce(1)
     const mockCallback = jest.fn()
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockApi,
     })()
 
@@ -118,16 +113,14 @@ describe('RJ side effect model', () => {
       type: RUN,
       payload: { params: [1, 'a', {}, undefined] },
       meta: {},
-      callbacks: {}
+      callbacks: {},
     })
 
     mockApi.mock.results[0].value.then(() => {
-
       expect(mockApi).toBeCalledWith(1, 'a', {}, undefined)
 
       done()
     })
-
   })
 
   it('should dispatch meta along with actions', done => {
@@ -135,9 +128,7 @@ describe('RJ side effect model', () => {
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
     const mockCallback = jest.fn()
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockApi,
     })()
 
@@ -148,18 +139,17 @@ describe('RJ side effect model', () => {
       type: RUN,
       payload: { params: [] },
       meta: { a: 1, b: 2 },
-      callbacks: {}
+      callbacks: {},
     })
 
     mockApi.mock.results[0].value.then(() => {
-
       expect(mockCallback).toBeCalledTimes(3)
 
       expect(mockCallback).nthCalledWith(1, {
         type: RUN,
         payload: { params: [] },
         meta: { a: 1, b: 2 },
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(2, {
@@ -184,9 +174,7 @@ describe('RJ side effect model', () => {
     const mockBadApi = jest.fn(() => Promise.reject('Something bad happened'))
     const mockCallback = jest.fn()
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockBadApi,
     })()
 
@@ -197,18 +185,17 @@ describe('RJ side effect model', () => {
       type: RUN,
       payload: { params: [] },
       meta: { a: 1, b: 2 },
-      callbacks: {}
+      callbacks: {},
     })
 
     mockBadApi.mock.results[0].value.catch(() => {
-
       expect(mockCallback).toBeCalledTimes(3)
 
       expect(mockCallback).nthCalledWith(1, {
         type: RUN,
         payload: { params: [] },
         meta: { a: 1, b: 2 },
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(2, {
@@ -219,11 +206,10 @@ describe('RJ side effect model', () => {
       expect(mockCallback).nthCalledWith(3, {
         type: FAILURE,
         meta: { a: 1, b: 2 },
-        payload: 'Something bad happened'
+        payload: 'Something bad happened',
       })
 
       done()
-
     })
   })
 
@@ -231,9 +217,7 @@ describe('RJ side effect model', () => {
     const mockApi = jest.fn().mockResolvedValueOnce(1)
     const mockCallback = jest.fn()
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockApi,
     })()
 
@@ -244,25 +228,23 @@ describe('RJ side effect model', () => {
       type: RUN,
       payload: { params: [] },
       meta: {},
-      callbacks: {}
+      callbacks: {},
     })
 
     subject.next({
       type: 'CLEAN',
       payload: { params: [] },
-      meta: {}
+      meta: {},
     })
 
-
     mockApi.mock.results[0].value.then(() => {
-
       expect(mockCallback).toBeCalledTimes(3)
 
       expect(mockCallback).nthCalledWith(1, {
         type: RUN,
         payload: { params: [] },
         meta: {},
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(2, {
@@ -274,8 +256,8 @@ describe('RJ side effect model', () => {
         type: CLEAN,
         meta: {},
         payload: {
-          params: []
-        }
+          params: [],
+        },
       })
 
       done()
@@ -288,9 +270,7 @@ describe('RJ side effect model', () => {
       .mockResolvedValueOnce('Alice')
       .mockResolvedValueOnce('Bob')
     const mockCallback = jest.fn()
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockApi,
     })()
 
@@ -301,26 +281,24 @@ describe('RJ side effect model', () => {
       type: RUN,
       payload: { params: [] },
       meta: {},
-      callbacks: {}
+      callbacks: {},
     })
 
     subject.next({
       type: RUN,
       payload: { params: [] },
       meta: {},
-      callbacks: {}
+      callbacks: {},
     })
 
-
     mockApi.mock.results[1].value.then(() => {
-
       expect(mockCallback).toBeCalledTimes(5)
 
       expect(mockCallback).nthCalledWith(1, {
         type: RUN,
         payload: { params: [] },
         meta: {},
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(2, {
@@ -332,12 +310,12 @@ describe('RJ side effect model', () => {
         type: RUN,
         payload: { params: [] },
         meta: {},
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(4, {
         type: PENDING,
-        meta: {}
+        meta: {},
       })
 
       expect(mockCallback).nthCalledWith(5, {
@@ -345,8 +323,8 @@ describe('RJ side effect model', () => {
         meta: {},
         payload: {
           params: [],
-          data: 'Bob'
-        }
+          data: 'Bob',
+        },
       })
 
       done()
@@ -361,39 +339,36 @@ describe('RJ side effect model', () => {
 
     const mockCallback = jest.fn()
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_EVERY,
     })()
 
-    const subject = new Subject();
+    const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
 
     subject.next({
       type: RUN,
       payload: { params: [] },
       meta: {},
-      callbacks: {}
+      callbacks: {},
     })
 
     subject.next({
       type: RUN,
       payload: { params: [] },
       meta: {},
-      callbacks: {}
+      callbacks: {},
     })
 
     mockApi.mock.results[1].value.then(() => {
-
       expect(mockCallback).toBeCalledTimes(6)
 
       expect(mockCallback).nthCalledWith(1, {
         type: RUN,
         payload: { params: [] },
         meta: {},
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(2, {
@@ -405,12 +380,12 @@ describe('RJ side effect model', () => {
         type: RUN,
         payload: { params: [] },
         meta: {},
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(4, {
         type: PENDING,
-        meta: {}
+        meta: {},
       })
 
       expect(mockCallback).nthCalledWith(5, {
@@ -418,8 +393,8 @@ describe('RJ side effect model', () => {
         meta: {},
         payload: {
           params: [],
-          data: 'Alice'
-        }
+          data: 'Alice',
+        },
       })
 
       expect(mockCallback).nthCalledWith(6, {
@@ -427,8 +402,8 @@ describe('RJ side effect model', () => {
         meta: {},
         payload: {
           params: [],
-          data: 'Bob'
-        }
+          data: 'Bob',
+        },
       })
 
       done()
@@ -448,11 +423,9 @@ describe('RJ side effect model', () => {
 
     const mockCallback = jest.fn()
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockApi,
-      takeEffect: [TAKE_EFFECT_GROUP_BY, action => action.meta.name]
+      takeEffect: [TAKE_EFFECT_GROUP_BY, action => action.meta.name],
     })()
 
     const subject = new Subject()
@@ -462,80 +435,79 @@ describe('RJ side effect model', () => {
       type: RUN,
       payload: { params: ['Alice'] },
       meta: { name: 'Alice' },
-      callbacks: {}
+      callbacks: {},
     })
 
     subject.next({
       type: RUN,
       payload: { params: ['Bob'] },
       meta: { name: 'Bob' },
-      callbacks: {}
+      callbacks: {},
     })
 
     subject.next({
       type: RUN,
       payload: { params: ['Alice'] },
       meta: { name: 'Alice' },
-      callbacks: {}
+      callbacks: {},
     })
 
     subject.next({
       type: RUN,
       payload: { params: ['Eve'] },
       meta: { name: 'Eve' },
-      callbacks: {}
+      callbacks: {},
     })
 
     mockApi.mock.results[3].value.then(() => {
-
       expect(mockCallback).toBeCalledTimes(11)
 
       expect(mockCallback).nthCalledWith(1, {
         type: RUN,
         payload: { params: ['Alice'] },
         meta: { name: 'Alice' },
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(2, {
         type: PENDING,
-        meta: { name: 'Alice' }
+        meta: { name: 'Alice' },
       })
 
       expect(mockCallback).nthCalledWith(3, {
         type: RUN,
         payload: { params: ['Bob'] },
         meta: { name: 'Bob' },
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(4, {
         type: PENDING,
-        meta: { name: 'Bob' }
+        meta: { name: 'Bob' },
       })
 
       expect(mockCallback).nthCalledWith(5, {
         type: RUN,
         payload: { params: ['Alice'] },
         meta: { name: 'Alice' },
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(6, {
         type: PENDING,
-        meta: { name: 'Alice' }
+        meta: { name: 'Alice' },
       })
 
       expect(mockCallback).nthCalledWith(7, {
         type: RUN,
         payload: { params: ['Eve'] },
         meta: { name: 'Eve' },
-        callbacks: {}
+        callbacks: {},
       })
 
       expect(mockCallback).nthCalledWith(8, {
         type: PENDING,
-        meta: { name: 'Eve' }
+        meta: { name: 'Eve' },
       })
 
       expect(mockCallback).nthCalledWith(9, {
@@ -543,8 +515,8 @@ describe('RJ side effect model', () => {
         meta: { name: 'Bob' },
         payload: {
           params: ['Bob'],
-          data: 'Bob is cool 1'
-        }
+          data: 'Bob is cool 1',
+        },
       })
 
       expect(mockCallback).nthCalledWith(10, {
@@ -552,8 +524,8 @@ describe('RJ side effect model', () => {
         meta: { name: 'Alice' },
         payload: {
           params: ['Alice'],
-          data: 'Alice is cool 2'
-        }
+          data: 'Alice is cool 2',
+        },
       })
 
       expect(mockCallback).nthCalledWith(11, {
@@ -561,15 +533,15 @@ describe('RJ side effect model', () => {
         meta: { name: 'Eve' },
         payload: {
           params: ['Eve'],
-          data: 'Eve is cool 1'
-        }
+          data: 'Eve is cool 1',
+        },
       })
 
       done()
     })
   })
 
-  it ('gets angry if no groupBy function is injected', () => {
+  it('gets angry if no groupBy function is injected', () => {
     const counterByName = {}
 
     const mockApi = jest.fn(
@@ -580,20 +552,17 @@ describe('RJ side effect model', () => {
         })
     )
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockApi,
-      takeEffect: TAKE_EFFECT_GROUP_BY
+      takeEffect: TAKE_EFFECT_GROUP_BY,
     })()
 
     const subject = new Subject()
 
     expect(() => makeRxObservable(subject.asObservable())).toThrow()
-
   })
 
-  it ('gets angry if unknown groupBy function is injected', () => {
+  it('gets angry if unknown groupBy function is injected', () => {
     const counterByName = {}
 
     const mockApi = jest.fn(
@@ -604,26 +573,21 @@ describe('RJ side effect model', () => {
         })
     )
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockApi,
-      takeEffect: "blabla"
+      takeEffect: 'blabla',
     })()
 
     const subject = new Subject()
 
     expect(() => makeRxObservable(subject.asObservable())).toThrow()
-
   })
 
-  it ('calls onSuccess callback when SUCCESS is produced', done => {
+  it('calls onSuccess callback when SUCCESS is produced', done => {
     const mockApiResult = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockApi,
     })()
 
@@ -631,7 +595,6 @@ describe('RJ side effect model', () => {
     makeRxObservable(subject.asObservable()).subscribe(() => {})
 
     const check = arg => {
-
       expect(arg).toEqual(mockApiResult)
 
       done()
@@ -642,18 +605,15 @@ describe('RJ side effect model', () => {
       payload: { params: [] },
       meta: {},
       callbacks: {
-        onSuccess: check
-      }
-    })    
-
+        onSuccess: check,
+      },
+    })
   })
 
-  it ('calls onFailure callback when SUCCESS is produced', done => {
-    const mockApi = jest.fn(() => Promise.reject('Something bad happened'));
+  it('calls onFailure callback when SUCCESS is produced', done => {
+    const mockApi = jest.fn(() => Promise.reject('Something bad happened'))
 
-    const {
-      makeRxObservable
-    } = rj({
+    const { makeRxObservable } = rj({
       effect: mockApi,
     })()
 
@@ -661,7 +621,6 @@ describe('RJ side effect model', () => {
     makeRxObservable(subject.asObservable()).subscribe(() => {})
 
     const check = arg => {
-
       expect(arg).toEqual('Something bad happened')
 
       done()
@@ -672,10 +631,8 @@ describe('RJ side effect model', () => {
       payload: { params: [] },
       meta: {},
       callbacks: {
-        onFailure: check
-      }
-    })    
-
+        onFailure: check,
+      },
+    })
   })
-
 })

@@ -17,37 +17,36 @@ describe('Rocketjump selectors', () => {
   }
 
   const rjSelectors = (...config) => {
-    return rj(...config)().makeSelectors();
+    return rj(...config)().makeSelectors()
   }
 
   it('should be getData, isLoading, getError, getBaseState', () => {
-
     const selectors = rjSelectors({
-      effect: () => Promise.resolve(1)
+      effect: () => Promise.resolve(1),
     })
 
     expect(selectors.isLoading(mockState)).toBe(mockState.pending)
     expect(selectors.isPending(mockState)).toBe(mockState.pending)
     expect(selectors.getError(mockState)).toBe(mockState.error)
     expect(selectors.getData(mockState)).toBe(mockState.data)
-
   })
 
   it('should be proxable and extendible', () => {
     const selectors = rjSelectors({
       effect: () => Promise.resolve(1),
       selectors: ({ getData }) => ({
-        getData: state => getData(state).map(s => ({
-          ...s,
-          name: s.name.toUpperCase(),
-          fresh: true,
-        })),
+        getData: state =>
+          getData(state).map(s => ({
+            ...s,
+            name: s.name.toUpperCase(),
+            fresh: true,
+          })),
         getOldest: state => {
           let people = [...getData(state)]
-          people.sort((a, b) => b.age - a.age);
+          people.sort((a, b) => b.age - a.age)
           return people[0]
-        }
-      })
+        },
+      }),
     })
 
     expect(selectors.getData(mockState)).toEqual([
@@ -60,63 +59,62 @@ describe('Rocketjump selectors', () => {
         name: 'BOB',
         fresh: true,
         age: 29,
-      }
+      },
     ])
 
     expect(selectors.getOldest(mockState)).toEqual({
       name: 'Bob',
       age: 29,
     })
-
   })
 
   it('should be composable', () => {
-
     const rjIsAlive = rj({
       selectors: ({ getData }) => ({
-        getData: state => getData(state).map(s => ({
-          ...s,
-          isAlive: s.age < 27,
-        }))
+        getData: state =>
+          getData(state).map(s => ({
+            ...s,
+            isAlive: s.age < 27,
+          })),
       }),
     })
 
-    const capitalize = s => s.slice(0, 1).toUpperCase() + s.slice(1).toLowerCase()
+    const capitalize = s =>
+      s.slice(0, 1).toUpperCase() + s.slice(1).toLowerCase()
 
     const rjRangerName = rj({
       selectors: ({ getData }) => ({
-        getData: state => getData(state).map(s => ({
-          ...s,
-          rangerName: [s.name.slice(0, -2), s.name.slice(-2)]
-            .map(capitalize)
-            .join(' '),
-        }))
+        getData: state =>
+          getData(state).map(s => ({
+            ...s,
+            rangerName: [s.name.slice(0, -2), s.name.slice(-2)]
+              .map(capitalize)
+              .join(' '),
+          })),
       }),
     })
 
-    const rjPoliteRanger = rj(
-      rjIsAlive,
-      rjRangerName,
-      {
-        selectors: ({ getData }) => ({
-          getData: state => getData(state).map(s => ({
+    const rjPoliteRanger = rj(rjIsAlive, rjRangerName, {
+      selectors: ({ getData }) => ({
+        getData: state =>
+          getData(state).map(s => ({
             ...s,
             hello: `My name is ${s.rangerName} an i am ${s.age}`,
-          }))
-        })
-      }
-    )
+          })),
+      }),
+    })
 
     const selectors = rjSelectors(rjPoliteRanger, {
       effect: () => Promise.resolve(1),
       selectors: ({ getData }) => ({
-        getData: state => getData(state).map(s => ({
-          ...s,
-          hello: s.isAlive
-            ? `${s.hello} and i am alive`
-            : `${s.hello} and i am a ghost`,
-        }))
-      })
+        getData: state =>
+          getData(state).map(s => ({
+            ...s,
+            hello: s.isAlive
+              ? `${s.hello} and i am alive`
+              : `${s.hello} and i am a ghost`,
+          })),
+      }),
     })
 
     expect(selectors.getData(mockState)).toEqual([

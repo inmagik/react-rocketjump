@@ -4,12 +4,11 @@ import Enzyme, { shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import { RUN, CLEAN, SUCCESS } from '../actionTypes'
 
-Enzyme.configure({ adapter: new Adapter() });
+Enzyme.configure({ adapter: new Adapter() })
 
 describe('React-RocketJump actions', () => {
-
   const makeRjComponent = rjState => {
-    const Component = (props) => null
+    const Component = props => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -26,23 +25,21 @@ describe('React-RocketJump actions', () => {
   }
 
   it('should produce default actions', () => {
-
-    const rjState = reactRj(() => Promise.resolve([{ id: 1, name: 'admin' }]));
+    const rjState = reactRj(() => Promise.resolve([{ id: 1, name: 'admin' }]))
 
     const wrapper = makeRjComponent(rjState)
 
     expect(wrapper.props()).toHaveProperty('run')
     expect(wrapper.props()).toHaveProperty('clean')
-
   })
 
   it('should produce a good run action', () => {
-    const actionLog = [];
+    const actionLog = []
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN])
-    });
+      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+    })
 
     const wrapper = makeRjComponent(rjState)
 
@@ -51,23 +48,23 @@ describe('React-RocketJump actions', () => {
     expect(actionLog[0]).toEqual({
       type: RUN,
       payload: {
-        params: [1, 'a', {}, undefined]
+        params: [1, 'a', {}, undefined],
       },
       meta: {},
       callbacks: {
         onSuccess: undefined,
-        onFailure: undefined
-      }
+        onFailure: undefined,
+      },
     })
   })
 
   it('should produce a good clean action', () => {
-    const actionLog = [];
+    const actionLog = []
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [CLEAN])
-    });
+      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [CLEAN]),
+    })
 
     const wrapper = makeRjComponent(rjState)
 
@@ -76,21 +73,20 @@ describe('React-RocketJump actions', () => {
     expect(actionLog[0]).toEqual({
       type: CLEAN,
       payload: {
-        params: [1, 'a', {}, undefined]
+        params: [1, 'a', {}, undefined],
       },
       meta: {},
       callbacks: {
         onSuccess: undefined,
-        onFailure: undefined
-      }
+        onFailure: undefined,
+      },
     })
   })
 
   it('should expose builder', () => {
-
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-    });
+    })
 
     const wrapper = makeRjComponent(rjState)
 
@@ -101,10 +97,9 @@ describe('React-RocketJump actions', () => {
   })
 
   it('should now allow direct run invocation', () => {
-
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-    });
+    })
 
     const wrapper = makeRjComponent(rjState)
 
@@ -113,8 +108,8 @@ describe('React-RocketJump actions', () => {
 
   it('should use onSuccess', done => {
     const rjState = reactRj({
-      effect: () => Promise.resolve([{ id: 1, name: 'admin' }])
-    });
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+    })
 
     const wrapper = makeRjComponent(rjState)
 
@@ -125,15 +120,16 @@ describe('React-RocketJump actions', () => {
 
     const onSuccess = jest.fn(successHandler)
 
-    wrapper.prop('run')
+    wrapper
+      .prop('run')
       .onSuccess(onSuccess)
       .run()
   })
 
   it('should use onFailure', done => {
     const rjState = reactRj({
-      effect: () => Promise.reject()
-    });
+      effect: () => Promise.reject(),
+    })
 
     const wrapper = makeRjComponent(rjState)
 
@@ -144,18 +140,19 @@ describe('React-RocketJump actions', () => {
 
     const onFailure = jest.fn(handler)
 
-    wrapper.prop('run')
+    wrapper
+      .prop('run')
       .onFailure(onFailure)
       .run()
   })
 
   it('should use plain meta data', done => {
-    const actionLog = [];
+    const actionLog = []
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN])
-    });
+      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+    })
 
     const wrapper = makeRjComponent(rjState)
 
@@ -164,19 +161,20 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper.prop('run')
+    wrapper
+      .prop('run')
       .withMeta({ a: 1 })
       .onSuccess(onSuccess)
       .run()
   })
 
   it('should compose plain meta data', done => {
-    const actionLog = [];
+    const actionLog = []
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN])
-    });
+      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+    })
 
     const wrapper = makeRjComponent(rjState)
 
@@ -185,7 +183,8 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper.prop('run')
+    wrapper
+      .prop('run')
       .withMeta({ a: 1 })
       .withMeta({ b: 2 })
       .withMeta({ a: 2, c: 3 })
@@ -194,12 +193,12 @@ describe('React-RocketJump actions', () => {
   })
 
   it('should use meta data transform', done => {
-    const actionLog = [];
+    const actionLog = []
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN])
-    });
+      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+    })
 
     const wrapper = makeRjComponent(rjState)
 
@@ -208,7 +207,8 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper.prop('run')
+    wrapper
+      .prop('run')
       .withMeta({ a: 1 })
       .withMeta(() => ({}))
       .onSuccess(onSuccess)
@@ -216,12 +216,12 @@ describe('React-RocketJump actions', () => {
   })
 
   it('should use meta data transform correctly', done => {
-    const actionLog = [];
+    const actionLog = []
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN])
-    });
+      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+    })
 
     const wrapper = makeRjComponent(rjState)
 
@@ -230,7 +230,8 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper.prop('run')
+    wrapper
+      .prop('run')
       .withMeta({ a: 1 })
       .withMeta(oldMeta => ({ b: oldMeta.a, a: 2 }))
       .onSuccess(onSuccess)
@@ -238,16 +239,15 @@ describe('React-RocketJump actions', () => {
   })
 
   it('should allow action renaming', () => {
-
     const rjState = reactRj({
-      effect: () => Promise.resolve([{ id: 1, name: 'admin' }])
-    });
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+    })
 
-    const Component = (props) => null
+    const Component = props => null
 
     const RjComponent = connectRj(rjState, undefined, ({ run, clean }) => ({
       fetchTodos: run,
-      cleanTodos: clean
+      cleanTodos: clean,
     }))(Component)
 
     const wrapper = shallow(<RjComponent />).find(Component)
@@ -256,7 +256,6 @@ describe('React-RocketJump actions', () => {
     expect(wrapper.props()).toHaveProperty('cleanTodos')
     expect(wrapper.props()).not.toHaveProperty('run')
     expect(wrapper.props()).not.toHaveProperty('clean')
-
   })
 
   it('should allow action proxying', done => {
@@ -265,12 +264,13 @@ describe('React-RocketJump actions', () => {
     const rjState = reactRj({
       effect: id => Promise.resolve([{ id: id + 7, name: 'admin' }]),
       actions: ({ run }) => ({
-        run: id => run(id * 2)
+        run: id => run(id * 2),
       }),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [SUCCESS])
-    });
+      reducer: oldReducer =>
+        makeActionObserver(oldReducer, actionLog, [SUCCESS]),
+    })
 
-    const Component = (props) => null
+    const Component = props => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -282,13 +282,14 @@ describe('React-RocketJump actions', () => {
         meta: {},
         payload: {
           data: [{ id: 9, name: 'admin' }],
-          params: [2]
-        }
+          params: [2],
+        },
       })
       done()
     }
 
-    wrapper.prop('run')
+    wrapper
+      .prop('run')
       .onSuccess(onSuccess)
       .run(1)
   })
@@ -299,12 +300,13 @@ describe('React-RocketJump actions', () => {
     const rjState = reactRj({
       effect: id => Promise.resolve([{ id: id + 7, name: 'admin' }]),
       actions: ({ run }) => ({
-        runDouble: id => run(id * 2)
+        runDouble: id => run(id * 2),
       }),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [SUCCESS])
-    });
+      reducer: oldReducer =>
+        makeActionObserver(oldReducer, actionLog, [SUCCESS]),
+    })
 
-    const Component = (props) => null
+    const Component = props => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -316,8 +318,8 @@ describe('React-RocketJump actions', () => {
         meta: {},
         payload: {
           data: [{ id: 9, name: 'admin' }],
-          params: [2]
-        }
+          params: [2],
+        },
       })
       done()
     }
@@ -325,7 +327,8 @@ describe('React-RocketJump actions', () => {
     expect(wrapper.props()).toHaveProperty('run')
     expect(wrapper.props()).toHaveProperty('runDouble')
 
-    wrapper.prop('runDouble')
+    wrapper
+      .prop('runDouble')
       .onSuccess(onSuccess)
       .run(1)
   })
@@ -336,12 +339,13 @@ describe('React-RocketJump actions', () => {
     const rjState = reactRj({
       effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
       actions: ({ run }) => ({
-        runObject: object => run(object.id, object.name)
+        runObject: object => run(object.id, object.name),
       }),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [SUCCESS])
-    });
+      reducer: oldReducer =>
+        makeActionObserver(oldReducer, actionLog, [SUCCESS]),
+    })
 
-    const Component = (props) => null
+    const Component = props => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -353,13 +357,14 @@ describe('React-RocketJump actions', () => {
         meta: {},
         payload: {
           data: [{ id: 8, name: 'admin' }],
-          params: [1, 'admin']
-        }
+          params: [1, 'admin'],
+        },
       })
       done()
     }
 
-    wrapper.prop('runObject')
+    wrapper
+      .prop('runObject')
       .onSuccess(onSuccess)
       .run({ id: 1, name: 'admin' })
   })
@@ -370,12 +375,13 @@ describe('React-RocketJump actions', () => {
     const rjState = reactRj({
       effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
       actions: ({ run }) => ({
-        runObject: object => run(object.id, object.name).withMeta({ z: 1 })
+        runObject: object => run(object.id, object.name).withMeta({ z: 1 }),
       }),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [SUCCESS])
-    });
+      reducer: oldReducer =>
+        makeActionObserver(oldReducer, actionLog, [SUCCESS]),
+    })
 
-    const Component = (props) => null
+    const Component = props => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -387,13 +393,14 @@ describe('React-RocketJump actions', () => {
         meta: { z: 1 },
         payload: {
           data: [{ id: 8, name: 'admin' }],
-          params: [1, 'admin']
-        }
+          params: [1, 'admin'],
+        },
       })
       done()
     }
 
-    wrapper.prop('runObject')
+    wrapper
+      .prop('runObject')
       .onSuccess(onSuccess)
       .run({ id: 1, name: 'admin' })
   })
@@ -404,12 +411,16 @@ describe('React-RocketJump actions', () => {
     const rjState = reactRj({
       effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
       actions: ({ run }) => ({
-        runObject: object => run(object.id, object.name).withMeta({ z: 1 }).withMeta(({ z }) => ({ x: z }))
+        runObject: object =>
+          run(object.id, object.name)
+            .withMeta({ z: 1 })
+            .withMeta(({ z }) => ({ x: z })),
       }),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [SUCCESS])
-    });
+      reducer: oldReducer =>
+        makeActionObserver(oldReducer, actionLog, [SUCCESS]),
+    })
 
-    const Component = (props) => null
+    const Component = props => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -421,13 +432,14 @@ describe('React-RocketJump actions', () => {
         meta: { x: 1 },
         payload: {
           data: [{ id: 8, name: 'admin' }],
-          params: [1, 'admin']
-        }
+          params: [1, 'admin'],
+        },
       })
       done()
     }
 
-    wrapper.prop('runObject')
+    wrapper
+      .prop('runObject')
       .onSuccess(onSuccess)
       .run({ id: 1, name: 'admin' })
   })
@@ -437,20 +449,19 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, ['CUSTOM'])
-    });
+      reducer: oldReducer =>
+        makeActionObserver(oldReducer, actionLog, ['CUSTOM']),
+    })
 
-    const Component = (props) => null
+    const Component = props => null
 
     const RjComponent = connectRj(rjState, undefined, ({ run, clean }) => ({
       run,
       clean,
-      custom: () => ({ type: 'CUSTOM' })
+      custom: () => ({ type: 'CUSTOM' }),
     }))(Component)
 
     const wrapper = shallow(<RjComponent />).find(Component)
-
-
 
     wrapper.prop('custom')()
 
@@ -462,25 +473,28 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, ['CUSTOM'])
-    });
+      reducer: oldReducer =>
+        makeActionObserver(oldReducer, actionLog, ['CUSTOM']),
+    })
 
-    const Component = (props) => null
+    const Component = props => null
 
     const RjComponent = connectRj(rjState, undefined, ({ run, clean }) => ({
       run,
       clean,
-      custom: () => ({ type: 'CUSTOM' })
+      custom: () => ({ type: 'CUSTOM' }),
     }))(Component)
 
     const wrapper = shallow(<RjComponent />).find(Component)
 
     const onSuccess = jest.fn()
 
-    wrapper.prop('custom').onSuccess(onSuccess).run()
+    wrapper
+      .prop('custom')
+      .onSuccess(onSuccess)
+      .run()
 
     expect(actionLog[0]).toEqual({ type: 'CUSTOM' })
     expect(onSuccess).not.toHaveBeenCalled()
   })
-
 })

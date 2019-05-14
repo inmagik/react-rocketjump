@@ -1,25 +1,27 @@
-import { rj } from "../../.."
-import rjList from ".."
-import { nextPreviousPaginationAdapter, limitOffsetPaginationAdapter } from "../pagination"
-import { SUCCESS } from "../../../actionTypes";
+import { rj } from '../../..'
+import rjList from '..'
+import {
+  nextPreviousPaginationAdapter,
+  limitOffsetPaginationAdapter,
+} from '../pagination'
+import { SUCCESS } from '../../../actionTypes'
 
 describe('List Plugin', () => {
   it('should make a list paginated reducer', () => {
-
     const { reducer } = rj(
       rjList({
         pageSize: 100,
-        pagination: nextPreviousPaginationAdapter
+        pagination: nextPreviousPaginationAdapter,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
     const prevState = {
       data: null,
       pending: false,
-      error: null
+      error: null,
     }
 
     const action = {
@@ -73,20 +75,19 @@ describe('List Plugin', () => {
             id: 7,
             name: 'Eve',
           },
-        ]
-      }
+        ],
+      },
     })
   })
 
   it('should append items when meta append', () => {
-
     const { reducer } = rj(
       rjList({
         pageSize: 100,
-        pagination: nextPreviousPaginationAdapter
+        pagination: nextPreviousPaginationAdapter,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
@@ -100,7 +101,7 @@ describe('List Plugin', () => {
         ],
       },
       pending: false,
-      error: null
+      error: null,
     }
 
     const action = {
@@ -134,7 +135,6 @@ describe('List Plugin', () => {
       pending: false,
       error: null,
       data: {
-
         pagination: {
           count: 99,
           current: { page: 1 },
@@ -159,19 +159,18 @@ describe('List Plugin', () => {
             name: 'Eve',
           },
         ],
-      }
+      },
     })
   })
 
   it('should prepend items when meta prepend', () => {
-
     const { reducer } = rj(
       rjList({
         pageSize: 100,
-        pagination: nextPreviousPaginationAdapter
+        pagination: nextPreviousPaginationAdapter,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
@@ -185,7 +184,7 @@ describe('List Plugin', () => {
         ],
       },
       pending: false,
-      error: null
+      error: null,
     }
 
     const action = {
@@ -219,7 +218,6 @@ describe('List Plugin', () => {
       pending: false,
       error: null,
       data: {
-
         pagination: {
           count: 99,
           current: { page: 1 },
@@ -244,19 +242,18 @@ describe('List Plugin', () => {
             name: 'Mallory',
           },
         ],
-      }
+      },
     })
   })
 
   it('should make selectors for list', () => {
-
     const { makeSelectors } = rj(
       rjList({
         pageSize: 10,
-        pagination: nextPreviousPaginationAdapter
+        pagination: nextPreviousPaginationAdapter,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
@@ -268,7 +265,7 @@ describe('List Plugin', () => {
       hasPrev,
       getNext,
       getPrev,
-      getCurrent
+      getCurrent,
     } = makeSelectors()
 
     const state = {
@@ -308,21 +305,21 @@ describe('List Plugin', () => {
   })
 
   it('should use fallback reducer', () => {
+    const fallbackReducer = jest.fn((state, action) => state)
 
-    const fallbackReducer = jest.fn((state, action) => state);
-
-    const otherPlugin = () => rj({
-      reducer: () => fallbackReducer
-    })
+    const otherPlugin = () =>
+      rj({
+        reducer: () => fallbackReducer,
+      })
 
     const { reducer } = rj(
       otherPlugin(),
       rjList({
         pageSize: 100,
-        pagination: nextPreviousPaginationAdapter
+        pagination: nextPreviousPaginationAdapter,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
@@ -339,35 +336,30 @@ describe('List Plugin', () => {
     reducer(prevState, action)
 
     expect(fallbackReducer).toBeCalledWith(null, action)
-
   })
 
   it('should get angry if no pagesize is provided', () => {
-
-    expect(() => rjList({ pagination: nextPreviousPaginationAdapter })).toThrow()
-
+    expect(() =>
+      rjList({ pagination: nextPreviousPaginationAdapter })
+    ).toThrow()
   })
 
   it('should get angry if no pagination is provided', () => {
-
     expect(() => rjList({ pageSize: 100 })).toThrow()
-
   })
 
   it('should get angry if no config is provided', () => {
-
     expect(() => rjList()).toThrow()
-
   })
 
   it('should not break with null state', () => {
     const { makeSelectors } = rj(
       rjList({
         pageSize: 10,
-        pagination: nextPreviousPaginationAdapter
+        pagination: nextPreviousPaginationAdapter,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
@@ -379,7 +371,7 @@ describe('List Plugin', () => {
       hasPrev,
       getNext,
       getPrev,
-      getCurrent
+      getCurrent,
     } = makeSelectors()
 
     const state = {
@@ -398,29 +390,30 @@ describe('List Plugin', () => {
   })
 
   it('should allow custom list reducer', () => {
-
     const customReducer = jest.fn((oldList, action) => {
-      return action.payload.data.results.filter(item => item.name.startsWith('A'))
+      return action.payload.data.results.filter(item =>
+        item.name.startsWith('A')
+      )
     })
 
     const { reducer } = rj(
       rjList({
         pageSize: 100,
         pagination: nextPreviousPaginationAdapter,
-        customListReducer: customReducer
+        customListReducer: customReducer,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
     const prevState = {
       data: {
         list: [],
-        pagination: null
+        pagination: null,
       },
       pending: false,
-      error: null
+      error: null,
     }
 
     const action = {
@@ -468,19 +461,17 @@ describe('List Plugin', () => {
             id: 23,
             name: 'Alice',
           },
-        ]
-      }
+        ],
+      },
     })
-
   })
 
   it('should allow custom pagination reducer', () => {
-
     const customReducer = jest.fn((oldPagination, action) => {
       return {
         a: 1,
         b: 2,
-        c: 3
+        c: 3,
       }
     })
 
@@ -488,20 +479,20 @@ describe('List Plugin', () => {
       rjList({
         pageSize: 100,
         pagination: nextPreviousPaginationAdapter,
-        customPaginationReducer: customReducer
+        customPaginationReducer: customReducer,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
     const prevState = {
       data: {
         list: [],
-        pagination: null
+        pagination: null,
       },
       pending: false,
-      error: null
+      error: null,
     }
 
     const action = {
@@ -541,7 +532,7 @@ describe('List Plugin', () => {
         pagination: {
           a: 1,
           b: 2,
-          c: 3
+          c: 3,
         },
         list: [
           {
@@ -556,20 +547,19 @@ describe('List Plugin', () => {
             id: 7,
             name: 'Eve',
           },
-        ]
-      }
+        ],
+      },
     })
-
   })
 
   it('supports limitOffset pagination', () => {
     const { makeSelectors, reducer } = rj(
       rjList({
         pageSize: 10,
-        pagination: limitOffsetPaginationAdapter
+        pagination: limitOffsetPaginationAdapter,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
@@ -581,7 +571,7 @@ describe('List Plugin', () => {
       hasPrev,
       getNext,
       getPrev,
-      getCurrent
+      getCurrent,
     } = makeSelectors()
 
     const state = {
@@ -631,11 +621,11 @@ describe('List Plugin', () => {
           results: [
             {
               id: '9',
-              name: 'Mallory'
-            }
-          ]
-        }
-      }
+              name: 'Mallory',
+            },
+          ],
+        },
+      },
     }
 
     const nextState = reducer(state, action)
@@ -648,19 +638,16 @@ describe('List Plugin', () => {
     expect(getNext(nextState)).toEqual({ limit: 10, offset: 40 })
     expect(getPrev(nextState)).toEqual({ limit: 10, offset: 20 })
     expect(getCurrent(nextState)).toEqual({ limit: 10, offset: 30 })
-
-
   })
-
 
   it('supports nextPrev pagination', () => {
     const { makeSelectors, reducer } = rj(
       rjList({
         pageSize: 10,
-        pagination: nextPreviousPaginationAdapter
+        pagination: nextPreviousPaginationAdapter,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
@@ -672,7 +659,7 @@ describe('List Plugin', () => {
       hasPrev,
       getNext,
       getPrev,
-      getCurrent
+      getCurrent,
     } = makeSelectors()
 
     const state = {
@@ -722,11 +709,11 @@ describe('List Plugin', () => {
           results: [
             {
               id: '9',
-              name: 'Mallory'
-            }
-          ]
-        }
-      }
+              name: 'Mallory',
+            },
+          ],
+        },
+      },
     }
 
     const nextState = reducer(state, action)
@@ -739,18 +726,16 @@ describe('List Plugin', () => {
     expect(getNext(nextState)).toEqual({ page: 3 })
     expect(getPrev(nextState)).toEqual({ page: 1 })
     expect(getCurrent(nextState)).toEqual({ page: 2 })
-
-
   })
 
   it('handles first load correctly with nextPrev adapter', () => {
     const { makeSelectors, reducer } = rj(
       rjList({
         pageSize: 10,
-        pagination: nextPreviousPaginationAdapter
+        pagination: nextPreviousPaginationAdapter,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
@@ -762,13 +747,13 @@ describe('List Plugin', () => {
       hasPrev,
       getNext,
       getPrev,
-      getCurrent
+      getCurrent,
     } = makeSelectors()
 
     const state = {
       loading: false,
       error: null,
-      data: null
+      data: null,
     }
 
     const action = {
@@ -782,11 +767,11 @@ describe('List Plugin', () => {
           results: [
             {
               id: '9',
-              name: 'Mallory'
-            }
-          ]
-        }
-      }
+              name: 'Mallory',
+            },
+          ],
+        },
+      },
     }
 
     const nextState = reducer(state, action)
@@ -799,18 +784,16 @@ describe('List Plugin', () => {
     expect(getNext(nextState)).toEqual({ page: 2 })
     expect(getPrev(nextState)).toEqual(null)
     expect(getCurrent(nextState)).toEqual({ page: 1 })
-
-
   })
 
   it('handles first load correctly with limitOffset adapter', () => {
     const { makeSelectors, reducer } = rj(
       rjList({
         pageSize: 10,
-        pagination: limitOffsetPaginationAdapter
+        pagination: limitOffsetPaginationAdapter,
       }),
       {
-        effect: () => Promise.resolve(1)
+        effect: () => Promise.resolve(1),
       }
     )()
 
@@ -822,13 +805,13 @@ describe('List Plugin', () => {
       hasPrev,
       getNext,
       getPrev,
-      getCurrent
+      getCurrent,
     } = makeSelectors()
 
     const state = {
       loading: false,
       error: null,
-      data: null
+      data: null,
     }
 
     const action = {
@@ -842,11 +825,11 @@ describe('List Plugin', () => {
           results: [
             {
               id: '9',
-              name: 'Mallory'
-            }
-          ]
-        }
-      }
+              name: 'Mallory',
+            },
+          ],
+        },
+      },
     }
 
     const nextState = reducer(state, action)
@@ -859,8 +842,5 @@ describe('List Plugin', () => {
     expect(getNext(nextState)).toEqual({ limit: 10, offset: 10 })
     expect(getPrev(nextState)).toEqual(null)
     expect(getCurrent(nextState)).toEqual({ limit: 10, offset: 0 })
-
-
   })
-
 })

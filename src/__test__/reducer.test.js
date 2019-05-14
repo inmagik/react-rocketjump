@@ -2,10 +2,9 @@ import { rj } from '..'
 import { PENDING, SUCCESS, FAILURE, CLEAN } from '../actionTypes'
 
 describe('Rocketjump reducer', () => {
-
   it('should return the initial state', () => {
     const { reducer } = rj({
-      effect: () => Promise.resolve(1)
+      effect: () => Promise.resolve(1),
     })()
 
     expect(reducer(undefined, { type: '@' })).toEqual({
@@ -23,9 +22,9 @@ describe('Rocketjump reducer', () => {
     }
 
     const { reducer } = rj({
-      effect: () => Promise.resolve(1)
+      effect: () => Promise.resolve(1),
     })()
-    
+
     expect(reducer(prevState, { type: PENDING })).toEqual({
       pending: true,
       data: 'custom_data',
@@ -39,9 +38,9 @@ describe('Rocketjump reducer', () => {
       data: null,
       error: null,
     }
-    
+
     const { reducer } = rj({
-      effect: () => Promise.resolve(1)
+      effect: () => Promise.resolve(1),
     })()
 
     expect(
@@ -65,7 +64,7 @@ describe('Rocketjump reducer', () => {
     }
 
     const { reducer } = rj({
-      effect: () => Promise.resolve(1)
+      effect: () => Promise.resolve(1),
     })()
 
     expect(
@@ -84,11 +83,11 @@ describe('Rocketjump reducer', () => {
       error: 'Too many errors... Always...',
       customKey: 23,
     }
-    
+
     const { reducer } = rj({
-      effect: () => Promise.resolve(1)
+      effect: () => Promise.resolve(1),
     })()
-    
+
     expect(reducer(prevState, { type: CLEAN })).toEqual({
       pending: false,
       data: null,
@@ -116,7 +115,7 @@ describe('Rocketjump reducer', () => {
       data: null,
       error: null,
     }
-    
+
     expect(
       reducer(prevState, { type: SUCCESS, payload: { data: 'Maik' } })
     ).toEqual({
@@ -169,7 +168,7 @@ describe('Rocketjump reducer', () => {
       hisCustomKey: 1,
       myCustomKey: 12,
     })
-    
+
     state = reducer(state, { type: 'COMPUTE_BRAIN_AGE' })
     expect(state).toEqual({
       pending: false,
@@ -179,5 +178,4 @@ describe('Rocketjump reducer', () => {
       myCustomKey: 'Your brain age is: 24',
     })
   })
-
 })

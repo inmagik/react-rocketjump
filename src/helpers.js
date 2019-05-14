@@ -1,6 +1,9 @@
 export function get(obj, path, defaultValue = undefined) {
   const keys = path.split('.')
-  const result = obj === null ? undefined : keys.reduce((context, current) => context[current], obj)
+  const result =
+    obj === null
+      ? undefined
+      : keys.reduce((context, current) => context[current], obj)
   return result === undefined ? defaultValue : result
 }
 
@@ -12,7 +15,7 @@ export function set(obj, path, value) {
 
 export function keyBy(list, keyFunc = a => a) {
   let out = {}
-  list.forEach(item => out[keyFunc(item)] = item)
+  list.forEach(item => (out[keyFunc(item)] = item))
   return out
 }
 

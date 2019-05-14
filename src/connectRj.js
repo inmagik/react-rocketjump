@@ -1,7 +1,12 @@
 import React, { useMemo } from 'react'
 import hoistStatics from 'hoist-non-react-statics'
 import bindActionCreators from './bindActionCreators'
-import { useRxSubject, useReduxReducer, useConstant, useCreateRjState } from './hooks'
+import {
+  useRxSubject,
+  useReduxReducer,
+  useConstant,
+  useCreateRjState,
+} from './hooks'
 
 const defaultMapActionsToProps = a => a
 
@@ -12,7 +17,6 @@ export default function connectRj(
   mapActionsToProps = defaultMapActionsToProps
 ) {
   return function wrapWithConnect(WrappedComponent) {
-
     function ConnectFunction(props) {
       const rjRunnableState = useCreateRjState(rjStateOrPartial)
       const {
