@@ -1,7 +1,10 @@
+/example
 /src
 /scripts
 .babel*
+.webpack.config.*
 rollup.config.js
+db.json
 
 # dependencies
 /node_modules
