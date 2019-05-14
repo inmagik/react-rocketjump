@@ -1,5 +1,6 @@
 import { rj } from '..'
 import { Subject } from 'rxjs'
+import { mergeMap } from 'rxjs/operators'
 import { PENDING, SUCCESS, FAILURE, CLEAN, RUN } from '../actionTypes'
 import {
   TAKE_EFFECT_EVERY,
@@ -880,6 +881,32 @@ describe('RJ side effect model', () => {
     const subject = new Subject()
 
     expect(() => makeRxObservable(subject.asObservable())).toThrow()
+  })
+
+  it('call provided takeEffect when function is given', () => {
+    const mockApi = jest.fn().mockResolvedValue(1312)
+    const customMockTakeEffect = jest
+      .fn()
+      // NOTE: the only scope of writing this implementation
+      // is to avoid makeRxObservable to throw shit
+      .mockImplementation(mapTo$ => mergeMap(mapTo$))
+
+    const { makeRxObservable } = rj({
+      effect: mockApi,
+      takeEffect: customMockTakeEffect,
+    })()
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable()).subscribe(() => {})
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+    // FIXME this is a poor test think somenthing better haha
+    expect(customMockTakeEffect).toHaveBeenCalledTimes(1)
   })
 
   it('calls onSuccess callback when SUCCESS is produced', done => {

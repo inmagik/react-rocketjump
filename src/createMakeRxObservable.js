@@ -25,9 +25,7 @@ export default function createMakeRxObservable({
   takeEffect,
 }) {
   return function makeRxObservable($source) {
-    const [effectType, ...effectTypeArgs] = takeEffect
-
-    const mapActionToObserableEffect = action => {
+    function mapActionToObserable(action) {
       if (action.type === CLEAN) {
         return of(action)
       }
@@ -60,17 +58,22 @@ export default function createMakeRxObservable({
       )
     }
 
-    // TODO
-    // implement custom takeEffect
+    const [effectType, ...effectTypeArgs] = takeEffect
 
-    if (effectType === TAKE_EFFECT_EVERY) {
-      return $source.pipe(mergeMap(mapActionToObserableEffect))
+    // Custom take effect
+    if (typeof effectType === 'function') {
+      // TODO: Maybe in future check the return value of
+      // custom take effect and print some warning to help
+      // developers to better debugging better rj configuration
+      return $source.pipe(effectType(mapActionToObserable))
+    } else if (effectType === TAKE_EFFECT_EVERY) {
+      return $source.pipe(mergeMap(mapActionToObserable))
     } else if (effectType === TAKE_EFFECT_LATEST) {
-      return $source.pipe(switchMap(mapActionToObserableEffect))
+      return $source.pipe(switchMap(mapActionToObserable))
     } else if (effectType === TAKE_EFFECT_QUEUE) {
-      return $source.pipe(concatMap(mapActionToObserableEffect))
+      return $source.pipe(concatMap(mapActionToObserable))
     } else if (effectType === TAKE_EFFECT_EXHAUST) {
-      return $source.pipe(exhaustMap(mapActionToObserableEffect))
+      return $source.pipe(exhaustMap(mapActionToObserable))
     } else if (effectType === TAKE_EFFECT_GROUP_BY) {
       const groupByFn = effectTypeArgs[0]
       if (typeof groupByFn !== 'function') {
@@ -81,7 +84,7 @@ export default function createMakeRxObservable({
       }
       return $source.pipe(
         groupBy(groupByFn),
-        mergeMap(group => group.pipe(switchMap(mapActionToObserableEffect)))
+        mergeMap(group => group.pipe(switchMap(mapActionToObserable)))
       )
     } else {
       throw new Error(
