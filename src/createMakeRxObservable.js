@@ -3,7 +3,7 @@ import {
   map,
   switchMap,
   mergeMap,
-  // exhaustMap,
+  exhaustMap,
   concatMap,
   catchError,
   groupBy,
@@ -14,6 +14,7 @@ import { SUCCESS, FAILURE, PENDING, CLEAN } from './actionTypes'
 export const TAKE_EFFECT_LATEST = 'latest'
 export const TAKE_EFFECT_EVERY = 'every'
 export const TAKE_EFFECT_QUEUE = 'queue'
+export const TAKE_EFFECT_EXHAUST = 'exhaust'
 export const TAKE_EFFECT_GROUP_BY = 'groupBy'
 
 const defaultCallEffect = (call, ...args) => call(...args)
@@ -60,7 +61,7 @@ export default function createMakeRxObservable({
     }
 
     // TODO
-    // implement exhaustMap and custom takeEffect
+    // implement custom takeEffect
 
     if (effectType === TAKE_EFFECT_EVERY) {
       return $source.pipe(mergeMap(mapActionToObserableEffect))
@@ -68,6 +69,8 @@ export default function createMakeRxObservable({
       return $source.pipe(switchMap(mapActionToObserableEffect))
     } else if (effectType === TAKE_EFFECT_QUEUE) {
       return $source.pipe(concatMap(mapActionToObserableEffect))
+    } else if (effectType === TAKE_EFFECT_EXHAUST) {
+      return $source.pipe(exhaustMap(mapActionToObserableEffect))
     } else if (effectType === TAKE_EFFECT_GROUP_BY) {
       const groupByFn = effectTypeArgs[0]
       if (typeof groupByFn !== 'function') {
