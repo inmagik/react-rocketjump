@@ -1,10 +1,10 @@
 import { rj } from '..'
 import { Subject } from 'rxjs'
-import { PENDING, SUCCESS, FAILURE, CLEAN } from '../actionTypes'
+import { PENDING, SUCCESS, FAILURE, CLEAN, RUN } from '../actionTypes'
 import {
-  RUN,
   TAKE_EFFECT_EVERY,
   TAKE_EFFECT_GROUP_BY,
+  TAKE_EFFECT_QUEUE,
 } from '../createMakeRxObservable'
 
 describe('RJ side effect model', () => {
@@ -291,6 +291,9 @@ describe('RJ side effect model', () => {
       callbacks: {},
     })
 
+    // At this point all the side effect fn are called
+    expect(mockApi).toBeCalledTimes(2)
+
     mockApi.mock.results[1].value.then(() => {
       expect(mockCallback).toBeCalledTimes(5)
 
@@ -361,6 +364,9 @@ describe('RJ side effect model', () => {
       callbacks: {},
     })
 
+    // At this point all the side effect fn are called
+    expect(mockApi).toBeCalledTimes(2)
+
     mockApi.mock.results[1].value.then(() => {
       expect(mockCallback).toBeCalledTimes(6)
 
@@ -407,6 +413,189 @@ describe('RJ side effect model', () => {
       })
 
       done()
+    })
+  })
+
+  it('takes every side effect and dispatch succees in order of completation', done => {
+    let resolves = []
+    const mockApi = jest
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise(resolve => {
+            resolves.push(() => resolve('Gio Va'))
+          })
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise(resolve => {
+            resolves.push(() => resolve('Ma Ik'))
+          })
+      )
+
+    const mockCallback = jest.fn()
+
+    const { makeRxObservable } = rj({
+      effect: mockApi,
+      takeEffect: TAKE_EFFECT_EVERY,
+    })()
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    // At this point all the side effect fn are called
+    expect(mockApi).toBeCalledTimes(2)
+
+    // Resolve the second promise
+    resolves[1]()
+    // ... then resolve the first promise
+    resolves[0]()
+
+    mockApi.mock.results[1].value.then(() => {
+      expect(mockCallback).toBeCalledTimes(6)
+
+      expect(mockCallback).nthCalledWith(1, {
+        type: RUN,
+        payload: { params: [] },
+        meta: {},
+        callbacks: {},
+      })
+
+      expect(mockCallback).nthCalledWith(2, {
+        type: PENDING,
+        meta: {},
+      })
+
+      expect(mockCallback).nthCalledWith(3, {
+        type: RUN,
+        payload: { params: [] },
+        meta: {},
+        callbacks: {},
+      })
+
+      expect(mockCallback).nthCalledWith(4, {
+        type: PENDING,
+        meta: {},
+      })
+
+      expect(mockCallback).nthCalledWith(5, {
+        type: SUCCESS,
+        meta: {},
+        payload: {
+          params: [],
+          data: 'Ma Ik',
+        },
+      })
+
+      expect(mockCallback).nthCalledWith(6, {
+        type: SUCCESS,
+        meta: {},
+        payload: {
+          params: [],
+          data: 'Gio Va',
+        },
+      })
+
+      done()
+    })
+  })
+
+  it('takes queue side effect when specified', done => {
+    const mockApi = jest
+      .fn()
+      .mockResolvedValueOnce('Gio Va')
+      .mockResolvedValueOnce('Ma Ik')
+
+    const mockCallback = jest.fn()
+
+    const { makeRxObservable } = rj({
+      effect: mockApi,
+      takeEffect: TAKE_EFFECT_QUEUE,
+    })()
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    // At this point only the first side effect function should be caled
+    expect(mockApi).toBeCalledTimes(1)
+
+    // TODO: write a test to check the catch vs then
+    mockApi.mock.results[0].value.then(() => {
+      // When the first resolves the second should be called
+      expect(mockApi).toBeCalledTimes(2)
+      mockApi.mock.results[1].value.then(() => {
+        expect(mockCallback).nthCalledWith(1, {
+          type: RUN,
+          payload: { params: [] },
+          meta: {},
+          callbacks: {},
+        })
+
+        expect(mockCallback).nthCalledWith(2, {
+          type: PENDING,
+          meta: {},
+        })
+
+        expect(mockCallback).nthCalledWith(3, {
+          type: SUCCESS,
+          meta: {},
+          payload: {
+            params: [],
+            data: 'Gio Va',
+          },
+        })
+
+        expect(mockCallback).nthCalledWith(4, {
+          type: RUN,
+          payload: { params: [] },
+          meta: {},
+          callbacks: {},
+        })
+
+        expect(mockCallback).nthCalledWith(5, {
+          type: PENDING,
+          meta: {},
+        })
+
+        expect(mockCallback).nthCalledWith(6, {
+          type: SUCCESS,
+          meta: {},
+          payload: {
+            params: [],
+            data: 'Ma Ik',
+          },
+        })
+
+        done()
+      })
     })
   })
 
