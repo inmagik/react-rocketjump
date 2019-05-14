@@ -1,3 +1,5 @@
+/website
+/docs
 /example
 /src
 /scripts
@@ -5,6 +7,10 @@
 .webpack.config.*
 rollup.config.js
 db.json
+
+docker-compose*.yml
+Dockerfile*
+.docker*
 
 # dependencies
 /node_modules
