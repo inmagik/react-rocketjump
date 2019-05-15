@@ -1,4 +1,4 @@
-import { RUN, CLEAN, EFFECT_ACTION } from './actionTypes'
+import { RUN, CLEAN, CANCEL, EFFECT_ACTION } from './actionTypes'
 
 /**
  * Mark an action as an effect action
@@ -84,6 +84,12 @@ export function run(...params) {
   return makeLibraryAction(RUN, ...params)
 }
 
+// TODO params really make sense for clean?
 export function clean(...params) {
   return makeLibraryAction(CLEAN, ...params)
+}
+
+// TODO params really make sense for cancel?
+export function cancel(...params) {
+  return makeLibraryAction(CANCEL, ...params)
 }
