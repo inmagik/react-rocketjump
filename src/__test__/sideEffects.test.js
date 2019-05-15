@@ -316,6 +316,7 @@ describe('RJ side effect model', () => {
   it('can unload a every side effect', done => {
     const mockApi = jest.fn()
       .mockResolvedValueOnce(1)
+      .mockResolvedValueOnce(2)
       .mockResolvedValueOnce(23)
     const mockCallback = jest.fn()
 
@@ -335,13 +336,20 @@ describe('RJ side effect model', () => {
     })
 
     subject.next({
+      type: RUN,
+      payload: { params: ['GioVa'] },
+      meta: {},
+      callbacks: {},
+    })
+
+    subject.next({
       type: CLEAN,
       payload: { params: [] },
       meta: {},
     })
 
-    mockApi.mock.results[0].value.then(() => {
-      expect(mockCallback).toBeCalledTimes(3)
+    mockApi.mock.results[1].value.then(() => {
+      expect(mockCallback).toBeCalledTimes(5)
 
       expect(mockCallback).nthCalledWith(1, {
         type: RUN,
@@ -356,6 +364,18 @@ describe('RJ side effect model', () => {
       })
 
       expect(mockCallback).nthCalledWith(3, {
+        type: RUN,
+        payload: { params: ['GioVa'] },
+        meta: {},
+        callbacks: {},
+      })
+
+      expect(mockCallback).nthCalledWith(4, {
+        type: PENDING,
+        meta: {},
+      })
+
+      expect(mockCallback).nthCalledWith(5, {
         type: CLEAN,
         meta: {},
         payload: {
@@ -371,21 +391,21 @@ describe('RJ side effect model', () => {
       })
 
       mockApi.mock.results[1].value.then(() => {
-        expect(mockCallback).toBeCalledTimes(6)
+        expect(mockCallback).toBeCalledTimes(8)
 
-        expect(mockCallback).nthCalledWith(4, {
+        expect(mockCallback).nthCalledWith(6, {
           type: RUN,
           payload: { params: [] },
           meta: {},
           callbacks: {},
         })
 
-        expect(mockCallback).nthCalledWith(5, {
+        expect(mockCallback).nthCalledWith(7, {
           type: PENDING,
           meta: {},
         })
 
-        expect(mockCallback).nthCalledWith(6, {
+        expect(mockCallback).nthCalledWith(8, {
           type: SUCCESS,
           meta: {},
           payload: {
