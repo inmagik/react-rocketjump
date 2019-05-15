@@ -21,6 +21,27 @@ each of which is a RocketJump `partial` except for the last one, which is a `con
 ## The config object
 The config object can contain the following properties
 
+### effect
+`(...args) => Promise`
+
+This function is the asynchronous task that we are creating a RocketJump for. Settings this property is very important, since its presence means that a RocketJump object will be created, and not a RocketJump partial. When creating plugins, just avoid setting this in order to make the plugin reusable!
+
+__Example__
+
+Making a simple RocketJump Object that makes a GET request (using SuperAgent syntax in our example) to some host
+
+```js
+const rjObject = rj({
+    effect: id => request.get(`https://my.host.dev/api/resource/${id}/`).then(({ body }) => body)
+})
+```
+
+There is also a shortcut syntax in case the `effect` option is the only option you need to set
+
+```js
+const rjObject = rj(id => request.get(`https://my.host.dev/api/resource/${id}/`).then(({ body }) => body))
+```
+
 ### actions
 `Object<Action> => Object<Action>`
 

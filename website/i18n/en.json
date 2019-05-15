@@ -5,6 +5,10 @@
     "previous": "Previous",
     "tagline": "A website for testing",
     "docs": {
+      "api_connect": {
+        "title": "Connecting RocketJumps",
+        "sidebar_label": "Connecting RocketJumps"
+      },
       "api_rj": {
         "title": "RocketJump constructor",
         "sidebar_label": "RocketJump constructor"
