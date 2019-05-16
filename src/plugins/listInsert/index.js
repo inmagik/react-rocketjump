@@ -28,9 +28,7 @@ const rjListInsert = (config = {}) => {
           )
         }
         const mergeFunc = config.merge ? config.merge : defaultMerge
-        const newState = { ...state }
-        set(newState, path, mergeFunc(action, get(newState, path)))
-        return newState
+        return set(state, path, mergeFunc(action, get(state, path)))
       }
       return oldReducer(state, action)
     },

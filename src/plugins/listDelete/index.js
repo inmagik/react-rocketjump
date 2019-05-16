@@ -29,11 +29,9 @@ const rjListDelete = (config = {}) => {
             'It seems you are using this plugin on a paginated list. Remember that this plugin is agnostic wrt pagination, and will break it. To suppress this warning, set warnPagination: false in the config object'
           )
         }
-        const newState = { ...state }
-        let list = get(newState, path)
+        let list = get(state, path)
         if (list) list = list.filter(listItem => !identity(action, listItem))
-        set(newState, path, list)
-        return newState
+        return set(state, path, list)
       }
       return oldReducer(state, action)
     },

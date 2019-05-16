@@ -1,3 +1,5 @@
+import immutable from 'object-path-immutable'
+
 export function get(obj, path, defaultValue = undefined) {
   const keys = path.split('.')
   const result =
@@ -8,9 +10,7 @@ export function get(obj, path, defaultValue = undefined) {
 }
 
 export function set(obj, path, value) {
-  const keys = path.split('.')
-  const lastKey = keys.pop()
-  keys.reduce((context, key) => context[key], obj)[lastKey] = value
+  return immutable.set(obj, path, value)
 }
 
 export function keyBy(list, keyFunc = a => a) {
@@ -20,12 +20,7 @@ export function keyBy(list, keyFunc = a => a) {
 }
 
 export function omit(object, props) {
-  const out = {}
-  const propsDict = keyBy(props)
-  for (let k in object) {
-    if (!propsDict[k]) out[k] = object[k]
-  }
-  return out
+  return props.reduce((obj, prop) => immutable.del(obj, prop), object)
 }
 
 export const getOrSelect = (obj, selector) => {
