@@ -177,7 +177,6 @@ This setting is used to control what to do when more instances of a task are spa
 
 * `latest`: cancel any pending task except for the latest, or, in other words, when a task is launched kill all the pending instances before launching it
 * `every`: never cancel a task, just await all of them to complete. No grants about order of completion is set.
-* `queue`: manage task start operations using a queue: when a task is launched, it is enqueued waiting for all the previous (pending) instances to complete (or fail). Order of completion is granted to be the launch order.
 * `exhaust`: if there is a pending instance of the task, it ignores any other attempt to spawn other instances of the same task
 * `groupBy`: compute a key for each task invocation, and behaves like the `latest` policy with respect to tasks with the same key.
 

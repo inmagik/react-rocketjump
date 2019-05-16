@@ -23,9 +23,11 @@ useRj(rocketJumpObject, mapStateToProps, mapActionsToProps)
 A RocketJump object is the output of a call to the [RocketJump Constructor](api_rj.md) in which there was included a configuration object with the `effect` property. The RocketJump object is used as a recipe to create all the stuff listed beforehand
 
 ### mapStateToProps
-`(state, selectors) => props`
+`(state, selectors, ownProps) => props`
 
 This function is used to gather values from the state, leveraging powerful selectors, and inject them in the component as props. When writing this function, you should treat the state as an opaque object, and rely on selectors to extract data from it. This allows to decouple the state shape and the code that needs data contained in the state.
+
+The ownProps object contains the props passed to the component from its parent, and can be accessed to write more direct bindings. When using `useRj` hook this parameter is not available (because props are already available in the context)
 
 Predefined selectors included in the `selectors` bag are
 * __getData__: returns the output of the last completed invocation of the task
