@@ -3,8 +3,12 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "A website for testing",
+    "tagline": "RocketJump your React!",
     "docs": {
+      "api_actions": {
+        "title": "Using actions",
+        "sidebar_label": "Using actions"
+      },
       "api_connect": {
         "title": "Connecting RocketJumps",
         "sidebar_label": "Connecting RocketJumps"
