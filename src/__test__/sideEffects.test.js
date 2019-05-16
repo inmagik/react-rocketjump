@@ -521,91 +521,92 @@ describe('RJ side effect model', () => {
     })
   })
 
-  // it('can unload a queue side effect', done => {
-  //   const mockApi = jest.fn()
-  //     .mockResolvedValueOnce(1)
-  //     .mockResolvedValueOnce(23)
-  //   const mockCallback = jest.fn()
-  //
-  //   const { makeRxObservable } = rj({
-  //     effect: mockApi,
-  //     takeEffect: 'every',
-  //   })()
-  //
-  //   const subject = new Subject()
-  //   makeRxObservable(subject.asObservable()).subscribe(mockCallback)
-  //
-  //   subject.next({
-  //     type: RUN,
-  //     payload: { params: [] },
-  //     meta: {},
-  //     callbacks: {},
-  //   })
-  //
-  //   subject.next({
-  //     type: CLEAN,
-  //     payload: { params: [] },
-  //     meta: {},
-  //   })
-  //
-  //   mockApi.mock.results[0].value.then(() => {
-  //     expect(mockCallback).toBeCalledTimes(3)
-  //
-  //     expect(mockCallback).nthCalledWith(1, {
-  //       type: RUN,
-  //       payload: { params: [] },
-  //       meta: {},
-  //       callbacks: {},
-  //     })
-  //
-  //     expect(mockCallback).nthCalledWith(2, {
-  //       type: PENDING,
-  //       meta: {},
-  //     })
-  //
-  //     expect(mockCallback).nthCalledWith(3, {
-  //       type: CLEAN,
-  //       meta: {},
-  //       payload: {
-  //         params: [],
-  //       },
-  //     })
-  //
-  //     subject.next({
-  //       type: RUN,
-  //       payload: { params: [] },
-  //       meta: {},
-  //       callbacks: {},
-  //     })
-  //
-  //     mockApi.mock.results[1].value.then(() => {
-  //       expect(mockCallback).toBeCalledTimes(6)
-  //
-  //       expect(mockCallback).nthCalledWith(4, {
-  //         type: RUN,
-  //         payload: { params: [] },
-  //         meta: {},
-  //         callbacks: {},
-  //       })
-  //
-  //       expect(mockCallback).nthCalledWith(5, {
-  //         type: PENDING,
-  //         meta: {},
-  //       })
-  //
-  //       expect(mockCallback).nthCalledWith(6, {
-  //         type: SUCCESS,
-  //         meta: {},
-  //         payload: {
-  //           params: [],
-  //           data: 23,
-  //         },
-  //       })
-  //
-  //       done()
-  //     })
-  //   })
-  // })
+  it('can unload a queue side effect', done => {
+    const mockApi = jest
+      .fn()
+      .mockResolvedValueOnce(1)
+      .mockResolvedValueOnce(23)
+    const mockCallback = jest.fn()
+
+    const { makeRxObservable } = rj({
+      effect: mockApi,
+      takeEffect: 'every',
+    })()
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    subject.next({
+      type: CLEAN,
+      payload: { params: [] },
+      meta: {},
+    })
+
+    mockApi.mock.results[0].value.then(() => {
+      expect(mockCallback).toBeCalledTimes(3)
+
+      expect(mockCallback).nthCalledWith(1, {
+        type: RUN,
+        payload: { params: [] },
+        meta: {},
+        callbacks: {},
+      })
+
+      expect(mockCallback).nthCalledWith(2, {
+        type: PENDING,
+        meta: {},
+      })
+
+      expect(mockCallback).nthCalledWith(3, {
+        type: CLEAN,
+        meta: {},
+        payload: {
+          params: [],
+        },
+      })
+
+      subject.next({
+        type: RUN,
+        payload: { params: [] },
+        meta: {},
+        callbacks: {},
+      })
+
+      mockApi.mock.results[1].value.then(() => {
+        expect(mockCallback).toBeCalledTimes(6)
+
+        expect(mockCallback).nthCalledWith(4, {
+          type: RUN,
+          payload: { params: [] },
+          meta: {},
+          callbacks: {},
+        })
+
+        expect(mockCallback).nthCalledWith(5, {
+          type: PENDING,
+          meta: {},
+        })
+
+        expect(mockCallback).nthCalledWith(6, {
+          type: SUCCESS,
+          meta: {},
+          payload: {
+            params: [],
+            data: 23,
+          },
+        })
+
+        done()
+      })
+    })
+  })
 
   it('takes only the last side effect as default', done => {
     const mockApi = jest
