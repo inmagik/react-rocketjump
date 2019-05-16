@@ -37,6 +37,10 @@
         "title": "Plugins",
         "sidebar_label": "Introduction"
       },
+      "plugin_list_insert": {
+        "title": "ListInsert Plugin",
+        "sidebar_label": "ListInsert Plugin"
+      },
       "plugin_list": {
         "title": "List Plugin",
         "sidebar_label": "List Plugin"

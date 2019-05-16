@@ -27,7 +27,7 @@ This plugin supports some configuration options:
 ## Usage
 ```js
 import { rj } from 'react-rocketjump'
-import rjList, { nextPreviousPaginationAdapter } from 'redux-rocketjump/plugins/list' 
+import rjList, { nextPreviousPaginationAdapter } from 'react-rocketjump/plugins/list' 
 
 const GET_ITEMS = 'GET_ITEMS'
 

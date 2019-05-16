@@ -3,7 +3,7 @@
     "Why React-Rocketjump?": ["motivation"],
     "Getting Started": ["installation", "quickstart", "concepts"],
     "API": ["api_rj", "api_connect", "api_actions"],
-    "Plugins": ["plugin_all", "plugin_list", "plugin_plain_list"]
+    "Plugins": ["plugin_all", "plugin_list", "plugin_plain_list", "plugin_list_insert"]
   },
   "docs-other": {
     "First Category": ["doc4", "doc5"]
