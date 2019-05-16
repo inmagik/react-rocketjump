@@ -33,6 +33,10 @@
       "motivation": {
         "title": "Motivation"
       },
+      "plugin_list": {
+        "title": "List Plugin",
+        "sidebar_label": "List Plugin"
+      },
       "quickstart": {
         "title": "Quick Start",
         "sidebar_label": "Quick Start"
@@ -48,6 +52,7 @@
       "Why React-Rocketjump?": "Why React-Rocketjump?",
       "Getting Started": "Getting Started",
       "API": "API",
+      "Plugins": "Plugins",
       "First Category": "First Category"
     }
   },
