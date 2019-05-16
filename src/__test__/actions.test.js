@@ -2,7 +2,7 @@ import React from 'react'
 import { rj as reactRj, connectRj } from '..'
 import Enzyme, { shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import { RUN, CLEAN, SUCCESS } from '../actionTypes'
+import { RUN, CLEAN, CANCEL, SUCCESS, EFFECT_ACTION } from '../actionTypes'
 
 Enzyme.configure({ adapter: new Adapter() })
 
@@ -31,6 +31,7 @@ describe('React-RocketJump actions', () => {
 
     expect(wrapper.props()).toHaveProperty('run')
     expect(wrapper.props()).toHaveProperty('clean')
+    expect(wrapper.props()).toHaveProperty('cancel')
   })
 
   it('should produce a good run action', () => {
@@ -56,6 +57,7 @@ describe('React-RocketJump actions', () => {
         onFailure: undefined,
       },
     })
+    expect(actionLog[0][EFFECT_ACTION]).toBe(true)
   })
 
   it('should produce a good clean action', () => {
@@ -81,6 +83,33 @@ describe('React-RocketJump actions', () => {
         onFailure: undefined,
       },
     })
+    expect(actionLog[0][EFFECT_ACTION]).toBe(true)
+  })
+
+  it('should produce a good cancel action', () => {
+    const actionLog = []
+
+    const rjState = reactRj({
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [CANCEL]),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+
+    wrapper.prop('cancel')(1, 'a', {}, undefined)
+
+    expect(actionLog[0]).toEqual({
+      type: CANCEL,
+      payload: {
+        params: [1, 'a', {}, undefined],
+      },
+      meta: {},
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+    expect(actionLog[0][EFFECT_ACTION]).toBe(true)
   })
 
   it('should expose builder', () => {

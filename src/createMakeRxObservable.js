@@ -8,8 +8,10 @@ import {
   catchError,
   groupBy,
   tap,
+  takeUntil,
+  filter,
 } from 'rxjs/operators'
-import { SUCCESS, FAILURE, PENDING, CLEAN } from './actionTypes'
+import { SUCCESS, FAILURE, PENDING, CLEAN, CANCEL } from './actionTypes'
 
 export const TAKE_EFFECT_LATEST = 'latest'
 export const TAKE_EFFECT_EVERY = 'every'
@@ -26,7 +28,7 @@ export default function createMakeRxObservable({
 }) {
   return function makeRxObservable($source) {
     function mapActionToObserable(action) {
-      if (action.type === CLEAN) {
+      if (action.type === CLEAN || action.type === CANCEL) {
         return of(action)
       }
       const { payload, meta, callbacks } = action
@@ -38,6 +40,9 @@ export default function createMakeRxObservable({
         from(callEffect(effectCall, ...params)).pipe(
           map(data => ({ type: SUCCESS, payload: { data, params }, meta })),
           catchError(error => of({ type: FAILURE, payload: error, meta })),
+          takeUntil($source.pipe(filter(action =>
+            action.type === CLEAN || action.type === CANCEL
+          ))),
           tap(action => {
             // NOTE: This code may look strange but this dragon
             // trick is usde only 2 go to next event loop and flush

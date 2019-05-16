@@ -1,4 +1,4 @@
-import { FAILURE, SUCCESS, PENDING, CLEAN } from './actionTypes'
+import { FAILURE, SUCCESS, PENDING, CLEAN, CANCEL } from './actionTypes'
 
 // Barebone reducer for handle an async effect
 
@@ -28,6 +28,11 @@ export default function reducer(prevState = defaultState, action) {
         ...prevState,
         pending: false,
         data: action.payload.data,
+      }
+    case CANCEL:
+      return {
+        ...prevState,
+        pending: false,
       }
     case CLEAN:
       // So easy if someone add some shit to state
