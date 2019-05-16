@@ -40,8 +40,8 @@ const siteConfig = {
   headerLinks: [
     {doc: 'installation', label: 'Docs'},
     {doc: 'api_rj', label: 'API'},
-    {page: 'help', label: 'Help'},
     {blog: true, label: 'Blog'},
+    {page: 'https://www.github.com/inmagik/react-rocketjump', label: 'GitHub'},
   ],
 
   // If you have users set above, you add it here:
@@ -91,6 +91,8 @@ const siteConfig = {
   // Open Graph and Twitter card images.
   ogImage: 'img/undraw_online.svg',
   twitterImage: 'img/undraw_tweetstorm.svg',
+
+  docsSideNavCollapsible: true,
 
   // Show documentation's last contributor's name.
   // enableUpdateBy: true,

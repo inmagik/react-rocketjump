@@ -9,6 +9,10 @@
         "title": "Using actions",
         "sidebar_label": "Using actions"
       },
+      "api_composition": {
+        "title": "RocketJump Composition",
+        "sidebar_label": "Composition"
+      },
       "api_connect": {
         "title": "Connecting RocketJumps",
         "sidebar_label": "Connecting RocketJumps"
@@ -21,12 +25,6 @@
         "title": "General concepts",
         "sidebar_label": "General concepts"
       },
-      "doc4": {
-        "title": "Other Document"
-      },
-      "doc5": {
-        "title": "Fifth Document"
-      },
       "installation": {
         "title": "Installation"
       },
@@ -37,17 +35,33 @@
         "title": "Plugins",
         "sidebar_label": "Introduction"
       },
+      "plugin_list_delete": {
+        "title": "ListDelete Plugin",
+        "sidebar_label": "ListDelete Plugin"
+      },
       "plugin_list_insert": {
         "title": "ListInsert Plugin",
         "sidebar_label": "ListInsert Plugin"
+      },
+      "plugin_list_update": {
+        "title": "ListUpdate Plugin",
+        "sidebar_label": "ListUpdate Plugin"
       },
       "plugin_list": {
         "title": "List Plugin",
         "sidebar_label": "List Plugin"
       },
+      "plugin_map": {
+        "title": "Map Plugin",
+        "sidebar_label": "Map Plugin"
+      },
       "plugin_plain_list": {
         "title": "PlainList Plugin",
         "sidebar_label": "PlainList Plugin"
+      },
+      "plugin_writing": {
+        "title": "Writing Plugins",
+        "sidebar_label": "Writing Plugins"
       },
       "quickstart": {
         "title": "Quick Start",
@@ -57,15 +71,14 @@
     "links": {
       "Docs": "Docs",
       "API": "API",
-      "Help": "Help",
-      "Blog": "Blog"
+      "Blog": "Blog",
+      "GitHub": "GitHub"
     },
     "categories": {
-      "Why React-Rocketjump?": "Why React-Rocketjump?",
+      "Why React-RocketJump?": "Why React-RocketJump?",
       "Getting Started": "Getting Started",
       "API": "API",
-      "Plugins": "Plugins",
-      "First Category": "First Category"
+      "Plugins": "Plugins"
     }
   },
   "pages-strings": {

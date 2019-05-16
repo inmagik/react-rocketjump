@@ -3,7 +3,7 @@ id: motivation
 title: Motivation
 ---
 
-## Why React-Rocketjump?
+## Why React-RocketJump?
 The journey of React-RocketJump started in 2018 under the name of Redux-Rocketjump, when React had still no hooks and Redux was the greatest tool for state management.Redux is pretty good in doing his job, but it has a great problem: verbosity.
 
 Actions’ and reducers’ definitions can require many lines of code (if you care about readability, of course), and this usually ends up in writing code via copy - paste - adapt. Moreover, there are recurrent patterns, like pagination, which are not straightforward to implement starting from scratch and that are needed in a great number of projects. Again, this ends up in copypasting stuff, which is, at the end, a bad practice.

@@ -57,6 +57,7 @@ This function is used to inject active props to your component, e.g. props that 
 
 Predefined `actions` bag contains
 * `run`: launches the task 
+* `cancel`: cancels any pending instances of the task
 * `clean`: cancels any pending instances of the task and resets the state to the original value
 
 Plugins can add new actions or change the behaviour of existing ones, hence if you are using plugins refer to their documentation
