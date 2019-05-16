@@ -119,7 +119,6 @@ export default function createMakeRxObservable({
           map(data => ({ type: SUCCESS, payload: { data, params }, meta })),
           catchError(error => of({ type: FAILURE, payload: error, meta })),
           tap(action => {
-            // TODO: Bro check potential issue from unsub from React prior to here
             // NOTE: This code may look strange but this dragon
             // trick is usde only 2 go to next event loop and flush
             // all the update related to dispatch maybe in future
