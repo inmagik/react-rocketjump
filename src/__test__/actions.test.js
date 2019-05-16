@@ -91,7 +91,8 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [CANCEL]),
+      reducer: oldReducer =>
+        makeActionObserver(oldReducer, actionLog, [CANCEL]),
     })
 
     const wrapper = makeRjComponent(rjState)
