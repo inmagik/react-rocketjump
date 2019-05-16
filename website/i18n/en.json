@@ -33,9 +33,17 @@
       "motivation": {
         "title": "Motivation"
       },
+      "plugin_all": {
+        "title": "Plugins",
+        "sidebar_label": "Introduction"
+      },
       "plugin_list": {
         "title": "List Plugin",
         "sidebar_label": "List Plugin"
+      },
+      "plugin_plain_list": {
+        "title": "PlainList Plugin",
+        "sidebar_label": "PlainList Plugin"
       },
       "quickstart": {
         "title": "Quick Start",

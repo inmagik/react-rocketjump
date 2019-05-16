@@ -37,9 +37,7 @@ const listState = rj(
             pagination: nextPreviousPaginationAdapter
         }),
         {
-            state: 'items',
-            type: GET_ITEMS,
-            api: ({ page }) => fetch(`http://example.com/items?page=${page}`)
+            effect: page => fetch(`http://example.com/items?page=${page}`)
                 .then(response => response.json())
         }
     )
