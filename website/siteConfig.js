@@ -22,7 +22,7 @@ const users = [
 
 const siteConfig = {
   title: 'ReactRocketJump', // Title for your website.
-  tagline: 'Handle state and side effects with classy using modern React and functional programming.',
+  tagline: 'Rocketjump your react! Handle state and side effects with classy',
   url: 'https://inmagik.github.io', // Your website URL
   baseUrl: '/react-rocketjump/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
