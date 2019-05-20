@@ -84,7 +84,7 @@ class Footer extends React.Component {
         </section>
 
         <a
-          href="https://inmagik.com/inmagik/react-rocketjump"
+          href="https://inmagik.com"
           target="_blank"
           rel="noreferrer noopener"
           className="fbOpenSource inmagikOpenSource">
