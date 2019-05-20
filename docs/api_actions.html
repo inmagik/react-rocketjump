@@ -1,0 +1,113 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Using actions · ReactRocketJump</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;p&gt;Once you have &lt;a href=&quot;/react-rocketjump/docs/api_connect&quot;&gt;connected your component with a RocketJump Object&lt;/a&gt;, you have some actions bound to your props. There are two ways to trigger these actions: the &lt;em&gt;quicker&lt;/em&gt; way and the &lt;em&gt;rich&lt;/em&gt; way. The &lt;em&gt;quicker&lt;/em&gt; way is, ehm, quicker, but allows bare minimal configuration, while the &lt;em&gt;rich&lt;/em&gt; way is more verbose but allows to exploit the full power of React-RocketJump. Whether to use the former or the latter is a matter of need, each specific case may fit better with one or the other. However, you don&#x27;t have to stick with an approach: you can select the best one any time you need to make a call.&lt;/p&gt;
+"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Using actions · ReactRocketJump"/><meta property="og:type" content="website"/><meta property="og:url" content="https://inmagik.github.io/react-rocketjump/"/><meta property="og:description" content="&lt;p&gt;Once you have &lt;a href=&quot;/react-rocketjump/docs/api_connect&quot;&gt;connected your component with a RocketJump Object&lt;/a&gt;, you have some actions bound to your props. There are two ways to trigger these actions: the &lt;em&gt;quicker&lt;/em&gt; way and the &lt;em&gt;rich&lt;/em&gt; way. The &lt;em&gt;quicker&lt;/em&gt; way is, ehm, quicker, but allows bare minimal configuration, while the &lt;em&gt;rich&lt;/em&gt; way is more verbose but allows to exploit the full power of React-RocketJump. Whether to use the former or the latter is a matter of need, each specific case may fit better with one or the other. However, you don&#x27;t have to stick with an approach: you can select the best one any time you need to make a call.&lt;/p&gt;
+"/><meta property="og:image" content="https://inmagik.github.io/react-rocketjump/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://inmagik.github.io/react-rocketjump/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/react-rocketjump/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><link rel="stylesheet" href="/react-rocketjump/css/main.css"/><script src="/react-rocketjump/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/react-rocketjump/"><h2 class="headerTitle">ReactRocketJump</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/react-rocketjump/docs/installation" target="_self">Docs</a></li><li class="siteNavGroupActive"><a href="/react-rocketjump/docs/api_rj" target="_self">API</a></li><li class=""><a href="https://www.github.com/inmagik/react-rocketjump" target="_self">GitHub</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>API</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Why React-RocketJump?<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/motivation">Motivation</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Getting Started<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/quickstart">Quick Start</a></li><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/concepts">General concepts</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">API<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/api_rj">RocketJump constructor</a></li><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/api_connect">Connecting RocketJumps</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/react-rocketjump/docs/api_actions">Using actions</a></li><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/api_composition">Composition</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Plugins<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/plugin_all">Introduction</a></li><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/plugin_list">List Plugin</a></li><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/plugin_plain_list">PlainList Plugin</a></li><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/plugin_list_insert">ListInsert Plugin</a></li><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/plugin_list_update">ListUpdate Plugin</a></li><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/plugin_list_delete">ListDelete Plugin</a></li><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/plugin_map">Map Plugin</a></li><li class="navListItem"><a class="navItem" href="/react-rocketjump/docs/plugin_writing">Writing Plugins</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              const headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                if (event.target.tagName === 'A') {
+                  document.body.classList.remove('tocActive');
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle">Using actions</h1></header><article><div><span><p>Once you have <a href="/react-rocketjump/docs/api_connect">connected your component with a RocketJump Object</a>, you have some actions bound to your props. There are two ways to trigger these actions: the <em>quicker</em> way and the <em>rich</em> way. The <em>quicker</em> way is, ehm, quicker, but allows bare minimal configuration, while the <em>rich</em> way is more verbose but allows to exploit the full power of React-RocketJump. Whether to use the former or the latter is a matter of need, each specific case may fit better with one or the other. However, you don't have to stick with an approach: you can select the best one any time you need to make a call.</p>
+<h2><a class="anchor" aria-hidden="true" id="quicker-way-direct-invocation"></a><a href="#quicker-way-direct-invocation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Quicker way: direct invocation</h2>
+<p>Action properties are functions that can be directly invoked. Let's suppose we imported the <code>run</code> action under the <code>loadData</code> name. The quick invocation consists of</p>
+<pre><code class="hljs css language-js">loadData(arg1, arg2, arg3, ...)
+</code></pre>
+<p>This invocation triggers the dispatching of the action to the state, and, in case it is a side-effect action, to the side-effect management logic.</p>
+<p>In case of a <code>run</code> action, the params you pass in during the call are sent to the <code>effect</code> function of the RocketJump, and hence a new task is spawned with them. <strong>Beware</strong> that plugins can modify the way params are sent to the <code>effect</code> function, so refer to their documentation.</p>
+<p>In case of a <code>clean</code> action, the params are ignored, except for the case some plugin does some magic on them. Again, refer to plugin documentation.</p>
+<p>In case of user-defined actions, it is up to the user to know what to do with the params</p>
+<h2><a class="anchor" aria-hidden="true" id="rich-way-using-the-builder"></a><a href="#rich-way-using-the-builder" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Rich way: using the Builder</h2>
+<p>Each action comes with a builder, which allows to set a bunch of properties on the action that will be sent to the store. Let's take again our <code>run</code> action imported with the name <code>loadData</code>. The methods exposed on the action by the builder are</p>
+<pre><code class="hljs css language-js">
+Builder builder = loadData.withMeta(object)
+Builder builder = loadData.withMeta(<span class="hljs-function"><span class="hljs-params">oldMeta</span> =&gt;</span> newMeta)
+Builder builder = loadData.onSuccess(callback)
+Builder builder = loadData.onError(callback)
+</code></pre>
+<p>Each of these methods instantiates a new Builder to be used for the <em>rich</em> call, and calls the omonimous method on the created builder (so avoiding an explicit call to instantiate the builder).</p>
+<p>The methods exposed by the builder object are</p>
+<pre><code class="hljs css language-js">builder.withMeta(object)
+builder.withMeta(<span class="hljs-function"><span class="hljs-params">oldMeta</span> =&gt;</span> newMeta)
+builder.onSuccess(callback)
+builder.onError(callback)
+builder.run(...args)
+</code></pre>
+<p>First of all, builder methods are designed to be chainable, hence probably you'll never create a <code>builder</code> variable in your code, but you'd end up writing something like</p>
+<pre><code class="hljs css language-js">loadData
+    .withMeta({ <span class="hljs-attr">id</span>: <span class="hljs-number">42</span> })
+    .onSuccess(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(data))
+    .onError(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.warn(err))
+    .run()
+</code></pre>
+<p>Now, let's go describing the methods of the builder</p>
+<h3><a class="anchor" aria-hidden="true" id="withmetafunction"></a><a href="#withmetafunction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>withMeta(function)</h3>
+<p><code>builder.withMeta(oldMeta =&gt; newMeta)</code></p>
+<p>The <code>withMeta</code> builder method allows to add a transform on metadata attached to the action. The transform is encoded as a function that receives the old metadata object (a JavaScript plain object) and is required to return the next metadata object (again, as a plain JavaScript object). This method can be used to add some metadata, to change some of them, or even to delete some keys (even if you should do it with care). Calling <code>withMeta</code> multiple times simply chains all the transformation, such that the output of the first is the input of the second and so on, the metadata object attached to the action will be the output of the last transform.</p>
+<p><strong>Example</strong></p>
+<p>This call exposes the <code>key</code> meta data under the <code>id</code> property</p>
+<pre><code class="hljs css language-js">builder.withMeta(<span class="hljs-function"><span class="hljs-params">prevMeta</span> =&gt;</span> { ...prevMeta, <span class="hljs-attr">id</span>: prevMeta.key })
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="withmetaobject"></a><a href="#withmetaobject" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>withMeta(object)</h3>
+<p><code>builder.withMeta(object)</code></p>
+<p>This is equivalent to <code>builder.withMeta(prevMeta =&gt; { ...prevMeta, ...object })</code>, it can be useful as a quick and lightweight way to add some keys to the metadata object</p>
+<h3><a class="anchor" aria-hidden="true" id="onsuccess"></a><a href="#onsuccess" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>onSuccess</h3>
+<p><code>builder.onSuccess(callback)</code></p>
+<p>This method allows to attach a callback to be invoked when the asynchronous task completes without errors. The callback is not invoked in case the task it is attached to is canceled (remember <a href="/react-rocketjump/docs/api_rj">takeEffect</a>?). Calling this method multiple times on the same builder causes the callback to be overwritten: the callback attached to the action is the argument of the last invocation of this method</p>
+<p><strong>Example</strong></p>
+<p>Triggering an alert when an action completes</p>
+<pre><code class="hljs css language-js">builder.onSuccess(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> alert(data[<span class="hljs-number">0</span>].name))
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="onfailure"></a><a href="#onfailure" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>onFailure</h3>
+<p><code>builder.onFailure(callback)</code></p>
+<p>This method allows to attach a callback to be invoked when the asynchronous task completes with errors. The callback is not invoked in case the task it is attached to is canceled (remember <a href="/react-rocketjump/docs/api_rj">takeEffect</a>?). Calling this method multiple times on the same builder causes the callback to be overwritten: the callback attached to the action to handle failures is the argument of the last invocation of this method</p>
+<p><strong>Example</strong></p>
+<p>Triggering an alert when an action completes</p>
+<pre><code class="hljs css language-js">builder.onFailure(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> alert(data[<span class="hljs-number">0</span>].name))
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="run"></a><a href="#run" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>run</h3>
+<p><code>builder.run(...args)</code></p>
+<p>This method closes the builder and dispatches the action with the passed in <code>...args</code> as params and the configuration defined with the other methods. This method must be the last invocation on a builder, no further configuration will be taken into account after calling it.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/react-rocketjump/docs/api_connect"><span class="arrow-prev">← </span><span class="function-name-prevnext">Connecting RocketJumps</span></a><a class="docs-next button" href="/react-rocketjump/docs/api_composition"><span>Composition</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#quicker-way-direct-invocation">Quicker way: direct invocation</a></li><li><a href="#rich-way-using-the-builder">Rich way: using the Builder</a><ul class="toc-headings"><li><a href="#withmetafunction">withMeta(function)</a></li><li><a href="#withmetaobject">withMeta(object)</a></li><li><a href="#onsuccess">onSuccess</a></li><li><a href="#onfailure">onFailure</a></li><li><a href="#run">run</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/react-rocketjump/" class="nav-home"></a><div><h5>Docs</h5><a href="/react-rocketjump/docs/quickstart">Getting Started</a><a href="/react-rocketjump/docs/api_rj">API Reference</a><a href="/react-rocketjump/docs/plugin_all">Plugins</a></div><div><h5>More</h5><a href="https://github.com/inmagik/react-rocketjump">GitHub</a><a class="github-button" href="https://github.com/inmagik/react-rocketjump" data-icon="octicon-star" data-count-href="/inmagik/react-rocketjump/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://inmagik.com/inmagik/react-rocketjump" target="_blank" rel="noreferrer noopener" class="fbOpenSource inmagikOpenSource"><img src="/react-rocketjump/img/inmagik_logo.png" alt="Facebook Open Source" width="50" height="50"/></a><section class="copyright">Copyright © 2019 INMAGIK srl</section></footer></div></body></html>
