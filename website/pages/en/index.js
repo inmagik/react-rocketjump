@@ -60,7 +60,7 @@ class HomeSplash extends React.Component {
 
     return (
       <SplashContainer>
-        <Logo img_src={`${baseUrl}img/undraw_monitor.svg`} />
+        {/* <Logo img_src={`${baseUrl}img/undraw_monitor.svg`} /> */}
         <div className="inner">
           <ProjectTitle siteConfig={siteConfig} />
           <PromoSection>
@@ -149,16 +149,26 @@ class Index extends React.Component {
       <Block layout="fourColumn">
         {[
           {
-            content: 'This is the content of my feature',
-            image: `${baseUrl}img/undraw_react.svg`,
-            imageAlign: 'top',
-            title: 'Feature One',
+            content: `The power and beautiful of redux wrapped into a reutilizable container with a declarative syntax.`,
+            // image: `${baseUrl}img/undraw_react.svg`,
+            // imageAlign: 'top',
+            title: 'What is ReactRocketJump?',
           },
           {
-            content: 'The content of my second feature',
-            image: `${baseUrl}img/undraw_operating_system.svg`,
-            imageAlign: 'top',
-            title: 'Feature Two',
+            content: `Rocketjump has no implicit dependencies outside React>=16.8, state and side effects are bounded locally to your Component,
+            so you can use rocketjump without have to rewrite your entire app.
+            \nYou can use it side-by-side to something like redux and maybe reutilizze stuff like selectors, reducers and api calls.
+            `,
+            // image: `${baseUrl}img/undraw_operating_system.svg`,
+            // imageAlign: 'top',
+            title: 'Flexible',
+          },
+          {
+            content: `Rocketjump use the composition to give you a reutilizable api.
+            Rocketjump objects are reutilizable blueprint so you can easy share your behaviors with no effort`,
+            // image: `${baseUrl}img/undraw_operating_system.svg`,
+            // imageAlign: 'top',
+            title: 'Reutilizable',
           },
         ]}
       </Block>
@@ -198,11 +208,11 @@ class Index extends React.Component {
         <HomeSplash siteConfig={siteConfig} language={language} />
         <div className="mainContainer">
           <Features />
-          <FeatureCallout />
+          {/* <FeatureCallout />
           <LearnHow />
           <TryOut />
           <Description />
-          <Showcase />
+          <Showcase /> */}
         </div>
       </div>
     );

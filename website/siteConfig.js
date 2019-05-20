@@ -21,8 +21,8 @@ const users = [
 ];
 
 const siteConfig = {
-  title: 'React-RocketJump', // Title for your website.
-  tagline: 'RocketJump your React!',
+  title: 'ReactRocketJump', // Title for your website.
+  tagline: 'Handle state and side effects with classy using modern React and functional programming.',
   url: 'https://inmagik.github.io', // Your website URL
   baseUrl: '/react-rocketjump/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
@@ -48,14 +48,14 @@ const siteConfig = {
   // users,
 
   /* path to images for header/footer */
-  headerIcon: 'img/favicon.ico',
-  footerIcon: 'img/favicon.ico',
-  favicon: 'img/favicon.ico',
+  // headerIcon: 'img/favicon.ico',
+  // footerIcon: 'img/favicon.ico',
+  // favicon: 'img/favicon.ico',
 
   /* Colors for website */
   colors: {
-    primaryColor: '#6a8405',
-    secondaryColor: '#4a5c03',
+    primaryColor: '#3BBAE5',
+    secondaryColor: 'deepskyblue',
   },
 
   /* Custom fonts for website */
