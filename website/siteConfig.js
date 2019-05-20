@@ -40,8 +40,8 @@ const siteConfig = {
   headerLinks: [
     {doc: 'installation', label: 'Docs'},
     {doc: 'api_rj', label: 'API'},
-    {blog: true, label: 'Blog'},
-    {page: 'https://www.github.com/inmagik/react-rocketjump', label: 'GitHub'},
+    // {blog: true, label: 'Blog'},
+    {href: 'https://www.github.com/inmagik/react-rocketjump', label: 'GitHub'},
   ],
 
   // If you have users set above, you add it here:
@@ -102,7 +102,7 @@ const siteConfig = {
 
   // You may provide arbitrary config keys to be used as needed by your
   // template. For example, if you need your repo's URL...
-  //   repoUrl: 'https://github.com/facebook/test-site',
+  repoUrl: 'https://github.com/inmagik/react-rocketjump',
 };
 
 module.exports = siteConfig;
