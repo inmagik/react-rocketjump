@@ -1,5 +1,6 @@
 import React from 'react'
-import { renderHook, act } from 'react-hooks-testing-library'
+import { act } from 'react-dom/test-utils'
+import { renderHook } from 'react-hooks-testing-library'
 import memoize from 'memoize-one'
 import rj from '../rj'
 import ConfigureRj from '../ConfigureRj'
@@ -52,10 +53,12 @@ describe('useRj', () => {
       () => Promise.resolve(1312)
     )
 
-    const { result } = renderHook(() => useRj(maRjState, state => ({
-      ...state,
-      maik: 1312,
-    })))
+    const { result } = renderHook(() =>
+      useRj(maRjState, state => ({
+        ...state,
+        maik: 1312,
+      }))
+    )
 
     expect(result.current[0]).toEqual({
       data: null,
@@ -74,9 +77,11 @@ describe('useRj', () => {
       () => Promise.resolve(1312)
     )
 
-    const { result } = renderHook(() => useRj(maRjState, (state, { getData }) => ({
-      friends: getData(state),
-    })))
+    const { result } = renderHook(() =>
+      useRj(maRjState, (state, { getData }) => ({
+        friends: getData(state),
+      }))
+    )
 
     expect(result.current[0]).toEqual({
       friends: null,
@@ -84,8 +89,9 @@ describe('useRj', () => {
   })
 
   it('should create a per-instance version of selectors to enable good memoization', () => {
-    const mySelector = jest.fn()
-      .mockImplementation(n => n === 0 ? 0 : n + 1300)
+    const mySelector = jest
+      .fn()
+      .mockImplementation(n => (n === 0 ? 0 : n + 1300))
 
     const maRjState = rj(
       rj({
@@ -106,24 +112,28 @@ describe('useRj', () => {
         },
         actions: () => ({
           gang: n => ({ type: 'GANG', payload: n }),
-          charlie: () => ({ type: 'CHARLIE' })
+          charlie: () => ({ type: 'CHARLIE' }),
         }),
         selectors: ({ getData }) => {
           const memoSelector = memoize(mySelector)
           return { getMaik: state => memoSelector(getData(state)) }
-        }
+        },
       }),
       () => Promise.resolve(1312)
     )
 
-    const { result: resultA } = renderHook(() => useRj(maRjState, (state, { getMaik }) => ({
-      friends: getMaik(state),
-      beat: state.beat,
-    })))
-    const { result: resultB } = renderHook(() => useRj(maRjState, (state, { getMaik }) => ({
-      friends: getMaik(state),
-      beat: state.beat,
-    })))
+    const { result: resultA } = renderHook(() =>
+      useRj(maRjState, (state, { getMaik }) => ({
+        friends: getMaik(state),
+        beat: state.beat,
+      }))
+    )
+    const { result: resultB } = renderHook(() =>
+      useRj(maRjState, (state, { getMaik }) => ({
+        friends: getMaik(state),
+        beat: state.beat,
+      }))
+    )
 
     // No MEMO selectors called 2 Time
     expect(mySelector).toHaveBeenCalledTimes(2)
@@ -182,27 +192,52 @@ describe('useRj', () => {
       friends: 1312,
       beat: 2,
     })
+  })
 
+  it('should run rj sideEffects and react to succees', async () => {
+    const mockFn = jest.fn().mockResolvedValue(23)
+    const maRjState = rj(mockFn)
+
+    const { result } = renderHook(() =>
+      useRj(maRjState, (state, { getData }) => ({
+        friends: getData(state),
+      }))
+    )
+
+    expect(result.current[0]).toEqual({
+      friends: null,
+    })
+
+    await act(async () => {
+      result.current[1].run()
+    })
+    expect(result.current[0]).toEqual({
+      friends: 23,
+    })
   })
 
   it('should be configurable by ConfigureRj', () => {
-    const maRjState = rj(
-      () => Promise.resolve(1312)
-    )
+    const maRjState = rj(() => Promise.resolve(1312))
 
     function Wrapper({ children }) {
       return (
-        <ConfigureRj composeReducer={(prevState = { data: 'GANG' }) => prevState}>
+        <ConfigureRj
+          composeReducer={(prevState = { data: 'GANG' }) => prevState}
+        >
           {children}
         </ConfigureRj>
       )
     }
 
-    const { result } = renderHook(() => useRj(maRjState, (state, { getData }) => ({
-      friends: getData(state),
-    })), {
-      wrapper: Wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useRj(maRjState, (state, { getData }) => ({
+          friends: getData(state),
+        })),
+      {
+        wrapper: Wrapper,
+      }
+    )
 
     expect(result.current[0]).toEqual({
       friends: 'GANG',
@@ -242,5 +277,4 @@ describe('useRj', () => {
   test.todo('Test actions')
 
   test.todo('Test mapActions')
-
 })

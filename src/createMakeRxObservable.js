@@ -150,7 +150,7 @@ export default function createMakeRxObservable({
       return takeEffectLatest($source, mapActionToObserable)
     } else if (effectType === TAKE_EFFECT_EVERY) {
       return takeEffectEvery($source, mapActionToObserable)
-    /*} else if (effectType === TAKE_EFFECT_QUEUE) {
+      /*} else if (effectType === TAKE_EFFECT_QUEUE) {
       return takeEffectQueue($source, mapActionToObserable)*/
     } else if (effectType === TAKE_EFFECT_EXHAUST) {
       return takeEffectExhaust($source, mapActionToObserable)
