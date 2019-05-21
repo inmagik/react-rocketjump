@@ -1,6 +1,8 @@
+import React from 'react'
 import { renderHook, act } from 'react-hooks-testing-library'
 import memoize from 'memoize-one'
 import rj from '../rj'
+import ConfigureRj from '../ConfigureRj'
 import useRj from '../useRj'
 
 describe('useRj', () => {
@@ -182,4 +184,63 @@ describe('useRj', () => {
     })
 
   })
+
+  it('should be configurable by ConfigureRj', () => {
+    const maRjState = rj(
+      () => Promise.resolve(1312)
+    )
+
+    function Wrapper({ children }) {
+      return (
+        <ConfigureRj composeReducer={(prevState = { data: 'GANG' }) => prevState}>
+          {children}
+        </ConfigureRj>
+      )
+    }
+
+    const { result } = renderHook(() => useRj(maRjState, (state, { getData }) => ({
+      friends: getData(state),
+    })), {
+      wrapper: Wrapper,
+    })
+
+    expect(result.current[0]).toEqual({
+      friends: 'GANG',
+    })
+  })
+
+  // it('should be configurable by ConfigureRj', () => {
+  //   const maRjState = rj(
+  //     () => Promise.resolve(1312)
+  //   )
+  //
+  //   function Wrapper({ children }) {
+  //     return (
+  //       <ConfigureRj composeReducer={(prevState = { data: 'GANG' }) => prevState}>
+  //         {children}
+  //       </ConfigureRj>
+  //     )
+  //   }
+  //
+  //   const { result } = renderHook(() => useRj(maRjState, (state, { getData }) => ({
+  //     friends: getData(state),
+  //   })), {
+  //     wrapper: Wrapper,
+  //   })
+  //
+  //   expect(result.current[0]).toEqual({
+  //     friends: 'GANG',
+  //   })
+  // })
+
+  test.todo('Test type checking on rjPartial ....')
+
+  test.todo('Test the acting of side effects')
+
+  test.todo('Test onSuccess onFailure')
+
+  test.todo('Test actions')
+
+  test.todo('Test mapActions')
+
 })
