@@ -149,13 +149,13 @@ class Index extends React.Component {
       <Block layout="fourColumn">
         {[
           {
-            content: `The power and beautiful of redux wrapped into a reutilizable container with a declarative syntax.`,
+            content: `The power and beauty of redux wrapped into a reusable container with a declarative syntax.`,
             // image: `${baseUrl}img/undraw_react.svg`,
             // imageAlign: 'top',
             title: 'What is ReactRocketJump?',
           },
           {
-            content: `Rocketjump has no implicit dependencies outside React>=16.8, state and side effects are bounded locally to your Component,
+            content: `Rocketjump has no implicit dependencies except React>=16.8. State and side effects are bound locally to your Component,
             so you can use rocketjump without have to rewrite your entire app.
             \nYou can use it side-by-side to something like redux and maybe reutilizze stuff like selectors, reducers and api calls.
             `,
@@ -164,11 +164,11 @@ class Index extends React.Component {
             title: 'Flexible',
           },
           {
-            content: `Rocketjump use the composition to give you a reutilizable api.
-            Rocketjump objects are reutilizable blueprint so you can easy share your behaviors with no effort`,
+            content: `Rocketjump uses composition in order to let you build a reusable api.
+            Rocketjump objects are reusable blueprint so you can easy share your behaviors with no effort`,
             // image: `${baseUrl}img/undraw_operating_system.svg`,
             // imageAlign: 'top',
-            title: 'Reutilizable',
+            title: 'Reusable',
           },
         ]}
       </Block>
