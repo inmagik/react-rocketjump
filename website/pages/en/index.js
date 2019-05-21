@@ -164,7 +164,7 @@ class Index extends React.Component {
             title: 'Flexible',
           },
           {
-            content: `Rocketjump use the composition in order to let you build a reusable api.
+            content: `Rocketjump uses composition in order to let you build a reusable api.
             Rocketjump objects are reusable blueprint so you can easy share your behaviors with no effort`,
             // image: `${baseUrl}img/undraw_operating_system.svg`,
             // imageAlign: 'top',
