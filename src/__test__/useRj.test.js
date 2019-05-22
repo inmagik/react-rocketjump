@@ -216,33 +216,33 @@ describe('useRj', () => {
     })
   })
 
-  it('should be configurable by ConfigureRj', () => {
-    const maRjState = rj(() => Promise.resolve(1312))
-
-    function Wrapper({ children }) {
-      return (
-        <ConfigureRj
-          composeReducer={(prevState = { data: 'GANG' }) => prevState}
-        >
-          {children}
-        </ConfigureRj>
-      )
-    }
-
-    const { result } = renderHook(
-      () =>
-        useRj(maRjState, (state, { getData }) => ({
-          friends: getData(state),
-        })),
-      {
-        wrapper: Wrapper,
-      }
-    )
-
-    expect(result.current[0]).toEqual({
-      friends: 'GANG',
-    })
-  })
+  // it('should be configurable by ConfigureRj', () => {
+  //   const maRjState = rj(() => Promise.resolve(1312))
+  //
+  //   function Wrapper({ children }) {
+  //     return (
+  //       <ConfigureRj
+  //         composeReducer={(prevState = { data: 'GANG' }) => prevState}
+  //       >
+  //         {children}
+  //       </ConfigureRj>
+  //     )
+  //   }
+  //
+  //   const { result } = renderHook(
+  //     () =>
+  //       useRj(maRjState, (state, { getData }) => ({
+  //         friends: getData(state),
+  //       })),
+  //     {
+  //       wrapper: Wrapper,
+  //     }
+  //   )
+  //
+  //   expect(result.current[0]).toEqual({
+  //     friends: 'GANG',
+  //   })
+  // })
 
   // it('should be configurable by ConfigureRj', () => {
   //   const maRjState = rj(

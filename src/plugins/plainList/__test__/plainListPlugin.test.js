@@ -6,7 +6,7 @@ describe('List Plugin', () => {
   it('should make a list reducer', () => {
     const { reducer } = rj(rjList(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     const prevState = {
       data: null,
@@ -60,7 +60,7 @@ describe('List Plugin', () => {
   it('should append items when meta append', () => {
     const { reducer } = rj(rjList(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     let state = {
       data: [
@@ -150,7 +150,7 @@ describe('List Plugin', () => {
   it('should prepend items when meta prepend', () => {
     const { reducer } = rj(rjList(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     let state = {
       data: [
@@ -240,7 +240,7 @@ describe('List Plugin', () => {
   it('should make selectors for list', () => {
     const { makeSelectors } = rj(rjList(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     const { getList, getCount } = makeSelectors()
 
@@ -276,7 +276,7 @@ describe('List Plugin', () => {
 
     const { reducer } = rj(otherPlugin(), rjList(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     const prevState = null
 
@@ -296,7 +296,7 @@ describe('List Plugin', () => {
   it('should not break with null state', () => {
     const { makeSelectors } = rj(rjList(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     const { getList, getCount } = makeSelectors()
 
@@ -321,7 +321,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const prevState = {
       data: {

@@ -5,7 +5,7 @@ describe('List Insert plugin', () => {
   it('adds a insertItem action', () => {
     const { actionCreators } = rj(rjListInsert(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     expect(actionCreators).toHaveProperty('insertItem')
 
@@ -33,7 +33,7 @@ describe('List Insert plugin', () => {
 
     const { reducer } = rj(spy, rjListInsert(), {
       effect: () => Promise.resolve(),
-    })()
+    })
 
     const prevState = {
       pending: false,
@@ -53,7 +53,7 @@ describe('List Insert plugin', () => {
   it('inserts items', () => {
     const { reducer } = rj(rjListInsert(), {
       effect: () => Promise.resolve(),
-    })()
+    })
 
     const prevState = {
       pending: false,
@@ -106,7 +106,7 @@ describe('List Insert plugin', () => {
   it('can operate with a custom path', () => {
     const { reducer } = rj(rjListInsert({ path: 'data.custom.path.to.list' }), {
       effect: () => Promise.resolve(),
-    })()
+    })
 
     const prevState = {
       pending: false,
@@ -185,7 +185,7 @@ describe('List Insert plugin', () => {
       {
         effect: () => Promise.resolve(),
       }
-    )()
+    )
 
     const prevState = {
       pending: false,
@@ -213,7 +213,7 @@ describe('List Insert plugin', () => {
       {
         effect: () => Promise.resolve(),
       }
-    )()
+    )
 
     const prevState = {
       pending: false,

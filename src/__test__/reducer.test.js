@@ -5,7 +5,7 @@ describe('Rocketjump reducer', () => {
   it('should return the initial state', () => {
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     expect(reducer(undefined, { type: '@' })).toEqual({
       pending: false,
@@ -23,7 +23,7 @@ describe('Rocketjump reducer', () => {
 
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     expect(reducer(prevState, { type: PENDING })).toEqual({
       pending: true,
@@ -41,7 +41,7 @@ describe('Rocketjump reducer', () => {
 
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     expect(
       reducer(prevState, {
@@ -65,7 +65,7 @@ describe('Rocketjump reducer', () => {
 
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     expect(
       reducer(prevState, { type: SUCCESS, payload: { data: 'Yeah' } })
@@ -86,7 +86,7 @@ describe('Rocketjump reducer', () => {
 
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     expect(reducer(prevState, { type: CLEAN })).toEqual({
       pending: false,
@@ -106,7 +106,7 @@ describe('Rocketjump reducer', () => {
 
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     expect(reducer(prevState, { type: CANCEL })).toEqual({
       pending: false,
@@ -128,7 +128,7 @@ describe('Rocketjump reducer', () => {
           return nextState
         }
       },
-    })()
+    })
 
     const prevState = {
       pending: true,
@@ -177,7 +177,7 @@ describe('Rocketjump reducer', () => {
               }
             : prevState,
       ],
-    })()
+    })
 
     let state = reducer(undefined, {})
 

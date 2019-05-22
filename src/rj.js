@@ -1,7 +1,80 @@
-import { forgeRocketJump, isPartialRj } from 'rocketjump-core'
-import { $TYPE_RJ_EXTREA_CONFIG } from './internals'
+import { forgeRocketJump, isPartialRj, isObjectRj } from 'rocketjump-core'
 import makeExport from './export'
 import createMakeRxObservable from './createMakeRxObservable'
+
+function shouldRocketJump(partialRjsOrConfigs) {
+  let hasEffectConfigured = false
+  for (let partialRjOrConfig of partialRjsOrConfigs) {
+    // Parital allowed
+    if (isPartialRj(partialRjOrConfig)) {
+      continue
+    }
+    // Rj Object not allowed
+    if (isObjectRj(partialRjOrConfig)) {
+      throw new Error(
+        '[react-rocketjump] you can pass an rj object as argument.'
+      )
+    }
+    // Config object is allowed
+    if (partialRjOrConfig !== null && typeof partialRjOrConfig === 'object') {
+      if (typeof partialRjOrConfig.effect === 'function') {
+        if (hasEffectConfigured) {
+          throw new Error(
+            '[react-rocketjump] effect should defined one time at last.'
+          )
+        }
+        hasEffectConfigured = true
+      }
+      continue
+    }
+    // A function effect
+    if (typeof partialRjOrConfig === 'function') {
+      if (hasEffectConfigured) {
+        throw new Error(
+          '[react-rocketjump] effect should defined one time at last.'
+        )
+      }
+      hasEffectConfigured = true
+      continue
+    }
+    // Bad shit as config
+    throw new Error(
+      '[react-rocketjump] you can pass only config object or rj partial to rj constructor.'
+    )
+  }
+
+  if (partialRjsOrConfigs.length === 0) {
+    return false
+  }
+  const lastPartialOrConfig =
+    partialRjsOrConfigs[partialRjsOrConfigs.length - 1]
+
+  // Object \w effect configured
+  if (
+    lastPartialOrConfig !== null &&
+    typeof lastPartialOrConfig === 'object' &&
+    lastPartialOrConfig.effect
+  ) {
+    return true
+  }
+
+  // Is a function (and not a partial rj) rj(() => Promise.resolve(23))
+  if (
+    !isPartialRj(lastPartialOrConfig) &&
+    typeof lastPartialOrConfig === 'function'
+  ) {
+    return true
+  }
+
+  // Not defined at last
+  if (hasEffectConfigured) {
+    throw new Error(
+      '[react-rocketjump] effect should defined one time at last.'
+    )
+  }
+
+  return false
+}
 
 // Don't needed
 function makeRunConfig(finalConfig) {
@@ -14,39 +87,31 @@ function makeRecursionRjs(
   extraConfig,
   isLastRjInvocation
 ) {
-  let hasEffectConfigured = !isLastRjInvocation
-  let rjsOrConfigs = [...partialRjsOrConfigs]
-  // Extends only from ConfigureRj
-  if (
-    extraConfig !== null &&
-    typeof extraConfig === 'object' &&
-    extraConfig.__rjtype === $TYPE_RJ_EXTREA_CONFIG
-  ) {
-    rjsOrConfigs.push(extraConfig)
-  }
-  rjsOrConfigs = rjsOrConfigs.map(config => {
-    if (typeof config === 'function') {
+  let hasEffectConfigured = false
+
+  const recursionRjs = partialRjsOrConfigs.map(partialRjOrConfig => {
+    if (typeof partialRjOrConfig === 'function') {
       // A Partial RJ
-      if (isPartialRj(config)) {
-        return config
+      if (isPartialRj(partialRjOrConfig)) {
+        return partialRjOrConfig
       } else {
         // Use as EFFECT Call
         hasEffectConfigured = true
         return {
-          effect: config,
+          effect: partialRjOrConfig,
         }
       }
     }
     hasEffectConfigured =
-      hasEffectConfigured || typeof config.effect === 'function'
-    return config
+      hasEffectConfigured || typeof partialRjOrConfig.effect === 'function'
+    return partialRjOrConfig
   })
 
-  if (!hasEffectConfigured) {
-    throw new Error(`[react-rj] the effect option is mandatory.`)
+  if (!hasEffectConfigured && isLastRjInvocation) {
+    throw new Error(`[react-rocketjump] you can't invoke a partialRj.`)
   }
 
-  return rjsOrConfigs
+  return recursionRjs
 }
 
 function finalizeExport(finalExport, runConfig, finalConfig) {
@@ -71,36 +136,10 @@ function finalizeExport(finalExport, runConfig, finalConfig) {
   }
 }
 
-const reactRjImpl = {
+export default forgeRocketJump({
+  shouldRocketJump,
   makeRunConfig,
   makeRecursionRjs,
   makeExport,
   finalizeExport,
-}
-
-const rj = forgeRocketJump(reactRjImpl)
-
-function adjustConfig(c) {
-  if (typeof c === 'function') {
-    return c
-  }
-  return {
-    effect: c.api,
-    reducer: c.proxyReducer,
-  }
-}
-
-// FIXME For complex rjs i think is bugged
-// unstable shit use at your own risks ...
-rj.__unstableFromReduxRj = reduxRj => {
-  const proxyImpl = { ...reactRjImpl }
-
-  proxyImpl.makeRecursionRjs = (partialRjsOrConfigs, ...args) => {
-    const proxyRjs = partialRjsOrConfigs.map(adjustConfig)
-    return reactRjImpl.makeRecursionRjs(proxyRjs, ...args)
-  }
-
-  return reduxRj(undefined, undefined, proxyImpl)
-}
-
-export default rj
+})

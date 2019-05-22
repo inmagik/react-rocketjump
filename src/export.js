@@ -89,10 +89,5 @@ export default (_, rjConfig, extendExport = {}) => {
     makeSelectors,
   }
 
-  Object.defineProperty(newExport, '__rjtype', {
-    // RAVER FOLLE 23
-    value: extendExport.__rjtype,
-  })
-
   return newExport
 }

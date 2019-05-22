@@ -17,7 +17,7 @@ describe('RJ side effect model', () => {
 
     const { makeRxObservable } = rj({
       effect: mockApi,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -63,7 +63,7 @@ describe('RJ side effect model', () => {
 
     const { makeRxObservable } = rj({
       effect: mockApi,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -110,7 +110,7 @@ describe('RJ side effect model', () => {
 
     const { makeRxObservable } = rj({
       effect: mockBadApi,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -153,7 +153,7 @@ describe('RJ side effect model', () => {
 
     const { makeRxObservable } = rj({
       effect: mockApi,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -179,7 +179,7 @@ describe('RJ side effect model', () => {
 
     const { makeRxObservable } = rj({
       effect: mockApi,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -225,7 +225,7 @@ describe('RJ side effect model', () => {
 
     const { makeRxObservable } = rj({
       effect: mockBadApi,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -268,7 +268,7 @@ describe('RJ side effect model', () => {
 
     const { makeRxObservable } = rj({
       effect: mockApi,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -324,7 +324,7 @@ describe('RJ side effect model', () => {
     const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: 'every',
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -430,7 +430,7 @@ describe('RJ side effect model', () => {
     const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_EXHAUST,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -531,7 +531,7 @@ describe('RJ side effect model', () => {
     const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: 'every',
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -616,7 +616,7 @@ describe('RJ side effect model', () => {
     const mockCallback = jest.fn()
     const { makeRxObservable } = rj({
       effect: mockApi,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -689,7 +689,7 @@ describe('RJ side effect model', () => {
     const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_EVERY,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -782,7 +782,7 @@ describe('RJ side effect model', () => {
     const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_EVERY,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -965,7 +965,7 @@ describe('RJ side effect model', () => {
     const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_EXHAUST,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -1068,7 +1068,7 @@ describe('RJ side effect model', () => {
     const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: [TAKE_EFFECT_GROUP_BY, action => action.meta.name],
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -1197,7 +1197,7 @@ describe('RJ side effect model', () => {
     const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_GROUP_BY,
-    })()
+    })
 
     const subject = new Subject()
 
@@ -1218,7 +1218,7 @@ describe('RJ side effect model', () => {
     const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: 'blabla',
-    })()
+    })
 
     const subject = new Subject()
 
@@ -1236,7 +1236,7 @@ describe('RJ side effect model', () => {
     const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: customMockTakeEffect,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(() => {})
@@ -1257,7 +1257,7 @@ describe('RJ side effect model', () => {
 
     const { makeRxObservable } = rj({
       effect: mockApi,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(() => {})
@@ -1283,7 +1283,7 @@ describe('RJ side effect model', () => {
 
     const { makeRxObservable } = rj({
       effect: mockApi,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(() => {})

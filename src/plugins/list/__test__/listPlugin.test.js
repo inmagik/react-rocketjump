@@ -16,7 +16,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const prevState = {
       data: null,
@@ -89,7 +89,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const prevState = {
       data: {
@@ -172,7 +172,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const prevState = {
       data: {
@@ -255,7 +255,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const {
       getList,
@@ -322,7 +322,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const prevState = null
 
@@ -347,7 +347,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const { getNumPages } = makeSelectors()
 
@@ -397,7 +397,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const {
       getList,
@@ -442,7 +442,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const prevState = {
       data: {
@@ -521,7 +521,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const prevState = {
       data: {
@@ -598,7 +598,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const {
       getList,
@@ -688,7 +688,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const {
       getList,
@@ -778,7 +778,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const {
       getList,
@@ -837,7 +837,7 @@ describe('List Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     const {
       getList,

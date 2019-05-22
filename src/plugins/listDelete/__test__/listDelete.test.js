@@ -5,7 +5,7 @@ describe('List DeletePlugin', () => {
   it('adds a deleteItem action', () => {
     const { actionCreators } = rj(rjListDelete(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     expect(actionCreators).toHaveProperty('deleteItem')
 
@@ -33,7 +33,7 @@ describe('List DeletePlugin', () => {
 
     const { reducer } = rj(spy, rjListDelete(), {
       effect: () => Promise.resolve(),
-    })()
+    })
 
     const prevState = {
       pending: false,
@@ -53,7 +53,7 @@ describe('List DeletePlugin', () => {
   it('deletes items', () => {
     const { reducer } = rj(rjListDelete(), {
       effect: () => Promise.resolve(),
-    })()
+    })
 
     const prevState = {
       pending: false,
@@ -98,7 +98,7 @@ describe('List DeletePlugin', () => {
   it('can operate with a custom path', () => {
     const { reducer } = rj(rjListDelete({ path: 'data.custom.path.to.list' }), {
       effect: () => Promise.resolve(),
-    })()
+    })
 
     const prevState = {
       pending: false,
@@ -164,7 +164,7 @@ describe('List DeletePlugin', () => {
       {
         effect: () => Promise.resolve(),
       }
-    )()
+    )
 
     const prevState = {
       pending: false,
@@ -194,7 +194,7 @@ describe('List DeletePlugin', () => {
       {
         effect: () => Promise.resolve(),
       }
-    )()
+    )
 
     const prevState = {
       pending: false,

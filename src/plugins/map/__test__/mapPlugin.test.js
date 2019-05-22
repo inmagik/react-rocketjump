@@ -8,7 +8,7 @@ describe('Map Plugin', () => {
   it('should make map reducer', () => {
     const { reducer } = rj(rjMap(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     let state = reducer(
       {},
@@ -161,7 +161,7 @@ describe('Map Plugin', () => {
 
     const { reducer } = rj(spyRj(), rjMap(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     reducer(
       {},
@@ -177,7 +177,7 @@ describe('Map Plugin', () => {
   it('should make map selectors', () => {
     const { reducer, makeSelectors } = rj(rjMap(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     const { getMapPendings, getMapFailures, getMapData } = makeSelectors()
 
@@ -256,7 +256,7 @@ describe('Map Plugin', () => {
   it('should make map action creators', () => {
     const { actionCreators } = rj(rjMap(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     expect(actionCreators).toHaveProperty('runKey')
     expect(actionCreators).toHaveProperty('cleanKey')
@@ -293,7 +293,7 @@ describe('Map Plugin', () => {
 
     const { actionCreators, makeRxObservable } = rj(rjMap(), {
       effect: mockApi,
-    })()
+    })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
@@ -360,7 +360,7 @@ describe('Map Plugin', () => {
   it('should remove completed elements if told to do so', () => {
     const { reducer } = rj(rjMap({ keepCompleted: false }), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     let state = reducer(
       {},
@@ -427,7 +427,7 @@ describe('Map Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     let state = reducer(
       {},
@@ -463,7 +463,7 @@ describe('Map Plugin', () => {
   it('does not break with corner-case states', () => {
     const { reducer } = rj(rjMap(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     let state = reducer(null, {
       type: PENDING,
@@ -503,7 +503,7 @@ describe('Map Plugin', () => {
       {
         effect: () => Promise.resolve(1),
       }
-    )()
+    )
 
     let state = reducer(null, {
       type: PENDING,

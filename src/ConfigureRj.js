@@ -1,28 +1,13 @@
 import React, { useMemo } from 'react'
-import { $TYPE_RJ_EXTREA_CONFIG } from './internals'
 import ConfigureRjContext from './ConfigureRjContext'
 
 export default function ConfigureRj({
   children,
-  reducer,
-  composeReducer,
-  actions,
-  selectors,
-  callEffect,
+  effectCaller,
 }) {
-  const extraConfig = useMemo(() => {
-    const injectExtraConfig = {
-      reducer,
-      composeReducer,
-      actions,
-      selectors,
-      callEffect,
-    }
-    Object.defineProperty(injectExtraConfig, '__rjtype', {
-      value: $TYPE_RJ_EXTREA_CONFIG,
-    })
-    return injectExtraConfig
-  }, [callEffect, reducer, composeReducer, actions, selectors])
+  const extraConfig = useMemo(() => ({
+    effectCaller,
+  }), [effectCaller])
 
   return (
     <ConfigureRjContext.Provider value={extraConfig}>

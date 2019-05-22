@@ -5,7 +5,7 @@ describe('List Update plugin', () => {
   it('adds an updateItem action', () => {
     const { actionCreators } = rj(rjListUpdate(), {
       effect: () => Promise.resolve(1),
-    })()
+    })
 
     expect(actionCreators).toHaveProperty('updateItem')
 
@@ -34,7 +34,7 @@ describe('List Update plugin', () => {
 
     const { reducer } = rj(spy, rjListUpdate(), {
       effect: () => Promise.resolve(),
-    })()
+    })
 
     const prevState = {
       pending: false,
@@ -54,7 +54,7 @@ describe('List Update plugin', () => {
   it('updates items', () => {
     const { reducer } = rj(rjListUpdate(), {
       effect: () => Promise.resolve(),
-    })()
+    })
 
     const prevState = {
       pending: false,
@@ -103,7 +103,7 @@ describe('List Update plugin', () => {
   it('can operate with a custom path', () => {
     const { reducer } = rj(rjListUpdate({ path: 'data.custom.path.to.list' }), {
       effect: () => Promise.resolve(),
-    })()
+    })
 
     const prevState = {
       pending: false,
@@ -174,7 +174,7 @@ describe('List Update plugin', () => {
       {
         effect: () => Promise.resolve(),
       }
-    )()
+    )
 
     const prevState = {
       pending: false,
@@ -215,7 +215,7 @@ describe('List Update plugin', () => {
       {
         effect: () => Promise.resolve(),
       }
-    )()
+    )
 
     const prevState = {
       pending: false,

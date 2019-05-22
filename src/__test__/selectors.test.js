@@ -17,7 +17,7 @@ describe('Rocketjump selectors', () => {
   }
 
   const rjSelectors = (...config) => {
-    return rj(...config)().makeSelectors()
+    return rj(...config).makeSelectors()
   }
 
   it('should be getData, isLoading, getError, getBaseState', () => {
