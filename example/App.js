@@ -6,10 +6,11 @@ import { friendsState } from './state'
 
 const Shenron = () => (
   <div>
-  {Array.apply(null, { length: 500 }).map((_, i) => (
+    <Friends />
+  {/* {Array.apply(null, { length: 500 }).map((_, i) => (
     <Friends key={i} />
     //<div key={i}>{i}</div>
-  ))}
+  ))} */}
   </div>
 )
 
@@ -40,17 +41,15 @@ function Friends() {
   const [msg, setMsg] = useState(null)
 
   // console.log('RENDER', friends)
-  // useEffect(() => {
-  //   loadFriends.onSuccess(freshFriends => {
-  //     console.log('Got ma friend!', freshFriends)
-  //     setMsg('Got FRIENDS!')
-  //   }).run()
-  // }, [loadFriends])
+  useEffect(() => {
+    loadFriends(msg)
+  }, [loadFriends, msg])
 
 
   return (
     <div>
       o
+      <input type='text' value={msg} onChange={e => setMsg(e.target.value)} />
       <div>{msg}</div>
       {loading && <div>Waiting ma friends....</div>}
       {friends && friends.map(friend => (

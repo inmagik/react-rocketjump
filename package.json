@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "dev": "webpack-dev-server",
-    "server": "json-server --watch db.json --port 3004 --delay 300",
+    "server": "json-server --watch db.json --port 3004 --delay 500",
     "format": "prettier --no-semi --single-quote --trailing-comma es5  --write \"{src,__{tests,mocks}__}/**/*.js\"",
     "test": "jest",
     "prebuild": "rimraf lib && node scripts/make-plugin-defs.js",
