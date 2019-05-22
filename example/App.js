@@ -6,7 +6,7 @@ import { friendsState } from './state'
 
 const Shenron = () => (
   <div>
-  {Array.apply(null, { length: 200 }).map((_, i) => (
+  {Array.apply(null, { length: 500 }).map((_, i) => (
     <Friends key={i} />
     //<div key={i}>{i}</div>
   ))}

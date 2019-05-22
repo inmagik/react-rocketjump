@@ -1,27 +1,23 @@
 import { useMemo } from 'react'
-import {
-  useRxSubject,
-  useReduxReducer,
-  useConstant,
-  useCreateRjState,
-} from './hooks'
+import { isObjectRj } from 'rocketjump-core'
+import { useRxSubject, useReduxReducer, useConstant } from './hooks'
 import bindActionCreators from './bindActionCreators'
 
 const defaultMapActions = a => a
 
 export default function useRj(
-  // The returned value of rj()() or a partialRj rj()
-  rjStateOrPartial,
+  // The returned value of rj(..., EFFECT)
+  rjObject,
   selectState,
   mapActions = defaultMapActions
 ) {
-  const rjRunnableState = useCreateRjState(rjStateOrPartial)
-  const {
-    makeRxObservable,
-    actionCreators,
-    reducer,
-    makeSelectors,
-  } = rjRunnableState
+  if (!isObjectRj(rjObject)) {
+    throw new Error(
+      '[react-rocketjump] You should provide a rj object to useRj.'
+    )
+  }
+
+  const { makeRxObservable, actionCreators, reducer, makeSelectors } = rjObject
 
   const [state, dispatch] = useReduxReducer(reducer)
 

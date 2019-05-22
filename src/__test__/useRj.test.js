@@ -1,9 +1,7 @@
-import React from 'react'
 import { act } from 'react-dom/test-utils'
 import { renderHook } from 'react-hooks-testing-library'
 import memoize from 'memoize-one'
 import rj from '../rj'
-import ConfigureRj from '../ConfigureRj'
 import useRj from '../useRj'
 
 describe('useRj', () => {
@@ -268,7 +266,28 @@ describe('useRj', () => {
   //   })
   // })
 
-  test.todo('Test type checking on rjPartial ....')
+  it('should get angry with a non rj object is passed as argument', () => {
+    expect(() => {
+      useRj(rj())
+    }).toThrowError(
+      /\[react-rocketjump\] You should provide a rj object to useRj/
+    )
+    expect(() => {
+      useRj({})
+    }).toThrowError(
+      /\[react-rocketjump\] You should provide a rj object to useRj/
+    )
+    expect(() => {
+      useRj(23)
+    }).toThrowError(
+      /\[react-rocketjump\] You should provide a rj object to useRj/
+    )
+    expect(() => {
+      useRj()
+    }).toThrowError(
+      /\[react-rocketjump\] You should provide a rj object to useRj/
+    )
+  })
 
   test.todo('Test the acting of side effects')
 

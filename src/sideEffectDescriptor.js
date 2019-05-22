@@ -15,8 +15,8 @@ export const addConfigToSideEffectDescritor = (
   if (config.effect) {
     newSideEffectDescriptor.effect = config.effect
   }
-  if (config.callEffect) {
-    newSideEffectDescriptor.callEffect = config.callEffect
+  if (config.effectCaller) {
+    newSideEffectDescriptor.effectCaller = config.effectCaller
   }
   if (config.takeEffect) {
     newSideEffectDescriptor.takeEffect = arrayze(config.takeEffect)

@@ -100,10 +100,24 @@ const defaultCallEffect = (call, ...args) => call(...args)
 
 export default function createMakeRxObservable({
   effect: effectCall,
-  callEffect = defaultCallEffect,
+  effectCaller: rjCallEffect,
   takeEffect,
 }) {
-  return function makeRxObservable($source) {
+  return function makeRxObservable($source, overrideCallEffect) {
+    // Override the effectCaller from rj using local one istead
+    // ... when no effectCaller is provided
+    let callEffect
+    if (typeof rjCallEffect === 'function') {
+      // Use call effect from rj config
+      callEffect = rjCallEffect
+    } else if (typeof overrideCallEffect === 'function') {
+      // Use the local overrideCallEffect
+      callEffect = overrideCallEffect
+    } else {
+      // default NOOP call effect
+      callEffect = defaultCallEffect
+    }
+
     // Generate a result Observable from a given action
     // a RUN action but this is not checked is up to you
     // pass the corret action

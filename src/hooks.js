@@ -1,6 +1,5 @@
 import { useRef, useEffect, useReducer, useContext } from 'react'
 import { Subject } from 'rxjs'
-import { isPartialRj } from 'rocketjump-core'
 import ConfigureRjContext from './ConfigureRjContext'
 
 // Thanks 2 ma man @Andarist
@@ -17,10 +16,14 @@ export function useConstant(fn) {
 
 export function useRxSubject(makeObservable, callback) {
   const subject = useConstant(() => new Subject())
+  const extraConfig = useContext(ConfigureRjContext)
 
   // Dispatch the action returned from observable
   const subscription = useConstant(() => {
-    return makeObservable(subject.asObservable()).subscribe(callback)
+    return makeObservable(
+      subject.asObservable(),
+      extraConfig ? extraConfig.effectCaller : undefined
+    ).subscribe(callback)
   })
 
   // On unmount unsub
@@ -38,20 +41,4 @@ export function useReduxReducer(reducer) {
   }
   const [state, dispatch] = useReducer(reducer, undefined, initReducer)
   return [state, dispatch]
-}
-
-export function useCreateRjState(rjStateOrPartial) {
-  const extraConfig = useContext(ConfigureRjContext)
-  // NOTE: use useMemo if U want to change rjRunnableState
-  // from <ConfigureRj> after da first mount
-  // but i think this can only lead 2 stupid bugs...
-  // but think about it...
-  const rjRunnableState = useConstant(() => {
-    if (isPartialRj(rjStateOrPartial)) {
-      return rjStateOrPartial(extraConfig)
-    } else {
-      return rjStateOrPartial
-    }
-  })
-  return rjRunnableState
 }

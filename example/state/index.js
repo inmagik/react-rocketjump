@@ -69,4 +69,4 @@ export const friendsState = rj(
       resolve([ {name:'Giova',id:23} ])
     }, 500)
   })
-)()
+)

@@ -1,30 +1,30 @@
 import React, { useMemo } from 'react'
+import { isObjectRj } from 'rocketjump-core'
 import hoistStatics from 'hoist-non-react-statics'
 import bindActionCreators from './bindActionCreators'
-import {
-  useRxSubject,
-  useReduxReducer,
-  useConstant,
-  useCreateRjState,
-} from './hooks'
+import { useRxSubject, useReduxReducer, useConstant } from './hooks'
 
 const defaultMapActionsToProps = a => a
 
 export default function connectRj(
-  // The returned value of rj()() or a partialRj rj()
-  rjStateOrPartial,
+  // The returned value of rj(..., EFFECT)
+  rjObject,
   mapStateToProps,
   mapActionsToProps = defaultMapActionsToProps
 ) {
   return function wrapWithConnect(WrappedComponent) {
+    if (!isObjectRj(rjObject)) {
+      throw new Error(
+        '[react-rocketjump] You should provide a rj object to useRj.'
+      )
+    }
     function ConnectFunction(props) {
-      const rjRunnableState = useCreateRjState(rjStateOrPartial)
       const {
         makeRxObservable,
         actionCreators,
         reducer,
         makeSelectors,
-      } = rjRunnableState
+      } = rjObject
 
       const [state, dispatch] = useReduxReducer(reducer)
 
