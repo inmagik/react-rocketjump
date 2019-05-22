@@ -78,7 +78,7 @@ is creating (and exporting) our RocketJump object, which is composed by the inte
 Now we need a component capable of displaying todos. Create a `Todos.js` file with the following content
 
 ```js
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 
 const Todo = ({ todo }) => (
   <div>
@@ -89,7 +89,7 @@ const Todo = ({ todo }) => (
   </div>
 )
 
-class Todos extends PureComponent {
+class Todos extends Component {
   render() {
     const { todos } = this.props
     return (
@@ -133,9 +133,9 @@ export default connectRj(
 )(Todos)
 
 ```
-Redux users will find this construct familiar, since it behaves more or less like the `connect` primitive that ships with React-Redux. 
+Redux users will find this construct familiar, since it behaves more or less like the `connect` primitive that ships with React-Redux.
 
-With this statement, we are telling React-RocketJump to build a state object starting from `TodosListState` definition we imported. 
+With this statement, we are telling React-RocketJump to build a state object starting from `TodosListState` definition we imported.
 
 The second parameter is a function called `mapStateToProps`, whose parameters are the state object and a bunch of selectors used to extract meaningful information from it. In this case, we want the list contained in the state, so we leverage the `getList` selector, but there are a bunch of them. If you are curious, head on to the API description.
 
@@ -144,7 +144,7 @@ The last but not least parameter is another function called `mapDispatchToProps`
 The last tile needed to complete our mosaic is to use the props we defined in the Todos component. So, let's enrich it a little bit
 
 ```js
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 
 const Todo = ({ todo }) => (
   <div>
@@ -155,8 +155,8 @@ const Todo = ({ todo }) => (
   </div>
 )
 
-class Todos extends PureComponent {
-  
+class Todos extends Component {
+
   componentDidMount() {
      this.props.loadTodos(); // Trigger the side effect when the component mounts
   }
