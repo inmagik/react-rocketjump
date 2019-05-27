@@ -2,5 +2,5 @@ language: node_js
 node_js:
   - "node"
 script:
-  - yarn test-converage
+  - yarn test-coverage
   - codecov
