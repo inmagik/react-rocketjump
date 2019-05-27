@@ -12,7 +12,7 @@ function shouldRocketJump(partialRjsOrConfigs) {
     // Rj Object not allowed
     if (isObjectRj(partialRjOrConfig)) {
       throw new Error(
-        '[react-rocketjump] you can pass an rj object as argument.'
+        `[react-rocketjump] you can't pass an rj object as argument.`
       )
     }
     // Config object is allowed
@@ -20,7 +20,7 @@ function shouldRocketJump(partialRjsOrConfigs) {
       if (typeof partialRjOrConfig.effect === 'function') {
         if (hasEffectConfigured) {
           throw new Error(
-            '[react-rocketjump] effect should defined one time at last.'
+            '[react-rocketjump] effect should be defined only once, in the last argument.'
           )
         }
         hasEffectConfigured = true
@@ -31,7 +31,7 @@ function shouldRocketJump(partialRjsOrConfigs) {
     if (typeof partialRjOrConfig === 'function') {
       if (hasEffectConfigured) {
         throw new Error(
-          '[react-rocketjump] effect should defined one time at last.'
+          '[react-rocketjump] effect should be defined only once, in the last argument.'
         )
       }
       hasEffectConfigured = true
@@ -69,7 +69,7 @@ function shouldRocketJump(partialRjsOrConfigs) {
   // Not defined at last
   if (hasEffectConfigured) {
     throw new Error(
-      '[react-rocketjump] effect should defined one time at last.'
+      '[react-rocketjump] effect should be defined only once, in the last argument.'
     )
   }
 

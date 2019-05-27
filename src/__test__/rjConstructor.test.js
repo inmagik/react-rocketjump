@@ -36,6 +36,15 @@ describe('rj constructor', () => {
       )
     ).toBe(true)
   })
+  it('should get angry when invoke with shit', () => {
+    expect(() => {
+      rj(
+        23
+      )
+    }).toThrowError(
+      /\[react-rocketjump\] you can pass only config object or rj partial to rj constructor/
+    )
+  })
   it('should get angry with the function are both in config and not last args', () => {
     expect(() => {
       rj(
@@ -47,7 +56,15 @@ describe('rj constructor', () => {
         }
       )
     }).toThrowError(
-      /\[react-rocketjump\] effect should defined one time at last/
+      /\[react-rocketjump\] effect should be defined only once, in the last argument/
+    )
+    expect(() => {
+      rj(
+        () => 23,
+        () => 777,
+      )
+    }).toThrowError(
+      /\[react-rocketjump\] effect should be defined only once, in the last argument/
     )
     expect(() => {
       rj(
@@ -56,7 +73,7 @@ describe('rj constructor', () => {
         })
       )
     }).toThrowError(
-      /\[react-rocketjump\] you can pass an rj object as argument./
+      /\[react-rocketjump\] you can't pass an rj object as argument./
     )
     expect(() => {
       rj(
@@ -68,14 +85,14 @@ describe('rj constructor', () => {
         }
       )
     }).toThrowError(
-      /\[react-rocketjump\] effect should defined one time at last/
+      /\[react-rocketjump\] effect should be defined only once, in the last argument/
     )
     expect(() => {
       rj(() => 23, {
         effect: () => 23,
       })
     }).toThrowError(
-      /\[react-rocketjump\] effect should defined one time at last/
+      /\[react-rocketjump\] ./
     )
   })
   it('should produce rj partial no effect or function is provided', () => {
@@ -112,7 +129,7 @@ describe('rj constructor', () => {
         reducer: r => r,
       })()
     }).toThrowError(
-      /\[react-rocketjump\] you can pass an rj object as argument/
+      /\[react-rocketjump\] you can't pass an rj object as argument./
     )
   })
 })
