@@ -521,6 +521,41 @@ describe('RJ side effect model', () => {
     })
   })
 
+  it('should ignore cancel and clean in exhaust side effect', () => {
+    const mockApi = jest.fn()
+    const mockCallback = jest.fn()
+
+    const { makeRxObservable } = rj({
+      effect: mockApi,
+      takeEffect: TAKE_EFFECT_EXHAUST,
+    })
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+
+    subject.next({
+      type: CLEAN,
+      payload: { params: [] },
+      meta: {},
+    })
+    subject.next({
+      type: CANCEL,
+      payload: { params: [] },
+      meta: {},
+    })
+    expect(mockCallback).toBeCalledTimes(2)
+    expect(mockCallback).nthCalledWith(1, {
+      type: CLEAN,
+      payload: { params: [] },
+      meta: {},
+    })
+    expect(mockCallback).nthCalledWith(2, {
+      type: CANCEL,
+      payload: { params: [] },
+      meta: {},
+    })
+  })
+
   it('can unload a queue side effect', done => {
     const mockApi = jest
       .fn()

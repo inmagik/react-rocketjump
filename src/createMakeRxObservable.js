@@ -63,9 +63,13 @@ export const TAKE_EFFECT_EXHAUST = 'exhaust'
 function takeEffectExhaust($source, mapActionToObserable) {
   return merge(
     $source.pipe(
-      mergeMap(action =>
-        action.type === CANCEL || action.type === CLEAN ? of(action) : empty()
-      )
+      mergeMap(action => {
+        if (action.type === CANCEL || action.type === CLEAN) {
+          return of(action)
+        } else {
+          return empty()
+        }
+      })
     ),
     $source.pipe(
       exhaustMap(action => {

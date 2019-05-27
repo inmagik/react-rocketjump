@@ -38,9 +38,7 @@ describe('rj constructor', () => {
   })
   it('should get angry when invoke with shit', () => {
     expect(() => {
-      rj(
-        23
-      )
+      rj(23)
     }).toThrowError(
       /\[react-rocketjump\] you can pass only config object or rj partial to rj constructor/
     )
@@ -59,10 +57,7 @@ describe('rj constructor', () => {
       /\[react-rocketjump\] effect should be defined only once, in the last argument/
     )
     expect(() => {
-      rj(
-        () => 23,
-        () => 777,
-      )
+      rj(() => 23, () => 777)
     }).toThrowError(
       /\[react-rocketjump\] effect should be defined only once, in the last argument/
     )
@@ -91,9 +86,7 @@ describe('rj constructor', () => {
       rj(() => 23, {
         effect: () => 23,
       })
-    }).toThrowError(
-      /\[react-rocketjump\] ./
-    )
+    }).toThrowError(/\[react-rocketjump\] ./)
   })
   it('should produce rj partial no effect or function is provided', () => {
     expect(isPartialRj(rj())).toBe(true)
