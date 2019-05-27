@@ -13,12 +13,6 @@ export function set(obj, path, value) {
   return immutable.set(obj, path, value)
 }
 
-export function keyBy(list, keyFunc = a => a) {
-  let out = {}
-  list.forEach(item => (out[keyFunc(item)] = item))
-  return out
-}
-
 export function omit(object, props) {
   return props.reduce((obj, prop) => immutable.del(obj, prop), object)
 }
