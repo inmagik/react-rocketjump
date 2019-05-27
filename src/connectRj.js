@@ -15,7 +15,7 @@ export default function connectRj(
   return function wrapWithConnect(WrappedComponent) {
     if (!isObjectRj(rjObject)) {
       throw new Error(
-        '[react-rocketjump] You should provide a rj object to useRj.'
+        '[react-rocketjump] You should provide a rj object to connectRj.'
       )
     }
     function ConnectFunction(props) {

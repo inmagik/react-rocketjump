@@ -214,57 +214,27 @@ describe('useRj', () => {
     })
   })
 
-  // it('should be configurable by ConfigureRj', () => {
-  //   const maRjState = rj(() => Promise.resolve(1312))
-  //
-  //   function Wrapper({ children }) {
-  //     return (
-  //       <ConfigureRj
-  //         composeReducer={(prevState = { data: 'GANG' }) => prevState}
-  //       >
-  //         {children}
-  //       </ConfigureRj>
-  //     )
-  //   }
-  //
-  //   const { result } = renderHook(
-  //     () =>
-  //       useRj(maRjState, (state, { getData }) => ({
-  //         friends: getData(state),
-  //       })),
-  //     {
-  //       wrapper: Wrapper,
-  //     }
-  //   )
-  //
-  //   expect(result.current[0]).toEqual({
-  //     friends: 'GANG',
-  //   })
-  // })
+  it('should run rj sideEffects and react to failure', async () => {
+    const mockFn = jest.fn(() => Promise.reject('Bleah'))
+    const maRjState = rj(mockFn)
 
-  // it('should be configurable by ConfigureRj', () => {
-  //   const maRjState = rj(
-  //     () => Promise.resolve(1312)
-  //   )
-  //
-  //   function Wrapper({ children }) {
-  //     return (
-  //       <ConfigureRj composeReducer={(prevState = { data: 'GANG' }) => prevState}>
-  //         {children}
-  //       </ConfigureRj>
-  //     )
-  //   }
-  //
-  //   const { result } = renderHook(() => useRj(maRjState, (state, { getData }) => ({
-  //     friends: getData(state),
-  //   })), {
-  //     wrapper: Wrapper,
-  //   })
-  //
-  //   expect(result.current[0]).toEqual({
-  //     friends: 'GANG',
-  //   })
-  // })
+    const { result } = renderHook(() =>
+      useRj(maRjState, (state, { getError }) => ({
+        error: getError(state),
+      }))
+    )
+
+    expect(result.current[0]).toEqual({
+      error: null,
+    })
+
+    await act(async () => {
+      result.current[1].run()
+    })
+    expect(result.current[0]).toEqual({
+      error: 'Bleah',
+    })
+  })
 
   it('should get angry with a non rj object is passed as argument', () => {
     expect(() => {
@@ -288,8 +258,6 @@ describe('useRj', () => {
       /\[react-rocketjump\] You should provide a rj object to useRj/
     )
   })
-
-  test.todo('Test the acting of side effects')
 
   test.todo('Test onSuccess onFailure')
 

@@ -82,4 +82,5 @@ describe('ConfigureRj', () => {
       data: 777,
     })
   })
+  test.todo('Test also with connectRj')
 })
