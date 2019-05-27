@@ -4,6 +4,7 @@ Rocketjump your react! Handle state and side effects with classy
 
 [![Build Status](https://travis-ci.com/inmagik/react-rocketjump.svg?branch=master)](https://travis-ci.com/inmagik/react-rocketjump)
 [![npm version](https://badge.fury.io/js/react-rocketjump.svg)](https://badge.fury.io/js/react-rocketjump)
+[![codecov](https://codecov.io/gh/inmagik/react-rocketjump/branch/master/graph/badge.svg)](https://codecov.io/gh/inmagik/react-rocketjump)
 
 ## [WEBSITE](https://inmagik.github.io/react-rocketjump)
 

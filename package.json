@@ -15,6 +15,7 @@
     "server": "json-server --watch db.json --port 3004 --delay 500",
     "format": "prettier --no-semi --single-quote --trailing-comma es5  --write \"{src,__{tests,mocks}__}/**/*.js\"",
     "test": "jest",
+    "test-coverage": "jest --coverage",
     "prebuild": "rimraf lib && node scripts/make-plugin-defs.js",
     "build": "rollup -c"
   },
@@ -46,6 +47,7 @@
     "babel-eslint": "9.x",
     "babel-jest": "^24.8.0",
     "babel-loader": "^8.0.6",
+    "codecov": "^3.5.0",
     "css-loader": "^2.1.1",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.12.1",
