@@ -1,6 +1,6 @@
 import { rj } from '..'
 import { Subject } from 'rxjs'
-import { mergeMap } from 'rxjs/operators'
+import { mergeMap, debounceTime, distinctUntilChanged } from 'rxjs/operators'
 import { PENDING, SUCCESS, FAILURE, CLEAN, RUN, CANCEL } from '../actionTypes'
 import {
   TAKE_EFFECT_EVERY,
@@ -8,6 +8,8 @@ import {
   // TAKE_EFFECT_QUEUE,
   TAKE_EFFECT_EXHAUST,
 } from '../createMakeRxObservable'
+
+jest.useFakeTimers()
 
 describe('RJ side effect model', () => {
   it('should run an async api and dispatch PENDING and SUCCESS actions when resolved', done => {
@@ -788,6 +790,76 @@ describe('RJ side effect model', () => {
         payload: {
           params: [],
           data: 'Bob',
+        },
+      })
+
+      done()
+    })
+  })
+
+  it('can pipeling effect with rx', done => {
+    const mockApi = jest
+      .fn()
+      .mockResolvedValueOnce('Alice')
+      .mockResolvedValueOnce('Bob')
+
+    const mockCallback = jest.fn()
+
+    const rjWithDebouce = rj({
+      effectPipeline: $s =>
+        $s.pipe(
+          debounceTime(200),
+          distinctUntilChanged()
+        ),
+    })
+    const { makeRxObservable } = rj(rjWithDebouce, {
+      effect: mockApi,
+      takeEffect: TAKE_EFFECT_EVERY,
+    })
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    // forwoard debouce time
+    jest.runAllTimers()
+
+    expect(mockApi).toBeCalledTimes(1)
+
+    mockApi.mock.results[0].value.then(() => {
+      expect(mockCallback).toBeCalledTimes(3)
+
+      expect(mockCallback).nthCalledWith(1, {
+        type: RUN,
+        payload: { params: [] },
+        meta: {},
+        callbacks: {},
+      })
+
+      expect(mockCallback).nthCalledWith(2, {
+        type: PENDING,
+        meta: {},
+      })
+
+      expect(mockCallback).nthCalledWith(3, {
+        type: SUCCESS,
+        meta: {},
+        payload: {
+          params: [],
+          data: 'Alice',
         },
       })
 

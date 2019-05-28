@@ -106,8 +106,9 @@ export default function createMakeRxObservable({
   effect: effectCall,
   effectCaller: rjCallEffect,
   takeEffect,
+  effectPipeline,
 }) {
-  return function makeRxObservable($source, overrideCallEffect) {
+  return function makeRxObservable($actionSource, overrideCallEffect) {
     // Override the effectCaller from rj using local one istead
     // ... when no effectCaller is provided
     let callEffect
@@ -158,6 +159,11 @@ export default function createMakeRxObservable({
 
     const [effectType, ...effectTypeArgs] = takeEffect
 
+    const $source = effectPipeline.reduce(
+      ($source, piper) => piper($source),
+      $actionSource
+    )
+
     // Custom take effect
     if (typeof effectType === 'function') {
       // TODO: Maybe in future check the return value of
@@ -176,7 +182,7 @@ export default function createMakeRxObservable({
       return takeEffectGroupBy($source, mapActionToObserable, effectTypeArgs)
     } else {
       throw new Error(
-        `[react-rj] takeEffect: ${takeEffect} is an invalid effect.`
+        `[react-rocketjump] takeEffect: ${takeEffect} is an invalid effect.`
       )
     }
   }

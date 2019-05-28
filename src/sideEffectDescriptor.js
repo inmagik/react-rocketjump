@@ -3,6 +3,7 @@ import { arrayze } from 'rocketjump-core/utils'
 
 export const makeSideEffectDescriptor = () => ({
   takeEffect: [TAKE_EFFECT_LATEST],
+  effectPipeline: [],
 })
 
 // Simply return the last defined effect and take effect
@@ -20,6 +21,11 @@ export const addConfigToSideEffectDescritor = (
   }
   if (config.takeEffect) {
     newSideEffectDescriptor.takeEffect = arrayze(config.takeEffect)
+  }
+  if (typeof config.effectPipeline === 'function') {
+    newSideEffectDescriptor.effectPipeline = newSideEffectDescriptor.effectPipeline.concat(
+      config.effectPipeline
+    )
   }
 
   return newSideEffectDescriptor
