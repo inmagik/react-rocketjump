@@ -1,4 +1,4 @@
-import { empty, timer } from 'rxjs/'
+import { empty, timer } from 'rxjs'
 import { distinctUntilChanged, debounce } from 'rxjs/operators'
 import rj from '../../rj'
 
