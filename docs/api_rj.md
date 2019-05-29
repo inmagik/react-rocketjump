@@ -8,7 +8,7 @@ sidebar_label: RocketJump constructor
 import { rj } from 'react-rocketjump'
 ```
 
-The RocketJump constructor is the entry point of the library, and allows the definition of RocketJump `objects` and RocketJump `partials`. The only difference between an `object` and a `partial` is that the object is tied to a task and can be connected to a component, while a `partial` is a reusable logic that can be embedded in other `partial`s or `object`s but not connected to a component.
+The RocketJump constructor is the entry point of the library, and allows the definition of RocketJump `objects` and RocketJump `partials`. The only difference between an `object` and a `partial` is that the object is tied to a task and can be connected to a component, while a `partial` is a reusable logic that can be embedded in other `partials` or `objects` but not connected to a component.
 
 The RocketJump constructor takes an arbitrary number of arguments
 
