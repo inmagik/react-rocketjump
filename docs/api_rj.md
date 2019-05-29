@@ -32,7 +32,9 @@ Making a simple RocketJump Object that makes a GET request (using SuperAgent syn
 
 ```js
 const rjObject = rj({
-    effect: id => request.get(`https://my.host.dev/api/resource/${id}/`).then(({ body }) => body)
+    effect: id => request
+                    .get(`https://my.host.dev/api/resource/${id}/`)
+                    .then(({ body }) => body)
 })
 ```
 
@@ -62,13 +64,22 @@ const rjPart = rj({
 There is also a shortcut syntax in case the `effect` option is the only option you need to set
 
 ```js
-const rjObject = rj(id => request.get(`https://my.host.dev/api/resource/${id}/`).then(({ body }) => body))
+const rjObject = rj(id => request
+                            .get(`https://my.host.dev/api/resource/${id}/`)
+                            .then(({ body }) => body)
+                    )
 ```
 
 ### actions
 `Object<Action> => Object<Action>`
 
-This function is used to transform predefined actions, or add custom ones. It is passed an object containing the actions defined in nested partials and the two predefined `run` and `clean` actions, and it is expected to return an object containing other actions (the keys in the object are the names of the actions). The returned object is merged with the previous one before being passed down along the chain. Each partial can, in fact, customize actions freely, and customization is applied recursively from the most to the least nested partial, and from left to right in case of siblings.
+React-RocketJump creates some predefined actions to manage asynchronous tasks. These actions are
+
+* `run`, which starts a run of the task
+* `cancel`, which drops any pending run of the task
+* `clean`, which is like `cancel` but also cares of resetting the state
+
+This function is used to transform predefined actions, or add custom ones. It is passed an object containing the actions defined in nested partials and the predefined `run`, `cancel` and `clean` actions, and it is expected to return an object containing other actions (the keys in the object are the names of the actions). The returned object is merged with the previous one before being passed down along the chain. Each partial can, in fact, customize actions freely, and customization is applied recursively from the most to the least nested partial, and from left to right in case of siblings.
 
 __Example__
 
@@ -221,5 +232,29 @@ Group tasks by a meta key
 
 const rjPart = rj({
     takeEffect: ['groupBy', action => action.meta.id]
+})
+```
+
+### effectPipeline
+`(observable: RxObservable) => RxObservable`
+
+This is used to customize the pipeline used to dispatch actions to observables. It is passed in a function that is called with the action stream and it is expected to return again an RxObservable. This configuration setting is useful to introduce some transformations supported by RxJs, for instance `debounce`
+
+__Example__
+Debounce an API call
+
+```js
+import { rj } from 'react-rocketjump'
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
+
+const TypeaheadState = rj({
+  effectPipeline: $s =>
+    $s.pipe(
+      debounceTime(200),
+      distinctUntilChanged()
+    ),
+  effect: search => {
+    return fetch(`/api/users?search=${search}`).then(r => r.json()),
+  }
 })
 ```
