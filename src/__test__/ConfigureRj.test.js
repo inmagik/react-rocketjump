@@ -43,6 +43,42 @@ describe('ConfigureRj', () => {
       data: 1312,
     })
   })
+  it('should use the string noop as default effectCaller and bypass the ConfigureRj effectCaller', async () => {
+    const mockEffect = jest.fn().mockResolvedValue(23)
+    const mockEffectCaller = jest.fn().mockResolvedValue(1312)
+
+    const maRjState = rj({
+      effect: mockEffect,
+      effectCaller: 'noop',
+    })
+
+    function Wrapper({ children }) {
+      return (
+        <ConfigureRj effectCaller={mockEffectCaller}>{children}</ConfigureRj>
+      )
+    }
+
+    const { result } = renderHook(
+      () =>
+        useRj(maRjState, (state, { getData }) => ({
+          data: getData(state),
+        })),
+      {
+        wrapper: Wrapper,
+      }
+    )
+
+    await act(async () => {
+      result.current[1].run()
+    })
+
+    expect(mockEffect).toHaveBeenCalledTimes(1)
+    expect(mockEffectCaller).toHaveBeenCalledTimes(0)
+
+    expect(result.current[0]).toEqual({
+      data: 23,
+    })
+  })
   it('should inject the effect caller unless is provided', async () => {
     const mockEffect = jest.fn().mockResolvedValue(23)
     const mockEffectCaller = jest.fn().mockResolvedValue(1312)

@@ -115,6 +115,9 @@ export default function createMakeRxObservable({
     if (typeof rjCallEffect === 'function') {
       // Use call effect from rj config
       callEffect = rjCallEffect
+    } else if (rjCallEffect === 'noop') {
+      // Force callEffect to default NOOP
+      callEffect = defaultCallEffect
     } else if (typeof overrideCallEffect === 'function') {
       // Use the local overrideCallEffect
       callEffect = overrideCallEffect
