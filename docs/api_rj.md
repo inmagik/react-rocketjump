@@ -22,7 +22,7 @@ each of which is a RocketJump `partial` except for the last one, which is a `con
 The config object can contain the following properties
 
 ### effect
-`(...args) => Promise`
+`(...args) => Promise | (...args) => Observable`
 
 This function is the asynchronous task that we are creating a RocketJump for. Settings this property is very important, since its presence means that a RocketJump object will be created, and not a RocketJump partial. When creating plugins, just avoid setting this in order to make the plugin reusable!
 
@@ -33,6 +33,29 @@ Making a simple RocketJump Object that makes a GET request (using SuperAgent syn
 ```js
 const rjObject = rj({
     effect: id => request.get(`https://my.host.dev/api/resource/${id}/`).then(({ body }) => body)
+})
+```
+
+__Example__
+
+Using RXjs ajax
+
+```js
+import { ajax } from 'rxjs/ajax'
+
+const rjPart = rj({
+    effect: (...params) => {
+        return ajax({
+            url: 'https://my.api.dev/users/Alice',
+            method: 'GET',
+            headers: {
+                /*some headers*/
+            },
+            body: {
+                params
+            }
+        })
+    }
 })
 ```
 
@@ -154,9 +177,10 @@ const rjPart = rj({
 ```
 
 ### effectCaller
-`(effect, ...params) => Promise`
+`(effect, ...params) => Promise | (effect, ...params) => Observable | "noop"`
 
-This setting is used to hook into the process of launching the effect, and can be used to alter its params or to add some more of them. The first argument is the `effect` to be called, and the subsequent arguments are the arguments the user sent in the `run` action. You can do everything you need here, the important thing is that you call the effect and return the Promise used to await for task completion.
+This setting is used to hook into the process of launching the effect, and can be used to alter its params or to add some more of them. The first argument is the `effect` to be called, and the subsequent arguments are the arguments the user sent in the `run` action. You can do everything you need here, the important thing is that you call the effect and return the Promise used to await for task completion, or a Rx Observable (this is useful if you are using Rx Ajax API). In order to force the RocketJump Object to use the default `effectCaller` you can also pass the string `"noop"`. You may want to do this to opt-out a [shared configuration](api_configure.md)
+
 
 __Example__
 
@@ -171,7 +195,7 @@ const rjPart = rj({
 ```
 
 ### takeEffect
-`[policy, ...arguments]`
+`[policy, ...arguments] | (observable: RxObservable, mapTo: action => RxObservable) => RxObservable`
 
 This setting is used to control what to do when more instances of a task are spawned concurrently. The `policy` argument is a `String`, and can assume one of the following values
 
@@ -180,7 +204,14 @@ This setting is used to control what to do when more instances of a task are spa
 * `exhaust`: if there is a pending instance of the task, it ignores any other attempt to spawn other instances of the same task
 * `groupBy`: compute a key for each task invocation, and behaves like the `latest` policy with respect to tasks with the same key.
 
-The only case in which it is required to pass an argument is the `groupBy` case, where a key making function is required. The key making function is called with the `run` action object as a parameter, and is expected to return a scalar (int or string does not matter)
+The only case in which it is required to pass an argument is the `groupBy` case, where a key making function is required. The key making function is called with the `run` action object as a parameter, and is expected to return a scalar (int or string does not matter).
+
+You can also pass a function to this key in order to define your own policy. This function is called with two arguments:
+
+* `observable` is the stream of dispatched actions
+* `mapTo` is a function used to convert an asynchronous action (like the calling of the effect) in a proper stream
+
+This function is expected to return itself a `RxObservable`
 
 __Example__
 
@@ -192,4 +223,3 @@ const rjPart = rj({
     takeEffect: ['groupBy', action => action.meta.id]
 })
 ```
-

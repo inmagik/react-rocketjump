@@ -13,6 +13,10 @@
         "title": "RocketJump Composition",
         "sidebar_label": "Composition"
       },
+      "api_configure": {
+        "title": "Sharing configuration",
+        "sidebar_label": "Sharing configuration"
+      },
       "api_connect": {
         "title": "Connecting RocketJumps",
         "sidebar_label": "Connecting RocketJumps"

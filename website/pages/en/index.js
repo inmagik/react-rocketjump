@@ -156,8 +156,8 @@ class Index extends React.Component {
           },
           {
             content: `Rocketjump has no implicit dependencies except React>=16.8. State and side effects are bound locally to your Component,
-            so you can use rocketjump without have to rewrite your entire app.
-            \nYou can use it side-by-side to something like redux and maybe reutilizze stuff like selectors, reducers and api calls.
+            so you can use rocketjump without having to rewrite your entire app.
+            \nYou can use it side-by-side to something like redux and maybe reuse stuff like selectors, reducers and api calls.
             `,
             // image: `${baseUrl}img/undraw_operating_system.svg`,
             // imageAlign: 'top',
