@@ -24,7 +24,7 @@ describe('List Plugin', () => {
       error: null,
     }
 
-    const action = {
+    let action = {
       type: SUCCESS,
       payload: {
         params: [{ page: 1 }],
@@ -50,7 +50,7 @@ describe('List Plugin', () => {
       },
     }
 
-    const nextState = reducer(prevState, action)
+    let nextState = reducer(prevState, action)
 
     expect(nextState).toEqual({
       pending: false,
@@ -60,6 +60,116 @@ describe('List Plugin', () => {
           count: 99,
           current: { page: 1 },
           next: { page: 2 },
+          previous: null,
+        },
+        list: [
+          {
+            id: 23,
+            name: 'Alice',
+          },
+          {
+            id: 23,
+            name: 'Bob',
+          },
+          {
+            id: 7,
+            name: 'Eve',
+          },
+        ],
+      },
+    })
+
+    action = {
+      type: SUCCESS,
+      payload: {
+        params: [{ page: 1 }],
+        data: {
+          next: null,
+          previous: '/my-api?page=777',
+          count: 99,
+          results: [
+            {
+              id: 23,
+              name: 'Alice',
+            },
+            {
+              id: 23,
+              name: 'Bob',
+            },
+            {
+              id: 7,
+              name: 'Eve',
+            },
+          ],
+        },
+      },
+    }
+
+    nextState = reducer(prevState, action)
+
+    expect(nextState).toEqual({
+      pending: false,
+      error: null,
+      data: {
+        pagination: {
+          count: 99,
+          current: { page: 778 },
+          next: null,
+          previous: { page: 777 },
+        },
+        list: [
+          {
+            id: 23,
+            name: 'Alice',
+          },
+          {
+            id: 23,
+            name: 'Bob',
+          },
+          {
+            id: 7,
+            name: 'Eve',
+          },
+        ],
+      },
+    })
+
+    action = {
+      type: SUCCESS,
+      payload: {
+        params: [{ page: 1 }],
+        data: {
+          next: null,
+          previous: null,
+          count: 99,
+          results: [
+            {
+              id: 23,
+              name: 'Alice',
+            },
+            {
+              id: 23,
+              name: 'Bob',
+            },
+            {
+              id: 7,
+              name: 'Eve',
+            },
+          ],
+        },
+      },
+    }
+
+    nextState = reducer(prevState, action)
+
+    expect(nextState).toEqual({
+      pending: false,
+      error: null,
+      data: {
+        pagination: {
+          count: 99,
+          current: null,
+          next: null,
           previous: null,
         },
         list: [
@@ -648,7 +758,7 @@ describe('List Plugin', () => {
     expect(getPrev(state)).toBe(state.data.pagination.previous)
     expect(getCurrent(state)).toBe(state.data.pagination.current)
 
-    const action = {
+    let action = {
       type: SUCCESS,
       payload: {
         params: [{ limit: 10, offset: 30 }],
@@ -666,7 +776,7 @@ describe('List Plugin', () => {
       },
     }
 
-    const nextState = reducer(state, action)
+    let nextState = reducer(state, action)
 
     expect(getList(nextState)).toBe(action.payload.data.results)
     expect(getCount(nextState)).toBe(100)
@@ -677,6 +787,66 @@ describe('List Plugin', () => {
     expect(getNext(nextState)).toEqual({ limit: 10, offset: 40 })
     expect(getPrev(nextState)).toEqual({ limit: 10, offset: 20 })
     expect(getCurrent(nextState)).toEqual({ limit: 10, offset: 30 })
+
+    action = {
+      type: SUCCESS,
+      payload: {
+        params: [{ limit: 10, offset: 30 }],
+        data: {
+          next: null,
+          previous: '/my-api?limit=10&offset=20',
+          count: 100,
+          results: [
+            {
+              id: '9',
+              name: 'Mallory',
+            },
+          ],
+        },
+      },
+    }
+
+    nextState = reducer(state, action)
+
+    expect(getList(nextState)).toBe(action.payload.data.results)
+    expect(getCount(nextState)).toBe(100)
+    expect(getNumPages(nextState)).toBe(10)
+    expect(getNumPages(state, 50)).toBe(2)
+    expect(hasNext(nextState)).toBe(false)
+    expect(hasPrev(nextState)).toBe(true)
+    expect(getNext(nextState)).toBe(null)
+    expect(getPrev(nextState)).toEqual({ limit: 10, offset: 20 })
+    expect(getCurrent(nextState)).toEqual({ limit: 10, offset: 30 })
+
+    action = {
+      type: SUCCESS,
+      payload: {
+        params: [{ limit: 10, offset: 30 }],
+        data: {
+          next: null,
+          previous: null,
+          count: 100,
+          results: [
+            {
+              id: '9',
+              name: 'Mallory',
+            },
+          ],
+        },
+      },
+    }
+
+    nextState = reducer(state, action)
+
+    expect(getList(nextState)).toBe(action.payload.data.results)
+    expect(getCount(nextState)).toBe(100)
+    expect(getNumPages(nextState)).toBe(10)
+    expect(getNumPages(state, 50)).toBe(2)
+    expect(hasNext(nextState)).toBe(false)
+    expect(hasPrev(nextState)).toBe(false)
+    expect(getNext(nextState)).toBe(null)
+    expect(getPrev(nextState)).toBe(null)
+    expect(getCurrent(nextState)).toBe(null)
   })
 
   it('supports nextPrev pagination', () => {

@@ -1,80 +1,27 @@
-import request from 'superagent'
-import { ajax } from 'rxjs/ajax'
-import { map } from 'rxjs/operators'
 import { rj } from 'react-rocketjump'
+import rjDebounce from 'react-rocketjump/plugins/debounce'
+import { ajax } from 'rxjs/ajax'
 
-export const friendsState = rj(
-  () => ajax(`http://localhost:3004/friends`).pipe(
-    map(r => r.response)
-  )
-  // () => request.get(`http://localhost:3004/friends`).then(({ body }) => body),
-)
+// function authCaller(apiCall, ...args) {
+//   const o = apiCall(...args)
+//   // console.log(isObservable(new Promise(resolve => {})))
+//   return o.pipe(
+//     catchError(error => {
+//       console.log('~', error)
+//       return apiCall('GUAKAMOLE!')
+//       // return of([{ id: 23, name: 'SEEEECRET' }])
+//     })
+//   )
+// }
 
-// const rj1 = rj(
-//   rj({
-//     composeReducer: (prevState = { giova: 23 }) => prevState,
-//     actions: () => ({
-//       g1: () => ({ type: 'CHARLIE' }),
-//     }),
-//   }),
-//   rj({
-//     composeReducer: (prevState = { giova: 23 }) => prevState,
-//     actions: () => ({
-//       g2: () => ({ type: 'CHARLIE' }),
-//     }),
-//   }),
-//   rj({
-//     composeReducer: (prevState = { giova: 23 }) => prevState,
-//     actions: () => ({
-//       g3: () => ({ type: 'CHARLIE' }),
-//     }),
-//   }),
-//   rj({
-//     composeReducer: (prevState = { giova: 23 }) => prevState,
-//     actions: () => ({
-//       g233: () => ({ type: 'CHARLIE' }),
-//     }),
-//   }),
-//   rj({
-//     composeReducer: (prevState = { giova: 23 }) => prevState,
-//     actions: () => ({
-//       g22: () => ({ type: 'CHARLIE' }),
-//     }),
-//   }),
-//   rj({
-//     composeReducer: (prevState = { giova: 23 }) => prevState,
-//     actions: () => {
-//       // console.log('Creazy boy')
-//       return {
-//         g44: () => ({ type: 'CHARLIE' }),
-//       }
-//     },
-//   }),
-// )
-//
-// export const friendsState = rj(
-//   rj1,
-//   rj1, rj1, rj1,
-//   rj(rj1),
-//   rj(rj(rj1, rj1), rj(rj1), rj1, rj(rj(rj(rj1)))),
-//   rj(rj1),
-//   rj(rj(rj1, rj1), rj(rj1)),
-//   rj(rj(rj1, rj1), rj(rj1), rj1, rj(rj(rj(rj1)))),
-//   rj(rj1),
-//   rj(rj(rj1, rj1), rj(rj1)),
-//   rj(rj(rj1, rj1), rj(rj1), rj1, rj(rj(rj(rj1)))),
-//   rj(rj1),
-//   rj(rj(rj1, rj1), rj(rj1)),
-//   rj(rj(rj1, rj1), rj(rj1), rj1, rj(rj(rj(rj1)))),
-//   rj(rj1),
-//   rj(rj(rj1, rj1), rj(rj1)),
-//   rj(rj(rj1, rj1), rj(rj1), rj1, rj(rj(rj(rj1)))),
-//   rj(rj1),
-//   rj(rj(rj1, rj1), rj(rj1)),
-//   () => new Promise(resolve => {
-//     setTimeout(() => {
-//       console.log('SERVER RESOLVE!')
-//       resolve([ {name:'Giova',id:23} ])
-//     }, 500)
-//   })
-// )
+const API_URL = 'http://localhost:3004'
+
+export const FriendsState = rj(rjDebounce(200), {
+  effect: query => {
+    // if (query.indexOf('x') !== -1) {
+    //   return ajax.getJSON(`${API_URL}/ERROR`)
+    // }
+    return ajax.getJSON(`${API_URL}/friends?q=${query}`)
+  },
+  // effectCaller: authCaller,
+})

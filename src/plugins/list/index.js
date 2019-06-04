@@ -27,7 +27,7 @@ const makeListDataReducer = (
     { payload: { data, params } }
   ) => ({
     count: getOrSelect(data, paginationAdapter.count),
-    current: getOrSelect(params[0], paginationAdapter.current),
+    current: getOrSelect(data, paginationAdapter.current),
     next: getOrSelect(data, paginationAdapter.next),
     previous: getOrSelect(data, paginationAdapter.previous),
   })
