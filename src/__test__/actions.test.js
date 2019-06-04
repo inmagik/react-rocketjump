@@ -2,7 +2,8 @@ import React from 'react'
 import { rj as reactRj, connectRj } from '..'
 import Enzyme, { shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import { RUN, CLEAN, CANCEL, SUCCESS, EFFECT_ACTION } from '../actionTypes'
+import { RUN, CLEAN, CANCEL, SUCCESS } from '../actionTypes'
+import { isEffectAction } from '../actionCreators'
 
 Enzyme.configure({ adapter: new Adapter() })
 
@@ -57,7 +58,7 @@ describe('React-RocketJump actions', () => {
         onFailure: undefined,
       },
     })
-    expect(actionLog[0][EFFECT_ACTION]).toBe(true)
+    expect(isEffectAction(actionLog[0])).toBe(true)
   })
 
   it('should produce a good clean action', () => {
@@ -83,7 +84,7 @@ describe('React-RocketJump actions', () => {
         onFailure: undefined,
       },
     })
-    expect(actionLog[0][EFFECT_ACTION]).toBe(true)
+    expect(isEffectAction(actionLog[0])).toBe(true)
   })
 
   it('should produce a good cancel action', () => {
@@ -110,7 +111,7 @@ describe('React-RocketJump actions', () => {
         onFailure: undefined,
       },
     })
-    expect(actionLog[0][EFFECT_ACTION]).toBe(true)
+    expect(isEffectAction(actionLog[0])).toBe(true)
   })
 
   it('should expose builder', () => {

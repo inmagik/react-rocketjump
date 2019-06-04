@@ -1,6 +1,8 @@
-import { rj } from 'react-rocketjump'
+import { rj, SUCCESS } from 'react-rocketjump'
 import rjDebounce from 'react-rocketjump/plugins/debounce'
 import { ajax } from 'rxjs/ajax'
+
+console.log('A C T I O N', SUCCESS)
 
 // function authCaller(apiCall, ...args) {
 //   const o = apiCall(...args)

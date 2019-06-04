@@ -1,4 +1,7 @@
-import { RUN, CLEAN, CANCEL, EFFECT_ACTION } from './actionTypes'
+import { RUN, CLEAN, CANCEL } from './actionTypes'
+
+// Mark action for run into rx
+const EFFECT_ACTION = '@@RJ/EFFECT'
 
 /**
  * Mark an action as an effect action
@@ -10,6 +13,13 @@ import { RUN, CLEAN, CANCEL, EFFECT_ACTION } from './actionTypes'
 const makeEffectAction = action => {
   Object.defineProperty(action, EFFECT_ACTION, { value: true })
   return action
+}
+
+/**
+ * Check if is an effect action
+ */
+export const isEffectAction = action => {
+  return action[EFFECT_ACTION] === true
 }
 
 /**

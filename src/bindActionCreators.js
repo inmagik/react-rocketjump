@@ -1,4 +1,4 @@
-import { EFFECT_ACTION } from './actionTypes'
+import { isEffectAction } from './actionCreators'
 
 /**
  * Builder pattern implementation for action creators calls
@@ -38,7 +38,7 @@ class Builder {
 
   run(...args) {
     let action = this.actionCreator(...args)
-    if (action[EFFECT_ACTION] === true) {
+    if (isEffectAction(action)) {
       action = action.extend({
         callbacks: this.callbacks,
       })
@@ -136,7 +136,7 @@ function attachBuilder(boundActionCreator, actionCreator, dispatch, subject) {
 function bindActionCreator(actionCreator, dispatch, subject) {
   const out = (...args) => {
     const action = actionCreator(...args)
-    if (action[EFFECT_ACTION] === true) {
+    if (isEffectAction(action)) {
       delete action.extend
       delete action.withMeta
       subject.next(action)
