@@ -1,104 +1,25 @@
-import { of, from, concat, empty, merge } from 'rxjs'
+import { of, from, concat } from 'rxjs'
 import {
   map,
-  switchMap,
-  mergeMap,
-  exhaustMap,
   // concatMap,
   catchError,
-  groupBy,
   tap,
-  takeUntil,
-  filter,
 } from 'rxjs/operators'
-import { SUCCESS, FAILURE, PENDING, CLEAN, CANCEL } from './actionTypes'
-
-function takeUntilCancelAction($source) {
-  return takeUntil(
-    $source.pipe(
-      filter(action => action.type === CLEAN || action.type === CANCEL)
-    )
-  )
-}
-
-export const TAKE_EFFECT_LATEST = 'latest'
-
-function mapToLatest($source, mapActionToObserable) {
-  return switchMap(action => {
-    // Switch Map take always the last task so cancel ecc are auto emitted
-    if (action.type === CANCEL || action.type === CLEAN) {
-      return of(action)
-    }
-    return concat(of(action), mapActionToObserable(action)).pipe(
-      takeUntilCancelAction($source)
-    )
-  })
-}
-
-function takeEffectLatest($source, mapActionToObserable) {
-  return $source.pipe(mapToLatest($source, mapActionToObserable))
-}
-
-export const TAKE_EFFECT_EVERY = 'every'
-
-function takeEffectEvery($source, mapActionToObserable) {
-  return $source.pipe(
-    mergeMap(action => {
-      // Marge Map take every
-      if (action.type === CANCEL || action.type === CLEAN) {
-        return of(action)
-      }
-      return concat(
-        of(action),
-        mapActionToObserable(action).pipe(takeUntilCancelAction($source))
-      )
-    })
-  )
-}
-
-// export const TAKE_EFFECT_QUEUE = 'queue'
-
-export const TAKE_EFFECT_EXHAUST = 'exhaust'
-
-function takeEffectExhaust($source, mapActionToObserable) {
-  return merge(
-    $source.pipe(
-      mergeMap(action => {
-        if (action.type === CANCEL || action.type === CLEAN) {
-          return of(action)
-        } else {
-          return empty()
-        }
-      })
-    ),
-    $source.pipe(
-      exhaustMap(action => {
-        if (action.type === CANCEL || action.type === CLEAN) {
-          return empty()
-        }
-        return concat(of(action), mapActionToObserable(action)).pipe(
-          takeUntilCancelAction($source)
-        )
-      })
-    )
-  )
-}
-
-export const TAKE_EFFECT_GROUP_BY = 'groupBy'
-
-function takeEffectGroupBy($source, mapActionToObserable, effectTypeArgs) {
-  const groupByFn = effectTypeArgs[0]
-  if (typeof groupByFn !== 'function') {
-    throw new Error(
-      '[react-rj] when you choose the groupBy ' +
-        'takeEffect you must provide a function to group by the effect.'
-    )
-  }
-  return $source.pipe(
-    groupBy(groupByFn),
-    mergeMap($group => $group.pipe(mapToLatest($group, mapActionToObserable)))
-  )
-}
+import { SUCCESS, FAILURE, PENDING } from './actionTypes'
+import {
+  // Latest
+  TAKE_EFFECT_LATEST,
+  takeEffectLatest,
+  // Every
+  TAKE_EFFECT_EVERY,
+  takeEffectEvery,
+  // Exhaust
+  TAKE_EFFECT_EXHAUST,
+  takeEffectExhaust,
+  // Group By
+  TAKE_EFFECT_GROUP_BY,
+  takeEffectGroupBy,
+} from './rxEffects'
 
 const defaultCallEffect = (call, ...args) => call(...args)
 

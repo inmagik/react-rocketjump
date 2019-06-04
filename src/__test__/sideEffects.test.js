@@ -7,7 +7,7 @@ import {
   TAKE_EFFECT_GROUP_BY,
   // TAKE_EFFECT_QUEUE,
   TAKE_EFFECT_EXHAUST,
-} from '../createMakeRxObservable'
+} from '../rxEffects'
 
 jest.useFakeTimers()
 
