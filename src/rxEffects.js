@@ -83,7 +83,11 @@ export function takeEffectExhaust($source, mapActionToObserable) {
 
 export const TAKE_EFFECT_GROUP_BY = 'groupBy'
 
-export function takeEffectGroupBy($source, mapActionToObserable, effectTypeArgs) {
+export function takeEffectGroupBy(
+  $source,
+  mapActionToObserable,
+  effectTypeArgs
+) {
   const groupByFn = effectTypeArgs[0]
   if (typeof groupByFn !== 'function') {
     throw new Error(
