@@ -15,17 +15,17 @@ describe('compose', () => {
       connectRj(
         rjState,
         state => ({ un: state.data }),
-        ({ load }) => ({ loadUn: load })
+        ({ run }) => ({ loadUn: run })
       ),
       connectRj(
         rjState,
         state => ({ dos: state.data }),
-        ({ load }) => ({ loadDos: load })
+        ({ run }) => ({ loadDos: run })
       ),
       connectRj(
         rjState,
         state => ({ tres: state.data }),
-        ({ load }) => ({ loadTres: load })
+        ({ run }) => ({ loadTres: run })
       )
     )(MaComponent)
     const wrapper = shallow(<RjComponent />)
