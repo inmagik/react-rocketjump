@@ -39,6 +39,10 @@
         "title": "Plugins",
         "sidebar_label": "Introduction"
       },
+      "plugin_debounce": {
+        "title": "Debounce Plugin",
+        "sidebar_label": "Debounce Plugin"
+      },
       "plugin_list_delete": {
         "title": "ListDelete Plugin",
         "sidebar_label": "ListDelete Plugin"
