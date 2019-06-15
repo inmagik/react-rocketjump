@@ -2,7 +2,23 @@
   "docs": {
     "Why React-RocketJump?": ["motivation"],
     "Getting Started": ["installation", "quickstart", "concepts"],
-    "API": ["api_rj", "api_configure", "api_connect", "api_actions", "api_composition"],
-    "Plugins": ["plugin_all", "plugin_list", "plugin_plain_list", "plugin_list_insert", "plugin_list_update", "plugin_list_delete", "plugin_map", "plugin_writing"]
+    "API": [
+      "api_rj",
+      "api_configure",
+      "api_connect",
+      "api_actions",
+      "api_composition"
+    ],
+    "Plugins": [
+      "plugin_all",
+      "plugin_list",
+      "plugin_plain_list",
+      "plugin_list_insert",
+      "plugin_list_update",
+      "plugin_list_delete",
+      "plugin_map",
+      "plugin_debounce",
+      "plugin_writing"
+    ]
   }
 }
