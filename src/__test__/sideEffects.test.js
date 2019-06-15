@@ -1410,4 +1410,60 @@ describe('RJ side effect model', () => {
       },
     })
   })
+  it('should apply effect caller recursive', done => {
+    const mockApi = jest.fn().mockResolvedValueOnce(['GioVa'])
+    const mockCallback = jest.fn()
+
+    const callerA = jest.fn((fn, ...args) => {
+      return fn(...args).then(a => a.concat('Skaffo'))
+    })
+    function callerB(fn, ...args) {
+      return fn(...args).then(a => a.concat('Vegas'))
+    }
+
+    const { makeRxObservable } = rj(
+      { effectCaller: callerA },
+      { effectCaller: callerB },
+      {
+        effect: mockApi,
+      }
+    )
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    callerA.mock.results[0].value.then(() => {
+      expect(mockCallback).toBeCalledTimes(3)
+
+      expect(mockCallback).nthCalledWith(1, {
+        type: RUN,
+        payload: { params: [] },
+        meta: {},
+        callbacks: {},
+      })
+
+      expect(mockCallback).nthCalledWith(2, {
+        type: PENDING,
+        meta: {},
+      })
+
+      expect(mockCallback).nthCalledWith(3, {
+        type: SUCCESS,
+        meta: {},
+        payload: {
+          params: [],
+          data: ['GioVa', 'Vegas', 'Skaffo'],
+        },
+      })
+
+      done()
+    })
+  })
 })

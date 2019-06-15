@@ -1,12 +1,27 @@
 import { TAKE_EFFECT_LATEST } from './rxEffects'
 import { arrayze } from 'rocketjump-core/utils'
 
+// Thanks ma teacher Virgy <3
+const composeEffectCallers = (...callers) => (effectCall, ...args) => {
+  function recursion(callers, ...args) {
+    const [effectCaller, ...passCallers] = callers
+
+    if (passCallers.length === 0) {
+      return effectCaller(effectCall, ...args)
+    }
+
+    return effectCaller((...args) => recursion(passCallers, ...args), ...args)
+  }
+  return recursion(callers, ...args)
+}
+
 export const makeSideEffectDescriptor = () => ({
   takeEffect: [TAKE_EFFECT_LATEST],
   effectPipeline: [],
 })
 
-// Simply return the last defined effect and take effect
+// Merge prev sideEffectDescriptor with given rj config return
+// a new sideEffectDescriptor
 export const addConfigToSideEffectDescritor = (
   sideEffectDescriptor,
   config
@@ -17,7 +32,14 @@ export const addConfigToSideEffectDescritor = (
     newSideEffectDescriptor.effect = config.effect
   }
   if (config.effectCaller) {
-    newSideEffectDescriptor.effectCaller = config.effectCaller
+    if (sideEffectDescriptor.effectCaller) {
+      newSideEffectDescriptor.effectCaller = composeEffectCallers(
+        sideEffectDescriptor.effectCaller,
+        config.effectCaller
+      )
+    } else {
+      newSideEffectDescriptor.effectCaller = config.effectCaller
+    }
   }
   if (config.takeEffect) {
     newSideEffectDescriptor.takeEffect = arrayze(config.takeEffect)

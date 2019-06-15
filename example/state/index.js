@@ -1,5 +1,6 @@
 import { rj, SUCCESS } from 'react-rocketjump'
 import rjDebounce from 'react-rocketjump/plugins/debounce'
+import request from 'superagent'
 import { ajax } from 'rxjs/ajax'
 
 console.log('A C T I O N', SUCCESS)
@@ -16,14 +17,33 @@ console.log('A C T I O N', SUCCESS)
 //   )
 // }
 
+function authCaller(apiFn, ...args) {
+  return apiFn('~T0K3N~')(...args)
+}
+
 const API_URL = 'http://localhost:3004'
 
-export const FriendsState = rj(rjDebounce(200), {
-  effect: query => {
+const rjEasterEgg = rj({
+  effectCaller: (fnCall, ...args) =>
+    fnCall(...args).then(friends => {
+      return friends.concat({
+        id: 7777,
+        name: 'MissinHo',
+      })
+    }),
+})
+const rjBody = rj({
+  effectCaller: (fnCall, ...args) => fnCall(...args).then(({ body }) => body),
+})
+
+export const FriendsState = rj(rjEasterEgg, rjBody, rjDebounce(200), {
+  effect: t => query => {
     // if (query.indexOf('x') !== -1) {
     //   return ajax.getJSON(`${API_URL}/ERROR`)
     // }
-    return ajax.getJSON(`${API_URL}/friends?q=${query}`)
+    return request.get(`${API_URL}/friends`).query({ q: query, sacroToken: t })
+    // .then(({ body }) => body)
+    // return ajax.getJSON(`${API_URL}/friends?q=${query}`)
   },
-  // effectCaller: authCaller,
+  effectCaller: authCaller,
 })

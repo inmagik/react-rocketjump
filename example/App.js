@@ -4,20 +4,21 @@ import { FriendsState } from './state'
 
 export default function App() {
   const [search, setSearch] = useState('')
-  const [{ data: friends }, { runDebounced: loadFriends, clean }] = useRj(FriendsState)
+  const [{ data: friends }, { runDebounced: loadFriends, clean }] = useRj(
+    FriendsState
+  )
 
   useEffect(() => {
     loadFriends(search)
-    loadFriends(search)
-    loadFriends(search)
+    // loadFriends(search)
+    // loadFriends(search)
   }, [search, loadFriends])
 
   return (
     <div>
-
       <div>
         <input
-          type='text'
+          type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
@@ -25,13 +26,9 @@ export default function App() {
 
       <div>
         <button onClick={() => clean()}>X</button>
-        {friends && friends.map(friend => (
-          <div key={friend.id}>
-            {friend.name}
-          </div>
-        ))}
+        {friends &&
+          friends.map(friend => <div key={friend.id}>{friend.name}</div>)}
       </div>
-
     </div>
   )
 }
