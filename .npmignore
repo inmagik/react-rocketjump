@@ -4,6 +4,7 @@
 /src
 /scripts
 .babel*
+.prettierrc
 .webpack.config.*
 rollup.config.js
 db.json
