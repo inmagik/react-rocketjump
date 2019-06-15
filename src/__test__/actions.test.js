@@ -1,6 +1,7 @@
 import React from 'react'
+import { act } from 'react-dom/test-utils'
 import { rj as reactRj, connectRj } from '..'
-import Enzyme, { shallow } from 'enzyme'
+import Enzyme, { mount, shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import { RUN, CLEAN, CANCEL, SUCCESS } from '../actionTypes'
 import { isEffectAction } from '../actionCreators'
@@ -13,7 +14,7 @@ describe('React-RocketJump actions', () => {
 
     const RjComponent = connectRj(rjState)(Component)
 
-    return shallow(<RjComponent />).find(Component)
+    return mount(<RjComponent />).find(Component)
   }
 
   const makeActionObserver = (oldReducer, arrayLog, types) => {
@@ -137,44 +138,40 @@ describe('React-RocketJump actions', () => {
     expect(() => wrapper.prop('run').run()).toThrow()
   })
 
-  it('should use onSuccess', done => {
+  it('should use onSuccess', async () => {
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
     })
 
     const wrapper = makeRjComponent(rjState)
 
-    const successHandler = () => {
-      expect(onSuccess).toHaveBeenCalledTimes(1)
-      done()
-    }
+    const onSuccess = jest.fn()
 
-    const onSuccess = jest.fn(successHandler)
-
-    wrapper
-      .prop('run')
-      .onSuccess(onSuccess)
-      .run()
+    await act(async () => {
+      wrapper
+        .prop('run')
+        .onSuccess(onSuccess)
+        .run()
+    })
+    expect(onSuccess).toHaveBeenCalledTimes(1)
   })
 
-  it('should use onFailure', done => {
+  it('should use onFailure', async () => {
     const rjState = reactRj({
       effect: () => Promise.reject(),
     })
 
     const wrapper = makeRjComponent(rjState)
 
-    const handler = () => {
-      expect(onFailure).toHaveBeenCalledTimes(1)
-      done()
-    }
+    const onFailure = jest.fn()
 
-    const onFailure = jest.fn(handler)
-
-    wrapper
-      .prop('run')
-      .onFailure(onFailure)
-      .run()
+    await act(async () => {
+      wrapper
+        .prop('run')
+        .onFailure(onFailure)
+        .run()
+    })
+    expect(onFailure).toHaveBeenCalledTimes(1)
   })
 
   it('should use plain meta data', done => {
@@ -305,7 +302,7 @@ describe('React-RocketJump actions', () => {
 
     const RjComponent = connectRj(rjState)(Component)
 
-    const wrapper = shallow(<RjComponent />).find(Component)
+    const wrapper = mount(<RjComponent />).find(Component)
 
     const onSuccess = () => {
       expect(actionLog[0]).toEqual({
@@ -341,7 +338,7 @@ describe('React-RocketJump actions', () => {
 
     const RjComponent = connectRj(rjState)(Component)
 
-    const wrapper = shallow(<RjComponent />).find(Component)
+    const wrapper = mount(<RjComponent />).find(Component)
 
     const onSuccess = () => {
       expect(actionLog[0]).toEqual({
@@ -380,7 +377,7 @@ describe('React-RocketJump actions', () => {
 
     const RjComponent = connectRj(rjState)(Component)
 
-    const wrapper = shallow(<RjComponent />).find(Component)
+    const wrapper = mount(<RjComponent />).find(Component)
 
     const onSuccess = () => {
       expect(actionLog[0]).toEqual({
@@ -416,7 +413,7 @@ describe('React-RocketJump actions', () => {
 
     const RjComponent = connectRj(rjState)(Component)
 
-    const wrapper = shallow(<RjComponent />).find(Component)
+    const wrapper = mount(<RjComponent />).find(Component)
 
     const onSuccess = () => {
       expect(actionLog[0]).toEqual({
@@ -455,7 +452,7 @@ describe('React-RocketJump actions', () => {
 
     const RjComponent = connectRj(rjState)(Component)
 
-    const wrapper = shallow(<RjComponent />).find(Component)
+    const wrapper = mount(<RjComponent />).find(Component)
 
     const onSuccess = () => {
       expect(actionLog[0]).toEqual({
@@ -492,7 +489,7 @@ describe('React-RocketJump actions', () => {
       custom: () => ({ type: 'CUSTOM' }),
     }))(Component)
 
-    const wrapper = shallow(<RjComponent />).find(Component)
+    const wrapper = mount(<RjComponent />).find(Component)
 
     wrapper.prop('custom')()
 
@@ -516,7 +513,7 @@ describe('React-RocketJump actions', () => {
       custom: () => ({ type: 'CUSTOM' }),
     }))(Component)
 
-    const wrapper = shallow(<RjComponent />).find(Component)
+    const wrapper = mount(<RjComponent />).find(Component)
 
     const onSuccess = jest.fn()
 
