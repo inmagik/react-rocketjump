@@ -26,7 +26,7 @@ export const addConfigToSideEffectDescritor = (
   sideEffectDescriptor,
   config
 ) => {
-  let newSideEffectDescriptor = { ...sideEffectDescriptor }
+  const newSideEffectDescriptor = { ...sideEffectDescriptor }
 
   if (config.effect) {
     newSideEffectDescriptor.effect = config.effect

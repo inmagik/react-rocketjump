@@ -1,9 +1,18 @@
-import { rj, SUCCESS } from 'react-rocketjump'
+import { rj, makeAction, SUCCESS } from 'react-rocketjump'
 import rjDebounce from 'react-rocketjump/plugins/debounce'
 import request from 'superagent'
 import { ajax } from 'rxjs/ajax'
 
 console.log('A C T I O N', SUCCESS)
+
+const GangRj = rj({
+  effect: () => Promise.resolve(23),
+  actions: () => ({
+    giova: n => makeAction('GIOVA', n),
+  }),
+})
+
+console.log('U.u', GangRj.actionCreators.run(23).withMeta({ g: 2 }))
 
 // function authCaller(apiCall, ...args) {
 //   const o = apiCall(...args)

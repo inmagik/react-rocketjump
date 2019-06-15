@@ -9,12 +9,9 @@ import {
   kompose,
   arrayze,
 } from 'rocketjump-core/utils'
-import * as allActionCreators from './actionCreators'
+import DefaultActionCreators from './actionCreators'
 import defaultReducer from './reducer'
 import defaultMakeSelectors from './selectors'
-
-// Convert 2 plain object
-const defaultActionCreators = { ...allActionCreators }
 
 // Make the exports
 // take a extended export (the return of this function)
@@ -54,7 +51,7 @@ export default (_, rjConfig, extendExport = {}) => {
   let actionCreators
   if (!extendExport.actionCreators) {
     // Make fresh action creators
-    actionCreators = defaultActionCreators
+    actionCreators = DefaultActionCreators
   } else {
     // Use actionCreators to extended export
     actionCreators = extendExport.actionCreators

@@ -71,7 +71,7 @@ function extend(extensions) {
  * Such actions are wired into the library and are extremely general: customization with the `actions` directive
  * is provided in order to adapt them (and their interface and behaviour) to user needs
  */
-function makeLibraryAction(type, ...params) {
+export function makeLibraryAction(type, ...params) {
   const baseObject = makeEffectAction({
     type,
     payload: {
@@ -90,16 +90,24 @@ function makeLibraryAction(type, ...params) {
 
 // Barebone action creators
 
-export function run(...params) {
+function run(...params) {
   return makeLibraryAction(RUN, ...params)
 }
 
 // TODO params really make sense for clean?
-export function clean(...params) {
+function clean(...params) {
   return makeLibraryAction(CLEAN, ...params)
 }
 
 // TODO params really make sense for cancel?
-export function cancel(...params) {
+function cancel(...params) {
   return makeLibraryAction(CANCEL, ...params)
 }
+
+const ActionCreators = {
+  run,
+  clean,
+  cancel,
+}
+
+export default ActionCreators
