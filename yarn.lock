@@ -9,7 +9,7 @@
   dependencies:
     "@babel/highlight" "^7.0.0"
 
-"@babel/core@^7.1.0", "@babel/core@^7.4.4":
+"@babel/core@^7.1.0", "@babel/core@^7.4.5":
   version "7.4.5"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.4.5.tgz#081f97e8ffca65a9b4b0fdc7e274e703f000c06a"
   integrity sha512-OvjIh6aqXtlsA8ujtGKfC7LYWksYSX8yQcM8Ay3LuvVeQ63lcOKgoZWVqcpFwkd29aYU9rVx7jxhfhiEDV9MZA==
@@ -578,7 +578,7 @@
     "@babel/helper-regex" "^7.4.4"
     regexpu-core "^4.5.4"
 
-"@babel/preset-env@^7.4.4":
+"@babel/preset-env@^7.4.5":
   version "7.4.5"
   resolved "https://registry.yarnpkg.com/@babel/preset-env/-/preset-env-7.4.5.tgz#2fad7f62983d5af563b5f3139242755884998a58"
   integrity sha512-f2yNVXM+FsR5V8UwcFeIHzHWgnhXg3NpRmy0ADvALpnhB0SLbCvrCRr4BLOUYbQNLS+Z0Yer46x9dJXpXewI7w==
@@ -914,10 +914,15 @@
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.3.tgz#3dca0e3f33b200fc7d1139c0cd96c1268cadfd9d"
   integrity sha512-tHq6qdbT9U1IRSGf14CL0pUlULksvY9OZ+5eEgl1N7t+OA3tGvNpxJCzuKQlsNgCVwbAs670L1vcVQi8j9HjnA==
 
-"@types/node@*", "@types/node@^12.0.2":
+"@types/node@*":
   version "12.0.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.0.2.tgz#3452a24edf9fea138b48fad4a0a028a683da1e40"
   integrity sha512-5tabW/i+9mhrfEOUcLDu2xBPsHJ+X5Orqy9FKpale3SjDA17j5AEpYq5vfy3oAeAHGcvANRCO3NV3d2D6q3NiA==
+
+"@types/node@^12.0.8":
+  version "12.0.8"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.0.8.tgz#551466be11b2adc3f3d47156758f610bd9f6b1d8"
+  integrity sha512-b8bbUOTwzIY3V5vDTY1fIJ+ePKDUBqt2hC2woVGotdQQhG/2Sh62HOKHrT7ab+VerXAcPyAiTEipPu/FsreUtg==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -6245,10 +6250,10 @@ prepend-http@^1.0.1:
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-1.0.4.tgz#d4f4562b0ce3696e41ac52d0e002e57a635dc6dc"
   integrity sha1-1PRWKwzjaW5BrFLQ4ALlemNdxtw=
 
-prettier@^1.17.1:
-  version "1.17.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.17.1.tgz#ed64b4e93e370cb8a25b9ef7fef3e4fd1c0995db"
-  integrity sha512-TzGRNvuUSmPgwivDqkZ9tM/qTGW9hqDKWOE9YHiyQdixlKbv7kvEqsmDPrcHJTKwthU774TQwZXVtaQ/mMsvjg==
+prettier@^1.18.2:
+  version "1.18.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.18.2.tgz#6823e7c5900017b4bd3acf46fe9ac4b4d7bda9ea"
+  integrity sha512-OeHeMc0JhFE9idD4ZdtNibzY0+TPHSpSSb9h8FqtP+YnoZZ1sl8Vc9b1sasjfymH3SonAF4QcA2+mzHPhMvIiw==
 
 pretty-format@^24.8.0:
   version "24.8.0"
@@ -6885,13 +6890,13 @@ rollup-pluginutils@^2.3.0:
     estree-walker "^0.6.0"
     micromatch "^3.1.10"
 
-rollup@^1.10.1:
-  version "1.12.3"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.12.3.tgz#068b1957d5bebf6c0a758cfe42609b512add35a9"
-  integrity sha512-ueWhPijWN+GaPgD3l77hXih/gcDXmYph6sWeQegwBYtaqAE834e8u+MC2wT6FKIUsz1DBOyOXAQXUZB+rjWDoQ==
+rollup@^1.15.5:
+  version "1.15.5"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.15.5.tgz#1c1f7ef799d5b297aab6eb49ca7a6ab9c8aae6a0"
+  integrity sha512-Dix1YCY6BlsVK20SjQHBjKqxW2K+lqNr6BlCKxtdZuYqmUWLm8NzKHdrJyiFFjUO2hSI4wiC7apE+jAkDA3fEQ==
   dependencies:
     "@types/estree" "0.0.39"
-    "@types/node" "^12.0.2"
+    "@types/node" "^12.0.8"
     acorn "^6.1.1"
 
 rst-selector-parser@^2.2.3:
