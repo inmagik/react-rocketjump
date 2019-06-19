@@ -276,6 +276,12 @@ describe('useRj', () => {
             resolves[1] = resolve
           })
       )
+      .mockImplementationOnce(
+        () =>
+          new Promise(resolve => {
+            resolves[2] = resolve
+          })
+      )
 
     const testMaState = jest.fn()
 
