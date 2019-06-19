@@ -1,4 +1,5 @@
 import { act } from 'react-dom/test-utils'
+import { withLatestFrom, map } from 'rxjs/operators'
 import { renderHook } from 'react-hooks-testing-library'
 import memoize from 'memoize-one'
 import rj from '../rj'
@@ -257,6 +258,77 @@ describe('useRj', () => {
     }).toThrowError(
       /\[react-rocketjump\] You should provide a rj object to useRj/
     )
+  })
+
+  it('should provide a good state observable', async () => {
+    let resolves = []
+    const mockFn = jest
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise(resolve => {
+            resolves[0] = resolve
+          })
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise(resolve => {
+            resolves[1] = resolve
+          })
+      )
+
+    const testMaState = jest.fn()
+
+    const rjStateObserver = rj({
+      effectPipeline: (action$, state$) => {
+        return action$.pipe(
+          withLatestFrom(state$),
+          map(([action, state]) => {
+            testMaState(state)
+            return action
+          })
+        )
+      },
+    })
+    const maRjState = rj(rjStateObserver, mockFn)
+
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useRj(maRjState, (state, { getData }) => ({
+        pending: state.pending,
+        friends: getData(state),
+      }))
+    )
+
+    await act(async () => {
+      result.current[1].run()
+    })
+    expect(mockFn).toHaveBeenCalledTimes(1)
+    expect(testMaState).nthCalledWith(1, {
+      pending: false,
+      data: null,
+      error: null,
+    })
+    await act(async () => {
+      result.current[1].run()
+    })
+    expect(mockFn).toHaveBeenCalledTimes(2)
+    expect(testMaState).nthCalledWith(2, {
+      pending: true,
+      data: null,
+      error: null,
+    })
+    await act(async () => {
+      resolves[0]('LuX')
+      resolves[1]('Albi1312')
+    })
+    await act(async () => {
+      result.current[1].run()
+    })
+    expect(testMaState).nthCalledWith(3, {
+      pending: false,
+      data: 'Albi1312',
+      error: null,
+    })
   })
 
   test.todo('Test onSuccess onFailure')

@@ -62,7 +62,7 @@ export default (_, rjConfig, extendExport = {}) => {
   // Create the make selectors
   // NOTE: The reason why switch from creating selectors
   // to creating a function that THEN (when rj is executed) actually
-  // create reducer is a FUCKING TRICK eheh to let the user
+  // create selectors is a FUCKING TRICK eheh to let the user
   // to create a memoized-component version of the selectors
   let makeSelectors
   if (!extendExport.makeSelectors) {

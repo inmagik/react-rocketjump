@@ -6,8 +6,6 @@ import { PENDING, SUCCESS, CLEAN, RUN } from '../../../actionTypes'
 
 jest.useFakeTimers()
 
-const noopDispatch = () => {}
-
 describe('rjDebounce', () => {
   it('should debouce run', done => {
     const mockApi = jest
@@ -24,12 +22,9 @@ describe('rjDebounce', () => {
     })
 
     const subject = new Subject()
+    const dispatch = action => subject.next(action)
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
-    const { runDebounced, clean } = bindActionCreators(
-      actionCreators,
-      noopDispatch,
-      subject
-    )
+    const { runDebounced, clean } = bindActionCreators(actionCreators, dispatch)
     runDebounced()
     runDebounced()
     runDebounced('GioVa')
@@ -178,7 +173,8 @@ describe('rjDebounce', () => {
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
-    const { run } = bindActionCreators(actionCreators, noopDispatch, subject)
+    const dispatch = action => subject.next(action)
+    const { run } = bindActionCreators(actionCreators, dispatch, subject)
     run()
     run()
 

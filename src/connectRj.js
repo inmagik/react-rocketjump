@@ -2,7 +2,8 @@ import React, { useMemo } from 'react'
 import { isObjectRj } from 'rocketjump-core'
 import hoistStatics from 'hoist-non-react-statics'
 import bindActionCreators from './bindActionCreators'
-import { useRxSubject, useReduxReducer, useConstant } from './hooks'
+import { useConstant } from './hooks'
+import useMiniRedux from './useMiniRedux'
 
 const defaultMapActionsToProps = a => a
 
@@ -26,9 +27,7 @@ export default function connectRj(
         makeSelectors,
       } = rjObject
 
-      const [state, dispatch] = useReduxReducer(reducer)
-
-      const subject = useRxSubject(makeRxObservable, dispatch)
+      const [state, dispatch] = useMiniRedux(reducer, makeRxObservable)
 
       const memoizedSelectors = useConstant(() => {
         if (mapStateToProps !== undefined && mapStateToProps !== null) {
@@ -44,12 +43,8 @@ export default function connectRj(
       }, [state, memoizedSelectors, props])
 
       const boundActionCreators = useMemo(() => {
-        return bindActionCreators(
-          mapActionsToProps(actionCreators),
-          dispatch,
-          subject
-        )
-      }, [subject, dispatch, actionCreators])
+        return bindActionCreators(mapActionsToProps(actionCreators), dispatch)
+      }, [dispatch, actionCreators])
 
       return (
         <WrappedComponent

@@ -6,10 +6,9 @@ import { isEffectAction } from './actionCreators'
  * It is also the only way to leverage the rocketjump capabilities with full power
  */
 class Builder {
-  constructor(actionCreator, dispatch, subject) {
+  constructor(actionCreator, dispatch) {
     this.actionCreator = actionCreator
     this.dispatch = dispatch
-    this.subject = subject
     this.callbacks = {}
     this.metaTransforms = []
   }
@@ -47,7 +46,7 @@ class Builder {
       }, action)
       delete action.extend
       delete action.withMeta
-      this.subject.next(action)
+      this.dispatch(action)
     } else {
       this.dispatch(action)
     }
@@ -64,15 +63,15 @@ class Builder {
  * The run method throws an exception just to give the user a nicer feedback on the error he/she would receive
  *  in case of bad invocation
  */
-function attachBuilder(boundActionCreator, actionCreator, dispatch, subject) {
+function attachBuilder(boundActionCreator, actionCreator, dispatch) {
   boundActionCreator.onSuccess = callback => {
-    return new Builder(actionCreator, dispatch, subject).onSuccess(callback)
+    return new Builder(actionCreator, dispatch).onSuccess(callback)
   }
   boundActionCreator.onFailure = callback => {
-    return new Builder(actionCreator, dispatch, subject).onFailure(callback)
+    return new Builder(actionCreator, dispatch).onFailure(callback)
   }
   boundActionCreator.withMeta = meta => {
-    return new Builder(actionCreator, dispatch, subject).withMeta(meta)
+    return new Builder(actionCreator, dispatch).withMeta(meta)
   }
   boundActionCreator.run = () => {
     throw new Error(
@@ -133,18 +132,18 @@ function attachBuilder(boundActionCreator, actionCreator, dispatch, subject) {
  *    withMeta(obj) is equivalent to withMeta(oldMeta => ({ ...oldMeta, ...obj }))
  *
  */
-function bindActionCreator(actionCreator, dispatch, subject) {
+function bindActionCreator(actionCreator, dispatch) {
   const out = (...args) => {
     const action = actionCreator(...args)
     if (isEffectAction(action)) {
       delete action.extend
       delete action.withMeta
-      subject.next(action)
+      dispatch(action)
     } else {
       dispatch(action)
     }
   }
-  return attachBuilder(out, actionCreator, dispatch, subject)
+  return attachBuilder(out, actionCreator, dispatch)
 }
 
 /**
@@ -154,15 +153,11 @@ function bindActionCreator(actionCreator, dispatch, subject) {
  *
  * Both plain actions and rocketjump actions can be bound in this way
  */
-export default function bindActionCreators(actionCreators, dispatch, subject) {
+export default function bindActionCreators(actionCreators, dispatch) {
   const boundActionCreators = {}
   for (const key in actionCreators) {
     const actionCreator = actionCreators[key]
-    boundActionCreators[key] = bindActionCreator(
-      actionCreator,
-      dispatch,
-      subject
-    )
+    boundActionCreators[key] = bindActionCreator(actionCreator, dispatch)
   }
   return boundActionCreators
 }

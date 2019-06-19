@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { isObjectRj } from 'rocketjump-core'
-import { useRxSubject, useReduxReducer, useConstant } from './hooks'
+import { useConstant } from './hooks'
+import useMiniRedux from './useMiniRedux'
 import bindActionCreators from './bindActionCreators'
 
 const defaultMapActions = a => a
@@ -19,9 +20,7 @@ export default function useRj(
 
   const { makeRxObservable, actionCreators, reducer, makeSelectors } = rjObject
 
-  const [state, dispatch] = useReduxReducer(reducer)
-
-  const subject = useRxSubject(makeRxObservable, dispatch)
+  const [state, dispatch] = useMiniRedux(reducer, makeRxObservable)
 
   const memoizedSelectors = useConstant(() => {
     if (selectState !== undefined && selectState !== null) {
@@ -37,8 +36,8 @@ export default function useRj(
   }, [state, memoizedSelectors, selectState])
 
   const boundActionCreators = useMemo(() => {
-    return bindActionCreators(mapActions(actionCreators), dispatch, subject)
-  }, [subject, actionCreators, dispatch, mapActions])
+    return bindActionCreators(mapActions(actionCreators), dispatch)
+  }, [actionCreators, dispatch, mapActions])
 
   return [derivedState, boundActionCreators]
 }

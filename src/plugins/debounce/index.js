@@ -1,5 +1,6 @@
 import { empty, timer } from 'rxjs'
 import { distinctUntilChanged, debounce } from 'rxjs/operators'
+import { RUN } from '../../actionTypes'
 import rj from '../../rj'
 
 const rjDebounce = (time = 200) =>
@@ -7,10 +8,10 @@ const rjDebounce = (time = 200) =>
     actions: ({ run }) => ({
       runDebounced: (...args) => run(...args).withMeta({ debounced: true }),
     }),
-    effectPipeline: $s =>
-      $s.pipe(
+    effectPipeline: action$ =>
+      action$.pipe(
         debounce(action => {
-          if (action.meta.debounced) {
+          if (action.type === RUN && action.meta.debounced) {
             return timer(time)
           } else {
             return empty()
@@ -18,7 +19,7 @@ const rjDebounce = (time = 200) =>
         }),
         distinctUntilChanged((prevAction, currAction) => {
           // Ignore not debounced actions...
-          if (!currAction.meta.debounced) {
+          if (currAction.type !== RUN || !currAction.meta.debounced) {
             return false
           }
           // not same stuff

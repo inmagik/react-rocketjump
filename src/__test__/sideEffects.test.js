@@ -806,8 +806,8 @@ describe('RJ side effect model', () => {
     const mockCallback = jest.fn()
 
     const rjWithDebouce = rj({
-      effectPipeline: $s =>
-        $s.pipe(
+      effectPipeline: action$ =>
+        action$.pipe(
           debounceTime(200),
           distinctUntilChanged()
         ),

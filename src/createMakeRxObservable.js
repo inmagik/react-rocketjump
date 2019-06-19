@@ -29,7 +29,11 @@ export default function createMakeRxObservable({
   takeEffect,
   effectPipeline,
 }) {
-  return function makeRxObservable($actionSource, overrideCallEffect) {
+  return function makeRxObservable(
+    originalAction$,
+    state$,
+    overrideCallEffect
+  ) {
     // Override the effectCaller from rj using local one istead
     // ... when no effectCaller is provided
     let callEffect
@@ -83,9 +87,9 @@ export default function createMakeRxObservable({
 
     const [effectType, ...effectTypeArgs] = takeEffect
 
-    const $source = effectPipeline.reduce(
-      ($source, piper) => piper($source),
-      $actionSource
+    const action$ = effectPipeline.reduce(
+      (action$, piper) => piper(action$, state$),
+      originalAction$
     )
 
     // Custom take effect
@@ -93,17 +97,22 @@ export default function createMakeRxObservable({
       // TODO: Maybe in future check the return value of
       // custom take effect and print some warning to help
       // developers to better debugging better rj configuration
-      return effectType($source, mapActionToObserable)
+      return effectType(action$, state$, mapActionToObserable)
     } else if (effectType === TAKE_EFFECT_LATEST) {
-      return takeEffectLatest($source, mapActionToObserable)
+      return takeEffectLatest(action$, state$, mapActionToObserable)
     } else if (effectType === TAKE_EFFECT_EVERY) {
-      return takeEffectEvery($source, mapActionToObserable)
+      return takeEffectEvery(action$, state$, mapActionToObserable)
       /*} else if (effectType === TAKE_EFFECT_QUEUE) {
-      return takeEffectQueue($source, mapActionToObserable)*/
+      return takeEffectQueue(action$, state$, mapActionToObserable)*/
     } else if (effectType === TAKE_EFFECT_EXHAUST) {
-      return takeEffectExhaust($source, mapActionToObserable)
+      return takeEffectExhaust(action$, state$, mapActionToObserable)
     } else if (effectType === TAKE_EFFECT_GROUP_BY) {
-      return takeEffectGroupBy($source, mapActionToObserable, effectTypeArgs)
+      return takeEffectGroupBy(
+        action$,
+        state$,
+        mapActionToObserable,
+        effectTypeArgs
+      )
     } else {
       throw new Error(
         `[react-rocketjump] takeEffect: ${takeEffect} is an invalid effect.`
