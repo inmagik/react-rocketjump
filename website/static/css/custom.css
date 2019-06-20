@@ -1,7 +1,17 @@
 /* your custom css */
 
 .nav-footer .inmagikOpenSource {
-  width: 50px;
+  width: 70px;
+  height: 70px;
+  box-sizing: border-box;
+  border: 1px solid white;
+  border-radius: 50%;
+  opacity: 1;
+}
+
+.nav-footer .inmagikOpenSource img {
+  width: 68px;
+  height: 68px;
 }
 
 @media only screen and (min-device-width: 360px) and (max-device-width: 736px) {

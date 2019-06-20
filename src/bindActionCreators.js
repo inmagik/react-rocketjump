@@ -46,10 +46,41 @@ class Builder {
       }, action)
       delete action.extend
       delete action.withMeta
-      this.dispatch(action)
-    } else {
-      this.dispatch(action)
     }
+    this.dispatch(action)
+  }
+
+  asPromise(...args) {
+    return new Promise((resolve, reject) => {
+      let action = this.actionCreator(...args)
+      if (isEffectAction(action)) {
+        action = action.extend({
+          callbacks: {
+            onSuccess: (...args) => {
+              if (this.callbacks.onSuccess) {
+                this.callbacks.onSuccess(...args)
+              }
+              resolve(...args)
+            },
+            onFailure: (...args) => {
+              if (this.callbacks.onFailure) {
+                this.callbacks.onFailure(...args)
+              }
+              reject(...args)
+            },
+          },
+        })
+        action = this.metaTransforms.reduce((action, transform) => {
+          return action.withMeta(transform)
+        }, action)
+        delete action.extend
+        delete action.withMeta
+        this.dispatch(action)
+      } else {
+        this.dispatch(action)
+        resolve()
+      }
+    })
   }
 }
 
@@ -77,6 +108,9 @@ function attachBuilder(boundActionCreator, actionCreator, dispatch) {
     throw new Error(
       'In order to do a plain call without meta, onSuccess or onFailure, just invoke the action creator, use the run method only when you leverage the builder functionalities'
     )
+  }
+  boundActionCreator.asPromise = (...args) => {
+    return new Builder(actionCreator, dispatch).asPromise(...args)
   }
   return boundActionCreator
 }

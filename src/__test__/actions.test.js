@@ -126,6 +126,7 @@ describe('React-RocketJump actions', () => {
     expect(wrapper.prop('run')).toHaveProperty('onFailure')
     expect(wrapper.prop('run')).toHaveProperty('withMeta')
     expect(wrapper.prop('run')).toHaveProperty('run')
+    expect(wrapper.prop('run')).toHaveProperty('asPromise')
   })
 
   it('should now allow direct run invocation', () => {
@@ -524,5 +525,147 @@ describe('React-RocketJump actions', () => {
 
     expect(actionLog[0]).toEqual({ type: 'CUSTOM' })
     expect(onSuccess).not.toHaveBeenCalled()
+  })
+
+  it('should be able to return a Promise', async () => {
+    const rjState = reactRj({
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+
+    await act(async () => {
+      const p = wrapper.prop('run').asPromise()
+
+      expect(p).toBeInstanceOf(Promise)
+    })
+  })
+
+  it('should call onSuccess even in promise mode', async () => {
+    const rjState = reactRj({
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+
+    const onSuccess = jest.fn()
+    const onFailure = jest.fn()
+
+    await act(async () => {
+      await wrapper
+        .prop('run')
+        .onSuccess(onSuccess)
+        .onFailure(onFailure)
+        .asPromise()
+    })
+    expect(onSuccess).toHaveBeenCalledTimes(1)
+    expect(onFailure).toHaveBeenCalledTimes(0)
+  })
+
+  it('should call onFailure even in promise mode', async () => {
+    const rjState = reactRj({
+      effect: () => Promise.reject(),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+
+    const onSuccess = jest.fn()
+    const onFailure = jest.fn()
+
+    await act(async () => {
+      await wrapper
+        .prop('run')
+        .onSuccess(onSuccess)
+        .onFailure(onFailure)
+        .asPromise()
+        .catch(() => {})
+    })
+    expect(onFailure).toHaveBeenCalledTimes(1)
+    expect(onSuccess).toHaveBeenCalledTimes(0)
+  })
+
+  it('should resolve promises correctly', async () => {
+    const rjState = reactRj({
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+
+    const onSuccess = jest.fn()
+
+    await act(async () => {
+      await wrapper
+        .prop('run')
+        .asPromise()
+        .then(onSuccess)
+    })
+    expect(onSuccess).toHaveBeenCalledTimes(1)
+  })
+
+  it('should reject promises correctly', async () => {
+    const rjState = reactRj({
+      effect: () => Promise.reject(),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+
+    const onFailure = jest.fn()
+
+    await act(async () => {
+      await wrapper
+        .prop('run')
+        .asPromise()
+        .catch(onFailure)
+        .then(() => {})
+    })
+
+    expect(onFailure).toHaveBeenCalledTimes(1)
+  })
+
+  it('should use meta in promise mode', done => {
+    const actionLog = []
+
+    const rjState = reactRj({
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+
+    const onSuccess = () => {
+      expect(actionLog[0].meta).toEqual({})
+      done()
+    }
+
+    wrapper
+      .prop('run')
+      .withMeta({ a: 1 })
+      .withMeta(() => ({}))
+      .onSuccess(onSuccess)
+      .asPromise()
+  })
+
+  it('should allow promises on plain actions (even if useless)', async () => {
+    const actionLog = []
+
+    const rjState = reactRj({
+      effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
+      reducer: oldReducer =>
+        makeActionObserver(oldReducer, actionLog, ['CUSTOM']),
+    })
+
+    const Component = props => null
+
+    const RjComponent = connectRj(rjState, undefined, ({ run, clean }) => ({
+      run,
+      clean,
+      custom: () => ({ type: 'CUSTOM' }),
+    }))(Component)
+
+    const wrapper = mount(<RjComponent />).find(Component)
+
+    await wrapper.prop('custom').asPromise()
+
+    expect(actionLog[0]).toEqual({ type: 'CUSTOM' })
   })
 })
