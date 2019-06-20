@@ -85,22 +85,21 @@ class Index extends React.Component {
         id={props.id}
         background={props.background}
       >
-        <div style={{ display: 'flex' }}>
-          <GridBlock
-            align="left"
-            contents={[
-              {
-                title: 'Search GitHub Users',
-                content: 'A basic ..',
-              },
-            ]}
-            layout={props.layout}
-          />
+        <div>
+          <h2>Search GitHub Users</h2>
+          <p>
+            <i>
+              Application example: a simple client to do a GitHub user search.
+              This example uses the core features of React RocketJump to manage
+              async operations plus the debounce plugin not to flood Github with
+              requests
+            </i>
+          </p>
           <iframe
             src="https://codesandbox.io/embed/lucid-mclean-q6k6c?fontsize=13&editorsize=60&hidenavigation=1&codemirror=1"
             title="react-rocketjump-exapmple-1"
             style={{
-              flex: 1,
+              width: '100%',
               marginLeft: 20,
               height: 500,
               border: 0,
@@ -119,22 +118,22 @@ class Index extends React.Component {
         id={props.id}
         background={props.background}
       >
-        <div style={{ display: 'flex' }}>
-          <GridBlock
-            align="left"
-            contents={[
-              {
-                title: 'Pokèdex',
-                content: 'A basic ..',
-              },
-            ]}
-            layout={props.layout}
-          />
+        <div>
+          <h2>A simple Pokèdex</h2>
+          <p>
+            <i>
+              Classic PokèDex application build upon the PokéAPI. This example
+              uses the core features of React RocketJump to deal with the REST
+              API that exposes the data, the debounce plugin to make interaction
+              fluid and responsive and the list plugin, which is a real must
+              when dealing with paginated lists
+            </i>
+          </p>
           <iframe
             src="https://codesandbox.io/embed/reactrocketjumpexapmple1-tndoi?fontsize=13&editorsize=60&hidenavigation=1&codemirror=1"
             title="react-rocketjump-exapmple-1"
             style={{
-              flex: 1,
+              width: '100%',
               marginLeft: 20,
               height: 500,
               border: 0,

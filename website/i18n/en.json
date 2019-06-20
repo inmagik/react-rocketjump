@@ -39,6 +39,10 @@
         "title": "Plugins",
         "sidebar_label": "Introduction"
       },
+      "plugin_cache": {
+        "title": "Cache Plugin",
+        "sidebar_label": "Cache Plugin"
+      },
       "plugin_debounce": {
         "title": "Debounce Plugin",
         "sidebar_label": "Debounce Plugin"
