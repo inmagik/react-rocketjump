@@ -72,6 +72,7 @@ Builder builder = loadData.withMeta(object)
 Builder builder = loadData.withMeta(<span class="hljs-function"><span class="hljs-params">oldMeta</span> =&gt;</span> newMeta)
 Builder builder = loadData.onSuccess(callback)
 Builder builder = loadData.onError(callback)
+Builder builder = loadData.asPromise(...args)
 </code></pre>
 <p>Each of these methods instantiates a new Builder to be used for the <em>rich</em> call, and calls the omonimous method on the created builder (so avoiding an explicit call to instantiate the builder).</p>
 <p>The methods exposed by the builder object are</p>
@@ -80,13 +81,14 @@ builder.withMeta(<span class="hljs-function"><span class="hljs-params">oldMeta</
 builder.onSuccess(callback)
 builder.onError(callback)
 builder.run(...args)
+builder.asPromise(...args)
 </code></pre>
 <p>First of all, builder methods are designed to be chainable, hence probably you'll never create a <code>builder</code> variable in your code, but you'd end up writing something like</p>
 <pre><code class="hljs css language-js">loadData
-    .withMeta({ <span class="hljs-attr">id</span>: <span class="hljs-number">42</span> })
-    .onSuccess(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(data))
-    .onError(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.warn(err))
-    .run()
+  .withMeta({ <span class="hljs-attr">id</span>: <span class="hljs-number">42</span> })
+  .onSuccess(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(data))
+  .onError(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.warn(err))
+  .run()
 </code></pre>
 <p>Now, let's go describing the methods of the builder</p>
 <h3><a class="anchor" aria-hidden="true" id="withmetafunction"></a><a href="#withmetafunction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>withMeta(function)</h3>
@@ -116,4 +118,19 @@ builder.run(...args)
 <h3><a class="anchor" aria-hidden="true" id="run"></a><a href="#run" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>run</h3>
 <p><code>builder.run(...args)</code></p>
 <p>This method closes the builder and dispatches the action with the passed in <code>...args</code> as params and the configuration defined with the other methods. This method must be the last invocation on a builder, no further configuration will be taken into account after calling it.</p>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/react-rocketjump/docs/api_connect"><span class="arrow-prev">← </span><span class="function-name-prevnext">Connecting RocketJumps</span></a><a class="docs-next button" href="/react-rocketjump/docs/api_composition"><span>Composition</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#quicker-way-direct-invocation">Quicker way: direct invocation</a></li><li><a href="#rich-way-using-the-builder">Rich way: using the Builder</a><ul class="toc-headings"><li><a href="#withmetafunction">withMeta(function)</a></li><li><a href="#withmetaobject">withMeta(object)</a></li><li><a href="#onsuccess">onSuccess</a></li><li><a href="#onfailure">onFailure</a></li><li><a href="#run">run</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/react-rocketjump/" class="nav-home"></a><div><h5>Docs</h5><a href="/react-rocketjump/docs/quickstart">Getting Started</a><a href="/react-rocketjump/docs/api_rj">API Reference</a><a href="/react-rocketjump/docs/plugin_all">Plugins</a></div><div><h5>More</h5><a href="https://github.com/inmagik/react-rocketjump">GitHub</a><a class="github-button" href="https://github.com/inmagik/react-rocketjump" data-icon="octicon-star" data-count-href="/inmagik/react-rocketjump/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://inmagik.com" target="_blank" rel="noreferrer noopener" class="fbOpenSource inmagikOpenSource"><img src="/react-rocketjump/img/inmagik_logo.png" alt="Facebook Open Source" width="50" height="50"/></a><section class="copyright">Copyright © 2019 INMAGIK srl</section></footer></div></body></html>
+<h3><a class="anchor" aria-hidden="true" id="aspromise"></a><a href="#aspromise" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>asPromise</h3>
+<p><code>builder.asPromise(...args)</code></p>
+<p>This method closes the builder and dispatches the action with the passed in <code>...args</code> as params and the configuration defined with the other methods. This method must be the last invocation on a builder, no further configuration will be taken into account after calling it. The return value of this method is no more a <code>Builder</code> instance, but a <code>Promise</code>.</p>
+<p>If you set callbacks with <code>builder.onSuccess</code> or <code>builder.onFailure</code>, they will be invoked properly before the Promise completes (either resolving or rejecting)</p>
+<p><strong>Example</strong></p>
+<p>Returning a Promise from an action</p>
+<pre><code class="hljs css language-js">builder
+  .asPromise(<span class="hljs-number">1</span>, <span class="hljs-string">'admin'</span>)
+  .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'success'</span>)
+  })
+  .catch(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'failure'</span>)
+  })
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/react-rocketjump/docs/api_connect"><span class="arrow-prev">← </span><span class="function-name-prevnext">Connecting RocketJumps</span></a><a class="docs-next button" href="/react-rocketjump/docs/api_composition"><span>Composition</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#quicker-way-direct-invocation">Quicker way: direct invocation</a></li><li><a href="#rich-way-using-the-builder">Rich way: using the Builder</a><ul class="toc-headings"><li><a href="#withmetafunction">withMeta(function)</a></li><li><a href="#withmetaobject">withMeta(object)</a></li><li><a href="#onsuccess">onSuccess</a></li><li><a href="#onfailure">onFailure</a></li><li><a href="#run">run</a></li><li><a href="#aspromise">asPromise</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/react-rocketjump/" class="nav-home"></a><div><h5>Docs</h5><a href="/react-rocketjump/docs/quickstart">Getting Started</a><a href="/react-rocketjump/docs/api_rj">API Reference</a><a href="/react-rocketjump/docs/plugin_all">Plugins</a></div><div><h5>More</h5><a href="https://github.com/inmagik/react-rocketjump">GitHub</a><a class="github-button" href="https://github.com/inmagik/react-rocketjump" data-icon="octicon-star" data-count-href="/inmagik/react-rocketjump/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://inmagik.com" target="_blank" rel="noreferrer noopener" class="fbOpenSource inmagikOpenSource"><img src="/react-rocketjump/img/inmagik_logo.png" alt="InMagik Logo"/></a><section class="copyright">Copyright © 2019 INMAGIK srl</section></footer></div></body></html>
