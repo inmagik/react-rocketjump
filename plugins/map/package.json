@@ -1,1 +1,6 @@
-{"name":"redux-rocketjump/plugins/map","private":true,"main":"../../lib/plugins/map/index.cjs.js","module":"../../lib/plugins/map/index.esm.js"}
+{
+  "name": "redux-rocketjump/plugins/map",
+  "private": true,
+  "main": "../../lib/plugins/map/index.cjs.js",
+  "module": "../../lib/plugins/map/index.esm.js"
+}

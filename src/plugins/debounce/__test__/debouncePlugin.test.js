@@ -1,4 +1,5 @@
 import rj from '../../../rj'
+import { makeAction } from '../../../index'
 import { Subject } from 'rxjs'
 import rjDebounce from '../index'
 import bindActionCreators from '../../../bindActionCreators'
@@ -168,23 +169,28 @@ describe('rjDebounce', () => {
 
     const { makeRxObservable, actionCreators } = rj(rjDebounce(200), {
       effect: mockApi,
+      actions: () => ({
+        drago: () => makeAction('DRAGO'),
+      }),
       takeEffect: 'every',
     })
 
     const subject = new Subject()
     makeRxObservable(subject.asObservable()).subscribe(mockCallback)
     const dispatch = action => subject.next(action)
-    const { run } = bindActionCreators(actionCreators, dispatch, subject)
+    const { run, drago } = bindActionCreators(actionCreators, dispatch, subject)
+    drago()
+    drago()
     run()
     run()
 
     expect(mockApi).toBeCalledTimes(2)
 
     mockApi.mock.results[1].value.then(() => {
-      expect(mockCallback).toBeCalledTimes(6)
+      expect(mockCallback).toBeCalledTimes(8)
 
       expect(mockCallback).nthCalledWith(1, {
-        type: RUN,
+        type: 'DRAGO',
         payload: { params: [] },
         meta: {},
         callbacks: {
@@ -194,8 +200,13 @@ describe('rjDebounce', () => {
       })
 
       expect(mockCallback).nthCalledWith(2, {
-        type: PENDING,
+        type: 'DRAGO',
+        payload: { params: [] },
         meta: {},
+        callbacks: {
+          onSuccess: undefined,
+          onFailure: undefined,
+        },
       })
 
       expect(mockCallback).nthCalledWith(3, {
@@ -214,6 +225,21 @@ describe('rjDebounce', () => {
       })
 
       expect(mockCallback).nthCalledWith(5, {
+        type: RUN,
+        payload: { params: [] },
+        meta: {},
+        callbacks: {
+          onSuccess: undefined,
+          onFailure: undefined,
+        },
+      })
+
+      expect(mockCallback).nthCalledWith(6, {
+        type: PENDING,
+        meta: {},
+      })
+
+      expect(mockCallback).nthCalledWith(7, {
         type: SUCCESS,
         meta: {},
         payload: {
@@ -222,7 +248,7 @@ describe('rjDebounce', () => {
         },
       })
 
-      expect(mockCallback).nthCalledWith(6, {
+      expect(mockCallback).nthCalledWith(8, {
         type: SUCCESS,
         meta: {},
         payload: {

@@ -18,12 +18,12 @@ const rjDebounce = (time = 200) =>
           }
         }),
         distinctUntilChanged((prevAction, currAction) => {
-          // Ignore not debounced actions...
-          if (currAction.type !== RUN || !currAction.meta.debounced) {
-            return false
-          }
           // not same stuff
           if (currAction.type !== prevAction.type) {
+            return false
+          }
+          // Ignore not debounced actions...
+          if (currAction.type !== RUN || !currAction.meta.debounced) {
             return false
           }
           // cant be the same
