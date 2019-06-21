@@ -6,6 +6,7 @@ import {
   TAKE_EFFECT_EVERY,
   TAKE_EFFECT_GROUP_BY,
   // TAKE_EFFECT_QUEUE,
+  TAKE_EFFECT_GROUP_BY_EXHAUST,
   TAKE_EFFECT_EXHAUST,
 } from '../rxEffects'
 
@@ -1290,6 +1291,125 @@ describe('RJ side effect model', () => {
     })
   })
 
+  it('take exahust side effect group by when specified', done => {
+    const counterByName = {}
+
+    const mockApi = jest.fn(
+      name =>
+        new Promise(resolve => {
+          counterByName[name] = (counterByName[name] || 0) + 1
+          resolve(`${name} is cool ${counterByName[name]}`)
+        })
+    )
+
+    const mockCallback = jest.fn()
+
+    const { makeRxObservable } = rj({
+      effect: mockApi,
+      takeEffect: [TAKE_EFFECT_GROUP_BY_EXHAUST, action => action.meta.name],
+    })
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+
+    subject.next({
+      type: RUN,
+      payload: { params: ['Alice'] },
+      meta: { name: 'Alice' },
+      callbacks: {},
+    })
+
+    subject.next({
+      type: RUN,
+      payload: { params: ['Bob'] },
+      meta: { name: 'Bob' },
+      callbacks: {},
+    })
+
+    subject.next({
+      type: RUN,
+      payload: { params: ['Alice'] },
+      meta: { name: 'Alice' },
+      callbacks: {},
+    })
+
+    subject.next({
+      type: RUN,
+      payload: { params: ['Eve'] },
+      meta: { name: 'Eve' },
+      callbacks: {},
+    })
+
+    mockApi.mock.results[2].value.then(() => {
+      expect(mockCallback).toBeCalledTimes(9)
+
+      expect(mockCallback).nthCalledWith(1, {
+        type: RUN,
+        payload: { params: ['Alice'] },
+        meta: { name: 'Alice' },
+        callbacks: {},
+      })
+
+      expect(mockCallback).nthCalledWith(2, {
+        type: PENDING,
+        meta: { name: 'Alice' },
+      })
+
+      expect(mockCallback).nthCalledWith(3, {
+        type: RUN,
+        payload: { params: ['Bob'] },
+        meta: { name: 'Bob' },
+        callbacks: {},
+      })
+
+      expect(mockCallback).nthCalledWith(4, {
+        type: PENDING,
+        meta: { name: 'Bob' },
+      })
+
+      expect(mockCallback).nthCalledWith(5, {
+        type: RUN,
+        payload: { params: ['Eve'] },
+        meta: { name: 'Eve' },
+        callbacks: {},
+      })
+
+      expect(mockCallback).nthCalledWith(6, {
+        type: PENDING,
+        meta: { name: 'Eve' },
+      })
+
+      expect(mockCallback).nthCalledWith(7, {
+        type: SUCCESS,
+        meta: { name: 'Alice' },
+        payload: {
+          params: ['Alice'],
+          data: 'Alice is cool 1',
+        },
+      })
+
+      expect(mockCallback).nthCalledWith(8, {
+        type: SUCCESS,
+        meta: { name: 'Bob' },
+        payload: {
+          params: ['Bob'],
+          data: 'Bob is cool 1',
+        },
+      })
+
+      expect(mockCallback).nthCalledWith(9, {
+        type: SUCCESS,
+        meta: { name: 'Eve' },
+        payload: {
+          params: ['Eve'],
+          data: 'Eve is cool 1',
+        },
+      })
+
+      done()
+    })
+  })
+
   it('gets angry if no groupBy function is injected', () => {
     const counterByName = {}
 
@@ -1304,6 +1424,27 @@ describe('RJ side effect model', () => {
     const { makeRxObservable } = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_GROUP_BY,
+    })
+
+    const subject = new Subject()
+
+    expect(() => makeRxObservable(subject.asObservable())).toThrow()
+  })
+
+  it('gets angry if no groupByExhaust function is injected', () => {
+    const counterByName = {}
+
+    const mockApi = jest.fn(
+      name =>
+        new Promise(resolve => {
+          counterByName[name] = (counterByName[name] || 0) + 1
+          resolve(`${name} is cool ${counterByName[name]}`)
+        })
+    )
+
+    const { makeRxObservable } = rj({
+      effect: mockApi,
+      takeEffect: TAKE_EFFECT_GROUP_BY_EXHAUST,
     })
 
     const subject = new Subject()

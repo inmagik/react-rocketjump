@@ -1,6 +1,5 @@
 language: node_js
 node_js:
-  - "node"
+  - 'node'
 script:
-  - yarn test-coverage
-  - codecov
+  - yarn test-coverage && codecov
