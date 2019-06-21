@@ -3,7 +3,7 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "Rocketjump your react! Handle state and side effects with classy",
+    "tagline": "Rocketjump your react! Manage state and side effects like a breeze",
     "docs": {
       "api_actions": {
         "title": "Using actions",
@@ -78,6 +78,10 @@
       "quickstart": {
         "title": "Quick Start",
         "sidebar_label": "Quick Start"
+      },
+      "tips_and_tricks": {
+        "title": "Tips & Tricks",
+        "sidebar_label": "Custom hooks"
       }
     },
     "links": {
@@ -89,7 +93,8 @@
       "Why React-RocketJump?": "Why React-RocketJump?",
       "Getting Started": "Getting Started",
       "API": "API",
-      "Plugins": "Plugins"
+      "Plugins": "Plugins",
+      "Tips & Tricks": "Tips & Tricks"
     }
   },
   "pages-strings": {

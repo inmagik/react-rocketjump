@@ -19,6 +19,7 @@
       "plugin_map",
       "plugin_debounce",
       "plugin_writing"
-    ]
+    ],
+    "Tips & Tricks": ["tips_and_tricks"]
   }
 }

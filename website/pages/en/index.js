@@ -147,11 +147,7 @@ class Index extends React.Component {
     )
 
     const Block = props => (
-      <Container
-        padding={['bottom', 'top']}
-        id={props.id}
-        background={props.background}
-      >
+      <Container id={props.id} background={props.background}>
         <GridBlock
           align="center"
           contents={props.children}
@@ -214,30 +210,53 @@ class Index extends React.Component {
       </Block>
     )
 
+    const Presentation = () => (
+      <Container background="light">
+        <h2 className="text-center">What is React-RocketJump?</h2>
+        <p>
+          React RocketJump is a flexible, customizable, extensible tool to help
+          developers dealing with side effects and asynchronous code in React
+          Applications
+          <br />
+        </p>
+        <p>
+          Benefits of using React RocketJump
+          <ul className="custom-ul">
+            <li>
+              asynchronous code is managed locally in your components, without
+              the need of a global state
+            </li>
+            <li>you can start a task and then cancel it before it completes</li>
+            <li>
+              the library detects when components are mounted or unmounted, so
+              that no asynchronous code is run on unmounted components
+            </li>
+            <li>
+              extensible (but already powerful) and composable ecosystem of
+              plugins to manage the most common and challenging tasks
+            </li>
+          </ul>
+          At the end, React-RocketJump is the power of redux enriched with
+          side-effects management in the scope of a component
+          <br />
+        </p>
+      </Container>
+    )
+
     const Features = () => (
-      <Block layout="fourColumn">
+      <Block>
         {[
           {
-            content: `The power and beauty of redux wrapped into a reusable container with a declarative syntax.`,
-            // image: `${baseUrl}img/undraw_react.svg`,
-            // imageAlign: 'top',
-            title: 'What is ReactRocketJump?',
-          },
-          {
-            content: `Rocketjump has no implicit dependencies except React>=16.8. State and side effects are bound locally to your Component,
-            so you can use rocketjump without having to rewrite your entire app.
-            \nYou can use it side-by-side to something like redux and maybe reuse stuff like selectors, reducers and api calls.
-            `,
-            // image: `${baseUrl}img/undraw_operating_system.svg`,
-            // imageAlign: 'top',
             title: 'Flexible',
+            content: `React-Rocketjump has no explicit dependencies except React>=16.8. Since it works locally, inside components, 
+              you can add it to your app without any compatibility issue, and you can use it just where you need it.
+              You can use it side-by-side to other libraries, like Redux-RocketJump.
+            `,
           },
           {
-            content: `Rocketjump uses composition in order to let you build a reusable api.
-            Rocketjump objects are reusable blueprint so you can easy share your behaviors with no effort`,
-            // image: `${baseUrl}img/undraw_operating_system.svg`,
-            // imageAlign: 'top',
             title: 'Reusable',
+            content: `React-Rocketjump is built around the concept of composition in order to let you build a reusable api.
+            React-Rocketjump Objects are reusable blueprints so you can easily insert them in different components without worries`,
           },
         ]}
       </Block>
@@ -276,23 +295,8 @@ class Index extends React.Component {
       <div>
         <HomeSplash siteConfig={siteConfig} language={language} />
         <div className="mainContainer">
+          <Presentation />
           <Features />
-
-          {/* <iframe
-            src="https://codesandbox.io/embed/reactrocketjumpexapmple1-tndoi?fontsize=13&editorsize=60&hidenavigation=1&codemirror=1"
-            title="react-rocketjump-exapmple-1"
-            style={{ width:'100%', height: 500, border:0, borderRadius: 4, overflow: 'hidden' }}
-            sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe>
-          <iframe
-            src="https://codesandbox.io/embed/lucid-mclean-q6k6c?fontsize=13&editorsize=60&hidenavigation=1&codemirror=1"
-            title="react-rocketjump-exapmple-1"
-            style={{ width:'100%', height: 500, border:0, borderRadius: 4, overflow: 'hidden' }}
-            sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe> */}
-          {/* <FeatureCallout />
-          <LearnHow />
-          <TryOut />
-          <Description />
-          <Showcase /> */}
           <Example />
           <Example2 />
         </div>
