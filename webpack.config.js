@@ -4,7 +4,8 @@ module.exports = {
   entry: './example/index.js',
   mode: 'development',
   output: {
-    filename: 'bundle.js'
+    filename: 'bundle.js',
+    publicPath: '/',
   },
   devServer: {
     contentBase: './example',
@@ -16,17 +17,27 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /(node_modules)/,
-        use: 'babel-loader'
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react'],
+            plugins: [
+              'macros',
+              'preval',
+              '@babel/plugin-syntax-dynamic-import',
+            ],
+          },
+        },
       },
       {
         test: /\.css$/,
-        use: [ 'style-loader', 'css-loader' ]
-      }
-    ]
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
   },
   resolve: {
     alias: {
       'react-rocketjump': path.resolve(__dirname, 'src'),
-    }
-  }
-};
+    },
+  },
+}
