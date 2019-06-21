@@ -14,7 +14,7 @@
     "run-example": "npm-run-all -p dev-example fake-server",
     "dev-example": "webpack-dev-server",
     "fake-server": "node scripts/initExampleDB.js && json-server --watch ./example/db.json --port 9001 --delay 300",
-    "format": "prettier --write \"{src,__{tests,mocks}__}/**/*.js\"",
+    "format": "prettier --write \"{example,src,__{tests,mocks}__}/**/*.js\"",
     "test": "jest",
     "test-coverage": "jest --coverage",
     "codecov": "jest --coverage && codecov",
@@ -91,7 +91,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged"
+      "pre-commit": "pretty-quick --staged --pattern \"{example,src,__{tests,mocks}__}/**/*.js\""
     }
   }
 }
