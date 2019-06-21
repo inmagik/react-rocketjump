@@ -19,6 +19,9 @@ import {
   // Group By
   TAKE_EFFECT_GROUP_BY,
   takeEffectGroupBy,
+  // Group By Exhaust
+  TAKE_EFFECT_GROUP_BY_EXHAUST,
+  takeEffectGroupByExhaust,
 } from './rxEffects'
 
 const defaultCallEffect = (call, ...args) => call(...args)
@@ -108,6 +111,13 @@ export default function createMakeRxObservable({
       return takeEffectExhaust(action$, state$, mapActionToObserable)
     } else if (effectType === TAKE_EFFECT_GROUP_BY) {
       return takeEffectGroupBy(
+        action$,
+        state$,
+        mapActionToObserable,
+        effectTypeArgs
+      )
+    } else if (effectType === TAKE_EFFECT_GROUP_BY_EXHAUST) {
+      return takeEffectGroupByExhaust(
         action$,
         state$,
         mapActionToObserable,

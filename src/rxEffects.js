@@ -82,31 +82,35 @@ export function takeEffectEvery(action$, state$, mapActionToObserable) {
 
 // export const TAKE_EFFECT_QUEUE = 'queue'
 
+function actionToExhaustObservableEffect(action$, mapActionToObserable) {
+  return merge(
+    action$.pipe(
+      mergeMap(action => {
+        if (action.type === CANCEL || action.type === CLEAN) {
+          return of(action)
+        } else {
+          return empty()
+        }
+      })
+    ),
+    action$.pipe(
+      exhaustMap(action => {
+        if (action.type === CANCEL || action.type === CLEAN) {
+          return empty()
+        }
+        return concat(of(action), mapActionToObserable(action)).pipe(
+          takeUntilCancelAction(action$)
+        )
+      })
+    )
+  )
+}
+
 export const TAKE_EFFECT_EXHAUST = 'exhaust'
 
 export function takeEffectExhaust(action$, state$, mapActionToObserable) {
   return chainOnlyOnEffectActions(action$, effectAction$ =>
-    merge(
-      effectAction$.pipe(
-        mergeMap(action => {
-          if (action.type === CANCEL || action.type === CLEAN) {
-            return of(action)
-          } else {
-            return empty()
-          }
-        })
-      ),
-      effectAction$.pipe(
-        exhaustMap(action => {
-          if (action.type === CANCEL || action.type === CLEAN) {
-            return empty()
-          }
-          return concat(of(action), mapActionToObserable(action)).pipe(
-            takeUntilCancelAction(effectAction$)
-          )
-        })
-      )
-    )
+    actionToExhaustObservableEffect(effectAction$, mapActionToObserable)
   )
 }
 
@@ -129,6 +133,31 @@ export function takeEffectGroupBy(
     effectAction$.pipe(
       groupBy(groupByFn),
       mergeMap($group => $group.pipe(mapToLatest($group, mapActionToObserable)))
+    )
+  )
+}
+
+export const TAKE_EFFECT_GROUP_BY_EXHAUST = 'groupByExhaust'
+
+export function takeEffectGroupByExhaust(
+  action$,
+  state$,
+  mapActionToObserable,
+  effectTypeArgs
+) {
+  const groupByFn = effectTypeArgs[0]
+  if (typeof groupByFn !== 'function') {
+    throw new Error(
+      '[react-rj] when you choose the groupByExhaust ' +
+        'takeEffect you must provide a function to group by the effect.'
+    )
+  }
+  return chainOnlyOnEffectActions(action$, effectAction$ =>
+    effectAction$.pipe(
+      groupBy(groupByFn),
+      mergeMap($group =>
+        actionToExhaustObservableEffect($group, mapActionToObserable)
+      )
     )
   )
 }
