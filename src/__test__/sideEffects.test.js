@@ -1607,4 +1607,38 @@ describe('RJ side effect model', () => {
       done()
     })
   })
+
+  it('should throw proper errors', async () => {
+    const badApi = () =>
+      new Promise(resolve => {
+        const a = {}
+        resolve(a.b.c)
+      })
+
+    const error = await new Promise(resolve => {
+      const mockCallback = jest.fn()
+      const mockError = jest.fn(err => {
+        resolve(err)
+      })
+
+      const { makeRxObservable } = rj({
+        effect: badApi,
+      })
+
+      const subject = new Subject()
+      makeRxObservable(subject.asObservable()).subscribe(
+        mockCallback,
+        mockError
+      )
+
+      subject.next({
+        type: RUN,
+        payload: { params: [] },
+        meta: {},
+        callbacks: {},
+      })
+    })
+
+    expect(error).toBeInstanceOf(Error)
+  })
 })
