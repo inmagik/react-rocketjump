@@ -210,57 +210,56 @@ class Index extends React.Component {
       </Block>
     )
 
+    const Presentation = () => (
+      <Container background="light">
+        <h2 className="text-center">What is React-RocketJump?</h2>
+        <p>
+          React RocketJump is a flexible, customizable, extensible tool to help
+          developers dealing with side effects and asynchronous code in React
+          Applications
+          <br />
+        </p>
+        <p>
+          Benefits of using React RocketJump
+          <ul className="custom-ul">
+            <li>
+              asynchronous code is managed locally in your components, without
+              the need of a global state
+            </li>
+            <li>you can start a task and then cancel it before it completes</li>
+            <li>
+              the library detects when components are mounted or unmounted, so
+              that no asynchronous code is run on unmounted components
+            </li>
+            <li>
+              extensible (but already powerful) and composable ecosystem of
+              plugins to manage the most common and challenging tasks
+            </li>
+          </ul>
+          At the end, React-RocketJump is the power of redux enriched with
+          side-effects management in the scope of a component
+          <br />
+        </p>
+      </Container>
+    )
+
     const Features = () => (
-      <>
-        <Container background="light">
-          <h2 className="text-center">What is React-RocketJump?</h2>
-          <p>
-            React RocketJump is a flexible, customizable, extensible tool to
-            help developers dealing with side effects and asynchronous code in
-            React Applications
-            <br />
-          </p>
-          <p>
-            Benefits of using React RocketJump
-            <ul className="custom-ul">
-              <li>
-                asynchronous code is managed locally in your components, without
-                the need of a global state
-              </li>
-              <li>
-                you can start a task and then cancel it before it completes
-              </li>
-              <li>
-                the library detects when components are mounted or unmounted, so
-                that no asynchronous code is run on unmounted components
-              </li>
-              <li>
-                extensible (but already powerful) and composable ecosystem of
-                plugins to manage the most common and challenging tasks
-              </li>
-            </ul>
-            At the end, React-RocketJump is the power of redux enriched with
-            side-effects management in the scope of a component
-            <br />
-          </p>
-        </Container>
-        <Block>
-          {[
-            {
-              title: 'Flexible',
-              content: `React-Rocketjump has no explicit dependencies except React>=16.8. Since it works locally, inside components, 
+      <Block>
+        {[
+          {
+            title: 'Flexible',
+            content: `React-Rocketjump has no explicit dependencies except React>=16.8. Since it works locally, inside components, 
               you can add it to your app without any compatibility issue, and you can use it just where you need it.
               You can use it side-by-side to other libraries, like Redux-RocketJump.
             `,
-            },
-            {
-              title: 'Reusable',
-              content: `React-Rocketjump is built around the concept of composition in order to let you build a reusable api.
+          },
+          {
+            title: 'Reusable',
+            content: `React-Rocketjump is built around the concept of composition in order to let you build a reusable api.
             React-Rocketjump Objects are reusable blueprints so you can easily insert them in different components without worries`,
-            },
-          ]}
-        </Block>
-      </>
+          },
+        ]}
+      </Block>
     )
 
     const Showcase = () => {
@@ -296,6 +295,7 @@ class Index extends React.Component {
       <div>
         <HomeSplash siteConfig={siteConfig} language={language} />
         <div className="mainContainer">
+          <Presentation />
           <Features />
           <Example />
           <Example2 />
