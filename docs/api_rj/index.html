@@ -71,9 +71,10 @@
 <p><strong>Example</strong></p>
 <p>Making a simple RocketJump Object that makes a GET request (using SuperAgent syntax in our example) to some host</p>
 <pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> rjObject = rj({
-    <span class="hljs-attr">effect</span>: <span class="hljs-function"><span class="hljs-params">id</span> =&gt;</span> request
-                    .get(<span class="hljs-string">`https://my.host.dev/api/resource/<span class="hljs-subst">${id}</span>/`</span>)
-                    .then(<span class="hljs-function">(<span class="hljs-params">{ body }</span>) =&gt;</span> body)
+  <span class="hljs-attr">effect</span>: <span class="hljs-function"><span class="hljs-params">id</span> =&gt;</span>
+    request
+      .get(<span class="hljs-string">`https://my.host.dev/api/resource/<span class="hljs-subst">${id}</span>/`</span>)
+      .then(<span class="hljs-function">(<span class="hljs-params">{ body }</span>) =&gt;</span> body),
 })
 </code></pre>
 <p><strong>Example</strong></p>
@@ -81,25 +82,26 @@
 <pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { ajax } <span class="hljs-keyword">from</span> <span class="hljs-string">'rxjs/ajax'</span>
 
 <span class="hljs-keyword">const</span> rjPart = rj({
-    <span class="hljs-attr">effect</span>: <span class="hljs-function">(<span class="hljs-params">...params</span>) =&gt;</span> {
-        <span class="hljs-keyword">return</span> ajax({
-            <span class="hljs-attr">url</span>: <span class="hljs-string">'https://my.api.dev/users/Alice'</span>,
-            <span class="hljs-attr">method</span>: <span class="hljs-string">'GET'</span>,
-            <span class="hljs-attr">headers</span>: {
-                <span class="hljs-comment">/*some headers*/</span>
-            },
-            <span class="hljs-attr">body</span>: {
-                params
-            }
-        })
-    }
+  <span class="hljs-attr">effect</span>: <span class="hljs-function">(<span class="hljs-params">...params</span>) =&gt;</span> {
+    <span class="hljs-keyword">return</span> ajax({
+      <span class="hljs-attr">url</span>: <span class="hljs-string">'https://my.api.dev/users/Alice'</span>,
+      <span class="hljs-attr">method</span>: <span class="hljs-string">'GET'</span>,
+      <span class="hljs-attr">headers</span>: {
+        <span class="hljs-comment">/*some headers*/</span>
+      },
+      <span class="hljs-attr">body</span>: {
+        params,
+      },
+    })
+  },
 })
 </code></pre>
 <p>There is also a shortcut syntax in case the <code>effect</code> option is the only option you need to set</p>
-<pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> rjObject = rj(<span class="hljs-function"><span class="hljs-params">id</span> =&gt;</span> request
-                            .get(<span class="hljs-string">`https://my.host.dev/api/resource/<span class="hljs-subst">${id}</span>/`</span>)
-                            .then(<span class="hljs-function">(<span class="hljs-params">{ body }</span>) =&gt;</span> body)
-                    )
+<pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> rjObject = rj(<span class="hljs-function"><span class="hljs-params">id</span> =&gt;</span>
+  request
+    .get(<span class="hljs-string">`https://my.host.dev/api/resource/<span class="hljs-subst">${id}</span>/`</span>)
+    .then(<span class="hljs-function">(<span class="hljs-params">{ body }</span>) =&gt;</span> body)
+)
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="actions"></a><a href="#actions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>actions</h3>
 <p><code>Object&lt;Action&gt; =&gt; Object&lt;Action&gt;</code></p>
@@ -113,9 +115,9 @@
 <p><strong>Example</strong></p>
 <p>This partial is used to change the behaviour of the run function so as to copy the first param into the metadata associated with the action</p>
 <pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> rjPart = rj({
-    <span class="hljs-attr">actions</span>: <span class="hljs-function">(<span class="hljs-params">{ run }</span>) =&gt;</span> ({
-        <span class="hljs-attr">run</span>: <span class="hljs-function"><span class="hljs-params">param</span> =&gt;</span> run(param).withMeta({ <span class="hljs-attr">myParam</span> : param })
-    })
+  <span class="hljs-attr">actions</span>: <span class="hljs-function">(<span class="hljs-params">{ run }</span>) =&gt;</span> ({
+    <span class="hljs-attr">run</span>: <span class="hljs-function"><span class="hljs-params">param</span> =&gt;</span> run(param).withMeta({ <span class="hljs-attr">myParam</span>: param }),
+  }),
 })
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="selectors"></a><a href="#selectors" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>selectors</h3>
@@ -124,16 +126,16 @@
 <p><strong>Example</strong></p>
 <p>This partial is used to create a selector that changes some strings to upper case</p>
 <pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> rjPart = rj({
-    <span class="hljs-attr">selectors</span>: <span class="hljs-function">(<span class="hljs-params">{ getData }</span>) =&gt;</span> ({
-        <span class="hljs-attr">getUpperData</span>: <span class="hljs-function"><span class="hljs-params">state</span> =&gt;</span> {
-            <span class="hljs-keyword">const</span> data = getData(state)
-            <span class="hljs-keyword">return</span> {
-                ...data,
-                <span class="hljs-attr">name</span>: data.name.toUpperCase(),
-                <span class="hljs-attr">surname</span>: data.surname.toUpperCase()
-            }
-        }
-    })
+  <span class="hljs-attr">selectors</span>: <span class="hljs-function">(<span class="hljs-params">{ getData }</span>) =&gt;</span> ({
+    <span class="hljs-attr">getUpperData</span>: <span class="hljs-function"><span class="hljs-params">state</span> =&gt;</span> {
+      <span class="hljs-keyword">const</span> data = getData(state)
+      <span class="hljs-keyword">return</span> {
+        ...data,
+        <span class="hljs-attr">name</span>: data.name.toUpperCase(),
+        <span class="hljs-attr">surname</span>: data.surname.toUpperCase(),
+      }
+    },
+  }),
 })
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="reducer"></a><a href="#reducer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>reducer</h3>
@@ -142,20 +144,20 @@
 <p><strong>Example</strong></p>
 <p>This configuration describes the extension of a reducer to add support for a new action</p>
 <pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> rjPart = rj({
-    <span class="hljs-attr">reducer</span>: <span class="hljs-function"><span class="hljs-params">oldReducer</span> =&gt;</span> (state, action) =&gt; {
-        <span class="hljs-keyword">if</span> (action.type === <span class="hljs-string">'SWAP'</span>) {
-            <span class="hljs-keyword">const</span> { name, surname } = state.data
-            <span class="hljs-keyword">return</span> {
-                ...state,
-                <span class="hljs-attr">data</span>: {
-                    ...state.data,
-                    <span class="hljs-attr">surname</span>: name,
-                    <span class="hljs-attr">name</span>: surname
-                }
-            }
-        }
-        <span class="hljs-keyword">return</span> oldReducer(state, action)
+  <span class="hljs-attr">reducer</span>: <span class="hljs-function"><span class="hljs-params">oldReducer</span> =&gt;</span> <span class="hljs-function">(<span class="hljs-params">state, action</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (action.type === <span class="hljs-string">'SWAP'</span>) {
+      <span class="hljs-keyword">const</span> { name, surname } = state.data
+      <span class="hljs-keyword">return</span> {
+        ...state,
+        <span class="hljs-attr">data</span>: {
+          ...state.data,
+          <span class="hljs-attr">surname</span>: name,
+          <span class="hljs-attr">name</span>: surname,
+        },
+      }
     }
+    <span class="hljs-keyword">return</span> oldReducer(state, action)
+  },
 })
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="composereducer"></a><a href="#composereducer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>composeReducer</h3>
@@ -164,30 +166,32 @@
 <p>This setting has also a quick overload signature to avoid passing arrays of just one element, which is
 <code>(state, action) =&gt; state</code>. The behaviour of the following descriptions is the same</p>
 <pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> rjPart = rj({
-    <span class="hljs-attr">composeReducer</span>: <span class="hljs-function">(<span class="hljs-params">state, action</span>) =&gt;</span> produceNextState(state, action)
+  <span class="hljs-attr">composeReducer</span>: <span class="hljs-function">(<span class="hljs-params">state, action</span>) =&gt;</span> produceNextState(state, action),
 })
 
 <span class="hljs-keyword">const</span> rjPart = rj({
-    <span class="hljs-attr">composeReducer</span>: <span class="hljs-function">(<span class="hljs-params">state, action</span>) =&gt;</span> [produceNextState(state, action)]
+  <span class="hljs-attr">composeReducer</span>: <span class="hljs-function">(<span class="hljs-params">state, action</span>) =&gt;</span> [produceNextState(state, action)],
 })
 </code></pre>
 <p><strong>Example</strong></p>
 <p>This configuration describes the extension of a reducer to add support for a new action</p>
 <pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> rjPart = rj({
-    <span class="hljs-attr">composeReducer</span>: [<span class="hljs-function">(<span class="hljs-params">state, action</span>) =&gt;</span> {
-        <span class="hljs-keyword">if</span> (action.type === <span class="hljs-string">'SWAP'</span>) {
-            <span class="hljs-keyword">const</span> { name, surname } = state.data
-            <span class="hljs-keyword">return</span> {
-                ...state,
-                <span class="hljs-attr">data</span>: {
-                    ...state.data,
-                    <span class="hljs-attr">surname</span>: name,
-                    <span class="hljs-attr">name</span>: surname
-                }
-            }
+  <span class="hljs-attr">composeReducer</span>: [
+    <span class="hljs-function">(<span class="hljs-params">state, action</span>) =&gt;</span> {
+      <span class="hljs-keyword">if</span> (action.type === <span class="hljs-string">'SWAP'</span>) {
+        <span class="hljs-keyword">const</span> { name, surname } = state.data
+        <span class="hljs-keyword">return</span> {
+          ...state,
+          <span class="hljs-attr">data</span>: {
+            ...state.data,
+            <span class="hljs-attr">surname</span>: name,
+            <span class="hljs-attr">name</span>: surname,
+          },
         }
-        <span class="hljs-keyword">return</span> state  <span class="hljs-comment">/* Look at the difference with the reducer setting */</span>
-    }]
+      }
+      <span class="hljs-keyword">return</span> state <span class="hljs-comment">/* Look at the difference with the reducer setting */</span>
+    },
+  ],
 })
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="effectcaller"></a><a href="#effectcaller" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>effectCaller</h3>
@@ -198,7 +202,7 @@
 <pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> TOKEN = <span class="hljs-string">'somesecretyoudontwanttocommittogithub'</span>
 
 <span class="hljs-keyword">const</span> rjPart = rj({
-    <span class="hljs-attr">effectCaller</span>: <span class="hljs-function">(<span class="hljs-params">effect, ...params</span>) =&gt;</span> effect(TOKEN, ...params)
+  <span class="hljs-attr">effectCaller</span>: <span class="hljs-function">(<span class="hljs-params">effect, ...params</span>) =&gt;</span> effect(TOKEN, ...params),
 })
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="takeeffect"></a><a href="#takeeffect" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>takeEffect</h3>
@@ -209,6 +213,7 @@
 <li><code>every</code>: never cancel a task, just await all of them to complete. No grants about order of completion is set.</li>
 <li><code>exhaust</code>: if there is a pending instance of the task, it ignores any other attempt to spawn other instances of the same task</li>
 <li><code>groupBy</code>: compute a key for each task invocation, and behaves like the <code>latest</code> policy with respect to tasks with the same key.</li>
+<li><code>groupByExhaust</code>: compute a key for each task invocation, and behaves like the <code>exhaust</code> policy with respect to tasks with the same key.</li>
 </ul>
 <p>The only case in which it is required to pass an argument is the <code>groupBy</code> case, where a key making function is required. The key making function is called with the <code>run</code> action object as a parameter, and is expected to return a scalar (int or string does not matter).</p>
 <p>You can also pass a function to this key in order to define your own policy. This function is called with two arguments:</p>
@@ -219,27 +224,85 @@
 <p>This function is expected to return itself a <code>RxObservable</code></p>
 <p><strong>Example</strong></p>
 <p>Group tasks by a meta key</p>
-<pre><code class="hljs css language-js">
-<span class="hljs-keyword">const</span> rjPart = rj({
-    <span class="hljs-attr">takeEffect</span>: [<span class="hljs-string">'groupBy'</span>, action =&gt; action.meta.id]
+<pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> rjPart = rj({
+  <span class="hljs-attr">takeEffect</span>: [<span class="hljs-string">'groupBy'</span>, action =&gt; action.meta.id],
 })
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="effectpipeline"></a><a href="#effectpipeline" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>effectPipeline</h3>
-<p><code>(observable: RxObservable) =&gt; RxObservable</code></p>
-<p>This is used to customize the pipeline used to dispatch actions to observables. It is passed in a function that is called with the action stream and it is expected to return again an RxObservable. This configuration setting is useful to introduce some transformations supported by RxJs, for instance <code>debounce</code></p>
+<p><code>(actionObservable: RxObservable, stateObservable: RxObservable) =&gt; RxObservable</code></p>
+<p>This is used to customize the pipeline used to dispatch actions to observables. It is passed in a function that is called with the action stream and the state stream and it is expected to return again an RxObservable. This configuration setting is useful to introduce some transformations supported by RxJs, for instance <code>debounce</code></p>
 <p><strong>Example</strong>
 Debounce an API call</p>
 <pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { rj } <span class="hljs-keyword">from</span> <span class="hljs-string">'react-rocketjump'</span>
 <span class="hljs-keyword">import</span> { debounceTime, distinctUntilChanged } <span class="hljs-keyword">from</span> <span class="hljs-string">'rxjs/operators'</span>
 
 <span class="hljs-keyword">const</span> TypeaheadState = rj({
-  <span class="hljs-attr">effectPipeline</span>: <span class="hljs-function"><span class="hljs-params">$s</span> =&gt;</span>
-    $s.pipe(
+  <span class="hljs-attr">effectPipeline</span>: <span class="hljs-function">(<span class="hljs-params">action$, state$</span>) =&gt;</span>
+    action$.pipe(
       debounceTime(<span class="hljs-number">200</span>),
       distinctUntilChanged()
     ),
   <span class="hljs-attr">effect</span>: <span class="hljs-function"><span class="hljs-params">search</span> =&gt;</span> {
     <span class="hljs-keyword">return</span> fetch(<span class="hljs-string">`/api/users?search=<span class="hljs-subst">${search}</span>`</span>).then(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> r.json()),
+  }
+})
+</code></pre>
+<p>State Observable also expose a <code>.value</code> field to access the current state value.</p>
+<p><strong>Example</strong>
+Pass to effect the current next token.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { rj, useRj, RUN } <span class="hljs-keyword">from</span> <span class="hljs-string">'react-rocketjump'</span>
+<span class="hljs-keyword">import</span> { map } <span class="hljs-keyword">from</span> <span class="hljs-string">'rxjs/operators'</span>
+
+<span class="hljs-keyword">const</span> WithNextToken = rj({
+  <span class="hljs-attr">effectPipeline</span>: <span class="hljs-function">(<span class="hljs-params">action$, state$</span>) =&gt;</span>
+    action$.pipe(
+      map(<span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> {
+        <span class="hljs-keyword">if</span> (
+          action.type === RUN &amp;&amp;
+          state$.value.data &amp;&amp;
+          state$.value.data.nextToken !== <span class="hljs-literal">null</span>
+        ) {
+          <span class="hljs-keyword">return</span> {
+            ...action,
+            <span class="hljs-attr">payload</span>: {
+              <span class="hljs-attr">params</span>: action.payload.params.concat(state$.value.data.nextToken),
+            },
+          }
+        }
+        <span class="hljs-keyword">return</span> action
+      })
+    ),
+  <span class="hljs-attr">effect</span>: <span class="hljs-function">(<span class="hljs-params">nextToken = <span class="hljs-string">''</span></span>) =&gt;</span> {
+    <span class="hljs-keyword">return</span> fetch(<span class="hljs-string">`/api/users?nextToken=<span class="hljs-subst">${nextToken}</span>`</span>).then(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> r.json()),
+  }
+})
+</code></pre>
+<p>Or if your prefer a more reactive approach:</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { rj, useRj, RUN } <span class="hljs-keyword">from</span> <span class="hljs-string">'react-rocketjump'</span>
+<span class="hljs-keyword">import</span> { map, withLatestFrom } <span class="hljs-keyword">from</span> <span class="hljs-string">'rxjs/operators'</span>
+
+<span class="hljs-keyword">const</span> WithNextToken = rj({
+  <span class="hljs-attr">effectPipeline</span>: <span class="hljs-function">(<span class="hljs-params">action$, state$</span>) =&gt;</span>
+    action$.pipe(
+      withLatestFrom(state$),
+      map(<span class="hljs-function">(<span class="hljs-params">[action, state]</span>) =&gt;</span> {
+        <span class="hljs-keyword">if</span> (
+          action.type === RUN &amp;&amp;
+          state.data &amp;&amp;
+          state.data.nextToken !== <span class="hljs-literal">null</span>
+        ) {
+          <span class="hljs-keyword">return</span> {
+            ...action,
+            <span class="hljs-attr">payload</span>: {
+              <span class="hljs-attr">params</span>: action.payload.params.concat(state.data.nextToken),
+            },
+          }
+        }
+        <span class="hljs-keyword">return</span> action
+      })
+    ),
+  <span class="hljs-attr">effect</span>: <span class="hljs-function">(<span class="hljs-params">nextToken = <span class="hljs-string">''</span></span>) =&gt;</span> {
+    <span class="hljs-keyword">return</span> fetch(<span class="hljs-string">`/api/users?nextToken=<span class="hljs-subst">${nextToken}</span>`</span>).then(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> r.json()),
   }
 })
 </code></pre>

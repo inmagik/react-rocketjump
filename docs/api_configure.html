@@ -64,8 +64,8 @@
 <h2><a class="anchor" aria-hidden="true" id="sharable-properties"></a><a href="#sharable-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Sharable properties</h2>
 <p>By now, the capability of <code>&lt;ConfigureRj /&gt;</code> is limited to the <code>effectCaller</code> property. Introducing in the tree a <code>&lt;ConfigureRj /&gt;</code> component with the <code>effectCaller</code> property set means that any component using a RocketJump Object (both with the <code>connectRj</code> hoc or the <code>useRj</code> hook) will inherit the <code>effectCaller</code> unless you explicitly define it in the RocketJump Object definition</p>
 <pre><code class="hljs css language-js">&lt;ConfigureRj effectCaller={myCustomEffectCaller}&gt;
-    /* This is the scope of the shared configuration */
-&lt;/ConfigureRj&gt;
+    <span class="hljs-comment">/* This is the scope of the shared configuration */</span>
+<span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">ConfigureRj</span>&gt;</span></span>
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="example"></a><a href="#example" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Example</h2>
 <p>This example shows how you can use the <code>&lt;ConfigureRj /&gt;</code> API to easily implement authentication</p>
@@ -95,9 +95,9 @@
         <span class="hljs-tag">&lt;<span class="hljs-name">ConfigureRj</span> <span class="hljs-attr">effectCaller</span>=<span class="hljs-string">{this.injectAuth}</span>&gt;</span>
           {this.props.children}
         <span class="hljs-tag">&lt;/<span class="hljs-name">ConfigureRj</span>&gt;</span>
-      <span class="hljs-tag">&lt;/<span class="hljs-name">AuthContext.Provider</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">AuthContext.Provider</span>&gt;</span></span>
     )
   }
 }
-</span></code></pre>
+</code></pre>
 </span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/react-rocketjump/docs/api_rj"><span class="arrow-prev">← </span><span class="function-name-prevnext">RocketJump constructor</span></a><a class="docs-next button" href="/react-rocketjump/docs/api_connect"><span class="function-name-prevnext">Connecting RocketJumps</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#how-it-works">How it works?</a></li><li><a href="#sharable-properties">Sharable properties</a></li><li><a href="#example">Example</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/react-rocketjump/" class="nav-home"></a><div><h5>Docs</h5><a href="/react-rocketjump/docs/quickstart">Getting Started</a><a href="/react-rocketjump/docs/api_rj">API Reference</a><a href="/react-rocketjump/docs/plugin_all">Plugins</a></div><div><h5>More</h5><a href="https://github.com/inmagik/react-rocketjump">GitHub</a><a class="github-button" href="https://github.com/inmagik/react-rocketjump" data-icon="octicon-star" data-count-href="/inmagik/react-rocketjump/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://inmagik.com" target="_blank" rel="noreferrer noopener" class="fbOpenSource inmagikOpenSource"><img src="/react-rocketjump/img/inmagik_logo_circle1.png" alt="InMagik Logo"/></a><section class="copyright">Copyright © 2019 INMAGIK srl</section></footer></div></body></html>

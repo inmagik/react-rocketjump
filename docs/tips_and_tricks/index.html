@@ -67,7 +67,7 @@
   <span class="hljs-attr">actions</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> ({
     <span class="hljs-attr">writeBack</span>: <span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> ({ <span class="hljs-attr">type</span>: <span class="hljs-string">'write-back'</span>, data }),
   }),
-  <span class="hljs-attr">reducer</span>: <span class="hljs-function"><span class="hljs-params">oldReducer</span> =&gt;</span> (state, action) =&gt; {
+  <span class="hljs-attr">reducer</span>: <span class="hljs-function"><span class="hljs-params">oldReducer</span> =&gt;</span> <span class="hljs-function">(<span class="hljs-params">state, action</span>) =&gt;</span> {
     <span class="hljs-keyword">if</span> (action.type === <span class="hljs-string">'write-back'</span>) {
       <span class="hljs-keyword">return</span> {
         ...state,
