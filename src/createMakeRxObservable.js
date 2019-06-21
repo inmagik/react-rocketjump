@@ -1,4 +1,4 @@
-import { of, from, concat } from 'rxjs'
+import { of, from, concat, throwError } from 'rxjs'
 import {
   map,
   // concatMap,
@@ -67,7 +67,18 @@ export default function createMakeRxObservable({
         of({ type: PENDING, meta }),
         from(callEffect(effectCall, ...params)).pipe(
           map(data => ({ type: SUCCESS, payload: { data, params }, meta })),
-          catchError(error => of({ type: FAILURE, payload: error, meta })),
+          catchError(error => {
+            // Avoid headache
+            if (
+              error instanceof TypeError ||
+              error instanceof RangeError ||
+              error instanceof SyntaxError ||
+              error instanceof ReferenceError
+            ) {
+              return throwError(error)
+            }
+            return of({ type: FAILURE, payload: error, meta })
+          }),
           tap(action => {
             // NOTE: This code may look strange but this dragon
             // trick is usde only 2 go to next event loop and flush
