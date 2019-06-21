@@ -18,11 +18,11 @@ const users = [
     infoLink: 'https://www.facebook.com',
     pinned: true,
   },
-];
+]
 
 const siteConfig = {
-  title: 'ReactRocketJump', // Title for your website.
-  tagline: 'Rocketjump your react! Handle state and side effects with classy',
+  title: 'React-RocketJump', // Title for your website.
+  tagline: 'Rocketjump your react! Manage state and side effects like a breeze',
   url: 'https://inmagik.github.io', // Your website URL
   baseUrl: '/react-rocketjump/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
@@ -38,10 +38,13 @@ const siteConfig = {
 
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
-    {doc: 'installation', label: 'Docs'},
-    {doc: 'api_rj', label: 'API'},
+    { doc: 'installation', label: 'Docs' },
+    { doc: 'api_rj', label: 'API' },
     // {blog: true, label: 'Blog'},
-    {href: 'https://www.github.com/inmagik/react-rocketjump', label: 'GitHub'},
+    {
+      href: 'https://www.github.com/inmagik/react-rocketjump',
+      label: 'GitHub',
+    },
   ],
 
   // If you have users set above, you add it here:
@@ -103,6 +106,6 @@ const siteConfig = {
   // You may provide arbitrary config keys to be used as needed by your
   // template. For example, if you need your repo's URL...
   repoUrl: 'https://github.com/inmagik/react-rocketjump',
-};
+}
 
-module.exports = siteConfig;
+module.exports = siteConfig
