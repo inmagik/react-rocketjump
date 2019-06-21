@@ -22,4 +22,5 @@
 <url> <loc>https://inmagik.github.io/react-rocketjump/docs/plugin_plain_list</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://inmagik.github.io/react-rocketjump/docs/plugin_plain_list" /> </url>
 <url> <loc>https://inmagik.github.io/react-rocketjump/docs/plugin_writing</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://inmagik.github.io/react-rocketjump/docs/plugin_writing" /> </url>
 <url> <loc>https://inmagik.github.io/react-rocketjump/docs/quickstart</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://inmagik.github.io/react-rocketjump/docs/quickstart" /> </url>
+<url> <loc>https://inmagik.github.io/react-rocketjump/docs/tips_and_tricks</loc> <changefreq>hourly</changefreq> <priority>1.0</priority> <xhtml:link rel="alternate" hreflang="en" href="https://inmagik.github.io/react-rocketjump/docs/tips_and_tricks" /> </url>
 </urlset>
