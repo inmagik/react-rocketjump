@@ -100,7 +100,6 @@ class Index extends React.Component {
             title="react-rocketjump-exapmple-1"
             style={{
               width: '100%',
-              marginLeft: 20,
               height: 500,
               border: 0,
               borderRadius: 4,
@@ -114,7 +113,7 @@ class Index extends React.Component {
 
     const Example2 = props => (
       <Container
-        padding={['bottom', 'top']}
+        padding={['bottom']}
         id={props.id}
         background={props.background}
       >
@@ -134,7 +133,6 @@ class Index extends React.Component {
             title="react-rocketjump-exapmple-1"
             style={{
               width: '100%',
-              marginLeft: 20,
               height: 500,
               border: 0,
               borderRadius: 4,
@@ -248,7 +246,7 @@ class Index extends React.Component {
         {[
           {
             title: 'Flexible',
-            content: `React-Rocketjump has no explicit dependencies except React>=16.8. Since it works locally, inside components, 
+            content: `React-Rocketjump has no explicit dependencies except React>=16.8. Since it works locally, inside components,
               you can add it to your app without any compatibility issue, and you can use it just where you need it.
               You can use it side-by-side to other libraries, like Redux-RocketJump.
             `,
