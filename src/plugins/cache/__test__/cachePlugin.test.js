@@ -324,6 +324,42 @@ describe('Cache Plugin (Session - LRU)', () => {
     expect(effect).nthCalledWith(6, 1)
     expect(effect).nthCalledWith(7, 4)
   })
+
+  it('has a cache clearing function', async () => {
+    const effect = jest.fn().mockResolvedValue(10)
+
+    const state = rj(
+      rjCache({
+        ns: 'test',
+        size: 2,
+        store: SessionStorageStore,
+        provider: LRUCache,
+        key: (...args) => args[0],
+      }),
+      {
+        effect: effect,
+      }
+    )
+
+    const wrapper = makeRjComponent(state)
+
+    const run = wrapper.prop('run')
+
+    expect(wrapper.prop('resetCache')).not.toBeUndefined()
+
+    const reset = wrapper.prop('resetCache')
+
+    await act(async () => {
+      await run.asPromise(1)
+      await run.asPromise(1)
+      reset()
+      await run.asPromise(1)
+    })
+
+    expect(effect).toHaveBeenCalledTimes(2)
+    expect(effect).nthCalledWith(1, 1)
+    expect(effect).nthCalledWith(2, 1)
+  })
 })
 
 describe('Cache Plugin (Local - FIFO)', () => {
@@ -630,6 +666,42 @@ describe('Cache Plugin (Local - FIFO)', () => {
     expect(effect).nthCalledWith(6, 4)
     expect(effect).nthCalledWith(7, 1)
   })
+
+  it('has a cache clearing function', async () => {
+    const effect = jest.fn().mockResolvedValue(10)
+
+    const state = rj(
+      rjCache({
+        ns: 'test',
+        size: 2,
+        store: LocalStorageStore,
+        provider: FIFOCache,
+        key: (...args) => args[0],
+      }),
+      {
+        effect: effect,
+      }
+    )
+
+    const wrapper = makeRjComponent(state)
+
+    const run = wrapper.prop('run')
+
+    expect(wrapper.prop('resetCache')).not.toBeUndefined()
+
+    const reset = wrapper.prop('resetCache')
+
+    await act(async () => {
+      await run.asPromise(1)
+      await run.asPromise(1)
+      reset()
+      await run.asPromise(1)
+    })
+
+    expect(effect).toHaveBeenCalledTimes(2)
+    expect(effect).nthCalledWith(1, 1)
+    expect(effect).nthCalledWith(2, 1)
+  })
 })
 
 describe('Cache Plugin (InMemory - LRU)', () => {
@@ -935,6 +1007,42 @@ describe('Cache Plugin (InMemory - LRU)', () => {
     expect(effect).nthCalledWith(5, 2)
     expect(effect).nthCalledWith(6, 1)
     expect(effect).nthCalledWith(7, 4)
+  })
+
+  it('has a cache clearing function', async () => {
+    const effect = jest.fn().mockResolvedValue(10)
+
+    const state = rj(
+      rjCache({
+        ns: 'test',
+        size: 2,
+        store: InMemoryStore,
+        provider: LRUCache,
+        key: (...args) => args[0],
+      }),
+      {
+        effect: effect,
+      }
+    )
+
+    const wrapper = makeRjComponent(state)
+
+    const run = wrapper.prop('run')
+
+    expect(wrapper.prop('resetCache')).not.toBeUndefined()
+
+    const reset = wrapper.prop('resetCache')
+
+    await act(async () => {
+      await run.asPromise(1)
+      await run.asPromise(1)
+      reset()
+      await run.asPromise(1)
+    })
+
+    expect(effect).toHaveBeenCalledTimes(2)
+    expect(effect).nthCalledWith(1, 1)
+    expect(effect).nthCalledWith(2, 1)
   })
 })
 

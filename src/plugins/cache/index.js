@@ -1,6 +1,6 @@
-import { rj } from '../../index'
+import { rj, makeAction } from '../../index'
 import { of, from } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, filter, tap } from 'rxjs/operators'
 import { LRUCache } from './providers'
 import { SessionStorageStore } from './stores'
 
@@ -22,6 +22,9 @@ const rjCache = config => {
   const provider = new (config.provider || LRUCache)(ns, size, store)
   const key = config.key || defaultKey
   return rj({
+    actions: () => ({
+      resetCache: () => makeAction('$reset-cache'),
+    }),
     effectCaller: (effectFn, ...args) => {
       const k = key(...args)
       if (provider.has(k)) {
@@ -30,10 +33,20 @@ const rjCache = config => {
         return from(effectFn(...args)).pipe(
           map(result => {
             provider.set(k, result)
+            return result
           })
         )
       }
     },
+    effectPipeline: action$ =>
+      action$.pipe(
+        tap(action => {
+          if (action.type === '$reset-cache') {
+            provider.clear()
+          }
+        }),
+        filter(action => action.type !== '$reset-cache')
+      ),
   })
 }
 
