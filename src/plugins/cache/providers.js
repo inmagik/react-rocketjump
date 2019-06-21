@@ -22,6 +22,10 @@ export class LRUCache {
     this.store.setItem(`$${this.namespace}-meta`, nextMeta)
   }
 
+  _resetMeta() {
+    this.store.removeItem(`$${this.namespace}-meta`)
+  }
+
   has(key) {
     const realKey = this._effectiveKey(key)
     return !!this._meta().dict[realKey]
@@ -54,6 +58,14 @@ export class LRUCache {
     this._setMeta(meta)
     this.store.setItem(realKey, value)
   }
+
+  clear() {
+    const meta = this._meta()
+    Object.keys(meta.dict).forEach(key => {
+      this.store.removeItem(key)
+    })
+    this._resetMeta()
+  }
 }
 
 export class FIFOCache {
@@ -78,6 +90,10 @@ export class FIFOCache {
 
   _setMeta(nextMeta) {
     this.store.setItem(`$${this.namespace}-meta`, nextMeta)
+  }
+
+  _resetMeta() {
+    this.store.removeItem(`$${this.namespace}-meta`)
   }
 
   has(key) {
@@ -109,5 +125,13 @@ export class FIFOCache {
     meta.queue = [...meta.queue, realKey]
     this._setMeta(meta)
     this.store.setItem(realKey, value)
+  }
+
+  clear() {
+    const meta = this._meta()
+    Object.keys(meta.dict).forEach(key => {
+      this.store.removeItem(key)
+    })
+    this._resetMeta()
   }
 }

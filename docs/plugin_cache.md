@@ -37,6 +37,12 @@ const state = rj(
     )()
 ```
 
+## Actions
+
+This plugin injects in the `actions` bag the following action creators:
+
+- **resetCache**: removes all the items from the cache associated with the `ns` given in the configuration
+
 ## Store details
 
 ### SessionStorageStore and LocalStorageStore
