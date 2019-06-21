@@ -85,7 +85,7 @@ class Footer extends React.Component {
           className="fbOpenSource inmagikOpenSource"
         >
           <img
-            src={`${this.props.config.baseUrl}img/inmagik_logo.png`}
+            src={`${this.props.config.baseUrl}img/inmagik_logo_circle1.png`}
             alt="InMagik Logo"
           />
         </a>
