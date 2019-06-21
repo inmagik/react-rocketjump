@@ -247,9 +247,9 @@ const rjPart = rj({
 
 ### effectPipeline
 
-`(observable: RxObservable) => RxObservable`
+`(actionObservable: RxObservable, stateObservable: RxObservable) => RxObservable`
 
-This is used to customize the pipeline used to dispatch actions to observables. It is passed in a function that is called with the action stream and it is expected to return again an RxObservable. This configuration setting is useful to introduce some transformations supported by RxJs, for instance `debounce`
+This is used to customize the pipeline used to dispatch actions to observables. It is passed in a function that is called with the action stream and the state stream and it is expected to return again an RxObservable. This configuration setting is useful to introduce some transformations supported by RxJs, for instance `debounce`
 
 **Example**
 Debounce an API call
@@ -259,13 +259,80 @@ import { rj } from 'react-rocketjump'
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators'
 
 const TypeaheadState = rj({
-  effectPipeline: $s =>
-    $s.pipe(
+  effectPipeline: (action$, state$) =>
+    action$.pipe(
       debounceTime(200),
       distinctUntilChanged()
     ),
   effect: search => {
     return fetch(`/api/users?search=${search}`).then(r => r.json()),
+  }
+})
+```
+
+State Observable also expose a `.value` field to access the current state value.
+
+**Example**
+Pass to effect the current next token.
+
+
+```js
+import { rj, useRj, RUN } from 'react-rocketjump'
+import { map } from 'rxjs/operators'
+
+const WithNextToken = rj({
+  effectPipeline: (action$, state$) =>
+    action$.pipe(
+      map(action => {
+        if (
+          action.type === RUN &&
+          state$.value.data &&
+          state$.value.data.nextToken !== null
+        ) {
+          return {
+            ...action,
+            payload: {
+              params: action.payload.params.concat(state$.value.data.nextToken),
+            },
+          }
+        }
+        return action
+      })
+    ),
+  effect: (nextToken = '') => {
+    return fetch(`/api/users?nextToken=${nextToken}`).then(r => r.json()),
+  }
+})
+```
+
+Or if your prefer a more reactive approach:
+
+```js
+import { rj, useRj, RUN } from 'react-rocketjump'
+import { map, withLatestFrom } from 'rxjs/operators'
+
+const WithNextToken = rj({
+  effectPipeline: (action$, state$) =>
+    action$.pipe(
+      withLatestFrom(state$),
+      map(([action, state]) => {
+        if (
+          action.type === RUN &&
+          state.data &&
+          state.data.nextToken !== null
+        ) {
+          return {
+            ...action,
+            payload: {
+              params: action.payload.params.concat(state.data.nextToken),
+            },
+          }
+        }
+        return action
+      })
+    ),
+  effect: (nextToken = '') => {
+    return fetch(`/api/users?nextToken=${nextToken}`).then(r => r.json()),
   }
 })
 ```
