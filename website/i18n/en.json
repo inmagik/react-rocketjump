@@ -78,6 +78,10 @@
       "quickstart": {
         "title": "Quick Start",
         "sidebar_label": "Quick Start"
+      },
+      "tips_and_tricks": {
+        "title": "Tips & Tricks",
+        "sidebar_label": "Custom hooks"
       }
     },
     "links": {
@@ -89,7 +93,8 @@
       "Why React-RocketJump?": "Why React-RocketJump?",
       "Getting Started": "Getting Started",
       "API": "API",
-      "Plugins": "Plugins"
+      "Plugins": "Plugins",
+      "Tips & Tricks": "Tips & Tricks"
     }
   },
   "pages-strings": {
