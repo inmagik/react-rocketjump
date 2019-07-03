@@ -168,7 +168,7 @@ describe('List Plugin', () => {
       data: {
         pagination: {
           count: 99,
-          current: null,
+          current: { page: 1 },
           next: null,
           previous: null,
         },
@@ -846,7 +846,7 @@ describe('List Plugin', () => {
     expect(hasPrev(nextState)).toBe(false)
     expect(getNext(nextState)).toBe(null)
     expect(getPrev(nextState)).toBe(null)
-    expect(getCurrent(nextState)).toBe(null)
+    expect(getCurrent(nextState)).toEqual({ page: 1 })
   })
 
   it('supports nextPrev pagination', () => {
@@ -1055,5 +1055,53 @@ describe('List Plugin', () => {
     expect(getNext(nextState)).toEqual({ limit: 10, offset: 10 })
     expect(getPrev(nextState)).toEqual(null)
     expect(getCurrent(nextState)).toEqual({ limit: 10, offset: 0 })
+  })
+
+  it('deals with single page results correctly', () => {
+    const { makeSelectors, reducer } = rj(
+      rjList({
+        pageSize: 10,
+        pagination: nextPreviousPaginationAdapter,
+      }),
+      {
+        effect: () =>
+          Promise.resolve({
+            next: null,
+            prev: null,
+            results: [],
+            count: 50,
+          }),
+      }
+    )
+
+    const { getCurrent } = makeSelectors()
+
+    const state = {
+      loading: false,
+      error: null,
+      data: null,
+    }
+
+    const action = {
+      type: SUCCESS,
+      payload: {
+        params: [{}],
+        data: {
+          next: null,
+          previous: null,
+          count: 99,
+          results: [
+            {
+              id: '9',
+              name: 'Mallory',
+            },
+          ],
+        },
+      },
+    }
+
+    const nextState = reducer(state, action)
+
+    expect(getCurrent(nextState)).toEqual({ page: 1 })
   })
 })

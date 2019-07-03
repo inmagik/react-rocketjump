@@ -17,7 +17,7 @@ export const nextPreviousPaginationAdapter = {
   // Count of total stuff
   count: 'count',
 
-  current: ({ next, previous }) => {
+  current: ({ next, previous, count }) => {
     const { page: nextPage } = pickParamsFromUrl(next, pickPage) || {
       page: null,
     }
@@ -28,6 +28,8 @@ export const nextPreviousPaginationAdapter = {
       return { page: nextPage - 1 }
     } else if (prevPage !== null) {
       return { page: prevPage + 1 }
+    } else if (count > 0) {
+      return { page: 1 }
     } else {
       return null
     }
@@ -51,7 +53,7 @@ export const limitOffsetPaginationAdapter = {
   // Count of total stuff
   count: 'count',
 
-  current: ({ next, previous }) => {
+  current: ({ next, previous, count }) => {
     const { limit: prevLimit, offset: prevOffset } = pickParamsFromUrl(
       previous,
       pickLimitOffset
@@ -64,6 +66,8 @@ export const limitOffsetPaginationAdapter = {
       return { limit: prevLimit, offset: prevLimit + prevOffset }
     } else if (nextLimit !== null) {
       return { limit: nextLimit, offset: nextLimit - nextOffset }
+    } else if (count > 0) {
+      return { page: 1 }
     } else {
       return null
     }
