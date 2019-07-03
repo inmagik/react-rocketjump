@@ -1,34 +1,64 @@
-import React, { useEffect, useState } from 'react'
-import { useRj } from 'react-rocketjump'
-import { FriendsState } from './state'
+import preval from 'babel-plugin-preval/macro'
+import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom'
+import React, { Suspense } from 'react'
 
-export default function App() {
-  const [search, setSearch] = useState('')
-  const [{ data: friends }, { runDebounced: loadFriends, clean }] = useRj(
-    FriendsState
-  )
+const examples = preval`
+  const fs = require('fs');
+  module.exports = fs.readdirSync(__dirname + '/pages').filter(item => item[0] !== '.');
+`
+const lazyExamples = examples.map(example =>
+  React.lazy(() => import(`./pages/${example}`))
+)
 
-  useEffect(() => {
-    loadFriends(search)
-    // loadFriends(search)
-    // loadFriends(search)
-  }, [search, loadFriends])
+const BackButton = () => (
+  <div style={{ position: 'fixed', top: 5, left: 5, fontSize: 14 }}>
+    <Link to="/">{'<- Back 2 examples'}</Link>
+  </div>
+)
 
+function ListExamples() {
   return (
     <div>
-      <div>
-        <input
-          type="text"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <button onClick={() => clean()}>X</button>
-        {friends &&
-          friends.map(friend => <div key={friend.id}>{friend.name}</div>)}
-      </div>
+      <h1>RJ examples</h1>~
+      <ul>
+        {examples.map((example, i) => (
+          <li key={i}>
+            <Link to={`/examples/${example}`}>{example}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
+  )
+}
+
+function ExamplePage({ match }) {
+  const { example } = match.params
+
+  const index = examples.indexOf(example)
+
+  if (index === -1) {
+    return null
+  }
+
+  const ExampleComponent = lazyExamples[index]
+
+  return (
+    <>
+      <BackButton />
+      <ExampleComponent />
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <Router>
+      <Suspense fallback={<div>Loading ...</div>}>
+        <Switch>
+          <Route exact path="/" component={ListExamples} />
+          <Route path="/examples/:example" component={ExamplePage} />
+        </Switch>
+      </Suspense>
+    </Router>
   )
 }

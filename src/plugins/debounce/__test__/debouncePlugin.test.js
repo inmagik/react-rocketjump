@@ -260,4 +260,49 @@ describe('rjDebounce', () => {
       done()
     })
   })
+  it('should use the when option to decide when skip debounce', done => {
+    const mockApi = jest
+      .fn()
+      .mockResolvedValueOnce('Alice')
+      .mockResolvedValueOnce('Bob')
+      .mockResolvedValueOnce('Maik')
+
+    const mockCallback = jest.fn()
+
+    const { makeRxObservable, actionCreators } = rj(
+      rjDebounce({
+        time: 200,
+        when: (prev, curr) => {
+          if (prev && prev[0].q !== curr[0].q) {
+            return true
+          }
+          return false
+        },
+      }),
+      {
+        effect: mockApi,
+        takeEffect: 'every',
+      }
+    )
+
+    const subject = new Subject()
+    const dispatch = action => subject.next(action)
+    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const { runDebounced } = bindActionCreators(actionCreators, dispatch)
+    runDebounced({ q: 'G' })
+    expect(mockApi).toBeCalledTimes(1)
+    runDebounced({ q: 'Gi' })
+    runDebounced({ q: 'Gio' })
+    runDebounced({ q: 'Giov' })
+    runDebounced({ q: 'Giova' })
+    jest.advanceTimersByTime(100)
+    expect(mockApi).toBeCalledTimes(1)
+    jest.advanceTimersByTime(200)
+    expect(mockApi).toBeCalledTimes(2)
+    runDebounced({ q: 'Giova23' })
+    expect(mockApi).toBeCalledTimes(2)
+    runDebounced({ q: 'Giova23', xd: 23 })
+    expect(mockApi).toBeCalledTimes(3)
+    done()
+  })
 })
