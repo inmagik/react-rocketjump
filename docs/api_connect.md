@@ -19,6 +19,11 @@ connectRj(rocketJumpObject, mapStateToProps, mapActionsToProps)
 useRj(rocketJumpObject, mapStateToProps, mapActionsToProps)
 ```
 
+Moreover, the following helpers are provided to automate common cases
+```js
+useRunRj(rocketJumpObject, runArgs, shouldCleanBeforeRun, mapStateToProps, mapDispatchToProps)
+```
+
 ## Connection arguments
 
 ### RocketJumpObject
@@ -153,5 +158,33 @@ const Component = props => {
       loadX: run,
     })
   )
+}
+```
+
+## useRunRj
+`useRunRj` is very similar to `useRj`, but it is thought to allow for a quicker and more direct usage.
+
+Let's think to this example: we have a component that displays the properties of some resource available under a REST API on a GET endpoint. The way to achieve this using `useRj` is to get the id of the resource from props, connect the `RocketJump Object` with the hook, and then insert a `useEffect` hook to run the fetching task with the resource ID read from props. `useRunRj` is thought to speed up this scenario by automating the `run` call. Since this is a very recurrent case, the library provides this automation helper.
+
+The signature of the hook is
+
+```js
+import { useRunRj } from 'react-rocketjump'
+
+const Component = props => {
+  const [state, actions] = useRunRj(rjObject, runParams, shouldCleanBeforeRun, mapStateToProps, mapDispatchToProps)
+}
+```
+
+`rjObject`, `mapStateToProps` and `mapDispatchToProps` are the same of `useRj`. `runParams` is an array of parameters that are passed as positionals to the `run` call when executing the effect. `shouldCleanBeforeRun` tells the hook to clean up the state before performing a new run (a new run is triggered whenever some items in the `runParams` array changes) or not.
+
+In order for this to work, `mapDispatchToProps` should ensure to output a `run` function (and also a `clean` function in case `shouldCleanBeforeRun` is set)
+
+
+```js
+import { useRunRj } from 'react-rocketjump'
+
+const Component = props => {
+  const [{ data: resource }, actions] = useRj(rjObject, [props.resourceId], false)
 }
 ```
