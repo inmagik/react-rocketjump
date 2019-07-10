@@ -9,7 +9,7 @@ import rjCache, {
   InMemoryStore,
 } from '../index'
 import Adapter from 'enzyme-adapter-react-16'
-import { act } from 'react-hooks-testing-library'
+import { act } from 'react-dom/test-utils'
 import { clearInMemoryStore } from '../stores'
 
 Enzyme.configure({ adapter: new Adapter() })

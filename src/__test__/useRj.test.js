@@ -1,6 +1,6 @@
 import { act } from 'react-dom/test-utils'
 import { withLatestFrom, map } from 'rxjs/operators'
-import { renderHook } from 'react-hooks-testing-library'
+import { renderHook } from '@testing-library/react-hooks'
 import memoize from 'memoize-one'
 import rj from '../rj'
 import useRj from '../useRj'
