@@ -9,25 +9,9 @@ export default function useRunRj(
   rjObject,
   runArgs = [],
   shouldCleanOnNewEffect = true,
-  selectState,
-  mapActions
+  selectState
 ) {
-  const [state, actions] = useRj(rjObject, selectState, mapActions)
-
-  if (typeof actions.run !== 'function') {
-    throw new Error(
-      '[react-rocketjump] Your rocketjump should expose a run action when ' +
-        'used with useRunRj.'
-    )
-  }
-
-  if (shouldCleanOnNewEffect && typeof actions.clean !== 'function') {
-    throw new Error(
-      '[react-rocketjump] Your rocketjump should expose a clean action when ' +
-        'used with useRunRj and the shouldCleanOnNewEffect options is enabled.'
-    )
-  }
-
+  const [state, actions] = useRj(rjObject, selectState)
   const { run, clean } = actions
 
   useEffect(() => {

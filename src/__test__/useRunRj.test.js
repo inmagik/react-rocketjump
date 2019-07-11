@@ -124,40 +124,4 @@ describe('useRunRj', () => {
       error: null,
     })
   })
-
-  it('should get angry when the run action is removed', () => {
-    const mockApi = jest.fn().mockResolvedValue(23)
-    const MyRjState = rj(mockApi)
-
-    const { result } = renderHook(() =>
-      useRunRj(MyRjState, [], true, undefined, ({ run, clean }) => ({
-        // ... ignore run and clean ...
-      }))
-    )
-    expect(result.error.message).toEqual(
-      expect.stringContaining('[react-rocketjump]')
-    )
-  })
-
-  it('should get angry when the clean action is removed and shouldCleanOnNewEffect is true', async () => {
-    const mockApi = jest.fn(() => new Promise(() => {}))
-    const MyRjState = rj(mockApi)
-
-    const hook1 = renderHook(() =>
-      useRunRj(MyRjState, [], true, undefined, ({ run, clean }) => ({
-        // ... ignore clean ...
-        run,
-      }))
-    )
-    expect(hook1.result.error.message).toEqual(
-      expect.stringContaining('[react-rocketjump]')
-    )
-
-    const mapActions = ({ run }) => ({ run })
-    const hook2 = renderHook(() =>
-      useRunRj(MyRjState, [], false, undefined, mapActions)
-    )
-    // console.log(hook2.result)
-    expect(hook2.result.error).toBeUndefined()
-  })
 })
