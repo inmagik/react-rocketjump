@@ -52,10 +52,13 @@ export const TodosState = rj({
 // (4) And then use it in your component
 import { useRj } from 'react-rocketjump'
 const TodoList = props => {
-  const [{ todos }, { loadTodos }] = useRj(
+
+  // Here we use object destructuring operators to rename actions
+  //    this allows to avoid name clashes and to have more auto documented code
+
+  const [{ todos }, { run: loadTodos }] = useRj(
     TodosState,
     (state, { getData }) => ({ todos: getData(state) }), // extract data from state
-    ({ run }) => ({ loadTodos: run }) // map actions to props
   )
 
   useEffect(() => {
