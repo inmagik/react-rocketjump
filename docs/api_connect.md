@@ -11,17 +11,17 @@ Connecting a RocketJump Object with a React component means:
 - instantiating a reducer to manage the state object
 - creating action creators to manage the task and the state object
 
-There are two options to connect a RocketJump Object to a React Component: the `connectRj` higher order component, and the `useRj` hook. Both take the same arguments:
+There are two options to connect a RocketJump Object to a React Component: the `connectRj` higher order component, and the `useRj` hook. Their signature is quite similar:
 
 ```js
 connectRj(rocketJumpObject, mapStateToProps, mapActionsToProps)
 
-useRj(rocketJumpObject, mapStateToProps, mapActionsToProps)
+useRj(rocketJumpObject, mapStateToProps)
 ```
 
 Moreover, the following helpers are provided to automate common cases
 ```js
-useRunRj(rocketJumpObject, runArgs, shouldCleanBeforeRun, mapStateToProps, mapDispatchToProps)
+useRunRj(rocketJumpObject, runArgs, shouldCleanBeforeRun, mapStateToProps)
 ```
 
 ## Connection arguments
@@ -72,6 +72,8 @@ Predefined `actions` bag contains
 - `clean`: cancels any pending instances of the task and resets the state to the original value
 
 Plugins can add new actions or change the behaviour of existing ones, hence if you are using plugins refer to their documentation
+
+This parameter is mainly intended to rename actions, with the aim of avoiding name clashes in properties (which would be a very common case when connecting two or more `RocketJump Object` instances to the same component). If you need to further customize actions, refer to the `actions` configuration property when creating your `RocketJump Object` (you can find more info [here](api_rj.md))
 
 **Example**
 
@@ -139,7 +141,7 @@ The signature of the hook is
 import { useRj } from 'react-rocketjump'
 
 const Component = props => {
-  const [state, actions] = useRj(rjObject, mapStateToProps, mapDispatchToProps)
+  const [state, actions] = useRj(rjObject, mapStateToProps)
 }
 ```
 
@@ -149,17 +151,16 @@ The state object is the output of the invocation of `mapSelectorsToProps`, and t
 import { useRj } from 'react-rocketjump'
 
 const Component = props => {
-  const [{ x }, { loadX }] = useRj(
+  const [{ x }, { run: loadX }] = useRj(
     rjObject,
     (state, { getData }) => ({
       x: getData(state),
     }),
-    ({ run }) => ({
-      loadX: run,
-    })
   )
 }
 ```
+
+> Pro tip: you can use object destructuring to rename actions when using hooks. This allows to avoid name clashes with actions
 
 ## useRunRj
 `useRunRj` is very similar to `useRj`, but it is thought to allow for a quicker and more direct usage.
@@ -172,19 +173,17 @@ The signature of the hook is
 import { useRunRj } from 'react-rocketjump'
 
 const Component = props => {
-  const [state, actions] = useRunRj(rjObject, runParams, shouldCleanBeforeRun, mapStateToProps, mapDispatchToProps)
+  const [state, actions] = useRunRj(rjObject, runParams, shouldCleanBeforeRun, mapStateToProps)
 }
 ```
 
-`rjObject`, `mapStateToProps` and `mapDispatchToProps` are the same of `useRj`. `runParams` is an array of parameters that are passed as positionals to the `run` call when executing the effect. `shouldCleanBeforeRun` tells the hook to clean up the state before performing a new run (a new run is triggered whenever some items in the `runParams` array changes) or not.
-
-In order for this to work, `mapDispatchToProps` should ensure to output a `run` function (and also a `clean` function in case `shouldCleanBeforeRun` is set)
+`rjObject`, `mapStateToProps` are the same of `useRj`. `runParams` is an array of parameters that are passed as positionals to the `run` call when executing the effect. `shouldCleanBeforeRun` tells the hook to clean up the state before performing a new run (a new run is triggered whenever some items in the `runParams` array changes) or not.
 
 
 ```js
 import { useRunRj } from 'react-rocketjump'
 
 const Component = props => {
-  const [{ data: resource }, actions] = useRj(rjObject, [props.resourceId], false)
+  const [{ data: resource }, actions] = useRj(rjObject, [ props.resourceId ], false)
 }
 ```
