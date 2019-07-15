@@ -277,7 +277,7 @@ Pass to effect the current next token.
 
 
 ```js
-import { rj, useRj, RUN } from 'react-rocketjump'
+import { rj, RUN } from 'react-rocketjump'
 import { map } from 'rxjs/operators'
 
 const WithNextToken = rj({
@@ -308,7 +308,7 @@ const WithNextToken = rj({
 Or if your prefer a more reactive approach:
 
 ```js
-import { rj, useRj, RUN } from 'react-rocketjump'
+import { rj, RUN } from 'react-rocketjump'
 import { map, withLatestFrom } from 'rxjs/operators'
 
 const WithNextToken = rj({
