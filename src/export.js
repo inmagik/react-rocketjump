@@ -9,6 +9,7 @@ import {
   kompose,
   arrayze,
 } from 'rocketjump-core/utils'
+import { invertKeys } from './helpers'
 import DefaultActionCreators from './actionCreators'
 import defaultReducer from './reducer'
 import defaultMakeSelectors from './selectors'
@@ -78,12 +79,24 @@ export default (_, rjConfig, extendExport = {}) => {
     )
   }
 
+  // Default no computed
+  let computed = null
+  if (extendExport.computed) {
+    // Continue the export
+    computed = extendExport.computed
+  }
+  if (rjConfig.computed) {
+    // Merge given computed \w prev computed
+    computed = { ...computed, ...invertKeys(rjConfig.computed) }
+  }
+
   const newExport = {
     ...extendExport,
     sideEffect,
     reducer,
     actionCreators,
     makeSelectors,
+    computed,
   }
 
   return newExport

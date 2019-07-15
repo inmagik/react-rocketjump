@@ -25,22 +25,35 @@ export default function connectRj(
         actionCreators,
         reducer,
         makeSelectors,
+        computeState,
       } = rjObject
 
       const [state, dispatch] = useMiniRedux(reducer, makeRxObservable)
 
       const memoizedSelectors = useConstant(() => {
-        if (mapStateToProps !== undefined && mapStateToProps !== null) {
+        if (
+          typeof mapStateToProps === 'function' ||
+          typeof computeState === 'function'
+        ) {
           return makeSelectors()
         }
       })
 
       const stateDerivedProps = useMemo(() => {
-        if (mapStateToProps === undefined || mapActionsToProps === null) {
-          return state
+        let derivedState = state
+        if (typeof computeState === 'function') {
+          derivedState = computeState(state, memoizedSelectors)
         }
-        return mapStateToProps(state, memoizedSelectors, props)
-      }, [state, memoizedSelectors, props])
+        if (typeof mapStateToProps === 'function') {
+          derivedState = mapStateToProps(
+            state,
+            memoizedSelectors,
+            props,
+            derivedState
+          )
+        }
+        return derivedState
+      }, [state, memoizedSelectors, computeState, props])
 
       const boundActionCreators = useMemo(() => {
         return bindActionCreators(mapActionsToProps(actionCreators), dispatch)

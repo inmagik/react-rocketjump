@@ -14,22 +14,35 @@ export default function useRj(
       '[react-rocketjump] You should provide a rj object to useRj.'
     )
   }
-  const { makeRxObservable, actionCreators, reducer, makeSelectors } = rjObject
+  const {
+    makeRxObservable,
+    actionCreators,
+    reducer,
+    makeSelectors,
+    computeState,
+  } = rjObject
 
   const [state, dispatch] = useMiniRedux(reducer, makeRxObservable)
 
   const memoizedSelectors = useConstant(() => {
-    if (typeof selectState === 'function') {
+    if (
+      typeof selectState === 'function' ||
+      typeof computeState === 'function'
+    ) {
       return makeSelectors()
     }
   })
 
   const derivedState = useMemo(() => {
-    if (typeof selectState !== 'function') {
-      return state
+    let derivedState = state
+    if (typeof computeState === 'function') {
+      derivedState = computeState(state, memoizedSelectors)
     }
-    return selectState(state, memoizedSelectors)
-  }, [state, memoizedSelectors, selectState])
+    if (typeof selectState === 'function') {
+      derivedState = selectState(state, memoizedSelectors, derivedState)
+    }
+    return derivedState
+  }, [state, memoizedSelectors, selectState, computeState])
 
   const boundActionCreators = useMemo(() => {
     return bindActionCreators(actionCreators, dispatch)

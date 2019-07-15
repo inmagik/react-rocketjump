@@ -1,5 +1,15 @@
 import immutable from 'object-path-immutable'
 
+export function invertKeys(object) {
+  return Object.keys(object).reduce(
+    (inverted, key) => ({
+      ...inverted,
+      [object[key]]: key,
+    }),
+    {}
+  )
+}
+
 export function get(obj, path, defaultValue = undefined) {
   const keys = path.split('.')
   const result =

@@ -1,6 +1,7 @@
 import { forgeRocketJump, isPartialRj, isObjectRj } from 'rocketjump-core'
 import makeExport from './export'
 import createMakeRxObservable from './createMakeRxObservable'
+import createComputeState from './createComputeState'
 
 function shouldRocketJump(partialRjsOrConfigs) {
   let hasEffectConfigured = false
@@ -116,10 +117,15 @@ function makeRecursionRjs(
 
 function finalizeExport(finalExport, runConfig, finalConfig) {
   // ~~ END OF RECURSION CHAIN  ~~
-  const { sideEffect, ...rjExport } = finalExport
+  const { sideEffect, computed, ...rjExport } = finalExport
 
-  // Creat the make rx observable fn using merged side effect descriptor!
+  // Create the make rx observable function using merged side effect descriptor!
   const makeRxObservable = createMakeRxObservable(sideEffect)
+
+  // Create the compute state function by computed config,
+  // when no computed config is given return null is responsibility
+  // of useRj, connectRj, .. to check for null
+  const computeState = createComputeState(computed)
 
   // Finally the rocketjump runnable state is created!
   /*
@@ -132,6 +138,7 @@ function finalizeExport(finalExport, runConfig, finalConfig) {
   */
   return {
     ...rjExport,
+    computeState,
     makeRxObservable,
   }
 }

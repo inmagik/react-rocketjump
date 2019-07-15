@@ -87,6 +87,94 @@ describe('useRj', () => {
     })
   })
 
+  it('should compute state using given computed config', () => {
+    const maRjState = rj(
+      rj({
+        computed: {
+          shitBro: 'getError',
+          giova: 'getData',
+          magik: 'getMagic',
+          budda: 'getBuddy',
+        },
+        selectors: () => ({
+          getBuddy: () => 23,
+          getMagic: () => 23,
+        }),
+      }),
+      rj({
+        computed: {
+          shitBro: 'getError',
+          giova: 'getData',
+        },
+      }),
+      {
+        effect: () => Promise.resolve(1312),
+        computed: {
+          babu: 'isLoading',
+          friends: 'getData',
+        },
+        selectors: ({ getBuddy }) => ({
+          getBuddy: () => getBuddy() * 2,
+        }),
+      }
+    )
+
+    const { result } = renderHook(() => useRj(maRjState))
+
+    expect(result.current[0]).toEqual({
+      budda: 46,
+      magik: 23,
+      shitBro: null,
+      babu: false,
+      friends: null,
+    })
+  })
+
+  it('should compute state and give them to select state as last args', () => {
+    const maRjState = rj(
+      rj({
+        computed: {
+          shitBro: 'getError',
+          giova: 'getData',
+          magik: 'getMagic',
+          budda: 'getBuddy',
+        },
+        selectors: () => ({
+          getBuddy: () => 23,
+          getMagic: () => 23,
+        }),
+      }),
+      rj({
+        computed: {
+          shitBro: 'getError',
+          giova: 'getData',
+        },
+      }),
+      {
+        effect: () => Promise.resolve(1312),
+        computed: {
+          babu: 'isLoading',
+          friends: 'getData',
+        },
+        selectors: ({ getBuddy }) => ({
+          getBuddy: () => getBuddy() * 2,
+        }),
+      }
+    )
+
+    const { result } = renderHook(() =>
+      useRj(maRjState, (state, selectors, computedState) => ({
+        buddaTek: computedState.magik,
+        waiting: selectors.isLoading(state),
+      }))
+    )
+
+    expect(result.current[0]).toEqual({
+      buddaTek: 23,
+      waiting: false,
+    })
+  })
+
   it('should create a per-instance version of selectors to enable good memoization', () => {
     const mySelector = jest
       .fn()
@@ -298,7 +386,7 @@ describe('useRj', () => {
     })
     const maRjState = rj(rjStateObserver, mockFn)
 
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useRj(maRjState, (state, { getData }) => ({
         pending: state.pending,
         friends: getData(state),
@@ -340,6 +428,4 @@ describe('useRj', () => {
   test.todo('Test onSuccess onFailure')
 
   test.todo('Test actions')
-
-  test.todo('Test mapActions')
 })
