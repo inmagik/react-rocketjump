@@ -1,4 +1,6 @@
-import { rj } from '../../..'
+import { act } from 'react-dom/test-utils'
+import { renderHook } from '@testing-library/react-hooks'
+import { rj, useRj } from '../../..'
 import rjList from '..'
 import {
   nextPreviousPaginationAdapter,
@@ -1103,5 +1105,67 @@ describe('List Plugin', () => {
     const nextState = reducer(state, action)
 
     expect(getCurrent(nextState)).toEqual({ page: 1 })
+  })
+
+  it('should compute the list state', async () => {
+    const maRjState = rj(
+      rjList({
+        pageSize: 10,
+        pagination: nextPreviousPaginationAdapter,
+      }),
+      () =>
+        Promise.resolve({
+          next: '/my-api?page=3',
+          previous: '/my-api?page=1',
+          count: 100,
+          results: [
+            {
+              id: '9',
+              name: 'Mallory',
+            },
+          ],
+        })
+    )
+
+    const { result } = renderHook(() => useRj(maRjState))
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: null,
+        hasNext: false,
+        hasPrev: false,
+        next: null,
+        prev: null,
+        numPages: null,
+        current: null,
+      },
+      list: null,
+      loading: false,
+      error: null,
+    })
+
+    await act(async () => {
+      result.current[1].run()
+    })
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: 100,
+        hasNext: true,
+        hasPrev: true,
+        next: { page: 3 },
+        prev: { page: 1 },
+        numPages: 10,
+        current: { page: 2 },
+      },
+      list: [
+        {
+          id: '9',
+          name: 'Mallory',
+        },
+      ],
+      loading: false,
+      error: null,
+    })
   })
 })
