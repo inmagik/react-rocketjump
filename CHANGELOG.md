@@ -26,12 +26,12 @@ For a deep discussion of why this option was removed see: https://github.com/inm
 
 Use a rocketjump object and run it using `useEffect` according to `deps`, all `deps` are passed to `run` function.
 
-This is a simple sugar over `useRj` you can implement your own:
+This is a simple syntactic sugar over `useRj`, you can implement it by yourself:
 https://inmagik.github.io/react-rocketjump/docs/tips_and_tricks
 
-If youe have a `rocketjump` with easy-trigger-deps you can use `useRunRj` to write less code.
+If you have a `rocketjump` with easy-trigger-deps you can use `useRunRj` to write less code.
 
-Theese pieces of codes do the same.
+These pieces of codes do the same.
 
 Without `useRunRj()`:
 
@@ -60,12 +60,12 @@ You can find documentation about `useRunRj` here: https://inmagik.github.io/reac
 
 Now `rj` has a new config option: `computed`.
 
-`computed` is expected to be an object that map from a computed property name to a selector name.
+`computed` is expected to be an object that maps from a computed property name to a selector name.
 
-When a `rj` in the recursion chain "enable" `computed` the state returned from `useRj` or `connectRj`
-is computed according to this configuration, `computed` are merged using the normal `rj` recursion order.
+When a `rj` in the recursion chain "enables" `computed`, the state returned from `useRj` or `connectRj`
+is computed according to this configuration, otherwise the default structure is returned. `computed` declarations are merged using the normal `rj` recursion order.
 
-The `computed` mapping is unique you can't bind a selector multiple times, the last bindings wins.
+The `computed` mapping is unique, so you can't bind a selector multiple times. If you do this, the last bindings wins.
 
 Example:
 
@@ -105,12 +105,12 @@ The value of state is:
 
 #### `plugins/list`
 
-Now the plugin list use `computed` to avoid map the same state over and over again.
+Now the plugin list use `computed` to avoid mapping the same state over and over again.
 
-A new selector `getPagination` was exposed, return an Object with all the pagination info.
+A new selector `getPagination` is exposed, returning an Object with all the pagination info.
 
-The computed config is:
-(you can complete change this config writing your own `computed` config):
+The computed config privided by the plugin is:
+(you can completely change this config writing your own `computed` config):
 ```js
 {
   error: 'getError',
