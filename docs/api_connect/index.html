@@ -63,10 +63,13 @@
 <li>instantiating a reducer to manage the state object</li>
 <li>creating action creators to manage the task and the state object</li>
 </ul>
-<p>There are two options to connect a RocketJump Object to a React Component: the <code>connectRj</code> higher order component, and the <code>useRj</code> hook. Both take the same arguments:</p>
+<p>There are two options to connect a RocketJump Object to a React Component: the <code>connectRj</code> higher order component, and the <code>useRj</code> hook. Their signature is quite similar:</p>
 <pre><code class="hljs css language-js">connectRj(rocketJumpObject, mapStateToProps, mapActionsToProps)
 
-useRj(rocketJumpObject, mapStateToProps, mapActionsToProps)
+useRj(rocketJumpObject, mapStateToProps)
+</code></pre>
+<p>Moreover, the following helpers are provided to automate common cases</p>
+<pre><code class="hljs css language-js">useRunRj(rocketJumpObject, runArgs, shouldCleanBeforeRun, mapStateToProps)
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="connection-arguments"></a><a href="#connection-arguments" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Connection arguments</h2>
 <h3><a class="anchor" aria-hidden="true" id="rocketjumpobject"></a><a href="#rocketjumpobject" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RocketJumpObject</h3>
@@ -101,6 +104,7 @@ useRj(rocketJumpObject, mapStateToProps, mapActionsToProps)
 <li><code>clean</code>: cancels any pending instances of the task and resets the state to the original value</li>
 </ul>
 <p>Plugins can add new actions or change the behaviour of existing ones, hence if you are using plugins refer to their documentation</p>
+<p>This parameter is mainly intended to rename actions, with the aim of avoiding name clashes in properties (which would be a very common case when connecting two or more <code>RocketJump Object</code> instances to the same component). If you need to further customize actions, refer to the <code>actions</code> configuration property when creating your <code>RocketJump Object</code> (you can find more info <a href="/react-rocketjump/docs/api_rj">here</a>)</p>
 <p><strong>Example</strong></p>
 <p>This example describes how to inject the <code>run</code> action in the <code>loadTodos</code> prop</p>
 <pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> mapActionsToProps = <span class="hljs-function">(<span class="hljs-params">{ run }</span>) =&gt;</span> ({
@@ -147,22 +151,39 @@ useRj(rocketJumpObject, mapStateToProps, mapActionsToProps)
 <pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { useRj } <span class="hljs-keyword">from</span> <span class="hljs-string">'react-rocketjump'</span>
 
 <span class="hljs-keyword">const</span> Component = <span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> {
-  <span class="hljs-keyword">const</span> [state, actions] = useRj(rjObject, mapStateToProps, mapDispatchToProps)
+  <span class="hljs-keyword">const</span> [state, actions] = useRj(rjObject, mapStateToProps)
 }
 </code></pre>
 <p>The state object is the output of the invocation of <code>mapSelectorsToProps</code>, and the actions object is the output of <code>mapActionsToProps</code>. Our suggestion is to use object destructuring operators to have compact declaration, but feel free to structure your code as you wish.</p>
 <pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { useRj } <span class="hljs-keyword">from</span> <span class="hljs-string">'react-rocketjump'</span>
 
 <span class="hljs-keyword">const</span> Component = <span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> {
-  <span class="hljs-keyword">const</span> [{ x }, { loadX }] = useRj(
+  <span class="hljs-keyword">const</span> [{ x }, { <span class="hljs-attr">run</span>: loadX }] = useRj(
     rjObject,
     (state, { getData }) =&gt; ({
       <span class="hljs-attr">x</span>: getData(state),
     }),
-    ({ run }) =&gt; ({
-      <span class="hljs-attr">loadX</span>: run,
-    })
   )
 }
 </code></pre>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/react-rocketjump/docs/api_configure"><span class="arrow-prev">← </span><span>Sharing configuration</span></a><a class="docs-next button" href="/react-rocketjump/docs/api_actions"><span>Using actions</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#connection-arguments">Connection arguments</a><ul class="toc-headings"><li><a href="#rocketjumpobject">RocketJumpObject</a></li><li><a href="#mapstatetoprops">mapStateToProps</a></li><li><a href="#mapactionstoprops">mapActionsToProps</a></li></ul></li><li><a href="#connectrj">connectRj</a><ul class="toc-headings"><li><a href="#compose">compose</a></li></ul></li><li><a href="#userj">useRj</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/react-rocketjump/" class="nav-home"></a><div><h5>Docs</h5><a href="/react-rocketjump/docs/quickstart">Getting Started</a><a href="/react-rocketjump/docs/api_rj">API Reference</a><a href="/react-rocketjump/docs/plugin_all">Plugins</a></div><div><h5>More</h5><a href="https://github.com/inmagik/react-rocketjump">GitHub</a><a class="github-button" href="https://github.com/inmagik/react-rocketjump" data-icon="octicon-star" data-count-href="/inmagik/react-rocketjump/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://inmagik.com" target="_blank" rel="noreferrer noopener" class="fbOpenSource inmagikOpenSource"><img src="/react-rocketjump/img/inmagik_logo_circle1.png" alt="InMagik Logo"/></a><section class="copyright">Copyright © 2019 INMAGIK srl</section></footer></div></body></html>
+<blockquote>
+<p>Pro tip: you can use object destructuring to rename actions when using hooks. This allows to avoid name clashes with actions</p>
+</blockquote>
+<h2><a class="anchor" aria-hidden="true" id="userunrj"></a><a href="#userunrj" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>useRunRj</h2>
+<p><code>useRunRj</code> is very similar to <code>useRj</code>, but it is thought to allow for a quicker and more direct usage.</p>
+<p>Let's think to this example: we have a component that displays the properties of some resource available under a REST API on a GET endpoint. The way to achieve this using <code>useRj</code> is to get the id of the resource from props, connect the <code>RocketJump Object</code> with the hook, and then insert a <code>useEffect</code> hook to run the fetching task with the resource ID read from props. <code>useRunRj</code> is thought to speed up this scenario by automating the <code>run</code> call. Since this is a very recurrent case, the library provides this automation helper.</p>
+<p>The signature of the hook is</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { useRunRj } <span class="hljs-keyword">from</span> <span class="hljs-string">'react-rocketjump'</span>
+
+<span class="hljs-keyword">const</span> Component = <span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> {
+  <span class="hljs-keyword">const</span> [state, actions] = useRunRj(rjObject, runParams, shouldCleanBeforeRun, mapStateToProps)
+}
+</code></pre>
+<p><code>rjObject</code>, <code>mapStateToProps</code> are the same of <code>useRj</code>. <code>runParams</code> is an array of parameters that are passed as positionals to the <code>run</code> call when executing the effect. <code>shouldCleanBeforeRun</code> tells the hook to clean up the state before performing a new run (a new run is triggered whenever some items in the <code>runParams</code> array changes) or not.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { useRunRj } <span class="hljs-keyword">from</span> <span class="hljs-string">'react-rocketjump'</span>
+
+<span class="hljs-keyword">const</span> Component = <span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> {
+  <span class="hljs-keyword">const</span> [{ <span class="hljs-attr">data</span>: resource }, actions] = useRj(rjObject, [ props.resourceId ], <span class="hljs-literal">false</span>)
+}
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/react-rocketjump/docs/api_configure"><span class="arrow-prev">← </span><span>Sharing configuration</span></a><a class="docs-next button" href="/react-rocketjump/docs/api_actions"><span>Using actions</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#connection-arguments">Connection arguments</a><ul class="toc-headings"><li><a href="#rocketjumpobject">RocketJumpObject</a></li><li><a href="#mapstatetoprops">mapStateToProps</a></li><li><a href="#mapactionstoprops">mapActionsToProps</a></li></ul></li><li><a href="#connectrj">connectRj</a><ul class="toc-headings"><li><a href="#compose">compose</a></li></ul></li><li><a href="#userj">useRj</a></li><li><a href="#userunrj">useRunRj</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/react-rocketjump/" class="nav-home"></a><div><h5>Docs</h5><a href="/react-rocketjump/docs/quickstart">Getting Started</a><a href="/react-rocketjump/docs/api_rj">API Reference</a><a href="/react-rocketjump/docs/plugin_all">Plugins</a></div><div><h5>More</h5><a href="https://github.com/inmagik/react-rocketjump">GitHub</a><a class="github-button" href="https://github.com/inmagik/react-rocketjump" data-icon="octicon-star" data-count-href="/inmagik/react-rocketjump/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://inmagik.com" target="_blank" rel="noreferrer noopener" class="fbOpenSource inmagikOpenSource"><img src="/react-rocketjump/img/inmagik_logo_circle1.png" alt="InMagik Logo"/></a><section class="copyright">Copyright © 2019 INMAGIK srl</section></footer></div></body></html>
