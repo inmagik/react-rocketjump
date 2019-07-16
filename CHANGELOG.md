@@ -103,4 +103,22 @@ The value of state is:
 }
 ```
 
+#### `plugins/list`
+
+Now the plugin list use `computed` to avoid map the same state over and over again.
+
+A new selector `getPagination` was exposed, return an Object with all the pagination info.
+
+The computed config is:
+(you can complete change this config writing your own `computed` config):
+```js
+{
+  error: 'getError',
+  loading: 'isLoading',
+  list: 'getList',
+  pagination: 'getPagination',
+}
+```
+
+
 
