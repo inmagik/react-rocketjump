@@ -22,7 +22,7 @@ For a deep discussion of why this option was removed see: https://github.com/inm
 
 ### :zap: New features
 
-### `useRunRj`
+#### `useRunRj`
 
 Use a rocketjump object and run it using `useEffect` according to `deps`, all `deps` are passed to `run` function.
 
@@ -55,5 +55,52 @@ const [{ data: product }] = useRunRj(
 ```
 
 You can find documentation about `useRunRj` here: https://inmagik.github.io/react-rocketjump/docs/api_connect#userunrj
+
+#### `computed` :heart:
+
+Now `rj` has a new config option: `computed`.
+
+`computed` is expected to be an object that map from a computed property name to a selector name.
+
+When a `rj` in the recursion chain "enable" `computed` the state returned from `useRj` or `connectRj`
+is computed according to this configuration, `computed` are merged using the normal `rj` recursion order.
+
+The `computed` mapping is unique you can't bind a selector multiple times, the last bindings wins.
+
+Example:
+
+```js
+
+const MaRjState = rj(
+  rj({
+    computed: {
+      secret: 'getSecret',
+      ohShit: 'getError',
+    },
+    selectors: () => ({
+      getSecret: () => 23,
+    })
+  }, {
+    effect: myEffect,
+    computed: {
+      todos: 'getData',
+      error: 'getError',
+    }
+  })
+)
+
+const [state, actions] = useRj(MaRjState)
+
+```
+
+The value of state is:
+
+```js
+{
+  error: null, // state.error
+  secret: 23, 
+  todos: null, // state.data
+}
+```
 
 
