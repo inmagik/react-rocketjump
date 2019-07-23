@@ -6,15 +6,8 @@ import request from 'superagent'
 
 export const API_URL = 'http://localhost:9001'
 
-export const TodosListState = rj(rjPlainList(), {
+export const TodosListState = rj({
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
-  // effect: () => {
-  //   return new Promise((_, reject) => setTimeout(reject, 300))
-  //     // .catch(() => {
-  //     //   throw new TypeError('Sooooocio')
-  //     // })
-  //   // return request.get(`${API_URL}/todos`).then(({ body }) => body)
-  // },
   mutations: {
     addStupidTodo: {
       effect: todo =>
@@ -27,16 +20,33 @@ export const TodosListState = rj(rjPlainList(), {
         data: state.data.concat(todo),
       }),
     },
+    removeTodo: {
+      effect: todo =>
+        request.delete(`${API_URL}/todos/${todo.id}`).then(() => todo.id),
+      updater: (state, id) => ({
+        ...state,
+        data: state.data.filter(todo => todo.id !== id),
+      }),
+    },
+    toggleTodo: {
+      effect: todo =>
+        request
+          .put(`${API_URL}/todos/${todo.id}`)
+          .send({
+            ...todo,
+            done: !todo.done,
+          })
+          .then(({ body }) => body),
+      updater: (state, todo) => ({
+        ...state,
+        data: state.data.map(t => (t.id === todo.id ? todo : t)),
+      }),
+    },
   },
-  reducer: oldReducer => {
-    return (state, action) => {
-      console.log('Reducer', action)
-      return oldReducer(state, action)
-    }
+  computed: {
+    todos: 'getData',
+    loading: 'isPending',
   },
-  actions: ({ run }) => ({
-    loadTodos: run,
-  }),
 })
 
 export const AddTodoState = rj({

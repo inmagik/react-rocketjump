@@ -1,41 +1,19 @@
 import React, { useEffect } from 'react'
 import Todo from './Todo'
-import { useMaTodos, API_URL } from './localstate'
+import { useRunRj } from 'react-rocketjump'
+import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
 
 export default function Todos() {
   const [
-    { todos, loading, updating, deleting, adding },
-    { loadTodos, removeTodo, toggleTodo, addTodo, addStupidTodo },
-  ] = useMaTodos()
-
-  useEffect(() => {
-    loadTodos()
-  }, [loadTodos])
-
-  // useEffect(() => {
-  //   addStupidTodo({
-  //     name: 'bibi'
-  //   })
-  // }, [addStupidTodo])
-
-  // console.log('u', addStupidTodo)
+    { todos, loading },
+    { addStupidTodo, removeTodo, toggleTodo },
+  ] = useRunRj(TodosListState)
 
   return (
     <div className="todos">
       <h1>Ma REST Todos</h1>
-      <button
-        onClick={() =>
-          addStupidTodo
-            .onSuccess(todo => alert('ahahaha' + todo.id))
-            .run({
-              title: 'Soooooooocio!',
-            })
-        }
-      >
-        SSSS
-      </button>
       <h3>
         <a href={`${API_URL}/todos`}>
           {API_URL}
@@ -47,12 +25,12 @@ export default function Todos() {
           Loading <b>Y</b> todos...
         </div>
       )}
-      {todos && <NewTodo onSubmit={addTodo} adding={adding} />}
+      {todos && <NewTodo onSubmit={addStupidTodo} adding={false} />}
       <div className="todo-list">
         {todos &&
           todos.map(todo => (
             <Todo
-              saving={updating[todo.id] || deleting[todo.id]}
+              // saving={updating[todo.id] || deleting[todo.id]}
               onToggle={toggleTodo}
               onRemove={removeTodo}
               key={todo.id}

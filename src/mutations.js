@@ -1,8 +1,6 @@
 import createMakeRxObservable from './createMakeRxObservable'
 import { makeLibraryAction } from './actionCreators'
-import { RUN } from './actionTypes'
-import { tap, publish } from 'rxjs/operators'
-import { merge } from 'rxjs'
+import { RUN, SUCCESS } from './actionTypes'
 
 const MUTATION_PREFIX = `@RJ~MUTATION`
 
@@ -11,26 +9,38 @@ function makeActionCreator(name) {
     makeLibraryAction(`${MUTATION_PREFIX}/${name}/${RUN}`, ...params)
 }
 
-export function makeMutationsActionCreators(mutations) {
-  if (mutations === null) {
-    return {}
-  }
-
+export function enhanceActionCreators(mutations, actionCreators) {
   return Object.keys(mutations).reduce((actionCreators, name) => {
+    // TODO: Add DEV warn 4 overrid prev exist actions ....
     const actionCreator = makeActionCreator(name)
     return {
       ...actionCreators,
       [name]: actionCreator,
     }
-  }, [])
-  // console.log('Ma FUCKING mutations!!!!', mutations)
+  }, actionCreators)
 }
 
-export function enhanceMakeObservableWithMutations(makeObservable, mutations) {
-  if (mutations === null) {
-    return makeObservable
-  }
+export function enhanceReducer(mutations, reducer) {
+  const ActionsMap = Object.keys(mutations).reduce((all, name) => {
+    const mutation = mutations[name]
+    const update = (state, action) =>
+      mutation.updater(state, action.payload.data)
+    const type = `${MUTATION_PREFIX}/${name}/${SUCCESS}`
+    return {
+      ...all,
+      [type]: update,
+    }
+  }, {})
 
+  return (prevState, action) => {
+    if (ActionsMap[action.type]) {
+      return ActionsMap[action.type](prevState, action)
+    }
+    return reducer(prevState, action)
+  }
+}
+
+export function enhanceMakeObservable(mutations, makeObservable) {
   const makeMutationsObsList = Object.keys(mutations).map(name => {
     const { effect } = mutations[name]
     const prefix = `${MUTATION_PREFIX}/${name}/`
@@ -49,11 +59,21 @@ export function enhanceMakeObservableWithMutations(makeObservable, mutations) {
     o$ = makeMutationsObsList.reduce((o$, makeMutationObs) => {
       return makeMutationObs(o$, ...params)
     }, o$)
+    return o$
+  }
+}
 
-    return o$.pipe(
-      tap(action => {
-        console.log('Y shit', action)
-      })
-    )
+export function enhanceExportWithMutations(rjObject, mutations) {
+  if (mutations === null) {
+    return rjObject
+  }
+
+  const { makeRxObservable, actionCreators, reducer } = rjObject
+
+  return {
+    ...rjObject,
+    reducer: enhanceReducer(mutations, reducer),
+    actionCreators: enhanceActionCreators(mutations, actionCreators),
+    makeRxObservable: enhanceMakeObservable(mutations, makeRxObservable),
   }
 }
