@@ -7,16 +7,35 @@ import './Todos.css'
 export default function Todos() {
   const [
     { todos, loading, updating, deleting, adding },
-    { loadTodos, removeTodo, toggleTodo, addTodo },
+    { loadTodos, removeTodo, toggleTodo, addTodo, addStupidTodo },
   ] = useMaTodos()
 
   useEffect(() => {
     loadTodos()
   }, [loadTodos])
 
+  // useEffect(() => {
+  //   addStupidTodo({
+  //     name: 'bibi'
+  //   })
+  // }, [addStupidTodo])
+
+  // console.log('u', addStupidTodo)
+
   return (
     <div className="todos">
       <h1>Ma REST Todos</h1>
+      <button
+        onClick={() =>
+          addStupidTodo
+            .onSuccess(todo => alert('ahahaha' + todo.id))
+            .run({
+              title: 'Soooooooocio!',
+            })
+        }
+      >
+        SSSS
+      </button>
       <h3>
         <a href={`${API_URL}/todos`}>
           {API_URL}

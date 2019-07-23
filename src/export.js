@@ -90,6 +90,17 @@ export default (_, rjConfig, extendExport = {}) => {
     computed = { ...computed, ...invertKeys(rjConfig.computed) }
   }
 
+  // Default no mutations
+  let mutations = null
+  if (extendExport.mutations) {
+    // Continue the export
+    mutations = extendExport.mutations
+  }
+  if (rjConfig.mutations) {
+    // Merge given mutations \w prev mutations
+    mutations = { ...mutations, ...rjConfig.mutations }
+  }
+
   const newExport = {
     ...extendExport,
     sideEffect,
@@ -97,6 +108,7 @@ export default (_, rjConfig, extendExport = {}) => {
     actionCreators,
     makeSelectors,
     computed,
+    mutations,
   }
 
   return newExport

@@ -8,6 +8,32 @@ export const API_URL = 'http://localhost:9001'
 
 export const TodosListState = rj(rjPlainList(), {
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
+  // effect: () => {
+  //   return new Promise((_, reject) => setTimeout(reject, 300))
+  //     // .catch(() => {
+  //     //   throw new TypeError('Sooooocio')
+  //     // })
+  //   // return request.get(`${API_URL}/todos`).then(({ body }) => body)
+  // },
+  mutations: {
+    addStupidTodo: {
+      effect: todo =>
+        request
+          .post(`${API_URL}/todos`)
+          .send(todo)
+          .then(({ body }) => body),
+      updater: (state, todo) => ({
+        ...state,
+        data: state.data.concat(todo),
+      }),
+    },
+  },
+  reducer: oldReducer => {
+    return (state, action) => {
+      console.log('Reducer', action)
+      return oldReducer(state, action)
+    }
+  },
   actions: ({ run }) => ({
     loadTodos: run,
   }),
@@ -47,6 +73,7 @@ export function useMaTodos() {
     { data: todos, pending: loading },
     {
       loadTodos,
+      addStupidTodo,
       insertItem: appendTodo,
       updateItem: updateTodoInList,
       deleteItem: removeTodoFromList,
@@ -98,6 +125,6 @@ export function useMaTodos() {
 
   return [
     { todos, loading, updating, deleting, adding },
-    { loadTodos, removeTodo, toggleTodo, addTodo },
+    { loadTodos, removeTodo, toggleTodo, addTodo, addStupidTodo },
   ]
 }

@@ -6,6 +6,7 @@ import {
   tap,
 } from 'rxjs/operators'
 import { SUCCESS, FAILURE, PENDING } from './actionTypes'
+import { arrayze } from 'rocketjump-core/utils'
 import {
   // Latest
   TAKE_EFFECT_LATEST,
@@ -26,12 +27,15 @@ import {
 
 const defaultCallEffect = (call, ...args) => call(...args)
 
-export default function createMakeRxObservable({
-  effect: effectCall,
-  effectCaller: rjCallEffect,
-  takeEffect,
-  effectPipeline,
-}) {
+export default function createMakeRxObservable(
+  {
+    effect: effectCall,
+    effectCaller: rjCallEffect,
+    takeEffect,
+    effectPipeline = [],
+  },
+  prefix = ''
+) {
   return function makeRxObservable(
     originalAction$,
     state$,
@@ -64,9 +68,13 @@ export default function createMakeRxObservable({
       const params = payload.params
 
       return concat(
-        of({ type: PENDING, meta }),
+        of({ type: prefix + PENDING, meta }),
         from(callEffect(effectCall, ...params)).pipe(
-          map(data => ({ type: SUCCESS, payload: { data, params }, meta })),
+          map(data => ({
+            type: prefix + SUCCESS,
+            payload: { data, params },
+            meta,
+          })),
           catchError(error => {
             // Avoid headache
             if (
@@ -77,7 +85,7 @@ export default function createMakeRxObservable({
             ) {
               return throwError(error)
             }
-            return of({ type: FAILURE, payload: error, meta })
+            return of({ type: prefix + FAILURE, payload: error, meta })
           }),
           tap(action => {
             // NOTE: This code may look strange but this dragon
@@ -87,10 +95,10 @@ export default function createMakeRxObservable({
             // but for now i think the most common use cases is to
             // have all the state related to SUCCESS/FAILURE apllied
             Promise.resolve().then(() => {
-              if (action.type === SUCCESS && callbacks.onSuccess) {
+              if (action.type === prefix + SUCCESS && callbacks.onSuccess) {
                 callbacks.onSuccess(action.payload.data)
               }
-              if (action.type === FAILURE && callbacks.onFailure) {
+              if (action.type === prefix + FAILURE && callbacks.onFailure) {
                 callbacks.onFailure(action.payload)
               }
             })
@@ -99,7 +107,7 @@ export default function createMakeRxObservable({
       )
     }
 
-    const [effectType, ...effectTypeArgs] = takeEffect
+    const [effectType, ...effectTypeArgs] = arrayze(takeEffect)
 
     const action$ = effectPipeline.reduce(
       (action$, piper) => piper(action$, state$),
@@ -111,28 +119,30 @@ export default function createMakeRxObservable({
       // TODO: Maybe in future check the return value of
       // custom take effect and print some warning to help
       // developers to better debugging better rj configuration
-      return effectType(action$, state$, mapActionToObserable)
+      return effectType(action$, state$, mapActionToObserable, prefix)
     } else if (effectType === TAKE_EFFECT_LATEST) {
-      return takeEffectLatest(action$, state$, mapActionToObserable)
+      return takeEffectLatest(action$, state$, mapActionToObserable, prefix)
     } else if (effectType === TAKE_EFFECT_EVERY) {
-      return takeEffectEvery(action$, state$, mapActionToObserable)
+      return takeEffectEvery(action$, state$, mapActionToObserable, prefix)
       /*} else if (effectType === TAKE_EFFECT_QUEUE) {
       return takeEffectQueue(action$, state$, mapActionToObserable)*/
     } else if (effectType === TAKE_EFFECT_EXHAUST) {
-      return takeEffectExhaust(action$, state$, mapActionToObserable)
+      return takeEffectExhaust(action$, state$, mapActionToObserable, prefix)
     } else if (effectType === TAKE_EFFECT_GROUP_BY) {
       return takeEffectGroupBy(
         action$,
         state$,
         mapActionToObserable,
-        effectTypeArgs
+        effectTypeArgs,
+        prefix
       )
     } else if (effectType === TAKE_EFFECT_GROUP_BY_EXHAUST) {
       return takeEffectGroupByExhaust(
         action$,
         state$,
         mapActionToObserable,
-        effectTypeArgs
+        effectTypeArgs,
+        prefix
       )
     } else {
       throw new Error(
