@@ -1,6 +1,7 @@
 import createMakeRxObservable from './createMakeRxObservable'
 import { makeLibraryAction } from './actionCreators'
 import { RUN, SUCCESS } from './actionTypes'
+import { tap } from 'rxjs/operators'
 
 const MUTATION_PREFIX = `@RJ~MUTATION`
 
@@ -42,13 +43,14 @@ export function enhanceReducer(mutations, reducer) {
 
 export function enhanceMakeObservable(mutations, makeObservable) {
   const makeMutationsObsList = Object.keys(mutations).map(name => {
-    const { effect } = mutations[name]
+    const { effect, takeEffect } = mutations[name]
     const prefix = `${MUTATION_PREFIX}/${name}/`
 
     return createMakeRxObservable(
       {
         effect,
-        takeEffect: 'exhaust',
+        // TODO: Improve group by
+        takeEffect: takeEffect || 'exhaust',
       },
       prefix
     )
@@ -59,6 +61,11 @@ export function enhanceMakeObservable(mutations, makeObservable) {
     o$ = makeMutationsObsList.reduce((o$, makeMutationObs) => {
       return makeMutationObs(o$, ...params)
     }, o$)
+    o$ = o$.pipe(
+      tap(a => {
+        console.log('A', a)
+      })
+    )
     return o$
   }
 }

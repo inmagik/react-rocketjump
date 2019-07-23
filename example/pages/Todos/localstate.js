@@ -15,6 +15,7 @@ export const TodosListState = rj({
           .post(`${API_URL}/todos`)
           .send(todo)
           .then(({ body }) => body),
+      takeEffect: 'every',
       updater: (state, todo) => ({
         ...state,
         data: state.data.concat(todo),
@@ -27,6 +28,13 @@ export const TodosListState = rj({
         ...state,
         data: state.data.filter(todo => todo.id !== id),
       }),
+      // TODO: Improve
+      takeEffect: [
+        'groupBy',
+        action => {
+          return action.payload.params[0].id
+        },
+      ],
     },
     toggleTodo: {
       effect: todo =>
@@ -37,6 +45,12 @@ export const TodosListState = rj({
             done: !todo.done,
           })
           .then(({ body }) => body),
+      takeEffect: [
+        'groupBy',
+        action => {
+          return action.payload.params[0].id
+        },
+      ],
       updater: (state, todo) => ({
         ...state,
         data: state.data.map(t => (t.id === todo.id ? todo : t)),
