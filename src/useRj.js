@@ -44,9 +44,9 @@ export default function useRj(
     return derivedState
   }, [state, memoizedSelectors, selectState, computeState])
 
-  const boundActionCreators = useMemo(() => {
+  const boundedActionCreators = useMemo(() => {
     return bindActionCreators(actionCreators, dispatch)
   }, [actionCreators, dispatch])
 
-  return [derivedState, boundActionCreators]
+  return [derivedState, boundedActionCreators]
 }
