@@ -21,11 +21,21 @@ export function enhanceActionCreators(mutations, actionCreators) {
   }, actionCreators)
 }
 
-export function enhanceReducer(mutations, reducer) {
+export function enhanceReducer(mutations, reducer, actionCreators) {
   const ActionsMap = Object.keys(mutations).reduce((all, name) => {
     const mutation = mutations[name]
-    const update = (state, action) =>
-      mutation.updater(state, action.payload.data)
+
+    let update
+
+    if (typeof mutation.updater === 'string') {
+      // TODO: Better checks ...
+      const actionCreator = actionCreators[mutation.updater]
+      update = (state, action) =>
+        reducer(state, actionCreator(action.payload.data))
+    } else {
+      update = (state, action) => mutation.updater(state, action.payload.data)
+    }
+
     const type = `${MUTATION_PREFIX}/${name}/${SUCCESS}`
     return {
       ...all,
@@ -79,7 +89,7 @@ export function enhanceExportWithMutations(rjObject, mutations) {
 
   return {
     ...rjObject,
-    reducer: enhanceReducer(mutations, reducer),
+    reducer: enhanceReducer(mutations, reducer, actionCreators),
     actionCreators: enhanceActionCreators(mutations, actionCreators),
     makeRxObservable: enhanceMakeObservable(mutations, makeRxObservable),
   }

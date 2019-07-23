@@ -6,7 +6,7 @@ import request from 'superagent'
 
 export const API_URL = 'http://localhost:9001'
 
-export const TodosListState = rj({
+export const TodosListState = rj(rjPlainList(), {
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
   mutations: {
     addStupidTodo: {
@@ -16,10 +16,11 @@ export const TodosListState = rj({
           .send(todo)
           .then(({ body }) => body),
       takeEffect: 'every',
-      updater: (state, todo) => ({
-        ...state,
-        data: state.data.concat(todo),
-      }),
+      updater: 'insertItem',
+      // updater: (state, todo) => ({
+      //   ...state,
+      //   data: state.data.concat(todo),
+      // }),
     },
     removeTodo: {
       effect: todo =>
