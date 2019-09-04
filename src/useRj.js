@@ -22,7 +22,7 @@ export default function useRj(
     computeState,
   } = rjObject
 
-  const [state, dispatch] = useMiniRedux(reducer, makeRxObservable)
+  const [state, dispatch, state$] = useMiniRedux(reducer, makeRxObservable)
 
   const memoizedSelectors = useConstant(() => {
     if (
@@ -45,8 +45,8 @@ export default function useRj(
   }, [state, memoizedSelectors, selectState, computeState])
 
   const boundedActionCreators = useMemo(() => {
-    return bindActionCreators(actionCreators, dispatch)
-  }, [actionCreators, dispatch])
+    return bindActionCreators(actionCreators, dispatch, state$)
+  }, [actionCreators, dispatch, state$])
 
-  return [derivedState, boundedActionCreators]
+  return [derivedState, boundedActionCreators, state$]
 }

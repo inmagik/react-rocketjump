@@ -1,13 +1,56 @@
+import { useEffect, useReducer } from 'react'
 import createMakeRxObservable from './createMakeRxObservable'
 import { makeLibraryAction } from './actionCreators'
 import { RUN, SUCCESS } from './actionTypes'
 import { tap } from 'rxjs/operators'
+import { useConstant } from './hooks'
 
 const MUTATION_PREFIX = `@RJ~MUTATION`
 
+const mutationReducer = (prevState, action) => {
+  const type = action.type.split('/')[2]
+  // console.log('X', type)
+  if (type === 'PENDING') {
+    return {
+      ...prevState,
+      pending: true,
+    }
+  }
+  if (type === 'SUCCESS' || type === 'FAILURE') {
+    return {
+      ...prevState,
+      pending: false,
+    }
+  }
+  return prevState
+}
+
+export function useMutation(mutationFn) {
+  const [state, dispatch] = useReducer(mutationReducer, {
+    pending: false,
+  })
+  const subscription = useConstant(() => {
+    return mutationFn.__rjMutation.state$.subscribe(action => {
+      // console.log('SHit from future!', action)
+      dispatch(action)
+    })
+  })
+
+  // On unmount unsub
+  useEffect(() => {
+    return () => subscription.unsubscribe()
+  }, [subscription])
+
+  return state
+}
+
 function makeActionCreator(name) {
-  return (...params) =>
+  const actionCreator = (...params) =>
     makeLibraryAction(`${MUTATION_PREFIX}/${name}/${RUN}`, ...params)
+  actionCreator.__rjMutation = {
+    name,
+  }
+  return actionCreator
 }
 
 export function enhanceActionCreators(mutations, actionCreators) {
@@ -73,7 +116,7 @@ export function enhanceMakeObservable(mutations, makeObservable) {
     }, o$)
     o$ = o$.pipe(
       tap(a => {
-        console.log('A', a)
+        // console.log('A', a)
       })
     )
     return o$

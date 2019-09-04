@@ -31,7 +31,7 @@ export const TodosListState = rj(rjPlainList(), {
       }),
       // TODO: Improve
       takeEffect: [
-        'groupBy',
+        'groupByExhaust',
         action => {
           return action.payload.params[0].id
         },

@@ -12,6 +12,7 @@ export default function NewTodo({ adding, onSubmit }) {
   return (
     <form className="new-todo" onSubmit={submitTodo}>
       <input
+        style={adding ? { border: '1px solid purple' } : undefined}
         disabled={adding}
         placeholder="What to do ma friend?"
         value={title}

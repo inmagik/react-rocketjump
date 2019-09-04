@@ -40,14 +40,15 @@ export default function useMiniRedux(reducer, makeObservable) {
   const [state, dispatch] = useReducer(proxyReducer, undefined, initReducer)
 
   const extraConfig = useContext(ConfigureRjContext)
-  const subscription = useConstant(() => {
+  const dispatcher$ = useConstant(() => {
     // Dispatch the action returned from observable
     return makeObservable(
       action$,
       state$,
       extraConfig ? extraConfig.effectCaller : undefined
-    ).subscribe(dispatch)
+    )
   })
+  const subscription = useConstant(() => dispatcher$.subscribe(dispatch))
 
   // On unmount unsub
   useEffect(() => {
@@ -58,12 +59,14 @@ export default function useMiniRedux(reducer, makeObservable) {
     if (isEffectAction(action)) {
       // Emit action to given observable theese perform side
       // effect and emit action dispatched above by subscription
+      console.log('S', action)
       actionSubject.next(action)
     } else {
       // Update the state \w given reducer
+      // console.log('D', action)
       dispatch(action)
     }
   })
 
-  return [state, dispatchWithEffect]
+  return [state, dispatchWithEffect, dispatcher$]
 }

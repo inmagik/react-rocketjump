@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import Todo from './Todo'
-import { useRunRj } from 'react-rocketjump'
+import { useRunRj, useMutation } from 'react-rocketjump'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
@@ -10,6 +10,9 @@ export default function Todos() {
     { todos, loading },
     { addStupidTodo, removeTodo, toggleTodo },
   ] = useRunRj(TodosListState)
+
+  const { pending: adding } = useMutation(addStupidTodo)
+  // console.log('~', ss)
 
   return (
     <div className="todos">
@@ -25,7 +28,7 @@ export default function Todos() {
           Loading <b>Y</b> todos...
         </div>
       )}
-      {todos && <NewTodo onSubmit={addStupidTodo} adding={false} />}
+      {todos && <NewTodo onSubmit={addStupidTodo} adding={adding} />}
       <div className="todo-list">
         {todos &&
           todos.map(todo => (
