@@ -1,5 +1,7 @@
+import { makeExportValue } from 'rocketjump-core'
 import { TAKE_EFFECT_LATEST } from './rxEffects'
 import { arrayze } from 'rocketjump-core/utils'
+import { RJ_CONFIG_PLACEHOLDER } from './internals'
 
 // Thanks ma teacher Virgy <3
 const composeEffectCallers = (...callers) => (effectCall, ...args) => {
@@ -20,6 +22,19 @@ export const makeSideEffectDescriptor = () => ({
   effectPipeline: [],
 })
 
+const exportEffectCaller = makeExportValue({
+  defaultValue: undefined,
+  isLazy: v => v === RJ_CONFIG_PLACEHOLDER,
+  shouldCompose: v => !!v,
+  compose: (prevCaller, caller) => {
+    if (prevCaller) {
+      return composeEffectCallers(prevCaller, caller)
+    } else {
+      return caller
+    }
+  },
+})
+
 // Merge prev sideEffectDescriptor with given rj config return
 // a new sideEffectDescriptor
 export const addConfigToSideEffectDescritor = (
@@ -31,16 +46,10 @@ export const addConfigToSideEffectDescritor = (
   if (config.effect) {
     newSideEffectDescriptor.effect = config.effect
   }
-  if (config.effectCaller) {
-    if (sideEffectDescriptor.effectCaller) {
-      newSideEffectDescriptor.effectCaller = composeEffectCallers(
-        sideEffectDescriptor.effectCaller,
-        config.effectCaller
-      )
-    } else {
-      newSideEffectDescriptor.effectCaller = config.effectCaller
-    }
-  }
+  newSideEffectDescriptor.effectCaller = exportEffectCaller(
+    sideEffectDescriptor.effectCaller,
+    config.effectCaller
+  )
   if (config.takeEffect) {
     newSideEffectDescriptor.takeEffect = arrayze(config.takeEffect)
   }

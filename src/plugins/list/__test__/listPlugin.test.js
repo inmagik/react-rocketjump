@@ -1,5 +1,4 @@
-import { act } from 'react-dom/test-utils'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, act } from '@testing-library/react-hooks'
 import { rj, useRj } from '../../..'
 import rjList from '..'
 import {

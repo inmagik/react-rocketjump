@@ -59,7 +59,6 @@ export default function useMiniRedux(reducer, makeObservable) {
     if (isEffectAction(action)) {
       // Emit action to given observable theese perform side
       // effect and emit action dispatched above by subscription
-      console.log('S', action)
       actionSubject.next(action)
     } else {
       // Update the state \w given reducer

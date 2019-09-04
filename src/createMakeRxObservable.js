@@ -5,6 +5,7 @@ import {
   catchError,
   tap,
 } from 'rxjs/operators'
+import { squashExportValue } from 'rocketjump-core'
 import { SUCCESS, FAILURE, PENDING } from './actionTypes'
 import { arrayze } from 'rocketjump-core/utils'
 import {
@@ -25,37 +26,27 @@ import {
   takeEffectGroupByExhaust,
 } from './rxEffects'
 
-const defaultCallEffect = (call, ...args) => call(...args)
+const defaultEffectCaller = (call, ...args) => call(...args)
 
 export default function createMakeRxObservable(
-  {
-    effect: effectCall,
-    effectCaller: rjCallEffect,
-    takeEffect,
-    effectPipeline = [],
-  },
+  { effect: effectCall, effectCaller, takeEffect, effectPipeline },
   prefix = ''
 ) {
   return function makeRxObservable(
     originalAction$,
     state$,
-    overrideCallEffect
+    placeholderEffectCaller
   ) {
-    // Override the effectCaller from rj using local one istead
-    // ... when no effectCaller is provided
+    // Place the placeholderEffectCaller from ConfigureRj
+    // in the correct position of recursion chain
     let callEffect
-    if (typeof rjCallEffect === 'function') {
-      // Use call effect from rj config
-      callEffect = rjCallEffect
-    } else if (rjCallEffect === 'noop') {
-      // Force callEffect to default NOOP
-      callEffect = defaultCallEffect
-    } else if (typeof overrideCallEffect === 'function') {
-      // Use the local overrideCallEffect
-      callEffect = overrideCallEffect
-    } else {
-      // default NOOP call effect
-      callEffect = defaultCallEffect
+    callEffect = squashExportValue(
+      effectCaller,
+      [placeholderEffectCaller].filter(Boolean)
+    )
+    // Use default effect caller
+    if (!callEffect) {
+      callEffect = defaultEffectCaller
     }
 
     // Generate a result Observable from a given action

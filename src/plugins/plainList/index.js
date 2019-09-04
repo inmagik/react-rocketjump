@@ -56,6 +56,11 @@ const rjPlainList = (config = {}) => {
         return oldReducer(state, action)
       }
     },
+    computed: {
+      error: 'getError',
+      loading: 'isLoading',
+      list: 'getList',
+    },
   })
 }
 
