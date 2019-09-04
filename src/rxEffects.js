@@ -53,7 +53,7 @@ function mapToLatest(action$, mapActionToObserable, prefix) {
       return of(action)
     }
     return concat(of(action), mapActionToObserable(action)).pipe(
-      takeUntilCancelAction(action$)
+      takeUntilCancelAction(action$, prefix)
     )
   })
 }
@@ -67,7 +67,9 @@ export function takeEffectLatest(
   return chainOnlyOnEffectActions(
     action$,
     effectAction$ =>
-      effectAction$.pipe(mapToLatest(effectAction$, mapActionToObserable)),
+      effectAction$.pipe(
+        mapToLatest(effectAction$, mapActionToObserable, prefix)
+      ),
     prefix
   )
 }
@@ -90,7 +92,7 @@ export function takeEffectEvery(action$, state$, mapActionToObserable, prefix) {
           return concat(
             of(action),
             mapActionToObserable(action).pipe(
-              takeUntilCancelAction(effectAction$)
+              takeUntilCancelAction(effectAction$, prefix)
             )
           )
         })
@@ -122,7 +124,7 @@ function actionToExhaustObservableEffect(
           return empty()
         }
         return concat(of(action), mapActionToObserable(action)).pipe(
-          takeUntilCancelAction(action$)
+          takeUntilCancelAction(action$, prefix)
         )
       })
     )
@@ -140,7 +142,11 @@ export function takeEffectExhaust(
   return chainOnlyOnEffectActions(
     action$,
     effectAction$ =>
-      actionToExhaustObservableEffect(effectAction$, mapActionToObserable),
+      actionToExhaustObservableEffect(
+        effectAction$,
+        mapActionToObserable,
+        prefix
+      ),
     prefix
   )
 }
@@ -167,7 +173,7 @@ export function takeEffectGroupBy(
       effectAction$.pipe(
         groupBy(groupByFn),
         mergeMap($group =>
-          $group.pipe(mapToLatest($group, mapActionToObserable))
+          $group.pipe(mapToLatest($group, mapActionToObserable, prefix))
         )
       ),
     prefix
@@ -196,7 +202,7 @@ export function takeEffectGroupByExhaust(
       effectAction$.pipe(
         groupBy(groupByFn),
         mergeMap($group =>
-          actionToExhaustObservableEffect($group, mapActionToObserable)
+          actionToExhaustObservableEffect($group, mapActionToObserable, prefix)
         )
       ),
     prefix
