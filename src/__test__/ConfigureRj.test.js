@@ -1,7 +1,6 @@
 import ConfigureRj from '../ConfigureRj'
 import React from 'react'
-import { act } from 'react-dom/test-utils'
-import { renderHook } from '@testing-library/react-hooks'
+import { renderHook, act } from '@testing-library/react-hooks'
 import { rj } from '..'
 import useRj from '../useRj'
 
