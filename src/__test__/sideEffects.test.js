@@ -1608,6 +1608,69 @@ describe('RJ side effect model', () => {
     })
   })
 
+  it('should inject effect caller in given placeholder position', done => {
+    const mockApi = jest.fn().mockResolvedValueOnce(['GioVa'])
+    const mockCallback = jest.fn()
+
+    const callerA = jest.fn((fn, ...args) => {
+      return fn(...args).then(a => a.concat('Skaffo'))
+    })
+    function callerB(fn, ...args) {
+      return fn(...args).then(a => a.concat('Albi'))
+    }
+    function callerC(fn, ...args) {
+      return fn(...args).then(a => a.concat('Vegas'))
+    }
+
+    const { makeRxObservable } = rj(
+      { effectCaller: callerA },
+      { effectCaller: rj.configured() },
+      { effectCaller: callerC },
+      {
+        effect: mockApi,
+      }
+    )
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable(), null, callerB).subscribe(
+      mockCallback
+    )
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    callerA.mock.results[0].value.then(() => {
+      expect(mockCallback).toBeCalledTimes(3)
+
+      expect(mockCallback).nthCalledWith(1, {
+        type: RUN,
+        payload: { params: [] },
+        meta: {},
+        callbacks: {},
+      })
+
+      expect(mockCallback).nthCalledWith(2, {
+        type: PENDING,
+        meta: {},
+      })
+
+      expect(mockCallback).nthCalledWith(3, {
+        type: SUCCESS,
+        meta: {},
+        payload: {
+          params: [],
+          data: ['GioVa', 'Vegas', 'Albi', 'Skaffo'],
+        },
+      })
+
+      done()
+    })
+  })
+
   it('should throw proper errors', async () => {
     const badApi = () =>
       new Promise(resolve => {
