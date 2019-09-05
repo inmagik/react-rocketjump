@@ -36,7 +36,7 @@ describe('React-RocketJump actions', () => {
     expect(wrapper.props()).toHaveProperty('cancel')
   })
 
-  it('should produce a good run action', () => {
+  it('should produce a good run action', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -46,7 +46,9 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = makeRjComponent(rjState)
 
-    wrapper.prop('run')(1, 'a', {}, undefined)
+    await act(async () => {
+      wrapper.prop('run')(1, 'a', {}, undefined)
+    })
 
     expect(actionLog[0]).toEqual({
       type: RUN,
@@ -62,7 +64,7 @@ describe('React-RocketJump actions', () => {
     expect(isEffectAction(actionLog[0])).toBe(true)
   })
 
-  it('should produce a good clean action', () => {
+  it('should produce a good clean action', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -72,7 +74,9 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = makeRjComponent(rjState)
 
-    wrapper.prop('clean')(1, 'a', {}, undefined)
+    await act(async () => {
+      wrapper.prop('clean')(1, 'a', {}, undefined)
+    })
 
     expect(actionLog[0]).toEqual({
       type: CLEAN,
@@ -88,7 +92,7 @@ describe('React-RocketJump actions', () => {
     expect(isEffectAction(actionLog[0])).toBe(true)
   })
 
-  it('should produce a good cancel action', () => {
+  it('should produce a good cancel action', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -99,7 +103,9 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = makeRjComponent(rjState)
 
-    wrapper.prop('cancel')(1, 'a', {}, undefined)
+    await act(async () => {
+      wrapper.prop('cancel')(1, 'a', {}, undefined)
+    })
 
     expect(actionLog[0]).toEqual({
       type: CANCEL,
@@ -175,7 +181,7 @@ describe('React-RocketJump actions', () => {
     expect(onFailure).toHaveBeenCalledTimes(1)
   })
 
-  it('should use plain meta data', done => {
+  it('should use plain meta data', async done => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -190,14 +196,16 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper
-      .prop('run')
-      .withMeta({ a: 1 })
-      .onSuccess(onSuccess)
-      .run()
+    await act(async () => {
+      wrapper
+        .prop('run')
+        .withMeta({ a: 1 })
+        .onSuccess(onSuccess)
+        .run()
+    })
   })
 
-  it('should compose plain meta data', done => {
+  it('should compose plain meta data', async done => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -212,16 +220,18 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper
-      .prop('run')
-      .withMeta({ a: 1 })
-      .withMeta({ b: 2 })
-      .withMeta({ a: 2, c: 3 })
-      .onSuccess(onSuccess)
-      .run()
+    await act(async () => {
+      wrapper
+        .prop('run')
+        .withMeta({ a: 1 })
+        .withMeta({ b: 2 })
+        .withMeta({ a: 2, c: 3 })
+        .onSuccess(onSuccess)
+        .run()
+    })
   })
 
-  it('should use meta data transform', done => {
+  it('should use meta data transform', async done => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -236,15 +246,17 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper
-      .prop('run')
-      .withMeta({ a: 1 })
-      .withMeta(() => ({}))
-      .onSuccess(onSuccess)
-      .run()
+    await act(async () => {
+      wrapper
+        .prop('run')
+        .withMeta({ a: 1 })
+        .withMeta(() => ({}))
+        .onSuccess(onSuccess)
+        .run()
+    })
   })
 
-  it('should use meta data transform correctly', done => {
+  it('should use meta data transform correctly', async done => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -259,12 +271,14 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper
-      .prop('run')
-      .withMeta({ a: 1 })
-      .withMeta(oldMeta => ({ b: oldMeta.a, a: 2 }))
-      .onSuccess(onSuccess)
-      .run()
+    await act(async () => {
+      wrapper
+        .prop('run')
+        .withMeta({ a: 1 })
+        .withMeta(oldMeta => ({ b: oldMeta.a, a: 2 }))
+        .onSuccess(onSuccess)
+        .run()
+    })
   })
 
   it('should allow action renaming', () => {
@@ -287,7 +301,7 @@ describe('React-RocketJump actions', () => {
     expect(wrapper.props()).not.toHaveProperty('clean')
   })
 
-  it('should allow action proxying', done => {
+  it('should allow action proxying', async done => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -317,13 +331,15 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper
-      .prop('run')
-      .onSuccess(onSuccess)
-      .run(1)
+    await act(async () => {
+      wrapper
+        .prop('run')
+        .onSuccess(onSuccess)
+        .run(1)
+    })
   })
 
-  it('should allow action definition', done => {
+  it('should allow action definition', async done => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -356,13 +372,15 @@ describe('React-RocketJump actions', () => {
     expect(wrapper.props()).toHaveProperty('run')
     expect(wrapper.props()).toHaveProperty('runDouble')
 
-    wrapper
-      .prop('runDouble')
-      .onSuccess(onSuccess)
-      .run(1)
+    await act(async () => {
+      wrapper
+        .prop('runDouble')
+        .onSuccess(onSuccess)
+        .run(1)
+    })
   })
 
-  it('should allow action signature change', done => {
+  it('should allow action signature change', async done => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -392,13 +410,15 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper
-      .prop('runObject')
-      .onSuccess(onSuccess)
-      .run({ id: 1, name: 'admin' })
+    await act(async () => {
+      wrapper
+        .prop('runObject')
+        .onSuccess(onSuccess)
+        .run({ id: 1, name: 'admin' })
+    })
   })
 
-  it('should allow meta management inside', done => {
+  it('should allow meta management inside', async done => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -428,13 +448,15 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper
-      .prop('runObject')
-      .onSuccess(onSuccess)
-      .run({ id: 1, name: 'admin' })
+    await act(async () => {
+      wrapper
+        .prop('runObject')
+        .onSuccess(onSuccess)
+        .run({ id: 1, name: 'admin' })
+    })
   })
 
-  it('should allow meta transform inside', done => {
+  it('should allow meta transform inside', async done => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -467,10 +489,12 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper
-      .prop('runObject')
-      .onSuccess(onSuccess)
-      .run({ id: 1, name: 'admin' })
+    await act(async () => {
+      wrapper
+        .prop('runObject')
+        .onSuccess(onSuccess)
+        .run({ id: 1, name: 'admin' })
+    })
   })
 
   it('should allow plain actions', () => {
@@ -497,7 +521,7 @@ describe('React-RocketJump actions', () => {
     expect(actionLog[0]).toEqual({ type: 'CUSTOM' })
   })
 
-  it('should allow builder on plain action (without success indeed)', () => {
+  it('should allow builder on plain action (without success indeed)', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -518,10 +542,12 @@ describe('React-RocketJump actions', () => {
 
     const onSuccess = jest.fn()
 
-    wrapper
-      .prop('custom')
-      .onSuccess(onSuccess)
-      .run()
+    await act(async () => {
+      wrapper
+        .prop('custom')
+        .onSuccess(onSuccess)
+        .run()
+    })
 
     expect(actionLog[0]).toEqual({ type: 'CUSTOM' })
     expect(onSuccess).not.toHaveBeenCalled()
@@ -622,7 +648,7 @@ describe('React-RocketJump actions', () => {
     expect(onFailure).toHaveBeenCalledTimes(1)
   })
 
-  it('should use meta in promise mode', done => {
+  it('should use meta in promise mode', async done => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -637,12 +663,14 @@ describe('React-RocketJump actions', () => {
       done()
     }
 
-    wrapper
-      .prop('run')
-      .withMeta({ a: 1 })
-      .withMeta(() => ({}))
-      .onSuccess(onSuccess)
-      .asPromise()
+    await act(async () => {
+      wrapper
+        .prop('run')
+        .withMeta({ a: 1 })
+        .withMeta(() => ({}))
+        .onSuccess(onSuccess)
+        .asPromise()
+    })
   })
 
   it('should allow promises on plain actions (even if useless)', async () => {

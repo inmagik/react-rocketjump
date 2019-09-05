@@ -8,7 +8,9 @@ const MUTATION_PREFIX = `@RJ~MUTATION`
 // Make the action creater that trigger a mutation side effects
 function makeActionCreator(name, mutation) {
   const actionCreator = (...params) =>
-    makeLibraryAction(`${MUTATION_PREFIX}/${name}/${RUN}`, ...params)
+    makeLibraryAction(`${MUTATION_PREFIX}/${name}/${RUN}`, ...params).withMeta({
+      params,
+    })
 
   // Muation has state only when reducer is specified on it
   const hasState = typeof mutation.reducer === 'function'

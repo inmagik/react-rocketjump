@@ -51,13 +51,13 @@ export default function useRj(
     return derivedState
   }, [state, memoizedSelectors, selectState, computeState])
 
-  const boundedActionCreators = useMemo(() => {
+  const boundActionCreators = useMemo(() => {
     return bindActionCreators(actionCreators, dispatch)
   }, [actionCreators, dispatch])
 
   if (hasMutationsState) {
-    injectMutationsStateInActions(boundedActionCreators, mutationsState)
+    injectMutationsStateInActions(boundActionCreators, mutationsState)
   }
 
-  return [derivedState, boundedActionCreators]
+  return [derivedState, boundActionCreators]
 }

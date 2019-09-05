@@ -42,19 +42,47 @@ export default function useMiniRedux(
   function initReducer(initialArg) {
     const initialState = reducer(initialArg, { type: INIT })
     emitStateUpdate(initialState)
-    RjDebugEventEmitter.onStateInitialized(
-      debugTrackId,
-      debugInfo,
-      initialState
-    )
-    return initialState
+    if (process.env.NODE_ENV !== 'production') {
+      RjDebugEventEmitter.onStateInitialized(
+        debugTrackId,
+        debugInfo,
+        initialState
+      )
+      state$.__dispatchIndex = 0
+      return { idx: 0, state: initialState }
+    } else {
+      return initialState
+    }
   }
+  // Add emit on state changes and debug track in DEV only
   function proxyReducer(prevState, action) {
+    if (process.env.NODE_ENV !== 'production') {
+      const nextState = reducer(prevState.state, action)
+      emitStateUpdate(nextState)
+      const idx = prevState.idx + 1
+      if (idx > state$.__dispatchIndex) {
+        RjDebugEventEmitter.onActionDispatched(
+          debugTrackId,
+          debugInfo,
+          action,
+          prevState.state,
+          nextState
+        )
+        state$.__dispatchIndex = idx
+      }
+      return { idx, state: nextState }
+    }
     const nextState = reducer(prevState, action)
     emitStateUpdate(nextState)
     return nextState
   }
-  const [state, dispatch] = useReducer(proxyReducer, undefined, initReducer)
+  const [stateAndIdx, dispatch] = useReducer(
+    proxyReducer,
+    undefined,
+    initReducer
+  )
+  const state =
+    process.env.NODE_ENV !== 'production' ? stateAndIdx.state : stateAndIdx
 
   const extraConfig = useContext(ConfigureRjContext)
   const dispatch$ = useConstant(() => {
@@ -67,15 +95,9 @@ export default function useMiniRedux(
   })
   const subscription = useConstant(() =>
     dispatch$.subscribe(action => {
-      const prevState = state$.value
+      // const prevState = state$.value
       dispatch(action)
-      RjDebugEventEmitter.onActionDispatched(
-        debugTrackId,
-        debugInfo,
-        action,
-        prevState,
-        state$.value
-      )
+      // console.log("O.o", JSON.stringify({ action, state: state$.value }))
     })
   )
 

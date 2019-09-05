@@ -1,6 +1,6 @@
 // Our main builder the MagIK rj()
 import rj from './rj'
-import * as configHelpers from './configHelpers'
+import * as configHelpers from './configHelpers/index'
 
 // Attach config helpers to rj
 for (let name in configHelpers) {

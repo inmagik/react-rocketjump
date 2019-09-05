@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 import Todo from './Todo'
-import { useRunRj, useMutation, useRj, rj } from 'react-rocketjump'
+import { useRunRj, useRj, rj } from 'react-rocketjump'
 import rjLogger from 'react-rocketjump/logger'
-import { API_URL, TodosListState, Socio } from './localstate'
+import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
 
@@ -12,35 +12,11 @@ export default function Todos() {
   const [
     { todos, loading },
     { addStupidTodo, removeTodo, toggleTodo },
-    // { addStupidTodo: { pending: adding } }
   ] = useRunRj(TodosListState)
 
-  // const { loading: adding } = addStupidTodo.state()
-  // console.log('RENDER', adding)
-  // console.log(addStupidTodo)
-  let adding = false
-  // const addTodosState = addStupidTodo.current()
-  // addStupidTodo.state = {}
-
-  // trackMutationState(addStupidTodo)
-
-  // const { pending: adding } = useMutation(addStupidTodo)
-  // console.log('~', ss)
-  // useRunRj(TodosListState)
-  // useRunRj(Socio)
-  // useRj(TodosListState)
-  // let adding = false
-  // console.log('Render', todos)
-
-  // useEffect(() => {
-  //   console.log('Run Effect 1')
-  //   return () => console.log('Clear effect 1')
-  // })
-  //
-  // useEffect(() => {
-  //   console.log('Run Effect 2')
-  //   return () => console.log('Clear effect 2')
-  // })
+  const { pending: adding } = addStupidTodo.state()
+  const { pendings: deleting } = removeTodo.state()
+  const { pendings: updating } = toggleTodo.state()
 
   return (
     <div className="todos">
@@ -72,7 +48,7 @@ export default function Todos() {
         {todos &&
           todos.map(todo => (
             <Todo
-              // saving={updating[todo.id] || deleting[todo.id]}
+              saving={updating[todo.id] || deleting[todo.id]}
               onToggle={toggleTodo}
               onRemove={removeTodo}
               key={todo.id}

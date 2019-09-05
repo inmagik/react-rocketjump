@@ -10,44 +10,20 @@ export const Socio = rj(() => Promise.resolve(23))
 export const TodosListState = rj(rjPlainList(), {
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
   mutations: {
-    addStupidTodo: {
+    addStupidTodo: rj.mutation.single({
       effect: todo =>
         request
           .post(`${API_URL}/todos`)
           .send(todo)
           .then(({ body }) => body),
-      reducer: (state = { loading: false }, action) => {
-        if (action.type === 'SUCCESS' || action.type === 'FAILURE') {
-          return { loading: false }
-        } else if (action.type === 'PENDING') {
-          return { loading: true }
-        }
-        return state
-      },
-      // reducer: rj.mutations.single(),
-      // takeEffect: 'every',
       updater: 'insertItem',
-      // updater: (state, todo) => ({
-      //   ...state,
-      //   data: state.data.concat(todo),
-      // }),
-    },
-    removeTodo: {
+    }),
+    removeTodo: rj.mutation.multi(todo => todo.id, {
       effect: todo =>
-        request.delete(`${API_URL}/todos/${todo.id}`).then(() => todo.id),
-      updater: (state, id) => ({
-        ...state,
-        data: state.data.filter(todo => todo.id !== id),
-      }),
-      // TODO: Improve
-      takeEffect: [
-        'groupByExhaust',
-        action => {
-          return action.payload.params[0].id
-        },
-      ],
-    },
-    toggleTodo: {
+        request.delete(`${API_URL}/todos/${todo.id}`).then(() => todo),
+      updater: 'deleteItem',
+    }),
+    toggleTodo: rj.mutation.multi(todo => todo.id, {
       effect: todo =>
         request
           .put(`${API_URL}/todos/${todo.id}`)
@@ -56,17 +32,8 @@ export const TodosListState = rj(rjPlainList(), {
             done: !todo.done,
           })
           .then(({ body }) => body),
-      takeEffect: [
-        'groupBy',
-        action => {
-          return action.payload.params[0].id
-        },
-      ],
-      updater: (state, todo) => ({
-        ...state,
-        data: state.data.map(t => (t.id === todo.id ? todo : t)),
-      }),
-    },
+      updater: 'updateItem',
+    }),
   },
   computed: {
     todos: 'getData',

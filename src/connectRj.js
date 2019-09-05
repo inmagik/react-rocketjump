@@ -4,6 +4,7 @@ import hoistStatics from 'hoist-non-react-statics'
 import bindActionCreators from './bindActionCreators'
 import { useConstant } from './hooks'
 import useMiniRedux from './useMiniRedux'
+import { injectMutationsStateInActions } from './mutations'
 
 const defaultMapActionsToProps = a => a
 
@@ -26,9 +27,15 @@ export default function connectRj(
         reducer,
         makeSelectors,
         computeState,
+        hasMutationsState,
       } = rjObject
 
-      const [state, dispatch] = useMiniRedux(reducer, makeRxObservable)
+      const [state, mutationsState, dispatch] = useMiniRedux(
+        reducer,
+        makeRxObservable,
+        hasMutationsState,
+        rjObject.__rjconfig
+      )
 
       const memoizedSelectors = useConstant(() => {
         if (
@@ -58,6 +65,10 @@ export default function connectRj(
       const boundActionCreators = useMemo(() => {
         return bindActionCreators(mapActionsToProps(actionCreators), dispatch)
       }, [dispatch, actionCreators])
+
+      if (hasMutationsState) {
+        injectMutationsStateInActions(boundActionCreators, mutationsState)
+      }
 
       return (
         <WrappedComponent
