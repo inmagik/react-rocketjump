@@ -24,11 +24,11 @@ const mutationReducer = (prevState, action) => {
   }
   return prevState
 }
-
+const sss = {
+  pending: false,
+}
 export function useMutation(mutationFn) {
-  const [state, dispatch] = useReducer(mutationReducer, {
-    pending: false,
-  })
+  const [state, dispatch] = useReducer(mutationReducer, sss)
   const subscription = useConstant(() => {
     return mutationFn.__rjMutation.state$.subscribe(action => {
       // console.log('SHit from future!', action)
@@ -104,6 +104,7 @@ export function enhanceMakeObservable(mutations, makeObservable) {
         effect,
         // TODO: Improve group by
         takeEffect: takeEffect || 'exhaust',
+        effectPipeline: [],
       },
       prefix
     )

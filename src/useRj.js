@@ -21,8 +21,13 @@ export default function useRj(
     makeSelectors,
     computeState,
   } = rjObject
+  // console.log('O.o', rjObject)
 
-  const [state, dispatch, state$] = useMiniRedux(reducer, makeRxObservable)
+  const [state, dispatch, state$] = useMiniRedux(
+    reducer,
+    makeRxObservable,
+    rjObject.__rjconfig
+  )
 
   const memoizedSelectors = useConstant(() => {
     if (
@@ -48,5 +53,5 @@ export default function useRj(
     return bindActionCreators(actionCreators, dispatch, state$)
   }, [actionCreators, dispatch, state$])
 
-  return [derivedState, boundedActionCreators, state$]
+  return [derivedState, boundedActionCreators]
 }

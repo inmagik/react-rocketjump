@@ -6,6 +6,7 @@ import request from 'superagent'
 
 export const API_URL = 'http://localhost:9001'
 
+export const Socio = rj(() => Promise.resolve(23))
 export const TodosListState = rj(rjPlainList(), {
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
   mutations: {
@@ -15,7 +16,9 @@ export const TodosListState = rj(rjPlainList(), {
           .post(`${API_URL}/todos`)
           .send(todo)
           .then(({ body }) => body),
-      takeEffect: 'every',
+      // reducer: ,
+      // reducer: rj.mutations.single(),
+      // takeEffect: 'every',
       updater: 'insertItem',
       // updater: (state, todo) => ({
       //   ...state,
@@ -62,6 +65,7 @@ export const TodosListState = rj(rjPlainList(), {
     todos: 'getData',
     loading: 'isPending',
   },
+  name: 'FuckerTodos',
 })
 
 export const AddTodoState = rj({

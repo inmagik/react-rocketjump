@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { useRunRj } from 'react-rocketjump'
+import { API_URL, TodosListState, Socio } from './localstate'
 
 export default function NewTodo({ adding, onSubmit }) {
   const [title, setTitle] = useState('')
@@ -8,6 +10,7 @@ export default function NewTodo({ adding, onSubmit }) {
     onSubmit({ title: title, done: false })
     setTitle('')
   }
+  useRunRj(Socio)
 
   return (
     <form className="new-todo" onSubmit={submitTodo}>
