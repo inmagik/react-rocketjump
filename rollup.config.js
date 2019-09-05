@@ -18,6 +18,7 @@ const vendors = []
 export default ['esm', 'cjs'].map(format => ({
   input: {
     'index': 'src/index.js',
+    'logger': 'src/logger.js',
     ...plugins.reduce((all, plugin) => ({
       ...all,
       [`plugins/${plugin}/index`]: `src/plugins/${plugin}/index.js`

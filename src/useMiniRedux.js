@@ -25,6 +25,7 @@ export default function useMiniRedux(
   const stateSubject = useConstant(() => new ReplaySubject())
   const state$ = useConstant(() => stateSubject.asObservable())
 
+  // Debug RJ \w classy
   const debugEmitter = useConstant(() => createRjDebugEmitter(debugInfo))
 
   // Emit a state update to state$

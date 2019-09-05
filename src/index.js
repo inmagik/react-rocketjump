@@ -12,7 +12,6 @@ export { rj }
 // Hooks
 export { default as useRj } from './useRj'
 export { default as useRunRj } from './useRunRj'
-export { useMutation } from './mutations'
 
 // HOC
 export { default as connectRj } from './connectRj'
