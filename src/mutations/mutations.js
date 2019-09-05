@@ -1,7 +1,7 @@
-import createMakeRxObservable from './createMakeRxObservable'
-import { makeLibraryAction } from './actionCreators'
-import { RUN, SUCCESS, INIT } from './actionTypes'
-import combineReducers from './combineReducers'
+import createMakeRxObservable from '../createMakeRxObservable'
+import { makeLibraryAction } from '../actionCreators'
+import { RUN, SUCCESS, INIT } from '../actionTypes'
+import combineReducers from '../combineReducers'
 
 const MUTATION_PREFIX = `@MUTATION`
 
@@ -60,8 +60,13 @@ function enhanceReducer(mutations, reducer, actionCreators) {
       const actionCreator = actionCreators[mutation.updater]
       update = (state, action) =>
         reducer(state, actionCreator(action.payload.data))
-    } else {
+    } else if (typeof mutation.updater === 'function') {
       update = (state, action) => mutation.updater(state, action.payload.data)
+    } else {
+      throw new Error(
+        '[react-rocketjump] @mutations you should provide at least ' +
+          `an effect and an updater to mutation config [${name}].`
+      )
     }
 
     const type = `${MUTATION_PREFIX}/${name}/${SUCCESS}`
@@ -122,6 +127,13 @@ function enhanceMakeObservable(mutations, makeObservable) {
   const makeMutationsObsList = Object.keys(mutations).map(name => {
     const { effect, takeEffect } = mutations[name]
     const prefix = `${MUTATION_PREFIX}/${name}/`
+
+    if (typeof effect !== 'function') {
+      throw new Error(
+        '[react-rocketjump] @mutations you should provide at least ' +
+          `an effect and an updater to mutation config [${name}].`
+      )
+    }
 
     return createMakeRxObservable(
       {
