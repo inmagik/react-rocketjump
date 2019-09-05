@@ -4,11 +4,19 @@ import { useConstant } from './hooks'
 import ConfigureRjContext from './ConfigureRjContext'
 import { isEffectAction } from './actionCreators'
 import { RjDebugEventEmitter } from './debugger/emitter'
+import { INIT } from './actionTypes'
+
+const NoMutationState = {}
 
 // A "mini" redux
 // a reducer for handle state
 // and the roboust rxjs to handle complex side effecs in a pure, declarative, fancy way!
-export default function useMiniRedux(reducer, makeObservable, debugInfo) {
+export default function useMiniRedux(
+  reducer,
+  makeObservable,
+  hasMutationsState,
+  debugInfo
+) {
   // ACTION$ -> RX -> React Hook dispatch()
   const actionSubject = useConstant(() => new Subject())
   const action$ = useConstant(() => actionSubject.asObservable())
@@ -17,6 +25,7 @@ export default function useMiniRedux(reducer, makeObservable, debugInfo) {
   const stateSubject = useConstant(() => new ReplaySubject())
   const state$ = useConstant(() => stateSubject.asObservable())
 
+  // TODO: DO BETTER
   const debugTrackId = useConstant(() => RjDebugEventEmitter.getTrackId())
 
   // Emit a state update to state$
@@ -31,7 +40,7 @@ export default function useMiniRedux(reducer, makeObservable, debugInfo) {
   // Proxy reducer to have always the state$ observable in sync
   // with the action dispatched
   function initReducer(initialArg) {
-    const initialState = reducer(initialArg, { type: '@@INIT' })
+    const initialState = reducer(initialArg, { type: INIT })
     emitStateUpdate(initialState)
     RjDebugEventEmitter.onStateInitialized(
       debugTrackId,
@@ -90,5 +99,8 @@ export default function useMiniRedux(reducer, makeObservable, debugInfo) {
     }
   })
 
-  return [state, dispatchWithEffect, dispatch$]
+  const mainState = hasMutationsState ? state.root : state
+  const mutationsState = hasMutationsState ? state.mutations : NoMutationState
+
+  return [mainState, mutationsState, dispatchWithEffect]
 }

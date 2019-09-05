@@ -3,7 +3,7 @@ import {
   RJ_DISPATCH_EVENT,
   RJ_INIT_EVENT,
   RJ_TEARDOWN_EVENT,
-} from '../debugger/index'
+} from './debugger/index'
 
 function getRandomColor() {
   const letters = '0123456789ABCDEF'

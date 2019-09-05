@@ -16,7 +16,14 @@ export const TodosListState = rj(rjPlainList(), {
           .post(`${API_URL}/todos`)
           .send(todo)
           .then(({ body }) => body),
-      // reducer: ,
+      reducer: (state = { loading: false }, action) => {
+        if (action.type === 'SUCCESS' || action.type === 'FAILURE') {
+          return { loading: false }
+        } else if (action.type === 'PENDING') {
+          return { loading: true }
+        }
+        return state
+      },
       // reducer: rj.mutations.single(),
       // takeEffect: 'every',
       updater: 'insertItem',

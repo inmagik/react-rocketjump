@@ -1,3 +1,4 @@
+export const INIT = '@@INIT'
 export const RUN = 'RUN'
 export const PENDING = 'PENDING'
 export const SUCCESS = 'SUCCESS'

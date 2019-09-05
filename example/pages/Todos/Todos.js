@@ -15,15 +15,19 @@ export default function Todos() {
     // { addStupidTodo: { pending: adding } }
   ] = useRunRj(TodosListState)
 
-  const addTodosState = addStupidTodo.current()
+  // const { loading: adding } = addStupidTodo.state()
+  // console.log('RENDER', adding)
+  // console.log(addStupidTodo)
+  let adding = false
+  // const addTodosState = addStupidTodo.current()
   // addStupidTodo.state = {}
 
   // trackMutationState(addStupidTodo)
 
   // const { pending: adding } = useMutation(addStupidTodo)
   // console.log('~', ss)
-  useRunRj(TodosListState)
-  useRunRj(Socio)
+  // useRunRj(TodosListState)
+  // useRunRj(Socio)
   // useRj(TodosListState)
   // let adding = false
   // console.log('Render', todos)

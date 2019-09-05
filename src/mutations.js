@@ -1,62 +1,44 @@
-import { useEffect, useReducer } from 'react'
 import createMakeRxObservable from './createMakeRxObservable'
 import { makeLibraryAction } from './actionCreators'
-import { RUN, SUCCESS } from './actionTypes'
-import { tap } from 'rxjs/operators'
-import { useConstant } from './hooks'
+import { RUN, SUCCESS, INIT } from './actionTypes'
+import combineReducers from './combineReducers'
 
 const MUTATION_PREFIX = `@RJ~MUTATION`
 
-const mutationReducer = (prevState, action) => {
-  const type = action.type.split('/')[2]
-  // console.log('X', type)
-  if (type === 'PENDING') {
-    return {
-      ...prevState,
-      pending: true,
-    }
-  }
-  if (type === 'SUCCESS' || type === 'FAILURE') {
-    return {
-      ...prevState,
-      pending: false,
-    }
-  }
-  return prevState
-}
-const sss = {
-  pending: false,
-}
-export function useMutation(mutationFn) {
-  const [state, dispatch] = useReducer(mutationReducer, sss)
-  const subscription = useConstant(() => {
-    return mutationFn.__rjMutation.state$.subscribe(action => {
-      // console.log('SHit from future!', action)
-      dispatch(action)
-    })
-  })
-
-  // On unmount unsub
-  useEffect(() => {
-    return () => subscription.unsubscribe()
-  }, [subscription])
-
-  return state
-}
-
-function makeActionCreator(name) {
+// Make the action creater that trigger a mutation side effects
+function makeActionCreator(name, mutation) {
   const actionCreator = (...params) =>
     makeLibraryAction(`${MUTATION_PREFIX}/${name}/${RUN}`, ...params)
-  actionCreator.__rjMutation = {
-    name,
-  }
+
+  // Muation has state only when reducer is specified on it
+  const hasState = typeof mutation.reducer === 'function'
+  // Attach a special property to get the original mutation name
+  // and index the realted state
+  Object.defineProperty(actionCreator, '__rjMutation', {
+    value: { name, hasState },
+  })
   return actionCreator
 }
 
-export function enhanceActionCreators(mutations, actionCreators) {
+// Inject the special state() function on mutations action creators
+export function injectMutationsStateInActions(actions, state) {
+  const actionsKeys = Object.keys(actions)
+  for (let i = 0; i < actionsKeys.length; i++) {
+    const name = actionsKeys[i]
+    const action = actions[name]
+    if (action.__rjMutation && action.__rjMutation.hasState) {
+      action.state = () => state[name]
+    }
+  }
+  return actions
+}
+
+// Add specials rj mutations action creators to base rj action creators
+function enhanceActionCreators(mutations, actionCreators) {
   return Object.keys(mutations).reduce((actionCreators, name) => {
     // TODO: Add DEV warn 4 overrid prev exist actions ....
-    const actionCreator = makeActionCreator(name)
+    const mutation = mutations[name]
+    const actionCreator = makeActionCreator(name, mutation)
     return {
       ...actionCreators,
       [name]: actionCreator,
@@ -64,8 +46,9 @@ export function enhanceActionCreators(mutations, actionCreators) {
   }, actionCreators)
 }
 
-export function enhanceReducer(mutations, reducer, actionCreators) {
-  const ActionsMap = Object.keys(mutations).reduce((all, name) => {
+// enhance the basic reducer \w updater of mutations to rj root reducer
+function enhanceReducer(mutations, reducer, actionCreators) {
+  const handleMutationReducers = Object.keys(mutations).reduce((all, name) => {
     const mutation = mutations[name]
 
     let update
@@ -87,14 +70,53 @@ export function enhanceReducer(mutations, reducer, actionCreators) {
   }, {})
 
   return (prevState, action) => {
-    if (ActionsMap[action.type]) {
-      return ActionsMap[action.type](prevState, action)
+    if (handleMutationReducers[action.type]) {
+      return handleMutationReducers[action.type](prevState, action)
     }
     return reducer(prevState, action)
   }
 }
 
-export function enhanceMakeObservable(mutations, makeObservable) {
+// Reducer for track the mutation state
+function makeMutationReducer(mutation, name) {
+  return (state, action) => {
+    if (action.type === INIT) {
+      return mutation.reducer(state, action)
+    }
+    const pieces = action.type.split('/')
+    if (pieces.length !== 3) {
+      return state
+    }
+    if (pieces[0] === MUTATION_PREFIX && pieces[1] === name) {
+      const decoupleType = pieces[2]
+      return mutation.reducer(state, { ...action, type: decoupleType })
+    }
+    return state
+  }
+}
+
+// Mutations reducer or null if no mutations has a reducer
+function makeMutationsReducer(mutations) {
+  const mutationsReducers = Object.keys(mutations).reduce((all, name) => {
+    const mutation = mutations[name]
+
+    if (typeof mutation.reducer !== 'function') {
+      return all
+    }
+    return {
+      ...all,
+      [name]: makeMutationReducer(mutation, name),
+    }
+  }, {})
+
+  if (Object.keys(mutationsReducers).length === 0) {
+    return null
+  }
+
+  return combineReducers(mutationsReducers)
+}
+
+function enhanceMakeObservable(mutations, makeObservable) {
   const makeMutationsObsList = Object.keys(mutations).map(name => {
     const { effect, takeEffect } = mutations[name]
     const prefix = `${MUTATION_PREFIX}/${name}/`
@@ -102,8 +124,7 @@ export function enhanceMakeObservable(mutations, makeObservable) {
     return createMakeRxObservable(
       {
         effect,
-        // TODO: Improve group by
-        takeEffect: takeEffect || 'exhaust',
+        takeEffect: takeEffect || 'every',
         effectPipeline: [],
       },
       prefix
@@ -115,25 +136,37 @@ export function enhanceMakeObservable(mutations, makeObservable) {
     o$ = makeMutationsObsList.reduce((o$, makeMutationObs) => {
       return makeMutationObs(o$, ...params)
     }, o$)
-    o$ = o$.pipe(
-      tap(a => {
-        // console.log('A', a)
-      })
-    )
     return o$
   }
 }
 
 export function enhanceExportWithMutations(rjObject, mutations) {
   if (mutations === null) {
-    return rjObject
+    return { ...rjObject, hasMutationsState: false }
   }
 
   const { makeRxObservable, actionCreators, reducer } = rjObject
 
+  const enhancedReducer = enhanceReducer(mutations, reducer, actionCreators)
+  const mutationsReducer = makeMutationsReducer(mutations)
+
+  let hasMutationsState
+  let withMutationsReducer
+  if (mutationsReducer === null) {
+    hasMutationsState = false
+    withMutationsReducer = enhancedReducer
+  } else {
+    hasMutationsState = true
+    withMutationsReducer = combineReducers({
+      root: enhancedReducer,
+      mutations: mutationsReducer,
+    })
+  }
+
   return {
     ...rjObject,
-    reducer: enhanceReducer(mutations, reducer, actionCreators),
+    hasMutationsState,
+    reducer: withMutationsReducer,
     actionCreators: enhanceActionCreators(mutations, actionCreators),
     makeRxObservable: enhanceMakeObservable(mutations, makeRxObservable),
   }

@@ -166,7 +166,7 @@ function attachBuilder(boundActionCreator, actionCreator, dispatch) {
  *    withMeta(obj) is equivalent to withMeta(oldMeta => ({ ...oldMeta, ...obj }))
  *
  */
-function bindActionCreator(actionCreator, dispatch, state$) {
+function bindActionCreator(actionCreator, dispatch) {
   const out = (...args) => {
     const action = actionCreator(...args)
     if (isEffectAction(action)) {
@@ -178,12 +178,11 @@ function bindActionCreator(actionCreator, dispatch, state$) {
     }
   }
 
-  // TODO: Write this shit better ...
+  // When actionCreator is a mutation re - bound the rj mutation configuration
   if (actionCreator.__rjMutation) {
-    out.__rjMutation = {
-      name: actionCreator.__rjMutation.name,
-      state$: state$,
-    }
+    Object.defineProperty(out, '__rjMutation', {
+      value: actionCreator.__rjMutation,
+    })
   }
 
   return attachBuilder(out, actionCreator, dispatch)
@@ -196,15 +195,11 @@ function bindActionCreator(actionCreator, dispatch, state$) {
  *
  * Both plain actions and rocketjump actions can be bound in this way
  */
-export default function bindActionCreators(actionCreators, dispatch, state$) {
+export default function bindActionCreators(actionCreators, dispatch) {
   const boundActionCreators = {}
   for (const key in actionCreators) {
     const actionCreator = actionCreators[key]
-    boundActionCreators[key] = bindActionCreator(
-      actionCreator,
-      dispatch,
-      state$
-    )
+    boundActionCreators[key] = bindActionCreator(actionCreator, dispatch)
   }
   return boundActionCreators
 }

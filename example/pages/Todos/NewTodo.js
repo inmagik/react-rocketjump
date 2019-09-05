@@ -10,7 +10,7 @@ export default function NewTodo({ adding, onSubmit }) {
     onSubmit({ title: title, done: false })
     setTitle('')
   }
-  useRunRj(Socio)
+  // useRunRj(Socio)
 
   return (
     <form className="new-todo" onSubmit={submitTodo}>
