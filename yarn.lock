@@ -6917,7 +6917,7 @@ react-router@5.0.1:
     tiny-invariant "^1.0.2"
     tiny-warning "^1.0.0"
 
-react-test-renderer@^16.0.0-0, react-test-renderer@^16.9.0-alpha.0:
+react-test-renderer@^16.0.0-0, react-test-renderer@^16.9.0:
   version "16.9.0"
   resolved "https://registry.yarnpkg.com/react-test-renderer/-/react-test-renderer-16.9.0.tgz#7ed657a374af47af88f66f33a3ef99c9610c8ae9"
   integrity sha512-R62stB73qZyhrJo7wmCW9jgl/07ai+YzvouvCXIJLBkRlRqLx4j9RqcLEAfNfU3OxTGucqR2Whmn3/Aad6L3hQ==
@@ -7287,10 +7287,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rocketjump-core@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/rocketjump-core/-/rocketjump-core-2.0.0.tgz#dc02388947125e45f2663bdf09c296c8f2ddad8e"
-  integrity sha512-S7JXq5ss68zEDP5uFh+vqMq8dEsOI/h8iKPTMG4h0xVERjU6tdBIQqBMCiLgK7znStceYV5pvhjM5iBZDx/1xQ==
+rocketjump-core@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/rocketjump-core/-/rocketjump-core-2.1.0.tgz#594746f447d460676214e48b8004c71fdfa64d13"
+  integrity sha512-/UvynYBDyqusEsUzfGsUS2zhD22IVH1j1DUqIY14Ewx85hNoySNmV31qp9Py/Nc/5wuFCsRynTDU0jLVJZw4XA==
 
 rollup-plugin-babel@^4.3.3:
   version "4.3.3"
