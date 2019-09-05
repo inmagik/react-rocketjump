@@ -1,0 +1,6 @@
+{
+  "name": "react-rocketjump/logger",
+  "private": true,
+  "main": "../lib/logger.cjs.js",
+  "module": "../lib/logger.esm.js"
+}

@@ -1,5 +1,5 @@
 {
-  "name": "redux-rocketjump/plugins/listUpdate",
+  "name": "react-rocketjump/plugins/listUpdate",
   "private": true,
   "main": "../../lib/plugins/listUpdate/index.cjs.js",
   "module": "../../lib/plugins/listUpdate/index.esm.js"

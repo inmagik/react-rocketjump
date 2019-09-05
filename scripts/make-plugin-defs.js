@@ -13,7 +13,7 @@ plugins.forEach(plugin => {
     'plugins/' + plugin + '/package.json',
     JSON.stringify(
       {
-        name: 'redux-rocketjump/plugins/' + plugin,
+        name: 'react-rocketjump/plugins/' + plugin,
         private: true,
         main: '../../lib/plugins/' + plugin + '/index.cjs.js',
         module: '../../lib/plugins/' + plugin + '/index.esm.js',

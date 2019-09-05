@@ -1,5 +1,5 @@
 {
-  "name": "redux-rocketjump/plugins/map",
+  "name": "react-rocketjump/plugins/map",
   "private": true,
   "main": "../../lib/plugins/map/index.cjs.js",
   "module": "../../lib/plugins/map/index.esm.js"
