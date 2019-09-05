@@ -23,17 +23,15 @@ export default function rjLogger() {
 
   RjDebugEvents.subscribe(event => {
     if (event.type === RJ_INIT_EVENT) {
-      rjLives.push(event.payload.info)
+      rjLives.push(event.meta.info)
     } else if (event.type === RJ_TEARDOWN_EVENT) {
-      const index = rjLives.indexOf(event.payload.info)
+      const index = rjLives.indexOf(event.meta.info)
       rjLives.splice(index, 1)
-      // rjLives.push(event.info)
     } else if (event.type === RJ_DISPATCH_EVENT) {
-      const index = rjLives.indexOf(event.payload.info)
-      // console.log(rjLives)
-      const { trackId } = event
+      const { info, trackId } = event.meta
+      const index = rjLives.indexOf(info)
       const color = colors[trackId % colors.length]
-      const { action, prevState, nextState, info } = event.payload
+      const { action, prevState, nextState } = event.payload
       const rjName = info.name || `${index + 1}°`
       console.groupCollapsed(
         `%cRJ ${rjName} %caction %c${action.type}`,
@@ -50,7 +48,7 @@ export default function rjLogger() {
       console.log(`%cnext state`, 'color: green;font-weight:bold;', nextState)
       // console.log(`%c_rj ${pad(7)}`, 'color: grey', {
       //   debugTrackId: trackId,
-      //   lastRjConfig: event.payload.info,
+      //   lastRjConfig: info
       // })
       console.groupEnd()
     }

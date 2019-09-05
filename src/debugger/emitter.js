@@ -1,45 +1,40 @@
 import { RJ_DISPATCH_EVENT, RJ_INIT_EVENT, RJ_TEARDOWN_EVENT } from './events'
 import { AllRjEventsSubject } from './debugger'
 
-let RjDebugEventEmitter
-
-if (process.env.NODE_ENV !== 'production') {
-  let trackIdUniq = 0
-  RjDebugEventEmitter = {
-    getTrackId: () => {
-      const trackId = trackIdUniq
-      trackIdUniq++
-      return trackId
-    },
-    onStateInitialized: (trackId, info, state) => {
-      AllRjEventsSubject.next({
-        type: RJ_INIT_EVENT,
-        trackId,
-        payload: { state, info },
-      })
-    },
-    onActionDispatched: (trackId, info, action, prevState, nextState) => {
-      AllRjEventsSubject.next({
-        type: RJ_DISPATCH_EVENT,
-        trackId,
-        payload: { action, prevState, nextState, info },
-      })
-    },
-    onTeardown: (trackId, info) => {
-      AllRjEventsSubject.next({
-        type: RJ_TEARDOWN_EVENT,
-        trackId,
-        payload: { info },
-      })
-    },
+class RjDebugEventEmitter {
+  constructor(trackId, info) {
+    this.trackId = trackId
+    this.info = info
   }
-} else {
-  RjDebugEventEmitter = {
-    getTrackId: () => {},
-    onStateInitialized: () => {},
-    onActionDispatched: () => {},
-    onTeardown: () => {},
+
+  emit(type, payload = {}) {
+    if (process.env.NODE_ENV !== 'production') {
+      AllRjEventsSubject.next({
+        type,
+        meta: { trackId: this.trackId, info: this.info },
+        payload,
+      })
+    }
+  }
+
+  onStateInitialized(state) {
+    this.emit(RJ_INIT_EVENT, { state })
+  }
+
+  onActionDispatched(action, prevState, nextState) {
+    this.emit(RJ_DISPATCH_EVENT, { action, prevState, nextState })
+  }
+
+  onTeardown() {
+    this.emit(RJ_TEARDOWN_EVENT)
   }
 }
 
-export { RjDebugEventEmitter }
+let trackIdUniq = 0
+export default function createEmitter(info) {
+  const emitter = new RjDebugEventEmitter(trackIdUniq, info)
+  if (process.env.NODE_ENV !== 'production') {
+    trackIdUniq++
+  }
+  return emitter
+}

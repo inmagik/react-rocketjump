@@ -3,7 +3,7 @@ import { makeLibraryAction } from './actionCreators'
 import { RUN, SUCCESS, INIT } from './actionTypes'
 import combineReducers from './combineReducers'
 
-const MUTATION_PREFIX = `@RJ~MUTATION`
+const MUTATION_PREFIX = `@MUTATION`
 
 // Make the action creater that trigger a mutation side effects
 function makeActionCreator(name, mutation) {

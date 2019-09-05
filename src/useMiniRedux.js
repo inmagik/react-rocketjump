@@ -3,7 +3,7 @@ import { Subject, ReplaySubject } from 'rxjs'
 import { useConstant } from './hooks'
 import ConfigureRjContext from './ConfigureRjContext'
 import { isEffectAction } from './actionCreators'
-import { RjDebugEventEmitter } from './debugger/emitter'
+import createRjDebugEmitter from './debugger/emitter'
 import { INIT } from './actionTypes'
 
 const NoMutationState = {}
@@ -25,8 +25,7 @@ export default function useMiniRedux(
   const stateSubject = useConstant(() => new ReplaySubject())
   const state$ = useConstant(() => stateSubject.asObservable())
 
-  // TODO: DO BETTER
-  const debugTrackId = useConstant(() => RjDebugEventEmitter.getTrackId())
+  const debugEmitter = useConstant(() => createRjDebugEmitter(debugInfo))
 
   // Emit a state update to state$
   // ... keep a reference of current state
@@ -43,11 +42,7 @@ export default function useMiniRedux(
     const initialState = reducer(initialArg, { type: INIT })
     emitStateUpdate(initialState)
     if (process.env.NODE_ENV !== 'production') {
-      RjDebugEventEmitter.onStateInitialized(
-        debugTrackId,
-        debugInfo,
-        initialState
-      )
+      debugEmitter.onStateInitialized(initialState)
       state$.__dispatchIndex = 0
       return { idx: 0, state: initialState }
     } else {
@@ -61,13 +56,7 @@ export default function useMiniRedux(
       emitStateUpdate(nextState)
       const idx = prevState.idx + 1
       if (idx > state$.__dispatchIndex) {
-        RjDebugEventEmitter.onActionDispatched(
-          debugTrackId,
-          debugInfo,
-          action,
-          prevState.state,
-          nextState
-        )
+        debugEmitter.onActionDispatched(action, prevState.state, nextState)
         state$.__dispatchIndex = idx
       }
       return { idx, state: nextState }
@@ -85,29 +74,22 @@ export default function useMiniRedux(
     process.env.NODE_ENV !== 'production' ? stateAndIdx.state : stateAndIdx
 
   const extraConfig = useContext(ConfigureRjContext)
-  const dispatch$ = useConstant(() => {
+  const subscription = useConstant(() => {
     // Dispatch the action returned from observable
     return makeObservable(
       action$,
       state$,
       extraConfig ? extraConfig.effectCaller : undefined
-    )
+    ).subscribe(dispatch)
   })
-  const subscription = useConstant(() =>
-    dispatch$.subscribe(action => {
-      // const prevState = state$.value
-      dispatch(action)
-      // console.log("O.o", JSON.stringify({ action, state: state$.value }))
-    })
-  )
 
   // On unmount unsub
   useEffect(() => {
     return () => {
       subscription.unsubscribe()
-      RjDebugEventEmitter.onTeardown(debugInfo)
+      debugEmitter.onTeardown()
     }
-  }, [subscription, debugInfo])
+  }, [subscription, debugEmitter])
 
   const dispatchWithEffect = useConstant(() => action => {
     if (isEffectAction(action)) {
@@ -117,7 +99,6 @@ export default function useMiniRedux(
     } else {
       // Update the state \w given reducer
       dispatch(action)
-      RjDebugEventEmitter.onActionDispatched(debugTrackId, action, state$.value)
     }
   })
 
