@@ -1,4 +1,4 @@
-import { ReplaySubject } from 'rxjs'
+import { Subject } from 'rxjs'
 
-export const AllRjEventsSubject = new ReplaySubject()
+export const AllRjEventsSubject = new Subject()
 export const RjDebugEvents = AllRjEventsSubject.asObservable()

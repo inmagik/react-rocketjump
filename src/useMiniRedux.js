@@ -14,19 +14,28 @@ const NoMutationState = {}
 export default function useMiniRedux(
   reducer,
   makeObservable,
+  // the rj has at least one mutations state?
   hasMutationsState,
+  // debug information used as dev hints and other
   debugInfo
 ) {
-  // ACTION$ -> RX -> React Hook dispatch()
+  // Debug RJ \w classy (not in PROD)
+  const debugEmitter = useConstant(() => createRjDebugEmitter(debugInfo))
+
+  // Effect Action Observable
+  // emits effect actions
+  // pass through rj effect config for example { ...takeEffect: 'every' }
+  // make new observable
+  // $dispatchIntoReducer = makeObservable(EFFECT_ACTION$, ...)
+  // the new observable dispatch the emitted actions into react useReducer state
+  // $dispatchIntoReducer.subscribe(action => dispatch(action))
   const actionSubject = useConstant(() => new Subject())
   const action$ = useConstant(() => actionSubject.asObservable())
 
-  // STATE$ reducer() -> nextState -> reducer(nextState)
+  // STATE$
+  // emits state updates
   const stateSubject = useConstant(() => new ReplaySubject())
   const state$ = useConstant(() => stateSubject.asObservable())
-
-  // Debug RJ \w classy
-  const debugEmitter = useConstant(() => createRjDebugEmitter(debugInfo))
 
   // Emit a state update to state$
   // ... keep a reference of current state
@@ -37,12 +46,14 @@ export default function useMiniRedux(
     }
   }
 
-  // Proxy reducer to have always the state$ observable in sync
-  // with the action dispatched
+  // Init the reducer in the REDUX way
+  // pass special INIT actions and undefined to our reducer
   function initReducer(initialArg) {
     const initialState = reducer(initialArg, { type: INIT })
+    // emit first state update
     emitStateUpdate(initialState)
     if (process.env.NODE_ENV !== 'production') {
+      // when not in production keep a counter of dispatched actions
       debugEmitter.onStateInitialized(initialState)
       state$.__dispatchIndex = 0
       return { idx: 0, state: initialState }
@@ -50,7 +61,13 @@ export default function useMiniRedux(
       return initialState
     }
   }
-  // Add emit on state changes and debug track in DEV only
+
+  // Proxy the original reducer
+  // This is only a way to hook into the React updates
+  // and grab state and action to
+  // keep a reference of current state and emits state updates on observable
+  // ... and call the Rj debug hooks using for example to have
+  // a clear logging of state changes between times as the redux dev tools does
   function proxyReducer(prevState, action) {
     if (process.env.NODE_ENV !== 'production') {
       const nextState = reducer(prevState.state, action)

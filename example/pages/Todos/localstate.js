@@ -39,7 +39,7 @@ export const TodosListState = rj(rjPlainList(), {
     todos: 'getData',
     loading: 'isPending',
   },
-  // name: 'FuckerTodos',
+  name: 'FuckerTodos',
 })
 
 export const AddTodoState = rj({

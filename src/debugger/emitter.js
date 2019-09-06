@@ -38,3 +38,8 @@ export default function createEmitter(info) {
   }
   return emitter
 }
+
+// Test utils to reset the trackIdUniq
+export function testUtilResetEmmitersState() {
+  trackIdUniq = 0
+}
