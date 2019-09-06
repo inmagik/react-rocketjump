@@ -37,12 +37,18 @@ export function injectMutationsStateInActions(actions, state) {
 
 // Add specials rj mutations action creators to base rj action creators
 function enhanceActionCreators(mutations, actionCreators) {
-  return Object.keys(mutations).reduce((actionCreators, name) => {
-    // TODO: Add DEV warn 4 overrid prev exist actions ....
+  return Object.keys(mutations).reduce((enhancedActionCreators, name) => {
     const mutation = mutations[name]
     const actionCreator = makeActionCreator(name, mutation)
+    if (process.env.NODE_ENV !== 'production' && actionCreators[name]) {
+      console.warn(
+        `[react-rocketjump] @mutations WARNING the mutation [${name}] ` +
+          `override a pre existing action creator this can leading to ` +
+          `unexpected behaviors.`
+      )
+    }
     return {
-      ...actionCreators,
+      ...enhancedActionCreators,
       [name]: actionCreator,
     }
   }, actionCreators)
