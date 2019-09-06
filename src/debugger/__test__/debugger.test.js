@@ -14,7 +14,19 @@ import {
 } from '../../debugger/index'
 import { testUtilResetEmmitersState } from '../../debugger/emitter'
 
+const OLD_ENV = process.env
+
 beforeEach(() => {
+  jest.resetModules()
+  process.env = { ...OLD_ENV }
+})
+
+afterEach(() => {
+  process.env = OLD_ENV
+})
+
+beforeEach(() => {
+  jest.resetModules()
   testUtilResetEmmitersState()
 })
 
@@ -613,5 +625,19 @@ describe('RJ Debugger', () => {
     })
 
     expect(mockCallback).toBeCalledTimes(2)
+  })
+  it("should don't emit in PRODUCTION", async () => {
+    process.env.NODE_ENV = 'production'
+    const mockCallback = jest.fn()
+    RjDebugEvents.subscribe(mockCallback)
+
+    const effect = () => Promise.resolve(23)
+    const maRjState = rj({
+      effect,
+    })
+
+    renderHook(() => useRj(maRjState))
+
+    expect(mockCallback).toBeCalledTimes(0)
   })
 })
