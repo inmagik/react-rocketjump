@@ -56,14 +56,19 @@ function enhanceActionCreators(mutations, actionCreators) {
 
 // enhance the basic reducer \w updater of mutations to rj root reducer
 function enhanceReducer(mutations, reducer, actionCreators) {
-  const handleMutationReducers = Object.keys(mutations).reduce((all, name) => {
+  const handleMutationsReducers = Object.keys(mutations).reduce((all, name) => {
     const mutation = mutations[name]
 
     let update
 
     if (typeof mutation.updater === 'string') {
-      // TODO: Better checks ...
       const actionCreator = actionCreators[mutation.updater]
+      if (typeof actionCreator !== 'function') {
+        throw new Error(
+          `[react-rocketjump] @mutations you provide a non existing ` +
+            `action creator [${mutation.updater}] as updater for mutation [${name}].`
+        )
+      }
       update = (state, action) =>
         reducer(state, actionCreator(action.payload.data))
     } else if (typeof mutation.updater === 'function') {
@@ -83,8 +88,8 @@ function enhanceReducer(mutations, reducer, actionCreators) {
   }, {})
 
   return (prevState, action) => {
-    if (handleMutationReducers[action.type]) {
-      return handleMutationReducers[action.type](prevState, action)
+    if (handleMutationsReducers[action.type]) {
+      return handleMutationsReducers[action.type](prevState, action)
     }
     return reducer(prevState, action)
   }

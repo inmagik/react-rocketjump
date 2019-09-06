@@ -52,4 +52,32 @@ describe('RJ mutations config', () => {
       })
     }).not.toThrowError()
   })
+  it("should get angry when updater don't match any action creator", () => {
+    expect(() => {
+      rj({
+        mutations: {
+          giova: {
+            effect: () => Promise.resolve(1312),
+            updater: 'thisActionCreatorDontExist',
+          },
+        },
+        effect: () => Promise.resolve(1312),
+      })
+    }).toThrowError()
+
+    expect(() => {
+      rj({
+        mutations: {
+          giova: {
+            effect: () => Promise.resolve(1312),
+            updater: 'thisActiontIsCool',
+          },
+        },
+        actions: () => ({
+          thisActiontIsCool: () => ({}),
+        }),
+        effect: () => Promise.resolve(1312),
+      })
+    }).not.toThrowError()
+  })
 })
