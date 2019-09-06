@@ -1,17 +1,11 @@
 import React from 'react'
 import rj from '../../rj'
 import useRj from '../../useRj'
+import useRunRj from '../../useRunRj'
 import connectRj from '../../connectRj'
 import { renderHook, act } from '@testing-library/react-hooks'
 import { render, fireEvent, act as actForDom } from '@testing-library/react'
-import {
-  PENDING,
-  SUCCESS,
-  FAILURE,
-  CLEAN,
-  RUN,
-  CANCEL,
-} from '../../actionTypes'
+import { PENDING, SUCCESS, RUN } from '../../actionTypes'
 import {
   RjDebugEvents,
   RJ_DISPATCH_EVENT,
@@ -379,6 +373,221 @@ describe('RJ Debugger', () => {
           meta: {},
         },
         nextState: { pending: false, error: null, data: 23 },
+      },
+    })
+  })
+  it('should emit RJ_DISPATCH_EVENT when actions are dispatched in useRj and perist the trackId for the same useRj hook instance', async () => {
+    const mockCallback = jest.fn()
+    RjDebugEvents.subscribe(mockCallback)
+
+    const resolvesA = []
+    const effectA = () => new Promise(r => resolvesA.push(r))
+    const configA = {
+      effect: effectA,
+      name: 'RjA',
+    }
+    const RjA = rj(configA)
+
+    const resolvesB = []
+    const effectB = () => new Promise(r => resolvesB.push(r))
+    const configB = {
+      effect: effectB,
+      name: 'RjB',
+    }
+    const RjB = rj(configB)
+
+    const resolvesC = []
+    const effectC = () => new Promise(r => resolvesC.push(r))
+    const configC = {
+      effect: effectC,
+      name: 'RjC',
+    }
+    const RjC = rj(configC)
+
+    const DeepTree = () => {
+      useRunRj(RjC)
+      return <div />
+    }
+
+    const MaComplexTree = () => {
+      useRunRj(RjA)
+      const { run } = useRj(RjB)[1]
+      return (
+        <div>
+          <button onClick={() => run()}>Click Me</button>
+          <DeepTree />
+        </div>
+      )
+    }
+
+    const { getByText } = render(<MaComplexTree />)
+
+    expect(mockCallback).toBeCalledTimes(7)
+    expect(mockCallback).nthCalledWith(4, {
+      meta: {
+        info: configC,
+        trackId: 2,
+      },
+      type: RJ_DISPATCH_EVENT,
+      payload: {
+        prevState: { pending: false, error: null, data: null },
+        action: {
+          type: RUN,
+          payload: {
+            params: [],
+          },
+          meta: {},
+          callbacks: {
+            onSuccess: undefined,
+            onFailure: undefined,
+          },
+        },
+        nextState: { pending: false, error: null, data: null },
+      },
+    })
+    expect(mockCallback).nthCalledWith(5, {
+      meta: {
+        info: configA,
+        trackId: 0,
+      },
+      type: RJ_DISPATCH_EVENT,
+      payload: {
+        prevState: { pending: false, error: null, data: null },
+        action: {
+          type: RUN,
+          payload: {
+            params: [],
+          },
+          meta: {},
+          callbacks: {
+            onSuccess: undefined,
+            onFailure: undefined,
+          },
+        },
+        nextState: { pending: false, error: null, data: null },
+      },
+    })
+    expect(mockCallback).nthCalledWith(6, {
+      meta: {
+        info: configA,
+        trackId: 0,
+      },
+      type: RJ_DISPATCH_EVENT,
+      payload: {
+        prevState: { pending: false, error: null, data: null },
+        action: {
+          type: PENDING,
+          meta: {},
+        },
+        nextState: { pending: true, error: null, data: null },
+      },
+    })
+    expect(mockCallback).nthCalledWith(7, {
+      meta: {
+        info: configC,
+        trackId: 2,
+      },
+      type: RJ_DISPATCH_EVENT,
+      payload: {
+        prevState: { pending: false, error: null, data: null },
+        action: {
+          type: PENDING,
+          meta: {},
+        },
+        nextState: { pending: true, error: null, data: null },
+      },
+    })
+    await actForDom(async () => resolvesC[0]('C'))
+    expect(mockCallback).toBeCalledTimes(8)
+    expect(mockCallback).nthCalledWith(8, {
+      meta: {
+        info: configC,
+        trackId: 2,
+      },
+      type: RJ_DISPATCH_EVENT,
+      payload: {
+        prevState: { pending: true, error: null, data: null },
+        action: {
+          type: SUCCESS,
+          payload: { data: 'C', params: [] },
+          meta: {},
+        },
+        nextState: { pending: false, error: null, data: 'C' },
+      },
+    })
+    await actForDom(async () => resolvesA[0]('A'))
+    expect(mockCallback).toBeCalledTimes(9)
+    expect(mockCallback).nthCalledWith(9, {
+      meta: {
+        info: configA,
+        trackId: 0,
+      },
+      type: RJ_DISPATCH_EVENT,
+      payload: {
+        prevState: { pending: true, error: null, data: null },
+        action: {
+          type: SUCCESS,
+          payload: { data: 'A', params: [] },
+          meta: {},
+        },
+        nextState: { pending: false, error: null, data: 'A' },
+      },
+    })
+    await actForDom(async () => fireEvent.click(getByText('Click Me')))
+    expect(mockCallback).toBeCalledTimes(11)
+    expect(mockCallback).nthCalledWith(10, {
+      meta: {
+        info: configB,
+        trackId: 1,
+      },
+      type: RJ_DISPATCH_EVENT,
+      payload: {
+        prevState: { pending: false, error: null, data: null },
+        action: {
+          type: RUN,
+          payload: {
+            params: [],
+          },
+          meta: {},
+          callbacks: {
+            onSuccess: undefined,
+            onFailure: undefined,
+          },
+        },
+        nextState: { pending: false, error: null, data: null },
+      },
+    })
+    expect(mockCallback).nthCalledWith(11, {
+      meta: {
+        info: configB,
+        trackId: 1,
+      },
+      type: RJ_DISPATCH_EVENT,
+      payload: {
+        prevState: { pending: false, error: null, data: null },
+        action: {
+          type: PENDING,
+          meta: {},
+        },
+        nextState: { pending: true, error: null, data: null },
+      },
+    })
+    await actForDom(async () => resolvesB[0]('B'))
+    expect(mockCallback).toBeCalledTimes(12)
+    expect(mockCallback).nthCalledWith(12, {
+      meta: {
+        info: configB,
+        trackId: 1,
+      },
+      type: RJ_DISPATCH_EVENT,
+      payload: {
+        prevState: { pending: true, error: null, data: null },
+        action: {
+          type: SUCCESS,
+          payload: { data: 'B', params: [] },
+          meta: {},
+        },
+        nextState: { pending: false, error: null, data: 'B' },
       },
     })
   })
