@@ -189,6 +189,61 @@ describe('List Plugin', () => {
         ],
       },
     })
+
+    action = {
+      type: SUCCESS,
+      payload: {
+        params: [{ page: 1 }],
+        data: {
+          next: null,
+          previous: null,
+          count: 'invalidShit',
+          results: [
+            {
+              id: 23,
+              name: 'Alice',
+            },
+            {
+              id: 23,
+              name: 'Bob',
+            },
+            {
+              id: 7,
+              name: 'Eve',
+            },
+          ],
+        },
+      },
+    }
+
+    nextState = reducer(prevState, action)
+
+    expect(nextState).toEqual({
+      pending: false,
+      error: null,
+      data: {
+        pagination: {
+          count: 'invalidShit',
+          current: null,
+          next: null,
+          previous: null,
+        },
+        list: [
+          {
+            id: 23,
+            name: 'Alice',
+          },
+          {
+            id: 23,
+            name: 'Bob',
+          },
+          {
+            id: 7,
+            name: 'Eve',
+          },
+        ],
+      },
+    })
   })
 
   it('should append items when meta append', () => {
@@ -848,6 +903,34 @@ describe('List Plugin', () => {
     expect(getNext(nextState)).toBe(null)
     expect(getPrev(nextState)).toBe(null)
     expect(getCurrent(nextState)).toEqual({ page: 1 })
+
+    action = {
+      type: SUCCESS,
+      payload: {
+        params: [{ limit: 10, offset: 30 }],
+        data: {
+          next: null,
+          previous: null,
+          count: 'invalidShit',
+          results: [
+            {
+              id: '9',
+              name: 'Mallory',
+            },
+          ],
+        },
+      },
+    }
+
+    nextState = reducer(state, action)
+
+    expect(getList(nextState)).toBe(action.payload.data.results)
+    expect(getCount(nextState)).toBe('invalidShit')
+    expect(hasNext(nextState)).toBe(false)
+    expect(hasPrev(nextState)).toBe(false)
+    expect(getNext(nextState)).toBe(null)
+    expect(getPrev(nextState)).toBe(null)
+    expect(getCurrent(nextState)).toBe(null)
   })
 
   it('supports nextPrev pagination', () => {
