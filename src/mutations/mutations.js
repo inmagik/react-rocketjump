@@ -28,8 +28,20 @@ export function injectMutationsStateInActions(actions, state) {
   for (let i = 0; i < actionsKeys.length; i++) {
     const name = actionsKeys[i]
     const action = actions[name]
-    if (action.__rjMutation && action.__rjMutation.hasState) {
-      action.state = () => state[name]
+    if (action.__rjMutation) {
+      if (action.__rjMutation.hasState) {
+        action.state = () => state[name]
+      } else if (process.env.NODE_ENV !== 'production') {
+        // In dev only print warn if U try to access state of a mutation
+        // without state this help monkeys cathing mis config errors quickly
+        action.state = () => {
+          console.warn(
+            `[react-rocketjump] @mutations WARNING you try to access the ` +
+              `state of mutation [${name}] with no state, please declaring a ` +
+              `reducer in the [${name}] mutation config.`
+          )
+        }
+      }
     }
   }
   return actions
