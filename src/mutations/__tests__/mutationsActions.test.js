@@ -74,6 +74,29 @@ describe('RJ mutations action creators', () => {
     })
     expect(isEffectAction(action)).toBe(true)
   })
+  it('should be warn when a mutation override existing action creator', async () => {
+    const spy = jest.fn()
+
+    console.warn = spy
+    rj(
+      rj({
+        actions: () => ({
+          killHumans: () => {},
+        }),
+      }),
+      {
+        mutations: {
+          killHumans: {
+            effect: () => {},
+            updater: () => {},
+          },
+        },
+        effect: () => Promise.resolve(1312),
+      }
+    )
+
+    expect(spy.mock.calls[0][0]).toMatch(/\[react-rocketjump\] @mutations/)
+  })
   it('should be handle the mutation state when mutation has state', async () => {
     const resolves = []
     const MaRjState = rj({
