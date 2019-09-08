@@ -1499,6 +1499,73 @@ describe('RJ side effect model', () => {
     expect(customMockTakeEffect).toHaveBeenCalledTimes(1)
   })
 
+  it('emit successCallback along action when SUCCESS is produced', async () => {
+    const mockCallback = jest.fn()
+    const mockApiResult = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
+    const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
+
+    const { makeRxObservable } = rj({
+      effect: mockApi,
+    })
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+
+    const onSuccess = () => {}
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {
+        onSuccess: onSuccess,
+      },
+    })
+
+    await mockApi.mock.results[0].value
+
+    expect(mockCallback).nthCalledWith(3, {
+      type: SUCCESS,
+      payload: { data: mockApiResult, params: [] },
+      meta: {},
+      successCallback: onSuccess,
+    })
+  })
+
+  it('emit failureCallback along action when SUCCESS is produced', async () => {
+    const mockCallback = jest.fn()
+    const mockApi = jest.fn().mockRejectedValueOnce('Fuck')
+
+    const { makeRxObservable } = rj({
+      effect: mockApi,
+    })
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+
+    const onFailure = () => {}
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {
+        onFailure: onFailure,
+      },
+    })
+
+    try {
+      await mockApi.mock.results[0].value
+    } catch {}
+
+    expect(mockCallback).nthCalledWith(3, {
+      type: FAILURE,
+      payload: 'Fuck',
+      meta: {},
+      failureCallback: onFailure,
+    })
+  })
+
   it('should apply effect caller recursive', done => {
     const mockApi = jest.fn().mockResolvedValueOnce(['GioVa'])
     const mockCallback = jest.fn()
