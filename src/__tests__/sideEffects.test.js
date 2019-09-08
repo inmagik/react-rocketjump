@@ -1532,7 +1532,7 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('emit failureCallback along action when SUCCESS is produced', async () => {
+  it('emit failureCallback along action when FAILURE is produced', async () => {
     const mockCallback = jest.fn()
     const mockApi = jest.fn().mockRejectedValueOnce('Fuck')
 
