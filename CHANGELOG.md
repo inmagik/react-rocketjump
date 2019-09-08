@@ -14,7 +14,7 @@ Later when you define your rjs you can refer to them in your configuration, usin
 
 When rj encounter the special `rj.configured()` the configuration option will become lazy and the recursion will execute when rj mounts and have access to `<ConfigureRj />` context.
 
-Thanks to this you can place your configured `effectCaller` where do you want in recursion chain:
+Thanks to this you can place your configured `effectCaller` where do you want in the recursion chain:
 
 ```js
 <ConfigureRj effectCaller={myCustomEffectCaller}>
