@@ -101,7 +101,7 @@ function makeMutationReducer(mutation, name) {
     if (action.type === INIT) {
       return mutation.reducer(state, action)
     }
-    const pieces = action.type.split('/')
+    const pieces = (action.type || '').split('/')
     if (pieces.length !== 3) {
       return state
     }
