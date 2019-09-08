@@ -26,14 +26,14 @@ export default function useMiniRedux(
   // emits effect actions
   // pass through rj effect config for example { ...takeEffect: 'every' }
   // make new observable
-  // $dispatchIntoReducer = makeObservable(EFFECT_ACTION$, ...)
+  // dispatchIntoReducer$ = makeObservable(EFFECT_ACTION$, ...)
   // the new observable dispatch the emitted actions into react useReducer state
-  // $dispatchIntoReducer.subscribe(action => dispatch(action))
+  // dispatchIntoReducer$.subscribe(action => dispatch(action))
   const actionSubject = useConstant(() => new Subject())
   const action$ = useConstant(() => actionSubject.asObservable())
 
   // STATE$
-  // emits state updates
+  // emits state updates (used to build the $dispatchIntoReducer Observable)
   const stateSubject = useConstant(() => new ReplaySubject())
   const state$ = useConstant(() => stateSubject.asObservable())
 
@@ -53,8 +53,25 @@ export default function useMiniRedux(
     // emit first state update
     emitStateUpdate(initialState)
     if (process.env.NODE_ENV !== 'production') {
-      // when not in production keep a counter of dispatched actions
+      // In DEV call the debug emitter
       debugEmitter.onStateInitialized(initialState)
+      // NOTE
+      // First this mad shit happends only in DEV
+      // Second the reason of this magic shit is because
+      // call the reducer often than dispatch so logging the exact
+      // sequence is impossible but sinch the purity nature of reducers
+      // react call the reducer with the prev state and the exact sequence
+      // and can do it based on the assumption of the purity of the reducer
+      // so keeping an index in react state can helps us detect if the action
+      // is alredy been dispatched and react simply re call the reducer to
+      // have the state up date to render.
+      // i am not to much secure of my toughts but if you back to point
+      // one this stuff in only in DEV and don't change the other behaviur
+      // of how the state bheave.
+      // the original ideas was from Albi 1312.
+      //
+      // kepp a reference of current "dispatch index"
+      // and the same value in reducer state
       state$.__dispatchIndex = 0
       return { idx: 0, state: initialState }
     } else {
@@ -72,24 +89,35 @@ export default function useMiniRedux(
     if (process.env.NODE_ENV !== 'production') {
       const nextState = reducer(prevState.state, action)
       emitStateUpdate(nextState)
+      // The reducer always update the state and remain a pure function
       const idx = prevState.idx + 1
+      // if the new dispatch index is greater is a new action
       if (idx > state$.__dispatchIndex) {
+        // Emit the debug hook
         debugEmitter.onActionDispatched(action, prevState.state, nextState)
+        // keep the index at the last version
         state$.__dispatchIndex = idx
       }
+      // Always update the state in the same way a pure function lol
       return { idx, state: nextState }
     }
+    // in prod simply run the reducer and emit the state updates
     const nextState = reducer(prevState, action)
     emitStateUpdate(nextState)
     return nextState
   }
+
   const [stateAndIdx, dispatch] = useReducer(
     proxyReducer,
-    undefined,
+    undefined, // the first argument of reducer is undefined in the redux way
     initReducer
   )
   const state =
-    process.env.NODE_ENV !== 'production' ? stateAndIdx.state : stateAndIdx
+    process.env.NODE_ENV !== 'production'
+      ? // Grab the piece of original state
+        stateAndIdx.state
+      : // No need in prod is directly the state
+        stateAndIdx
 
   const extraConfig = useContext(ConfigureRjContext)
   const subscription = useConstant(() => {
