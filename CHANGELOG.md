@@ -1,3 +1,44 @@
+## 1.2.0
+###### *September 4, 2019*
+
+### :bangbang: Breaking changes
+
+Changed how `<ConfigureRj />` works.
+
+Before `effectCaller` in `<ConfigureRj />` will replace the rj `effectCaller` unless you explicit define them in rj configuration.
+
+This behavior was not enough flexible, so we introduced the ability of rj configuration to be lazy, for now we apply them only to `effectCaller` config option.
+
+Now when you define the `effectcaller` in `<ConfigureRj />` you enable a lazy configuration value.
+Later when you define your rjs you can refer to them in your configuration, using the speical syntax `rj.configured()`.
+
+When rj encounter the special `rj.configured()` the configuration option will become lazy and the recursion will execute when rj mounts and have access to `<ConfigureRj />` context.
+
+Thanks to this you can place your configured `effectCaller` where do you want in recursion chain:
+
+```js
+<ConfigureRj effectCaller={myCustomEffectCaller}>
+    /* This is the scope where the lazy effect caller is enabled */
+</ConfigureRj>
+```
+
+```js
+rj(
+  {
+    effectCaller: myEffectCallerA,
+    // ... rj config ...
+  }
+  {
+    effectCaller: rj.configured(),
+    // ... rj config ...
+  },
+  {
+    effectCaller: myEffectCallerB,
+    // ... rj config ...
+  }
+)
+```
+
 ## 1.1.0
 ###### *July 16, 2019*
 
