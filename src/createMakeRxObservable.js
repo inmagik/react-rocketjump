@@ -1,10 +1,5 @@
 import { of, from, concat, throwError } from 'rxjs'
-import {
-  map,
-  // concatMap,
-  catchError,
-  tap,
-} from 'rxjs/operators'
+import { map, catchError } from 'rxjs/operators'
 import { squashExportValue } from 'rocketjump-core'
 import { SUCCESS, FAILURE, PENDING } from './actionTypes'
 import { arrayze } from 'rocketjump-core/utils'
@@ -65,6 +60,8 @@ export default function createMakeRxObservable(
             type: prefix + SUCCESS,
             payload: { data, params },
             meta,
+            // Callback runned from the subscribtion in the react hook
+            successCallback: callbacks.onSuccess,
           })),
           catchError(error => {
             // Avoid headache
@@ -76,22 +73,12 @@ export default function createMakeRxObservable(
             ) {
               return throwError(error)
             }
-            return of({ type: prefix + FAILURE, payload: error, meta })
-          }),
-          tap(action => {
-            // NOTE: This code may look strange but this dragon
-            // trick is usde only 2 go to next event loop and flush
-            // all the update related to dispatch maybe in future
-            // implement somenthing like onPreSuccess onPostSuccess
-            // but for now i think the most common use cases is to
-            // have all the state related to SUCCESS/FAILURE apllied
-            Promise.resolve().then(() => {
-              if (action.type === prefix + SUCCESS && callbacks.onSuccess) {
-                callbacks.onSuccess(action.payload.data)
-              }
-              if (action.type === prefix + FAILURE && callbacks.onFailure) {
-                callbacks.onFailure(action.payload)
-              }
+            return of({
+              type: prefix + FAILURE,
+              payload: error,
+              meta,
+              // Callback runned from the subscribtion in the react hook
+              failureCallback: callbacks.onFailure,
             })
           })
         )

@@ -98,7 +98,28 @@ export default function useMiniRedux(
       action$,
       state$,
       extraConfig ? extraConfig.effectCaller : undefined
-    ).subscribe(dispatch)
+    ).subscribe(action => {
+      // Erase callbacks before dispatch on reducer
+      let successCallback
+      if (action.successCallback) {
+        successCallback = action.successCallback
+        delete action.successCallback
+      }
+      let failureCallback
+      if (action.failureCallback) {
+        failureCallback = action.failureCallback
+        delete action.failureCallback
+      }
+      // Dispatch the cleaned action
+      dispatch(action)
+      // Run the callbacks if needed
+      if (successCallback) {
+        successCallback(action.payload.data)
+      }
+      if (failureCallback) {
+        failureCallback(action.payload)
+      }
+    })
   })
 
   // On unmount unsub
