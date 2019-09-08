@@ -636,8 +636,11 @@ describe('RJ Debugger', () => {
       effect,
     })
 
-    renderHook(() => useRj(maRjState))
-
+    const { result } = renderHook(() => useRj(maRjState))
+    expect(mockCallback).toBeCalledTimes(0)
+    await act(async () => {
+      result.current[1].run()
+    })
     expect(mockCallback).toBeCalledTimes(0)
   })
 })
