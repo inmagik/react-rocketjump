@@ -25,7 +25,7 @@ function makeActionCreator(name, mutation) {
 // Inject the special state() function on mutations action creators
 function makeInjectMutationsStateInActions(hasMutationsState) {
   // Nothing 2 DO
-  if (!hasMutationsState) return
+  if (!hasMutationsState && process.env.NODE_ENV === 'production') return
   // Inject!
   return (actions, state) => {
     const actionsKeys = Object.keys(actions)

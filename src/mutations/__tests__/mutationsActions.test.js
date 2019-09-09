@@ -103,6 +103,26 @@ describe('RJ mutations action creators', () => {
     expect(spy.mock.calls[0][0]).toMatch(/\[react-rocketjump\] @mutations/)
   })
 
+  it('should be warn when try to get the state from a mutation without state', async () => {
+    const spy = jest.fn()
+
+    console.warn = spy
+    const MaRjState = rj({
+      mutations: {
+        killHumans: {
+          effect: () => {},
+          updater: () => {},
+        },
+      },
+      effect: () => Promise.resolve(1312),
+    })
+
+    const { result } = renderHook(() => useRj(MaRjState))
+    result.current[1].killHumans.state()
+
+    expect(spy.mock.calls[0][0]).toMatch(/\[react-rocketjump\] @mutations/)
+  })
+
   it('should be handle the mutation state when mutation has state', async () => {
     const resolves = []
     const MaRjState = rj({

@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs'
 import rj from '../../rj'
-import { RUN, SUCCESS, FAILURE, PENDING } from '../../actionTypes'
+import { RUN, SUCCESS, PENDING } from '../../actionTypes'
 
 const MUTATION_PREFIX = '@MUTATION'
 
