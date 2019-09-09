@@ -1,8 +1,12 @@
+import React from 'react'
 import rj from '../../rj'
 import useRj from '../../useRj'
+import connectRj from '../../connectRj'
 import { SUCCESS, FAILURE, PENDING } from '../../actionTypes'
 import { isEffectAction } from '../../actionCreators'
 import { renderHook, act } from '@testing-library/react-hooks'
+import { render } from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
 
 const MUTATION_PREFIX = '@MUTATION'
 
@@ -74,6 +78,7 @@ describe('RJ mutations action creators', () => {
     })
     expect(isEffectAction(action)).toBe(true)
   })
+
   it('should be warn when a mutation override existing action creator', async () => {
     const spy = jest.fn()
 
@@ -97,6 +102,7 @@ describe('RJ mutations action creators', () => {
 
     expect(spy.mock.calls[0][0]).toMatch(/\[react-rocketjump\] @mutations/)
   })
+
   it('should be handle the mutation state when mutation has state', async () => {
     const resolves = []
     const MaRjState = rj({
@@ -134,5 +140,33 @@ describe('RJ mutations action creators', () => {
     expect(result.current[1].killHumans.state()).toEqual({
       pending: false,
     })
+  })
+
+  it('should be handle the mutation state when mutation has state even with connectRj', async () => {
+    const effect = () => Promise.resolve(23)
+    const MaRjState = rj({
+      mutations: {
+        killHumans: {
+          effect: () => Promise.resolve(1312),
+          updater: () => {},
+          reducer: () => ({
+            magik: 23,
+          }),
+        },
+      },
+      effect,
+    })
+
+    let TreeWithConnect = ({ killHumans }) => {
+      const { magik } = killHumans.state()
+      return (
+        <div>
+          <div data-testid="magik">{magik}</div>
+        </div>
+      )
+    }
+    TreeWithConnect = connectRj(MaRjState)(TreeWithConnect)
+    const { getByTestId } = render(<TreeWithConnect />)
+    expect(getByTestId('magik')).toHaveTextContent('23')
   })
 })
