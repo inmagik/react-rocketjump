@@ -2,7 +2,10 @@ import { forgeRocketJump, isPartialRj, isObjectRj } from 'rocketjump-core'
 import makeExport from './export'
 import createMakeRxObservable from './createMakeRxObservable'
 import createComputeState from './createComputeState'
-import { enhanceFinalExportWithMutations } from './mutations/index'
+import {
+  enhanceFinalExportWithMutations,
+  checkMutationsConfig,
+} from './mutations/index'
 
 function shouldRocketJump(partialRjsOrConfigs) {
   let hasEffectConfigured = false
@@ -27,6 +30,7 @@ function shouldRocketJump(partialRjsOrConfigs) {
         }
         hasEffectConfigured = true
       }
+      checkMutationsConfig(partialRjOrConfig)
       continue
     }
     // A function effect

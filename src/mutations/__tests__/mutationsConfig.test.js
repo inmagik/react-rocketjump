@@ -80,4 +80,60 @@ describe('RJ mutations config', () => {
       })
     }).not.toThrowError()
   })
+  it('should get angry when mutations is not defined along with effect', () => {
+    expect(() => {
+      rj({
+        mutations: {
+          giova: {
+            effect: () => Promise.resolve(1312),
+            updater: () => {},
+          },
+        },
+      })
+    }).toThrowError()
+
+    expect(() => {
+      rj(
+        {
+          mutations: {
+            rinne: {
+              effect: () => Promise.resolve(1312),
+              updater: () => {},
+            },
+          },
+        },
+        {
+          mutations: {
+            giova: {
+              effect: () => Promise.resolve(1312),
+              updater: () => {},
+            },
+          },
+          effect: () => {},
+        }
+      )
+    }).toThrowError()
+
+    expect(() => {
+      rj(
+        rj({
+          mutations: {
+            rinne: {
+              effect: () => Promise.resolve(1312),
+              updater: () => {},
+            },
+          },
+        }),
+        {
+          mutations: {
+            giova: {
+              effect: () => Promise.resolve(1312),
+              updater: () => {},
+            },
+          },
+          effect: () => {},
+        }
+      )
+    }).toThrowError()
+  })
 })

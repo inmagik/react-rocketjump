@@ -192,27 +192,34 @@ function enancheComputeState(hasMutationsState, computeState) {
   return (state, selectors) => computeState(state.root, selectors)
 }
 
-export function enhanceMakeExportWithMutations(rjConfig, extendExport) {
-  // Default no mutations
-  let mutations = null
-  if (extendExport.mutations) {
-    // Continue the export
-    mutations = extendExport.mutations
+export function checkMutationsConfig(rjConfig) {
+  if (
+    typeof rjConfig.mutations === 'object' &&
+    rjConfig.mutations !== null &&
+    typeof rjConfig.effect !== 'function'
+  ) {
+    throw new Error(
+      '[react-rocketjump] @mutations must be defined along with effect, ' +
+        'please check your config.'
+    )
   }
+}
+
+export function enhanceMakeExportWithMutations(rjConfig, extendExport) {
+  // Set mutations config
   if (rjConfig.mutations) {
-    // Merge given mutations \w prev mutations
-    mutations = { ...mutations, ...rjConfig.mutations }
+    return {
+      ...extendExport,
+      mutations: rjConfig.mutations,
+    }
   }
 
-  return {
-    ...extendExport,
-    mutations,
-  }
+  return extendExport
 }
 
 export function enhanceFinalExportWithMutations(rjObject) {
   const { mutations, ...rjEnhancedObject } = rjObject
-  if (mutations === null) {
+  if (!mutations) {
     return rjEnhancedObject
   }
 
