@@ -10,6 +10,10 @@ export const Socio = rj(() => Promise.resolve(23))
 export const TodosListState = rj(rjPlainList(), {
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
   mutations: {
+    cleanShit: {
+      effect: () => Promise.resolve([]),
+      updater: 'updateData',
+    },
     addStupidTodo: rj.mutation.single({
       effect: todo =>
         request

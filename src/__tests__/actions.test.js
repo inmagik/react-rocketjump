@@ -3,7 +3,7 @@ import { act } from 'react-dom/test-utils'
 import { rj as reactRj, connectRj } from '..'
 import Enzyme, { mount, shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import { RUN, CLEAN, CANCEL, SUCCESS } from '../actionTypes'
+import { RUN, CLEAN, CANCEL, SUCCESS, UPDATE_DATA } from '../actionTypes'
 import { isEffectAction } from '../actionCreators'
 
 Enzyme.configure({ adapter: new Adapter() })
@@ -34,6 +34,7 @@ describe('React-RocketJump actions', () => {
     expect(wrapper.props()).toHaveProperty('run')
     expect(wrapper.props()).toHaveProperty('clean')
     expect(wrapper.props()).toHaveProperty('cancel')
+    expect(wrapper.props()).toHaveProperty('updateData')
   })
 
   it('should produce a good run action', async () => {
@@ -119,6 +120,28 @@ describe('React-RocketJump actions', () => {
       },
     })
     expect(isEffectAction(actionLog[0])).toBe(true)
+  })
+
+  it('should produce a good updateData action', async () => {
+    const actionLog = []
+
+    const rjState = reactRj({
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+      reducer: oldReducer =>
+        makeActionObserver(oldReducer, actionLog, [UPDATE_DATA]),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+
+    await act(async () => {
+      wrapper.prop('updateData')({ name: 'GioVa23' })
+    })
+
+    expect(actionLog[0]).toEqual({
+      type: UPDATE_DATA,
+      payload: { name: 'GioVa23' },
+    })
+    expect(isEffectAction(actionLog[0])).toBe(false)
   })
 
   it('should expose builder', () => {

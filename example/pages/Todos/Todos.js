@@ -11,7 +11,7 @@ rjLogger()
 export default function Todos() {
   const [
     { todos, loading },
-    { addStupidTodo, removeTodo, toggleTodo },
+    { addStupidTodo, removeTodo, toggleTodo, cleanShit },
   ] = useRunRj(TodosListState)
 
   const { pending: adding } = addStupidTodo.state()
@@ -21,6 +21,7 @@ export default function Todos() {
   return (
     <div className="todos">
       <h1>Ma REST Todos</h1>
+      <button onClick={() => cleanShit()}>Clean Shit</button>
       <h3>
         <a href={`${API_URL}/todos`}>
           {API_URL}

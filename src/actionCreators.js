@@ -1,4 +1,4 @@
-import { RUN, CLEAN, CANCEL } from './actionTypes'
+import { RUN, CLEAN, CANCEL, UPDATE_DATA } from './actionTypes'
 
 // Mark action for run into rx
 const EFFECT_ACTION = '@@RJ/EFFECT'
@@ -104,10 +104,16 @@ function cancel(...params) {
   return makeLibraryAction(CANCEL, ...params)
 }
 
+const updateData = data => ({
+  type: UPDATE_DATA,
+  payload: data,
+})
+
 const ActionCreators = {
   run,
   clean,
   cancel,
+  updateData,
 }
 
 export default ActionCreators

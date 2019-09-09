@@ -1,5 +1,12 @@
 import { rj } from '..'
-import { PENDING, SUCCESS, FAILURE, CLEAN, CANCEL } from '../actionTypes'
+import {
+  PENDING,
+  SUCCESS,
+  FAILURE,
+  CLEAN,
+  CANCEL,
+  UPDATE_DATA,
+} from '../actionTypes'
 
 describe('Rocketjump reducer', () => {
   it('should return the initial state', () => {
@@ -72,6 +79,26 @@ describe('Rocketjump reducer', () => {
     ).toEqual({
       pending: false,
       data: 'Yeah',
+      error: null,
+    })
+  })
+
+  it('should handle UPDATE_DATA actions', () => {
+    const prevState = {
+      pending: false,
+      data: { name: 'Albi' },
+      error: null,
+    }
+
+    const { reducer } = rj({
+      effect: () => Promise.resolve(1),
+    })
+
+    expect(
+      reducer(prevState, { type: UPDATE_DATA, payload: { name: 'GioVa' } })
+    ).toEqual({
+      pending: false,
+      data: { name: 'GioVa' },
       error: null,
     })
   })
