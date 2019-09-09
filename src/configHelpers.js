@@ -1,5 +1,5 @@
-import { RJ_CONFIG_PLACEHOLDER } from '../internals'
-import * as standardMutations from './standardMutations'
+import { RJ_CONFIG_PLACEHOLDER } from './internals'
+import * as standardMutations from './mutations/standard/index'
 
 // Placehoder for effectCaller (only it for now) in rj config
 export function configured() {

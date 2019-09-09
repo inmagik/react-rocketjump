@@ -1,38 +1,5 @@
-import { SUCCESS, FAILURE, PENDING } from '../actionTypes'
+import { SUCCESS, FAILURE, PENDING } from '../../actionTypes'
 import immutable from 'object-path-immutable'
-
-function singleMutationReducer(
-  state = { pending: false, error: null },
-  action
-) {
-  switch (action.type) {
-    case PENDING:
-      return {
-        ...state,
-        error: null,
-        pending: true,
-      }
-    case FAILURE:
-      return {
-        ...state,
-        error: action.payload,
-        pending: false,
-      }
-    case SUCCESS:
-      return {
-        ...state,
-        pending: false,
-      }
-    default:
-      return state
-  }
-}
-
-export const single = mutation => ({
-  reducer: singleMutationReducer,
-  takeEffect: 'exhaust',
-  ...mutation,
-})
 
 function makeMultiMutationReducer(makeKey) {
   return (state = { pendings: {}, errors: {} }, action) => {
@@ -70,8 +37,10 @@ function makeMultiMutationReducer(makeKey) {
   }
 }
 
-export const multi = (makeKey, mutation) => ({
-  reducer: makeMultiMutationReducer(makeKey),
-  takeEffect: ['groupByExhaust', action => makeKey(...action.meta.params)],
-  ...mutation,
-})
+export default function multi(makeKey, mutationConfig) {
+  return {
+    reducer: makeMultiMutationReducer(makeKey),
+    takeEffect: ['groupByExhaust', action => makeKey(...action.meta.params)],
+    ...mutationConfig,
+  }
+}
