@@ -19,7 +19,7 @@ function makeMultiMutationReducer(makeKey) {
         return {
           errors: {
             ...state.errors,
-            [key]: action.payload.params,
+            [key]: action.payload,
           },
           pendings: immutable.del(state.pendings, key),
         }
