@@ -134,6 +134,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
 
   const finalExport = {
     ...rjExport,
+    computed,
     computeState,
     makeRxObservable,
   }

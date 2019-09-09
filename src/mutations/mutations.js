@@ -2,6 +2,7 @@ import createMakeRxObservable from '../createMakeRxObservable'
 import { makeLibraryAction } from '../actionCreators'
 import { RUN, SUCCESS, INIT } from '../actionTypes'
 import combineReducers from '../combineReducers'
+import { get } from '../helpers'
 
 const MUTATION_PREFIX = `@MUTATION`
 
@@ -182,14 +183,47 @@ function enhanceMakeObservable(mutations, makeObservable) {
   }
 }
 
-function enancheComputeState(hasMutationsState, computeState) {
+function createWithMutationsComputeState(computed) {
+  const computedKeys = Object.keys(computed)
+  const mutationsSelectors = computedKeys
+    .filter(k => k.indexOf('@mutation') === 0)
+    .reduce((selectors, k) => {
+      // TODO: Check in DEV
+      const path = k.substr(k.indexOf('.') + 1)
+      return {
+        ...selectors,
+        [k]: state => get(state, path),
+      }
+    }, {})
+
+  return function computeState(state, selectors) {
+    return computedKeys.reduce((computedState, selectorName) => {
+      const keyName = computed[selectorName]
+      if (mutationsSelectors[selectorName]) {
+        const mutationSelector = mutationsSelectors[selectorName]
+        return {
+          ...computedState,
+          [keyName]: mutationSelector(state.mutations),
+        }
+      }
+      const selector = selectors[selectorName]
+      return {
+        ...computedState,
+        [keyName]: selector(state.root),
+      }
+    }, {})
+  }
+}
+
+function enancheComputeState(hasMutationsState, computeState, computed) {
   if (!hasMutationsState) {
     return computeState
   }
   if (!computeState) {
     return state => state.root
   }
-  return (state, selectors) => computeState(state.root, selectors)
+  const withMutationsComputeState = createWithMutationsComputeState(computed)
+  return (state, selectors) => withMutationsComputeState(state, selectors)
 }
 
 export function checkMutationsConfig(rjConfig) {
@@ -218,7 +252,7 @@ export function enhanceMakeExportWithMutations(rjConfig, extendExport) {
 }
 
 export function enhanceFinalExportWithMutations(rjObject) {
-  const { mutations, ...rjEnhancedObject } = rjObject
+  const { mutations, computed, ...rjEnhancedObject } = rjObject
   if (!mutations) {
     return rjEnhancedObject
   }
@@ -249,7 +283,11 @@ export function enhanceFinalExportWithMutations(rjObject) {
   return {
     ...rjEnhancedObject,
     injectStateInActions: makeInjectMutationsStateInActions(hasMutationsState),
-    computeState: enancheComputeState(hasMutationsState, computeState),
+    computeState: enancheComputeState(
+      hasMutationsState,
+      computeState,
+      computed
+    ),
     reducer: withMutationsReducer,
     actionCreators: enhanceActionCreators(mutations, actionCreators),
     makeRxObservable: enhanceMakeObservable(mutations, makeRxObservable),

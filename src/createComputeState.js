@@ -4,8 +4,7 @@ export default function createComputeState(computed) {
     return null
   }
   // Pre calculate computed keys 2 speed up computeState function
-  let computedKeys = null
-  computedKeys = Object.keys(computed)
+  const computedKeys = Object.keys(computed)
 
   /**
     Compute state according 2 computed config merged by:

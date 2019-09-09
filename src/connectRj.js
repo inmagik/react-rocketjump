@@ -26,7 +26,6 @@ export default function connectRj(
         reducer,
         makeSelectors,
         computeState,
-        injectStateInActions,
       } = rjObject
 
       const rjDebugInfo = rjObject.__rjconfig
@@ -64,10 +63,6 @@ export default function connectRj(
       const boundActionCreators = useMemo(() => {
         return bindActionCreators(mapActionsToProps(actionCreators), dispatch)
       }, [dispatch, actionCreators])
-
-      if (injectStateInActions && typeof injectStateInActions === 'function') {
-        injectStateInActions(boundActionCreators, state)
-      }
 
       return (
         <WrappedComponent
