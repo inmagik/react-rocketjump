@@ -6,16 +6,12 @@ import { isEffectAction } from './actionCreators'
 import createRjDebugEmitter from './debugger/emitter'
 import { INIT } from './actionTypes'
 
-const NoMutationState = {}
-
 // A "mini" redux
 // a reducer for handle state
 // and the roboust rxjs to handle complex side effecs in a pure, declarative, fancy way!
 export default function useMiniRedux(
   reducer,
   makeObservable,
-  // the rj has at least one mutations state?
-  hasMutationsState,
   // debug information used as dev hints and other
   debugInfo
 ) {
@@ -169,8 +165,5 @@ export default function useMiniRedux(
     }
   })
 
-  const mainState = hasMutationsState ? state.root : state
-  const mutationsState = hasMutationsState ? state.mutations : NoMutationState
-
-  return [mainState, mutationsState, dispatchWithEffect]
+  return [state, dispatchWithEffect]
 }

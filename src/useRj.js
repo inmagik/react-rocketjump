@@ -3,7 +3,6 @@ import { isObjectRj } from 'rocketjump-core'
 import { useConstant } from './hooks'
 import useMiniRedux from './useMiniRedux'
 import bindActionCreators from './bindActionCreators'
-import { injectMutationsStateInActions } from './mutations'
 
 export default function useRj(
   // The returned value of rj(..., EFFECT)
@@ -21,15 +20,11 @@ export default function useRj(
     reducer,
     makeSelectors,
     computeState,
-    hasMutationsState,
+    injectStateInActions,
   } = rjObject
 
-  const [state, mutationsState, dispatch] = useMiniRedux(
-    reducer,
-    makeRxObservable,
-    hasMutationsState,
-    rjObject.__rjconfig
-  )
+  const rjDebugInfo = rjObject.__rjconfig
+  const [state, dispatch] = useMiniRedux(reducer, makeRxObservable, rjDebugInfo)
 
   const memoizedSelectors = useConstant(() => {
     if (
@@ -55,8 +50,8 @@ export default function useRj(
     return bindActionCreators(actionCreators, dispatch)
   }, [actionCreators, dispatch])
 
-  if (hasMutationsState) {
-    injectMutationsStateInActions(boundActionCreators, mutationsState)
+  if (injectStateInActions && typeof injectStateInActions === 'function') {
+    injectStateInActions(boundActionCreators, state)
   }
 
   return [derivedState, boundActionCreators]

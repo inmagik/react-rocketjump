@@ -23,28 +23,33 @@ function makeActionCreator(name, mutation) {
 }
 
 // Inject the special state() function on mutations action creators
-export function injectMutationsStateInActions(actions, state) {
-  const actionsKeys = Object.keys(actions)
-  for (let i = 0; i < actionsKeys.length; i++) {
-    const name = actionsKeys[i]
-    const action = actions[name]
-    if (action.__rjMutation) {
-      if (action.__rjMutation.hasState) {
-        action.state = () => state[name]
-      } else if (process.env.NODE_ENV !== 'production') {
-        // In dev only print warn if U try to access state of a mutation
-        // without state this help monkeys cathing mis config errors quickly
-        action.state = () => {
-          console.warn(
-            `[react-rocketjump] @mutations WARNING you try to access the ` +
-              `state of mutation [${name}] with no state, please declaring a ` +
-              `reducer in the [${name}] mutation config.`
-          )
+function makeInjectMutationsStateInActions(hasMutationsState) {
+  // Nothing 2 DO
+  if (!hasMutationsState) return
+  // Inject!
+  return (actions, state) => {
+    const actionsKeys = Object.keys(actions)
+    for (let i = 0; i < actionsKeys.length; i++) {
+      const name = actionsKeys[i]
+      const action = actions[name]
+      if (action.__rjMutation) {
+        if (action.__rjMutation.hasState) {
+          action.state = () => state.mutations[name]
+        } else if (process.env.NODE_ENV !== 'production') {
+          // In dev only print warn if U try to access state of a mutation
+          // without state this help monkeys cathing mis config errors quickly
+          action.state = () => {
+            console.warn(
+              `[react-rocketjump] @mutations WARNING you try to access the ` +
+                `state of mutation [${name}] with no state, please declaring a ` +
+                `reducer in the [${name}] mutation config.`
+            )
+          }
         }
       }
     }
+    return actions
   }
-  return actions
 }
 
 // Add specials rj mutations action creators to base rj action creators
@@ -177,12 +182,46 @@ function enhanceMakeObservable(mutations, makeObservable) {
   }
 }
 
-export function enhanceExportWithMutations(rjObject, mutations) {
-  if (mutations === null) {
-    return { ...rjObject, hasMutationsState: false }
+function enancheComputeState(hasMutationsState, computeState) {
+  if (!hasMutationsState) {
+    return computeState
+  }
+  if (!computeState) {
+    return state => state.root
+  }
+  return (state, selectors) => computeState(state.root, selectors)
+}
+
+export function enhanceMakeExportWithMutations(rjConfig, extendExport) {
+  // Default no mutations
+  let mutations = null
+  if (extendExport.mutations) {
+    // Continue the export
+    mutations = extendExport.mutations
+  }
+  if (rjConfig.mutations) {
+    // Merge given mutations \w prev mutations
+    mutations = { ...mutations, ...rjConfig.mutations }
   }
 
-  const { makeRxObservable, actionCreators, reducer } = rjObject
+  return {
+    ...extendExport,
+    mutations,
+  }
+}
+
+export function enhanceFinalExportWithMutations(rjObject) {
+  const { mutations, ...rjEnhancedObject } = rjObject
+  if (mutations === null) {
+    return rjEnhancedObject
+  }
+
+  const {
+    makeRxObservable,
+    actionCreators,
+    reducer,
+    computeState,
+  } = rjEnhancedObject
 
   const enhancedReducer = enhanceReducer(mutations, reducer, actionCreators)
   const mutationsReducer = makeMutationsReducer(mutations)
@@ -201,8 +240,9 @@ export function enhanceExportWithMutations(rjObject, mutations) {
   }
 
   return {
-    ...rjObject,
-    hasMutationsState,
+    ...rjEnhancedObject,
+    injectStateInActions: makeInjectMutationsStateInActions(hasMutationsState),
+    computeState: enancheComputeState(hasMutationsState, computeState),
     reducer: withMutationsReducer,
     actionCreators: enhanceActionCreators(mutations, actionCreators),
     makeRxObservable: enhanceMakeObservable(mutations, makeRxObservable),
