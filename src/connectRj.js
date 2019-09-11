@@ -28,7 +28,10 @@ export default function connectRj(
         computeState,
       } = rjObject
 
-      const rjDebugInfo = rjObject.__rjconfig
+      const rjDebugInfo = {
+        ...rjObject.__rjconfig,
+        wrappedComponentName: WrappedComponent.name,
+      }
       const [state, dispatch] = useMiniRedux(
         reducer,
         makeRxObservable,
@@ -73,14 +76,13 @@ export default function connectRj(
       )
     }
 
-    const Connect = React.memo(ConnectFunction)
-
     const wrappedComponentName =
       WrappedComponent.displayName || WrappedComponent.name || 'Component'
 
     const displayName = `connectRj(${wrappedComponentName})`
-    Connect.displayName = displayName
+    ConnectFunction.displayName = displayName
 
+    const Connect = React.memo(ConnectFunction)
     return hoistStatics(Connect, WrappedComponent)
   }
 }

@@ -5,7 +5,7 @@ import {
   RJ_TEARDOWN_EVENT,
 } from '../debugger/index'
 
-function whereMyRjIsIvoked() {
+function whereMyRjIsIvoked(wrappedComponentName) {
   const originalStackLimit = Error.stackTraceLimit
   let stack
   Error.stackTraceLimit = Infinity
@@ -25,20 +25,39 @@ function whereMyRjIsIvoked() {
     return ['', '']
   }
   stack = stack.slice(1).map(parseStackLine)
+
   let startedMainHook = false
+  const rjHooks = ['useRj', 'useRunRj']
+  let hooks = []
+  let rjFn = ''
+
+  // console.log(stack)
   for (let i = 0; i < stack.length; i++) {
     const [functionName] = stack[i]
+    // console.log(functionName)
     if (!startedMainHook && functionName === 'useMiniRedux') {
       startedMainHook = true
     } else if (startedMainHook) {
-      if (functionName.indexOf('use') !== 0) {
+      if (rjHooks.indexOf(functionName) !== -1) {
+        rjFn = functionName
+      } else if (functionName.indexOf('use') === 0) {
+        hooks.push(functionName)
+      } else {
+        // connectRj
+        if (wrappedComponentName) {
+          return {
+            component: `<${wrappedComponentName} />`,
+            hooks,
+            rjFn: 'connectRj',
+          }
+        }
         // First non hook from useMiniRedux
-        return `<${functionName} />`
+        return { component: `<${functionName} />`, hooks, rjFn }
       }
     }
   }
 
-  return ''
+  return { component: '', hooks, rjFn }
 }
 
 function getRandomColor() {
@@ -60,7 +79,9 @@ export default function rjLogger() {
 
   RjDebugEvents.subscribe(event => {
     if (event.type === RJ_INIT_EVENT) {
-      whereUsed[event.meta.trackId] = whereMyRjIsIvoked()
+      whereUsed[event.meta.trackId] = whereMyRjIsIvoked(
+        event.meta.info.wrappedComponentName
+      )
       rjLives.push(event.meta.info)
     } else if (event.type === RJ_TEARDOWN_EVENT) {
       const index = rjLives.indexOf(event.meta.info)
@@ -72,22 +93,25 @@ export default function rjLogger() {
       const color = colors[trackId % colors.length]
       const { action, prevState, nextState } = event.payload
       const rjName = info.name || `${index + 1}°`
-      const rjUsedFrom = whereUsed[trackId]
+      const { component, rjFn, hooks } = whereUsed[trackId]
 
       console.groupCollapsed(
-        `%c${rjUsedFrom}%c RJ ${rjName} %caction %c${action.type}`,
-        'color:#61dafb;background:#20232a;font-family:monospace;',
-        `color:${color}`,
+        `%c${component}%c${hooks.map(
+          h => `  ${h}()`
+        )} %c ${rjFn}(${rjName})  %caction %c${action.type}`,
+        'color: #80338a;font-weight:normal',
+        'color: #20232a;font-weight:normal',
+        `color:${color};font-weight:normal`,
         'color:grey;font-weight:lighter;',
         'color:#464646;'
       )
-      console.log(`%cprev state`, 'color: grey;font-weight:bold;', prevState)
+      console.log(`%cprev state`, 'color: grey;font-weight:normal;', prevState)
       console.log(
         `%caction ${pad(4)}`,
-        'color:deepskyblue;font-weight:bold;',
+        'color:deepskyblue;font-weight:normal;',
         action
       )
-      console.log(`%cnext state`, 'color: green;font-weight:bold;', nextState)
+      console.log(`%cnext state`, 'color: green;font-weight:normal;', nextState)
       // console.log(`%c_rj ${pad(7)}`, 'color: grey', {
       //   debugTrackId: trackId,
       //   lastRjConfig: info

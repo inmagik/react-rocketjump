@@ -72,7 +72,10 @@ describe('RJ Debugger', () => {
     expect(mockCallback).toBeCalledTimes(1)
     expect(mockCallback).nthCalledWith(1, {
       meta: {
-        info: { effect },
+        info: {
+          effect,
+          wrappedComponentName: 'TreeWithConnect',
+        },
         trackId: 0,
       },
       type: RJ_INIT_EVENT,
