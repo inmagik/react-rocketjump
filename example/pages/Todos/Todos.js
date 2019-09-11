@@ -1,35 +1,19 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import Todo from './Todo'
-import { useRunRj, useRj, rj, connectRj, ConfigureRj } from 'react-rocketjump'
-import rjLogger from 'react-rocketjump/logger'
+import { useRunRj } from 'react-rocketjump'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
 
-rjLogger()
-
-// todos, loading,
-// run,
-// addStupidTodo, removeTodo, toggleTodo, cleanShit,
-// adding,
-function Todos() {
-  // useEffect(() => {
-  //   run()
-  // }, [run])
+export default function Todos() {
   const [
     { todos, loading, adding, deleting, updating },
-    { addStupidTodo, removeTodo, toggleTodo, cleanShit },
+    { addStupidTodo, removeTodo, toggleTodo },
   ] = useRunRj(TodosListState)
-
-  console.log(updating, deleting)
-  // const { pending: adding } = addStupidTodo.state()
-  // const { pendings: deleting } = removeTodo.state()
-  // const { pendings: updating } = toggleTodo.state()
 
   return (
     <div className="todos">
       <h1>Ma REST Todos</h1>
-      <button onClick={() => cleanShit()}>Clean Shit</button>
       <h3>
         <a href={`${API_URL}/todos`}>
           {API_URL}
@@ -68,20 +52,3 @@ function Todos() {
     </div>
   )
 }
-
-export default function MySuperTodos({ children }) {
-  const callMa = (fn, ...args) => fn(23)(...args)
-
-  return (
-    <ConfigureRj effectCaller={callMa}>
-      <Todos />
-    </ConfigureRj>
-  )
-}
-
-// root.getData()
-// export default connectRj(TodosListState, (state, { getData, isPending, getRoot, getMutations }) => ({
-//   loading: isPending(getRoot(state)),
-//   todos: getData(getRoot(state)),
-//   adding: getMutations(state, 'addStupidTodo').pending,
-// }))(React.memo(Todos))
