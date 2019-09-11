@@ -5,11 +5,14 @@ import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
 
+function useXD() {
+  return useRunRj(TodosListState)
+}
 export default function Todos() {
   const [
     { todos, loading, adding, deleting, updating },
     { addStupidTodo, removeTodo, toggleTodo },
-  ] = useRunRj(TodosListState)
+  ] = useXD()
 
   return (
     <div className="todos">

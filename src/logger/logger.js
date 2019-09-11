@@ -98,9 +98,8 @@ export default function rjLogger() {
       console.groupCollapsed(
         `%c${component}%c${hooks.map(
           h => `  ${h}()`
-        )} %c ${rjFn}(${rjName})  %caction %c${action.type}`,
+        )}  ${rjFn}(${rjName})  %caction %c${action.type}`,
         'color: #80338a;font-weight:normal',
-        'color: #20232a;font-weight:normal',
         `color:${color};font-weight:normal`,
         'color:grey;font-weight:lighter;',
         'color:#464646;'
