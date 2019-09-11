@@ -1,6 +1,6 @@
 {
   "name": "react-rocketjump",
-  "version": "2.0.0-rc4",
+  "version": "2.0.0-rc5",
   "description": "Rocketjump your react! Manage state and side effects like a breeze",
   "main": "lib/index.cjs.js",
   "module": "lib/index.esm.js",
