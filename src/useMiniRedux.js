@@ -33,21 +33,10 @@ export default function useMiniRedux(
   const stateSubject = useConstant(() => new ReplaySubject())
   const state$ = useConstant(() => stateSubject.asObservable())
 
-  // Emit a state update to state$
-  // ... keep a reference of current state
-  function emitStateUpdate(nextState) {
-    if (state$.value !== nextState) {
-      state$.value = nextState
-      stateSubject.next(nextState)
-    }
-  }
-
   // Init the reducer in the REDUX way
   // pass special INIT actions and undefined to our reducer
   function initReducer(initialArg) {
     const initialState = reducer(initialArg, { type: INIT })
-    // emit first state update
-    emitStateUpdate(initialState)
     if (process.env.NODE_ENV !== 'production') {
       // In DEV call the debug emitter
       debugEmitter.onStateInitialized(initialState)
@@ -55,16 +44,16 @@ export default function useMiniRedux(
       // First this mad shit happends only in DEV
       // Second the reason of this magic shit is because
       // call the reducer often than dispatch so logging the exact
-      // sequence is impossible but sinch the purity nature of reducers
-      // react call the reducer with the prev state and the exact sequence
+      // sequence is impossible but since the purity nature of reducers
+      // react call the reducer with the prev state in the exact sequence
       // and can do it based on the assumption of the purity of the reducer
       // so keeping an index in react state can helps us detect if the action
       // is alredy been dispatched and react simply re call the reducer to
       // have the state up date to render.
       // i am not to much secure of my toughts but if you back to point
-      // one this stuff in only in DEV and don't change the other behaviur
+      // one this stuff in only in DEV and don't change the other behaviurs
       // of how the state bheave.
-      // the original ideas was from Albi 1312.
+      // the original ideas was from mad man Albi 1312.
       //
       // kepp a reference of current "dispatch index"
       // and the same value in reducer state
@@ -81,26 +70,27 @@ export default function useMiniRedux(
   // keep a reference of current state and emits state updates on observable
   // ... and call the Rj debug hooks using for example to have
   // a clear logging of state changes between times as the redux dev tools does
-  function proxyReducer(prevState, action) {
-    if (process.env.NODE_ENV !== 'production') {
-      const nextState = reducer(prevState.state, action)
-      emitStateUpdate(nextState)
-      // The reducer always update the state and remain a pure function
-      const idx = prevState.idx + 1
-      // if the new dispatch index is greater is a new action
-      if (idx > state$.__dispatchIndex) {
-        // Emit the debug hook
-        debugEmitter.onActionDispatched(action, prevState.state, nextState)
-        // keep the index at the last version
-        state$.__dispatchIndex = idx
-      }
-      // Always update the state in the same way a pure function lol
-      return { idx, state: nextState }
+  function debugReducer(prevState, action) {
+    const nextState = reducer(prevState.state, action)
+    // emitStateUpdate(nextState)
+    // The reducer always update the state and remain a pure function
+    const idx = prevState.idx + 1
+    // if the new dispatch index is greater is a new action
+    if (idx > state$.__dispatchIndex) {
+      // Emit the debug hook
+      debugEmitter.onActionDispatched(action, prevState.state, nextState)
+      // keep the index at the last version
+      state$.__dispatchIndex = idx
     }
-    // in prod simply run the reducer and emit the state updates
-    const nextState = reducer(prevState, action)
-    emitStateUpdate(nextState)
-    return nextState
+    // Always update the state in the same way a pure function lol
+    return { idx, state: nextState }
+  }
+
+  let proxyReducer
+  if (process.env.NODE_ENV === 'production') {
+    proxyReducer = reducer
+  } else {
+    proxyReducer = debugReducer
   }
 
   const [stateAndIdx, dispatch] = useReducer(
@@ -145,6 +135,15 @@ export default function useMiniRedux(
       }
     })
   })
+
+  // Emit a state update to state$
+  // ... keep a reference of current state
+  useEffect(() => {
+    if (state$.value !== state) {
+      state$.value = state
+      stateSubject.next(state)
+    }
+  }, [state, state$, stateSubject])
 
   // On unmount unsub
   useEffect(() => {
