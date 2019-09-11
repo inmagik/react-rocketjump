@@ -154,7 +154,7 @@ function makeMutationsReducer(mutations) {
 
 function enhanceMakeObservable(mutations, makeObservable) {
   const makeMutationsObsList = Object.keys(mutations).map(name => {
-    const { effect, takeEffect } = mutations[name]
+    const { effect, takeEffect, effectCaller } = mutations[name]
     const prefix = `${MUTATION_PREFIX}/${name}/`
 
     if (typeof effect !== 'function') {
@@ -169,6 +169,7 @@ function enhanceMakeObservable(mutations, makeObservable) {
         effect,
         takeEffect: takeEffect || 'every',
         effectPipeline: [],
+        effectCaller,
       },
       prefix
     )

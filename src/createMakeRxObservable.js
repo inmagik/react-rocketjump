@@ -61,7 +61,7 @@ export default function createMakeRxObservable(
             payload: { data, params },
             meta,
             // Callback runned from the subscribtion in the react hook
-            successCallback: callbacks.onSuccess,
+            successCallback: callbacks ? callbacks.onSuccess : undefined,
           })),
           catchError(error => {
             // Avoid headache
@@ -78,7 +78,7 @@ export default function createMakeRxObservable(
               payload: error,
               meta,
               // Callback runned from the subscribtion in the react hook
-              failureCallback: callbacks.onFailure,
+              failureCallback: callbacks ? callbacks.onFailure : undefined,
             })
           })
         )

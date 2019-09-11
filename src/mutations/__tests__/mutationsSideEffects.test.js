@@ -205,62 +205,59 @@ describe('RJ mutations side effect model', () => {
     })
   })
 
-  // it('should apply the mutation effect caller', done => {
-  //   const mockApi = jest.fn().mockResolvedValueOnce(['GioVa'])
-  //   const mockCallback = jest.fn()
-  //
-  //   const callerA = jest.fn((fn, ...args) => {
-  //     return fn(...args).then(a => a.concat('Skaffo'))
-  //   })
-  //
-  //   const { makeRxObservable } = rj(
-  //     {
-  //       mutations: {
-  //         killHumans: {
-  //           effect: mockApi,
-  //           updater: () => {},
-  //           effectCaller: callerA,
-  //         }
-  //       },
-  //       effect: () => {},
-  //     }
-  //   )
-  //
-  //   const subject = new Subject()
-  //   makeRxObservable(subject.asObservable()).subscribe(mockCallback)
-  //
-  //   subject.next({
-  //     type: RUN,
-  //     payload: { params: [] },
-  //     meta: {},
-  //     callbacks: {},
-  //   })
-  //
-  //   callerA.mock.results[0].value.then(() => {
-  //     expect(mockCallback).toBeCalledTimes(3)
-  //
-  //     expect(mockCallback).nthCalledWith(1, {
-  //       type: RUN,
-  //       payload: { params: [] },
-  //       meta: {},
-  //       callbacks: {},
-  //     })
-  //
-  //     expect(mockCallback).nthCalledWith(2, {
-  //       type: PENDING,
-  //       meta: {},
-  //     })
-  //
-  //     expect(mockCallback).nthCalledWith(3, {
-  //       type: SUCCESS,
-  //       meta: {},
-  //       payload: {
-  //         params: [],
-  //         data: ['GioVa', 'Skaffo'],
-  //       },
-  //     })
-  //
-  //     done()
-  //   })
-  // })
+  it('should apply the mutation effect caller', done => {
+    const mockApi = jest.fn().mockResolvedValue(['GioVa'])
+    const mockCallback = jest.fn()
+
+    const callerA = jest.fn((fn, ...args) => {
+      return fn(...args).then(a => a.concat('Skaffo'))
+    })
+
+    const { makeRxObservable } = rj({
+      mutations: {
+        killHumans: {
+          effect: mockApi,
+          updater: () => {},
+          effectCaller: callerA,
+        },
+      },
+      effect: () => {},
+    })
+
+    const subject = new Subject()
+    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+
+    subject.next({
+      type: `${MUTATION_PREFIX}/killHumans/${RUN}`,
+      payload: { params: [] },
+      meta: {},
+    })
+
+    expect(callerA).toHaveBeenCalled()
+    callerA.mock.results[0].value.then(() => {
+      expect(mockCallback).toBeCalledTimes(3)
+
+      expect(mockCallback).nthCalledWith(1, {
+        type: `${MUTATION_PREFIX}/killHumans/${RUN}`,
+        payload: { params: [] },
+        meta: {},
+      })
+
+      expect(mockCallback).nthCalledWith(2, {
+        type: `${MUTATION_PREFIX}/killHumans/${PENDING}`,
+        meta: {},
+      })
+
+      expect(mockCallback).nthCalledWith(3, {
+        type: `${MUTATION_PREFIX}/killHumans/${SUCCESS}`,
+        meta: {},
+        payload: {
+          params: [],
+          data: ['GioVa', 'Skaffo'],
+        },
+      })
+
+      done()
+    })
+  })
 })

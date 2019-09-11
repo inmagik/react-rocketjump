@@ -40,6 +40,9 @@ export const TodosListState = rj(rjPlainList(), {
     }),
   },
   computed: {
+    adding: '@mutation.addStupidTodo.pending',
+    deleting: '@mutation.removeTodo.pendings',
+    updating: '@mutation.toggleTodo.pendings',
     todos: 'getData',
     loading: 'isPending',
   },
