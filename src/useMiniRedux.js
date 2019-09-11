@@ -4,6 +4,7 @@ import { useConstant } from './hooks'
 import ConfigureRjContext from './ConfigureRjContext'
 import { isEffectAction } from './actionCreators'
 import createRjDebugEmitter from './debugger/emitter'
+import flags from './flags'
 import { INIT } from './actionTypes'
 
 // A "mini" redux
@@ -37,7 +38,12 @@ export default function useMiniRedux(
   // pass special INIT actions and undefined to our reducer
   function initReducer(initialArg) {
     const initialState = reducer(initialArg, { type: INIT })
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV === 'production') {
+      return initialState
+    } else {
+      if (!flags.debugger) {
+        return initialState
+      }
       // In DEV call the debug emitter
       debugEmitter.onStateInitialized(initialState)
       // NOTE
@@ -59,38 +65,36 @@ export default function useMiniRedux(
       // and the same value in reducer state
       state$.__dispatchIndex = 0
       return { idx: 0, state: initialState }
-    } else {
-      return initialState
     }
-  }
-
-  // Proxy the original reducer
-  // This is only a way to hook into the React updates
-  // and grab state and action to
-  // keep a reference of current state and emits state updates on observable
-  // ... and call the Rj debug hooks using for example to have
-  // a clear logging of state changes between times as the redux dev tools does
-  function debugReducer(prevState, action) {
-    const nextState = reducer(prevState.state, action)
-    // emitStateUpdate(nextState)
-    // The reducer always update the state and remain a pure function
-    const idx = prevState.idx + 1
-    // if the new dispatch index is greater is a new action
-    if (idx > state$.__dispatchIndex) {
-      // Emit the debug hook
-      debugEmitter.onActionDispatched(action, prevState.state, nextState)
-      // keep the index at the last version
-      state$.__dispatchIndex = idx
-    }
-    // Always update the state in the same way a pure function lol
-    return { idx, state: nextState }
   }
 
   let proxyReducer
   if (process.env.NODE_ENV === 'production') {
     proxyReducer = reducer
+  } else if (!flags.debugger) {
+    proxyReducer = reducer
   } else {
-    proxyReducer = debugReducer
+    // Proxy the original reducer
+    // This is only a way to hook into the React updates
+    // and grab state and action to
+    // keep a reference of current state and emits state updates on observable
+    // ... and call the Rj debug hooks using for example to have
+    // a clear logging of state changes between times as the redux dev tools does
+    proxyReducer = (prevState, action) => {
+      const nextState = reducer(prevState.state, action)
+      // emitStateUpdate(nextState)
+      // The reducer always update the state and remain a pure function
+      const idx = prevState.idx + 1
+      // if the new dispatch index is greater is a new action
+      if (idx > state$.__dispatchIndex) {
+        // Emit the debug hook
+        debugEmitter.onActionDispatched(action, prevState.state, nextState)
+        // keep the index at the last version
+        state$.__dispatchIndex = idx
+      }
+      // Always update the state in the same way a pure function lol
+      return { idx, state: nextState }
+    }
   }
 
   const [stateAndIdx, dispatch] = useReducer(
@@ -98,12 +102,17 @@ export default function useMiniRedux(
     undefined, // the first argument of reducer is undefined in the redux way
     initReducer
   )
-  const state =
-    process.env.NODE_ENV !== 'production'
-      ? // Grab the piece of original state
-        stateAndIdx.state
-      : // No need in prod is directly the state
-        stateAndIdx
+  let state
+  if (process.env.NODE_ENV === 'production') {
+    // No need in prod is directly the state
+    state = stateAndIdx
+  } else if (!flags.debugger) {
+    // No need in prod is directly the state
+    state = stateAndIdx
+  } else {
+    // Grab the piece of original state
+    state = stateAndIdx.state
+  }
 
   const extraConfig = useContext(ConfigureRjContext)
   const subscription = useConstant(() => {
@@ -139,17 +148,19 @@ export default function useMiniRedux(
   // Emit a state update to state$
   // ... keep a reference of current state
   useEffect(() => {
-    if (state$.value !== state) {
-      state$.value = state
-      stateSubject.next(state)
-    }
+    state$.value = state
+    stateSubject.next(state)
   }, [state, state$, stateSubject])
 
   // On unmount unsub
   useEffect(() => {
     return () => {
       subscription.unsubscribe()
-      debugEmitter.onTeardown()
+      if (process.env.NODE_ENV !== 'production') {
+        if (flags.debugger) {
+          debugEmitter.onTeardown()
+        }
+      }
     }
   }, [subscription, debugEmitter])
 

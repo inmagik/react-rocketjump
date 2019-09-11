@@ -7,6 +7,8 @@ import bindActionCreators from './bindActionCreators'
 export default function useRj(
   // The returned value of rj(..., EFFECT)
   rjObject,
+  // A function|undefined to select state
+  // (state, memoizedSelectors, derivedState) => newDerivedState
   selectState
 ) {
   if (!isObjectRj(rjObject)) {
@@ -22,9 +24,17 @@ export default function useRj(
     computeState,
   } = rjObject
 
+  // The last config or rj recursion rj({},rj(),..,{},{<THIS>})
+  // used as debug hints
   const rjDebugInfo = rjObject.__rjconfig
   const [state, dispatch] = useMiniRedux(reducer, makeRxObservable, rjDebugInfo)
 
+  // Bind actions \w dispatch
+  const boundActionCreators = useConstant(() => {
+    return bindActionCreators(actionCreators, dispatch)
+  }, [actionCreators, dispatch])
+
+  // Create per-rj-instance memoized selectors
   const memoizedSelectors = useConstant(() => {
     if (
       typeof selectState === 'function' ||
@@ -34,6 +44,7 @@ export default function useRj(
     }
   })
 
+  // Derive the state
   const derivedState = useMemo(() => {
     let derivedState = state
     if (typeof computeState === 'function') {
@@ -44,10 +55,6 @@ export default function useRj(
     }
     return derivedState
   }, [state, memoizedSelectors, selectState, computeState])
-
-  const boundActionCreators = useMemo(() => {
-    return bindActionCreators(actionCreators, dispatch)
-  }, [actionCreators, dispatch])
 
   // Memoize return value now can saftley used in React Context.Provider
   return useMemo(() => [derivedState, boundActionCreators], [
