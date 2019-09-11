@@ -145,6 +145,18 @@ export default function useMiniRedux(
     })
   })
 
+  // Dispatch to reducer or start an effect
+  const dispatchWithEffect = useConstant(() => action => {
+    if (isEffectAction(action)) {
+      // Emit action to given observable theese perform side
+      // effect and emit action dispatched above by subscription
+      actionSubject.next(action)
+    } else {
+      // Update the state \w given reducer
+      dispatch(action)
+    }
+  })
+
   // Emit a state update to state$
   // ... keep a reference of current state
   useEffect(() => {
@@ -163,17 +175,6 @@ export default function useMiniRedux(
       }
     }
   }, [subscription, debugEmitter])
-
-  const dispatchWithEffect = useConstant(() => action => {
-    if (isEffectAction(action)) {
-      // Emit action to given observable theese perform side
-      // effect and emit action dispatched above by subscription
-      actionSubject.next(action)
-    } else {
-      // Update the state \w given reducer
-      dispatch(action)
-    }
-  })
 
   return [state, dispatchWithEffect]
 }
