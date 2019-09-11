@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import Todo from './Todo'
-import { useRunRj, useRj, rj, connectRj } from 'react-rocketjump'
+import { useRunRj, useRj, rj, connectRj, ConfigureRj } from 'react-rocketjump'
 import rjLogger from 'react-rocketjump/logger'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
@@ -12,7 +12,7 @@ rjLogger()
 // run,
 // addStupidTodo, removeTodo, toggleTodo, cleanShit,
 // adding,
-export default function Todos() {
+function Todos() {
   // useEffect(() => {
   //   run()
   // }, [run])
@@ -66,6 +66,16 @@ export default function Todos() {
           ))}
       </div>
     </div>
+  )
+}
+
+export default function MySuperTodos({ children }) {
+  const callMa = (fn, ...args) => fn(23)(...args)
+
+  return (
+    <ConfigureRj effectCaller={callMa}>
+      <Todos />
+    </ConfigureRj>
   )
 }
 

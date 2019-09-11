@@ -1,5 +1,6 @@
 import createMakeRxObservable from '../createMakeRxObservable'
 import { makeLibraryAction } from '../actionCreators'
+import { exportEffectCaller } from '../sideEffectDescriptor'
 import { RUN, SUCCESS, INIT } from '../actionTypes'
 import combineReducers from '../combineReducers'
 import { get } from '../helpers'
@@ -240,12 +241,32 @@ export function checkMutationsConfig(rjConfig) {
   }
 }
 
+function makeMutationExport(mutation) {
+  if (mutation.effectCaller) {
+    return {
+      ...mutation,
+      effectCaller: exportEffectCaller(undefined, mutation.effectCaller),
+    }
+  }
+  return mutation
+}
+
+function makeMutationsExport(mutations) {
+  return Object.keys(mutations).reduce(
+    (mutationsExport, name) => ({
+      ...mutationsExport,
+      [name]: makeMutationExport(mutations[name]),
+    }),
+    {}
+  )
+}
+
 export function enhanceMakeExportWithMutations(rjConfig, extendExport) {
   // Set mutations config
   if (rjConfig.mutations) {
     return {
       ...extendExport,
-      mutations: rjConfig.mutations,
+      mutations: makeMutationsExport(rjConfig.mutations),
     }
   }
 

@@ -55,4 +55,8 @@ export default function useRj(
   }
 
   return [derivedState, boundActionCreators]
+  // return useMemo(
+  //   () => [derivedState, boundActionCreators],
+  //   [derivedState, boundActionCreators]
+  // )
 }

@@ -22,7 +22,7 @@ export const makeSideEffectDescriptor = () => ({
   effectPipeline: [],
 })
 
-const exportEffectCaller = makeExportValue({
+export const exportEffectCaller = makeExportValue({
   defaultValue: undefined,
   isLazy: v => v === RJ_CONFIG_PLACEHOLDER,
   shouldCompose: v => !!v,

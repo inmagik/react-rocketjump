@@ -11,7 +11,11 @@ export const TodosListState = rj(rjPlainList(), {
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
   mutations: {
     cleanShit: {
-      effect: () => Promise.resolve([]),
+      effectCaller: rj.configured(),
+      effect: t => () => {
+        console.log('MAH!', t)
+        return Promise.resolve([])
+      },
       updater: 'updateData',
     },
     addStupidTodo: rj.mutation.single({

@@ -424,6 +424,18 @@ describe('useRj', () => {
     })
   })
 
+  it('should mantein the same return instance while state remain the same', () => {
+    const MaRjState = rj(() => {})
+
+    const { result, rerender } = renderHook(() => useRj(MaRjState))
+
+    let out = result.current
+
+    rerender({ giova: 23 })
+
+    expect(out).toBe(result.current)
+  })
+
   test.todo('Test onSuccess onFailure')
 
   test.todo('Test actions')
