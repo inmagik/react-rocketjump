@@ -11,7 +11,8 @@ export default function useRunRj(
   shouldCleanOnNewEffect = true,
   selectState
 ) {
-  const [state, actions] = useRj(rjObject, selectState)
+  const stateAndActions = useRj(rjObject, selectState)
+  const actions = stateAndActions[1]
   const { run, clean } = actions
 
   useEffect(() => {
@@ -28,5 +29,5 @@ export default function useRunRj(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clean, run, shouldCleanOnNewEffect, ...runArgs])
 
-  return [state, actions]
+  return stateAndActions
 }

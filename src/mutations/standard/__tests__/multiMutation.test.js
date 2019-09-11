@@ -23,10 +23,13 @@ describe('Rj multi mutation', () => {
         }),
       },
       effect: () => {},
+      computed: {
+        submitFormState: '@mutation.submitForm',
+      },
     })
 
     const { result } = renderHook(() => useRj(MaRjState))
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pendings: {},
       errors: {},
     })
@@ -36,7 +39,7 @@ describe('Rj multi mutation', () => {
     })
     expect(mockEffect).toHaveBeenCalledTimes(1)
 
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pendings: {
         '23': true,
       },
@@ -47,7 +50,7 @@ describe('Rj multi mutation', () => {
       result.current[1].submitForm(23)
     })
     expect(mockEffect).toHaveBeenCalledTimes(1)
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pendings: {
         '23': true,
       },
@@ -58,7 +61,7 @@ describe('Rj multi mutation', () => {
       result.current[1].submitForm(777)
     })
     expect(mockEffect).toHaveBeenCalledTimes(2)
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pendings: {
         '23': true,
         '777': true,
@@ -69,7 +72,7 @@ describe('Rj multi mutation', () => {
     await act(async () => {
       resolves[0]('Socio')
     })
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pendings: {
         '777': true,
       },
@@ -79,7 +82,7 @@ describe('Rj multi mutation', () => {
     await act(async () => {
       resolves[1]('Matto')
     })
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pendings: {},
       errors: {},
     })
@@ -88,7 +91,7 @@ describe('Rj multi mutation', () => {
       result.current[1].submitForm(1312)
     })
     expect(mockEffect).toHaveBeenCalledTimes(3)
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pendings: {
         '1312': true,
       },
@@ -98,7 +101,7 @@ describe('Rj multi mutation', () => {
     await act(async () => {
       rejects[2]('Bleah')
     })
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pendings: {},
       errors: {
         '1312': 'Bleah',

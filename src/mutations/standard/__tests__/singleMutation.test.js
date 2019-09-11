@@ -23,10 +23,13 @@ describe('Rj single mutation', () => {
         }),
       },
       effect: () => {},
+      computed: {
+        submitFormState: '@mutation.submitForm',
+      },
     })
 
     const { result } = renderHook(() => useRj(MaRjState))
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pending: false,
       error: null,
     })
@@ -35,7 +38,7 @@ describe('Rj single mutation', () => {
       result.current[1].submitForm()
     })
     expect(mockEffect).toHaveBeenCalledTimes(1)
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pending: true,
       error: null,
     })
@@ -48,7 +51,7 @@ describe('Rj single mutation', () => {
     await act(async () => {
       resolves[0]()
     })
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pending: false,
       error: null,
     })
@@ -57,14 +60,14 @@ describe('Rj single mutation', () => {
       result.current[1].submitForm()
     })
     expect(mockEffect).toHaveBeenCalledTimes(2)
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pending: true,
       error: null,
     })
     await act(async () => {
       rejects[1]('Culo')
     })
-    expect(result.current[1].submitForm.state()).toEqual({
+    expect(result.current[0].submitFormState).toEqual({
       pending: false,
       error: 'Culo',
     })

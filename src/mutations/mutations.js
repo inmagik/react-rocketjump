@@ -13,45 +13,7 @@ function makeActionCreator(name, mutation) {
     makeLibraryAction(`${MUTATION_PREFIX}/${name}/${RUN}`, ...params).withMeta({
       params,
     })
-
-  // Muation has state only when reducer is specified on it
-  const hasState = typeof mutation.reducer === 'function'
-  // Attach a special property to get the original mutation name
-  // and index the realted state
-  Object.defineProperty(actionCreator, '__rjMutation', {
-    value: { name, hasState },
-  })
   return actionCreator
-}
-
-// Inject the special state() function on mutations action creators
-function makeInjectMutationsStateInActions(hasMutationsState) {
-  // Nothing 2 DO
-  if (!hasMutationsState && process.env.NODE_ENV === 'production') return
-  // Inject!
-  return (actions, state) => {
-    const actionsKeys = Object.keys(actions)
-    for (let i = 0; i < actionsKeys.length; i++) {
-      const name = actionsKeys[i]
-      const action = actions[name]
-      if (action.__rjMutation) {
-        if (action.__rjMutation.hasState) {
-          action.state = () => state.mutations[name]
-        } else if (process.env.NODE_ENV !== 'production') {
-          // In dev only print warn if U try to access state of a mutation
-          // without state this help monkeys cathing mis config errors quickly
-          action.state = () => {
-            console.warn(
-              `[react-rocketjump] @mutations WARNING you try to access the ` +
-                `state of mutation [${name}] with no state, please declaring a ` +
-                `reducer in the [${name}] mutation config.`
-            )
-          }
-        }
-      }
-    }
-    return actions
-  }
 }
 
 // Add specials rj mutations action creators to base rj action creators
@@ -304,7 +266,6 @@ export function enhanceFinalExportWithMutations(rjObject) {
 
   return {
     ...rjEnhancedObject,
-    injectStateInActions: makeInjectMutationsStateInActions(hasMutationsState),
     computeState: enancheComputeState(
       hasMutationsState,
       computeState,

@@ -1,6 +1,5 @@
 import rj from '../../rj'
 import useRj from '../../useRj'
-import { SUCCESS, FAILURE, PENDING } from '../../actionTypes'
 import { isEffectAction } from '../../actionCreators'
 import { renderHook, act } from '@testing-library/react-hooks'
 import '@testing-library/jest-dom/extend-expect'
@@ -98,64 +97,5 @@ describe('RJ mutations action creators', () => {
     )
 
     expect(spy.mock.calls[0][0]).toMatch(/\[react-rocketjump\] @mutations/)
-  })
-
-  it('should be warn when try to get the state from a mutation without state', async () => {
-    const spy = jest.fn()
-
-    console.warn = spy
-    const MaRjState = rj({
-      mutations: {
-        killHumans: {
-          effect: () => {},
-          updater: () => {},
-        },
-      },
-      effect: () => Promise.resolve(1312),
-    })
-
-    const { result } = renderHook(() => useRj(MaRjState))
-    result.current[1].killHumans.state()
-
-    expect(spy.mock.calls[0][0]).toMatch(/\[react-rocketjump\] @mutations/)
-  })
-
-  it('should be handle the mutation state when mutation has state', async () => {
-    const resolves = []
-    const MaRjState = rj({
-      mutations: {
-        killHumans: {
-          effect: () => new Promise(r => resolves.push(r)),
-          updater: () => {},
-          reducer: (state = { pending: false }, { type }) => {
-            if (type === PENDING) {
-              return { ...state, pending: true }
-            }
-            if (type === SUCCESS || type === FAILURE) {
-              return { ...state, pending: false }
-            }
-            return state
-          },
-        },
-      },
-      effect: () => Promise.resolve(1312),
-    })
-
-    const { result } = renderHook(() => useRj(MaRjState))
-    expect(result.current[1].killHumans.state()).toEqual({
-      pending: false,
-    })
-    await act(async () => {
-      result.current[1].killHumans()
-    })
-    expect(result.current[1].killHumans.state()).toEqual({
-      pending: true,
-    })
-    await act(async () => {
-      resolves[0]()
-    })
-    expect(result.current[1].killHumans.state()).toEqual({
-      pending: false,
-    })
   })
 })

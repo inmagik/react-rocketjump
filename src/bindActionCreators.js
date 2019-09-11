@@ -178,13 +178,6 @@ function bindActionCreator(actionCreator, dispatch) {
     }
   }
 
-  // When actionCreator is a mutation re - bound the rj mutation configuration
-  if (actionCreator.__rjMutation) {
-    Object.defineProperty(out, '__rjMutation', {
-      value: actionCreator.__rjMutation,
-    })
-  }
-
   return attachBuilder(out, actionCreator, dispatch)
 }
 

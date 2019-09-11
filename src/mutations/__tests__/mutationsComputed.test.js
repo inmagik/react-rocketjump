@@ -70,5 +70,7 @@ describe('RJ mutations computed', () => {
       albi: 1312,
       ggg: { giova: 23 },
     })
+    // TODO test this shit better
+    jest.tod('Test better with actions etc ..')
   })
 })

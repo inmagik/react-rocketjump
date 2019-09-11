@@ -20,7 +20,6 @@ export default function useRj(
     reducer,
     makeSelectors,
     computeState,
-    injectStateInActions,
   } = rjObject
 
   const rjDebugInfo = rjObject.__rjconfig
@@ -50,13 +49,9 @@ export default function useRj(
     return bindActionCreators(actionCreators, dispatch)
   }, [actionCreators, dispatch])
 
-  if (injectStateInActions && typeof injectStateInActions === 'function') {
-    injectStateInActions(boundActionCreators, state)
-  }
-
-  return [derivedState, boundActionCreators]
-  // return useMemo(
-  //   () => [derivedState, boundActionCreators],
-  //   [derivedState, boundActionCreators]
-  // )
+  // Memoize return value now can saftley used in React Context.Provider
+  return useMemo(() => [derivedState, boundActionCreators], [
+    derivedState,
+    boundActionCreators,
+  ])
 }
