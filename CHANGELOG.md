@@ -76,6 +76,21 @@ function MaTodos() {
 }
 ```
 
+#### `logger` :smiling_imp:
+
+Yess, a [redux-logger](https://github.com/LogRocket/redux-logger) like logger for rj.
+
+Why a logger? Because as the grow of use of rj becames difficult to tracks and debug all the effects and the rjs state updateds. 
+
+Yes and some of us miss a tools like redux logger or redux dev tools.
+
+Yess, yess, yess the React dev tools especially the new version is AWESOME but this logger help you understand if your rj configuration and effects flows works as you want.
+
+This is what's look like:
+
+![Rj Logger Sample Screen](/assets/rj_logger_sample.png)
+
+
 
 ## 1.2.0
 ###### *September 4, 2019*
