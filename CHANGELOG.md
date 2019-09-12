@@ -88,7 +88,7 @@ Yess, yess, yess the React dev tools especially the new version is AWESOME but t
 
 This is what's look like:
 
-![Rj Logger Sample Screen](/assets/rj_logger_sample.png)
+![Rj Logger Sample Screen](/assets/logger_rj_in_console.png)
 
 
 
