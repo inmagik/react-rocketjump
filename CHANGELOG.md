@@ -1,3 +1,82 @@
+## 2.0.0
+###### *?*
+
+This release not contains breaking changes, but introduce a lot a new features, awesome stuff, some performance improvments and improve the rj stability.
+
+#### `mutations` :broken_heart: :fire: :metal:
+The main great feature of rj v2 is mutations.
+
+Mutations add an additional option to the rj config oject called `mutations` (only allowed in the last config object at the same level of `effect`), where you have to configured your mutations behaviours.
+
+What is a mutation?
+
+A mutation is simply an effect that when success update the root rj state with its result.
+
+Ok, for example take a normal rj to fetch some todos from an api.
+
+```js
+const MaTodosState = rj({
+  effect: () => fetch(`/todos`).then(r => r.json()),
+})
+```
+Now you want to toggle your todo with using api like *PATCH* `/todos/${id}`, you can write a mutation for that:
+```js
+const MaTodosState = rj({
+  mutations: {
+    toggleTodo:{
+      // The effect to perform accept the same values of rj effect () => Promise|Observable
+      effect: todo => fetch(`/todos/${todo.id}`, {
+         method: 'PATCH',
+         body: { done: !todo.done }
+      }).then(r => r.json()),
+      // A PURE function to update the main rj state called when the effect resolves|complete.
+      // (prevState, effectResult) => nextState
+      updater: (state, updatedTodo) => ({
+        ...state,
+        data: state.data.map(todo => todo.id === updatedTodo ? updatedTodo : todo),
+      })
+    } 
+  }
+  effect: () => fetch(`/todos`).then(r => r.json()),
+})
+```
+Yeah you have writed your first mutation!
+
+Ok, but how can i use mutations? 
+
+For every mutation config rj add an action creator, using the keys as names, to the action creators exported.
+
+Theese action creators trigger the `effect` defined in the corresponding mutation and when the effect succeded use the corresponding `updater` to update the state.
+
+Mutations action creators are effect actions and have the Builder as well.
+
+Mutations action creators are supported for all the React bindings `useRj`, `useRunRj` and `connectRj`.
+
+If the mutation name overwrite a preexisting action creator rj print a warn in DEV.
+
+So for example this a dub react component to toggle some todos using our RjObject:
+
+```js
+import React from 'react'
+import { useRunRj } from 'react-rocketjump'
+import { MaTodosState } from './localstate'
+
+function MaTodos() {
+  const [{ data: todos }, { toggleTodo }] = useRunRj(MaTodosState)
+  
+  return (
+    <ul>
+      {todos && todos.map(todo => (
+        <li key={todo.id} onClick={() => toggleTodo(todo)}>
+          {todo.title}{' '}{todo.done ? '√' : ''}
+        </li>
+      ))}
+    </ul>
+  )
+}
+```
+
+
 ## 1.2.0
 ###### *September 4, 2019*
 
