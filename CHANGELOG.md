@@ -90,6 +90,15 @@ This is what's look like:
 
 ![Rj Logger Sample Screen](/assets/logger_rj_in_console.png)
 
+Enable it:
+
+```js
+import rjLogger from 'react-rocketjump/logger'
+
+// The logger don't log in PRODUCTION
+// (place this before ReactDOM.render)
+rjLogger()
+```
 
 
 ## 1.2.0
