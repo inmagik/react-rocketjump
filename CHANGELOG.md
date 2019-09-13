@@ -1,16 +1,16 @@
 ## 2.0.0
 ###### *?*
 
-This release not contains breaking changes, but introduce a lot a new features, awesome stuff, some performance improvments and improve the rj stability.
+This release does not contain breaking changes, but it introduces a lot of new features, awesome stuff, some performance improvements and it improves the rj stability.
 
 #### `mutations` :broken_heart: :fire: :metal:
-The main great feature of rj v2 is mutations.
+The main great feature of rj v2 is the support for mutations.
 
-Mutations add an additional option to the rj config oject called `mutations` (only allowed in the last config object at the same level of `effect`), where you have to configured your mutations behaviours.
+Mutations add an additional option to the rj config object called `mutations` (only allowed in the last config object, as it follows the same rules of the `effect` configuration option), where you can configure your mutation behaviours.
 
 What is a mutation?
 
-A mutation is simply an effect that when success update the root rj state with its result.
+A mutation is simply an effect that, when run with a successful outcome, updates the root rj state with its result.
 
 Ok, for example take a normal rj to fetch some todos from an api.
 
@@ -19,12 +19,12 @@ const MaTodosState = rj({
   effect: () => fetch(`/todos`).then(r => r.json()),
 })
 ```
-Now you want to toggle your todo with using api like *PATCH* `/todos/${id}`, you can write a mutation for that:
+Now if you want to toggle your todo with using api like *PATCH* `/todos/${id}`, you can write a mutation:
 ```js
 const MaTodosState = rj({
   mutations: {
     toggleTodo:{
-      // The effect to perform accept the same values of rj effect () => Promise|Observable
+      // The effect to perform, it accepts the same values of rj effect () => Promise|Observable
       effect: todo => fetch(`/todos/${todo.id}`, {
          method: 'PATCH',
          body: { done: !todo.done }
@@ -40,21 +40,21 @@ const MaTodosState = rj({
   effect: () => fetch(`/todos`).then(r => r.json()),
 })
 ```
-Yeah you have writed your first mutation!
+Yeah you have written your first mutation!
 
-Ok, but how can i use mutations? 
+Ok, but how can I use mutations? 
 
-For every mutation config rj add an action creator, using the keys as names, to the action creators exported.
+For every configured mutation rj adds an action creator, using the keys as names, to the action creators bag.
 
-Theese action creators trigger the `effect` defined in the corresponding mutation and when the effect succeded use the corresponding `updater` to update the state.
+These action creators trigger the `effect` defined in the corresponding mutation and when the effect succedes they use the corresponding `updater` to update the (parent) state.
 
 Mutations action creators are effect actions and have the Builder as well.
 
 Mutations action creators are supported for all the React bindings `useRj`, `useRunRj` and `connectRj`.
 
-If the mutation name overwrite a preexisting action creator rj print a warn in DEV.
+If the mutation name overwrites a preexisting action creator rj prints a warn in DEV.
 
-So for example this a dub react component to toggle some todos using our RjObject:
+So for example this a dummy react component to toggle some todos using our RjObject:
 
 ```js
 import React from 'react'
@@ -78,19 +78,19 @@ function MaTodos() {
 
 #### `logger` :smiling_imp:
 
-Yess, a [redux-logger](https://github.com/LogRocket/redux-logger) like logger for rj.
+Yess, a [redux-logger](https://github.com/LogRocket/redux-logger) inspired logger for rj.
 
-Why a logger? Because as the grow of use of rj becames difficult to tracks and debug all the effects and the rjs state updateds. 
+Why a logger? Because as rj powered applications grow up in size, it becomes very difficult to track and debug all the effects and the rjs state updates. 
 
-Yes and some of us miss a tools like redux logger or redux dev tools.
+This, and some of us was missing a tools like redux logger or redux dev tools.
 
-Yess, yess, yess the React dev tools especially the new version is AWESOME but this logger help you understand if your rj configuration and effects flows works as you want.
+Yess, yess, yess the React dev tools, especially the new version, is AWESOME but this logger helps you understanding if your rj configuration and effects flows work as you want.
 
-This is what's look like:
+This is what it looks like:
 
 ![Rj Logger Sample Screen](/assets/logger_rj_in_console.png)
 
-Enable it:
+To enable it, just add this snippet to your `index.js`:
 
 ```js
 import rjLogger from 'react-rocketjump/logger'
@@ -108,14 +108,14 @@ rjLogger()
 
 Changed how `<ConfigureRj />` works.
 
-Before `effectCaller` in `<ConfigureRj />` will replace the rj `effectCaller` unless you explicit define them in rj configuration.
+Up to previous versions `effectCaller` in `<ConfigureRj />` was replacing the rj `effectCaller` unless you explicitly defined them in rj configuration.
 
-This behavior was not enough flexible, so we introduced the ability of rj configuration to be lazy, for now we apply them only to `effectCaller` config option.
+This behavior did not provide enough flexibility, so we introduced the ability of rj configuration to be lazy, up to now we apply it only to `effectCaller` config option.
 
 Now when you define the `effectcaller` in `<ConfigureRj />` you enable a lazy configuration value.
 Later when you define your rjs you can refer to them in your configuration, using the speical syntax `rj.configured()`.
 
-When rj encounter the special `rj.configured()` the configuration option will become lazy and the recursion will execute when rj mounts and have access to `<ConfigureRj />` context.
+When rj engine encounters the special `rj.configured()` slot, the configuration option will become lazy and the recursion will complete when rj mounts and has then access to `<ConfigureRj />` context.
 
 Thanks to this you can place your configured `effectCaller` where do you want in the recursion chain:
 
