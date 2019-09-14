@@ -44,4 +44,85 @@ describe('ConfigureRj', () => {
       data: 1312,
     })
   })
+  it('should inject the effect caller in mutations unless defined in mutation', async () => {
+    const mockEffect = jest.fn().mockResolvedValue(23)
+    const mockEffectCaller = jest.fn().mockResolvedValue(1312)
+    const mutationEffectCaller = jest.fn().mockResolvedValue(20900)
+
+    const maRjState = rj({
+      mutations: {
+        killHumans: {
+          effect: mockEffect,
+          effectCaller: mutationEffectCaller,
+          updater: 'updateData',
+        },
+      },
+      effect: () => {},
+      effectCaller: rj.configured(),
+    })
+
+    function Wrapper({ children }) {
+      return (
+        <ConfigureRj effectCaller={mockEffectCaller}>{children}</ConfigureRj>
+      )
+    }
+
+    const { result } = renderHook(() => useRj(maRjState), {
+      wrapper: Wrapper,
+    })
+
+    await act(async () => {
+      result.current[1].killHumans()
+    })
+
+    expect(mockEffect).toHaveBeenCalledTimes(0)
+    expect(mockEffectCaller).toHaveBeenCalledTimes(0)
+    expect(mutationEffectCaller).toHaveBeenCalledTimes(1)
+    expect(mutationEffectCaller).nthCalledWith(1, mockEffect)
+
+    expect(result.current[0]).toEqual({
+      pending: false,
+      error: null,
+      data: 20900,
+    })
+  })
+  it('should inject the effect caller in mutations unless set to false in mutation', async () => {
+    const mockEffect = jest.fn().mockResolvedValue(23)
+    const mockEffectCaller = jest.fn().mockResolvedValue(1312)
+
+    const maRjState = rj({
+      mutations: {
+        killHumans: {
+          effect: mockEffect,
+          effectCaller: false,
+          updater: 'updateData',
+        },
+      },
+      effect: () => {},
+      effectCaller: rj.configured(),
+    })
+
+    function Wrapper({ children }) {
+      return (
+        <ConfigureRj effectCaller={mockEffectCaller}>{children}</ConfigureRj>
+      )
+    }
+
+    const { result } = renderHook(() => useRj(maRjState), {
+      wrapper: Wrapper,
+    })
+
+    await act(async () => {
+      result.current[1].killHumans()
+    })
+
+    expect(mockEffect).toHaveBeenCalledTimes(1)
+    expect(mockEffectCaller).toHaveBeenCalledTimes(0)
+
+    expect(result.current[0]).toEqual({
+      pending: false,
+      error: null,
+      data: 23,
+    })
+  })
 })
