@@ -122,4 +122,90 @@ describe('RJ mutations computed', () => {
       kill: { pending: false },
     })
   })
+
+  it('should get angry when misconfigured mutation computed', async () => {
+    const MaRjState = rj({
+      mutations: {
+        socio: {
+          effect: () => Promise.resolve(23),
+          updater: s => s,
+        },
+      },
+      effect: () => Promise.resolve('U.u'),
+      computed: {
+        skinny: '@mutation.skinny.fulminatoDiMercurio',
+      },
+    })
+    expect(() => {
+      const { result } = renderHook(() => useRj(MaRjState))
+      // eslint-disable-next-line no-unused-vars
+      const { skinny } = result.current[0]
+    }).toThrow(/\[react-rocketjump\]/)
+  })
+
+  it('should get angry when miss mutation key of computed', async () => {
+    expect(() => {
+      rj({
+        mutations: {
+          socio: {
+            effect: () => Promise.resolve(23),
+            reducer: (s = {}) => s,
+            updater: s => s,
+          },
+        },
+        effect: () => Promise.resolve('U.u'),
+        computed: {
+          skinny: '@mutation.skinny.fulminatoDiMercurio.xd',
+        },
+      })
+    }).toThrow(/\[react-rocketjump\]/)
+  })
+
+  it('should get angry when use a mutation key of computed with no state', async () => {
+    expect(() => {
+      rj({
+        mutations: {
+          socio23: {
+            effect: () => Promise.resolve(23),
+            reducer: () => null,
+            updater: s => s,
+          },
+          socio: {
+            effect: () => Promise.resolve(23),
+            updater: s => s,
+          },
+        },
+        effect: () => Promise.resolve('U.u'),
+        computed: {
+          skinny: '@mutation.socio',
+        },
+      })
+    }).toThrow(/\[react-rocketjump\]/)
+  })
+
+  it('should get angry when use a bad computed selector', async () => {
+    const MaRjState = rj({
+      mutations: {
+        socio23: {
+          effect: () => Promise.resolve(23),
+          reducer: () => null,
+          updater: s => s,
+        },
+        socio: {
+          effect: () => Promise.resolve(23),
+          updater: s => s,
+        },
+      },
+      effect: () => Promise.resolve('U.u'),
+      computed: {
+        skinny: '@mutation.socio23',
+        giova: 'killTheMountains',
+      },
+    })
+    expect(() => {
+      const { result } = renderHook(() => useRj(MaRjState))
+      // eslint-disable-next-line no-unused-vars
+      const { skinny } = result.current[0]
+    }).toThrow(/\[react-rocketjump\]/)
+  })
 })

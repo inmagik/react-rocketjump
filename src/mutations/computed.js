@@ -1,15 +1,36 @@
 import { get } from '../helpers'
 
-function createWithMutationsComputeState(computed) {
+const COMPUTED_MUTATION_PREFIX = '@mutation'
+
+function createWithMutationsComputeState(computed, mutations) {
   const computedKeys = Object.keys(computed)
   const mutationsSelectors = computedKeys
-    .filter(k => k.indexOf('@mutation') === 0)
-    .reduce((selectors, k) => {
-      // TODO: Check in DEV
-      const path = k.substr(k.indexOf('.') + 1)
+    .filter(k => k.indexOf(COMPUTED_MUTATION_PREFIX) === 0)
+    .reduce((selectors, key) => {
+      const path = key.substr(
+        key.indexOf(COMPUTED_MUTATION_PREFIX) +
+          COMPUTED_MUTATION_PREFIX.length +
+          1
+      )
+      const firstDot = path.indexOf('.')
+      const mutationName = firstDot === -1 ? path : path.substr(0, firstDot)
+
+      // Catch bad computed config before run rj
+      if (mutations[mutationName] === undefined) {
+        throw new Error(
+          `[react-rocketjump] you specified a non existing mutation [${mutationName}] ` +
+            `in your computed config.`
+        )
+      } else if (mutations[mutationName].reducer === undefined) {
+        throw new Error(
+          `[react-rocketjump] you specified a mutation [${mutationName}] ` +
+            `with no state in your computed config.`
+        )
+      }
+
       return {
         ...selectors,
-        [k]: state => get(state, path),
+        [key]: state => get(state, path),
       }
     }, {})
 
@@ -24,6 +45,12 @@ function createWithMutationsComputeState(computed) {
         }
       }
       const selector = selectors[selectorName]
+      if (selector === undefined) {
+        throw new Error(
+          `[react-rocketjump] you specified a non existing selector [${selectorName}] ` +
+            `check your computed config.`
+        )
+      }
       return {
         ...computedState,
         [keyName]: selector(state.root),
@@ -32,13 +59,21 @@ function createWithMutationsComputeState(computed) {
   }
 }
 
-export function enancheComputeState(hasMutationsState, computeState, computed) {
+export function enancheComputeState(
+  mutations,
+  hasMutationsState,
+  computeState,
+  computed
+) {
   if (!hasMutationsState) {
     return computeState
   }
   if (!computeState) {
     return state => state.root
   }
-  const withMutationsComputeState = createWithMutationsComputeState(computed)
+  const withMutationsComputeState = createWithMutationsComputeState(
+    computed,
+    mutations
+  )
   return (state, selectors) => withMutationsComputeState(state, selectors)
 }

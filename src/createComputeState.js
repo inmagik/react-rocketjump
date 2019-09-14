@@ -29,6 +29,12 @@ export default function createComputeState(computed) {
     return computedKeys.reduce((computedState, selectorName) => {
       const keyName = computed[selectorName]
       const selector = selectors[selectorName]
+      if (selector === undefined) {
+        throw new Error(
+          `[react-rocketjump] you specified a non existing selector [${selectorName}] ` +
+            `check your computed config.`
+        )
+      }
       return {
         ...computedState,
         [keyName]: selector(state),

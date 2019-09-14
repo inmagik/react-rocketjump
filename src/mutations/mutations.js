@@ -85,6 +85,7 @@ export function enhanceFinalExportWithMutations(
   return {
     ...rjEnhancedObject,
     computeState: enancheComputeState(
+      mutations,
       hasMutationsState,
       computeState,
       computed
