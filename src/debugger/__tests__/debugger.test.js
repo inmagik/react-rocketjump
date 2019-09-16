@@ -6,6 +6,7 @@ import connectRj from '../../connectRj'
 import { renderHook, act } from '@testing-library/react-hooks'
 import { render, fireEvent, act as actForDom } from '@testing-library/react'
 import { PENDING, SUCCESS, RUN } from '../../actionTypes'
+import flags from '../../flags'
 import {
   RjDebugEvents,
   RJ_DISPATCH_EVENT,
@@ -15,13 +16,16 @@ import {
 import { testUtilResetEmmitersState } from '../../debugger/emitter'
 
 const OLD_ENV = process.env
+const OLD_FLAGS = flags
 
 beforeEach(() => {
   jest.resetModules()
+  flags.debugger = OLD_FLAGS.debugger
   process.env = { ...OLD_ENV }
 })
 
 afterEach(() => {
+  flags.debugger = OLD_FLAGS.debugger
   process.env = OLD_ENV
 })
 
@@ -631,6 +635,23 @@ describe('RJ Debugger', () => {
   })
   it("should don't emit in PRODUCTION", async () => {
     process.env.NODE_ENV = 'production'
+    const mockCallback = jest.fn()
+    RjDebugEvents.subscribe(mockCallback)
+
+    const effect = () => Promise.resolve(23)
+    const maRjState = rj({
+      effect,
+    })
+
+    const { result } = renderHook(() => useRj(maRjState))
+    expect(mockCallback).toBeCalledTimes(0)
+    await act(async () => {
+      result.current[1].run()
+    })
+    expect(mockCallback).toBeCalledTimes(0)
+  })
+  it("should don't emit in when debugger flags in disabled", async () => {
+    flags.debugger = false
     const mockCallback = jest.fn()
     RjDebugEvents.subscribe(mockCallback)
 

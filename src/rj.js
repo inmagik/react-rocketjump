@@ -134,7 +134,6 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
 
   const finalExport = {
     ...rjExport,
-    computed,
     computeState,
     makeRxObservable,
   }
@@ -149,7 +148,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
       makeRxObservable: fn,
     }
   */
-  return enhanceFinalExportWithMutations(finalExport)
+  return enhanceFinalExportWithMutations(finalExport, mergegAlongExport)
 }
 
 export default forgeRocketJump({
