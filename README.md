@@ -42,7 +42,11 @@ const TodoList = props => {
 
   // Here we use object destructuring operators to rename actions
   //    this allows to avoid name clashes and to have more auto documented code
-  const [{ data: todos, pending, error }] = useRunRj(TodosState) // Run side effects on mount only
+  const [{
+    data: todos, // <-- The result from effect, null at start
+    pending,     // <-- Is effect in pending? false at start
+    error        // <-- The eventually error from side effect, null when side effect starts 
+  }] = useRunRj(TodosState) // Run side effects on mount only
 
   return  (
     <>
