@@ -31,7 +31,7 @@ import { rj } from 'react-rocketjump'
 
 // (2) Create a RocketJump Object
 export const TodosState = rj({
-  // (3) Define your side effects.
+  // (3) Define your side effect
   // (...args) => Promise | Observable
   effect: () => fetch(`/api/todos`).then(r => r.json()),
 })
@@ -96,6 +96,7 @@ import { rj } from 'react-rocketjump'
 export const TodosState = rj({
   effect: (username = 'all') => fetch(`/api/todos/${username}`).then(r => r.json()),
 })
+
 import { useEffect } from 'react' 
 import { useRunRj } from 'react-rocketjump'
 const TodoList = ({ username }) => {
@@ -138,7 +139,9 @@ const TodoList = ({ username }) => {
 import { rj } from 'react-rocketjump'
 export const TodosState = rj({
   mutations: {
+    // Give a name to your mutation
     addTodo: {
+      // Describe the side effect
       effect: todo => fetch(`${API_URL}/todos`, {
         method: 'post',
         headers: {
@@ -146,6 +149,8 @@ export const TodosState = rj({
         },
         body: JSON.stringify(todo),
        }).then(r => r.json()),
+       // Describe how to update the state in respond of effect success
+       // (prevState, effectResult) => newState
        updater: (state, todo) => ({
         ...state,
         data: state.data.concat(todo),
@@ -155,15 +160,32 @@ export const TodosState = rj({
 
   effect: (username = 'all') => fetch(`/api/todos/${username}`).then(r => r.json()),
 })
+
 import { useEffect } from 'react' 
 import { useRunRj } from 'react-rocketjump'
 const TodoList = ({ username }) => {
-  
-   const [
+  const [
     { data: todos, pending, error },
-    { run, addTodo }  
-   ] = useRj(TodosState, [username]) 
+    {
+      run,
+      addTodo, // <-- Match the mutation name
+    }  
+  ] = useRj(TodosState, [username]) 
    
+  // Mutations actions works as run, cancel and clean
+  // trigger the realted side effects and update the state using give updater
+  function handleSubmit(values) {
+    addTodo
+      .onSuccess((newTodo) => {
+        console.log('Todo added!', newTodo)
+      })
+      .onFailire((error) => {
+        console.error("Can't add todo sorry...", error)
+      })
+      .run(values)
+  }
+  
+  // ...
 }
 ```
 
