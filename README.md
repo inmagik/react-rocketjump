@@ -54,7 +54,7 @@ const TodoList = props => {
       {pending && <div>Wait...</div>}
       <ul>
         {
-          todos !== null && // <--- null is the default data value
+          todos !== null &&
           todos.map(todo => (
           <li key={todo.id}>{todo.title}</li>
         ))}
