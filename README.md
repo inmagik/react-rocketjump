@@ -107,28 +107,63 @@ const TodoList = ({ username }) => {
   const [
     { data: todos, pending, error },
     { run }  
-   ] = useRj(TodosState, [username]) 
+  ] = useRj(TodosState, [username]) 
   
-   useEffect(() => {
+  useEffect(() => {
     if (username) {
       run(username)
     }  
-   }, [username])
+  }, [username])
    
-   function onTodosReload() {
-      // or with callbacks
-      run
-        // in callbacks is saftly to run side effects or set react state
-        // because callbacks are automatic unregistred when TodoList unmount
-        .onSuccess((todos) => {
-          console.log('Reload Y todos!', todos)
-        })
-        .onFailire((error) => {
-          console.error("Can't reload Y todos sorry...", error)
-        })
-   }
+  function onTodosReload() {
+    // or with callbacks
+    run
+      // in callbacks is saftly to run side effects or set react state
+      // because callbacks are automatic unregistred when TodoList unmount
+      .onSuccess((todos) => {
+        console.log('Reload Y todos!', todos)
+      })
+      .onFailire((error) => {
+        console.error("Can't reload Y todos sorry...", error)
+      })
+      .run()
+  }
   
   // ...
+}
+```
+
+### Mutations
+```js
+import { rj } from 'react-rocketjump'
+export const TodosState = rj({
+  mutations: {
+    addTodo: {
+      effect: todo => fetch(`${API_URL}/todos`, {
+        method: 'post',
+        headers: {
+         'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(todo),
+       }).then(r => r.json()),
+       updater: (state, todo) => ({
+        ...state,
+        data: state.data.concat(todo),
+      })
+    }
+  },
+
+  effect: (username = 'all') => fetch(`/api/todos/${username}`).then(r => r.json()),
+})
+import { useEffect } from 'react' 
+import { useRunRj } from 'react-rocketjump'
+const TodoList = ({ username }) => {
+  
+   const [
+    { data: todos, pending, error },
+    { run, addTodo }  
+   ] = useRj(TodosState, [username]) 
+   
 }
 ```
 
