@@ -26,51 +26,109 @@ yarn add react-rocketjump
 ### Your first rocket jump!
 
 ```js
-// (1) Define your customary fetching logic
-function loadTodosFromApi(params) {
-  let myHeaders = new Headers()
-
-  let config = {
-    method: 'GET',
-    headers: new Headers(),
-    body: params,
-  }
-
-  return fetch('https://myawesomehost/api/posts', config).then(response =>
-    response.json()
-  )
-}
-
-// (2) Import rocketjump (rj for friends)
+// (1) Import rocketjump (rj for friends)
 import { rj } from 'react-rocketjump'
 
-// (3) Create a RocketJump Object
+// (2) Create a RocketJump Object
 export const TodosState = rj({
-  effect: loadTodosFromApi,
+  // (3) Define your side effects.
+  // (...args) => Promise | Observable
+  effect: () => fetch(`/api/todos`).then(r => r.json()),
 })
 
 // (4) And then use it in your component
-import { useRj } from 'react-rocketjump'
+import { useRunRj } from 'react-rocketjump'
 const TodoList = props => {
 
   // Here we use object destructuring operators to rename actions
   //    this allows to avoid name clashes and to have more auto documented code
+  const [{ data: todos, pending, error }] = useRunRj(TodosState) // Run side effects on mount only
 
-  const [{ todos }, { run: loadTodos }] = useRj(
-    TodosState,
-    (state, { getData }) => ({ todos: getData(state) }), // extract data from state
+  return  (
+    <>
+      {error && <div>Got some troubles</div>}
+      {pending && <div>Wait...</div>}
+      <ul>
+        {
+          todos !== null && // <--- null is the default data value
+          todos.map(todo => (
+          <li key={todo.id}>{todo.title}</li>
+        ))}
+      </ul>
+    </>
   )
+}
+```
 
-  useEffect(() => {
-    loadTodos()
-  }, [loadTodos])
+### Trigger side effects on values changes
 
-  if (todos === null) {
-    // still loading
-    return null
-  }
+```js
+import { rj } from 'react-rocketjump'
+export const TodosState = rj({
+  effect: (username = 'all') => fetch(`/api/todos/${username}`).then(r => r.json()),
+})
 
-  return <MyTodosList todos={todos} />
+import { useRunRj } from 'react-rocketjump'
+const TodoList = ({ username }) => {
+  
+  // Every time the username changes the effect re-run
+  // the previouse effect will be canceled if in pending
+  const [
+    { data: todos, pending, error },
+    {
+      // run the sie effect
+      run,
+      // stop the side effect and clear the state
+      clean,
+      // stop the side effect
+      cancel,
+    }
+  ] = useRunRj(TodosState, [username]) 
+  
+  // ...
+}
+```
+
+### Trigger side effects when you want
+
+```js
+import { rj } from 'react-rocketjump'
+export const TodosState = rj({
+  effect: (username = 'all') => fetch(`/api/todos/${username}`).then(r => r.json()),
+})
+import { useEffect } from 'react' 
+import { useRunRj } from 'react-rocketjump'
+const TodoList = ({ username }) => {
+  
+  // useRj don't auto trigger side effects
+  // Give you the state and actions generated from the RocketJump Object
+  // is up to you to trigger sie effect
+  // useRunRj is implement with useRj and useEffect to call the run action with your deps
+  const [
+    { data: todos, pending, error },
+    { run }  
+   ] = useRj(TodosState, [username]) 
+  
+   useEffect(() => {
+    if (username) {
+      run(username)
+    }  
+   }, [username])
+   
+   function onTodosReload() {
+      // or with callbacks
+      run
+        // in callbacks is saftly to run side effects or set react state
+        // because callbacks are automatic unregistred when TodoList unmount
+        .onSuccess((todos) => {
+          console.log('Reload Y todos!', todos)
+        })
+        .onFailire((error) => {
+          console.error("Can't reload Y todos sorry...", error)
+        })
+   }
+  
+  // ...
 }
 ```
 
