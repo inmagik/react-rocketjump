@@ -271,11 +271,74 @@ Mutations actions are the standard rj shape, in plus params are default added to
 
 ##### Select the mutations state
 
-...
+When you enable mutations in your conf state your state is sliced in two parts the mutations and the root state.
+
+For select the root state, the normal rj state, you have a special selector `getRoot`,
+
+```js
+const [state, actions] = useRunRj(MaRjObject, (state, { getRoot, getData }) => ({
+  maDataKey: getData(getRoot(state)),
+}))
+```
+
+For select a specific mutation state you have another special selector `getMutation`:
+
+```js
+const [state, actions] = useRunRj(MaRjObject, (state, { getMutation }) => ({
+  pending: getMutation(state, 'mutationKey.path.to.your.state.deep.as.you.want'),
+}))
+```
 
 ##### `computed` for mutations
 
-...
+When you enable mutations state `computed` for old computed still working as exptected.
+
+This works as well:
+```js
+const MaTodosState = rj({
+  mutations: {
+    updateUserProfile:{
+      effect: newProfile => fetch(`/user`, {
+         method: 'PATCH',
+         body: newProfile,
+      }).then(r => r.json()),
+      updater: 'updateData',
+      reducer: ({ pending: false }, action) => /* reducer logic */, 
+      // ignore all the updateUserProfile() while effect is in peding
+      takeEffect: 'exhaust',
+    } 
+  },
+  effect: () => fetch(`/user`).then(r => r.json()),
+  computed: {
+    todos: 'getData', // <-- Select data from your root state
+  },
+})
+```
+
+To compute the mutation state your have a special key `@mutation` followed by the path of your mutation:
+
+```js
+const MaTodosState = rj({
+  mutations: {
+    updateUserProfile:{
+      effect: newProfile => fetch(`/user`, {
+         method: 'PATCH',
+         body: newProfile,
+      }).then(r => r.json()),
+      updater: 'updateData',
+      reducer: ({ pending: false }, action) => /* reducer logic */, 
+      // ignore all the updateUserProfile() while effect is in peding
+      takeEffect: 'exhaust',
+    } 
+  },
+  effect: () => fetch(`/user`).then(r => r.json()),
+  computed: {
+    todos: 'getData', // <-- Select data from your root state,
+    updatingProfile: '@mutation.updateUserProfile.pending',
+  },
+})
+```
+
 
 ##### The standard mutation `rj.mutation.single`
 
