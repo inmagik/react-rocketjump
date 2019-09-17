@@ -326,8 +326,7 @@ const MaTodosState = rj({
          body: newProfile,
       }).then(r => r.json()),
       updater: 'updateData',
-      reducer: ({ pending: false }, action) => /* reducer logic */, 
-      // ignore all the updateUserProfile() while effect is in peding
+      reducer: ({ pending: false }, action) => /* reducer logic */,
       takeEffect: 'exhaust',
     } 
   },
@@ -372,6 +371,15 @@ import rjLogger from 'react-rocketjump/logger'
 rjLogger()
 ```
 
+To add a name to your RocketJump Object in the logger output simply add a `name` key in your rj config:
+
+```js
+const TomatoesState = rj({
+  effect,
+  // ... rj config ...
+  name: 'Tomatoes'
+})
+```
 
 ## 1.2.0
 ###### *September 4, 2019*
