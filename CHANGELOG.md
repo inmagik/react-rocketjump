@@ -69,7 +69,18 @@ function MaTodos() {
   return (
     <ul>
       {todos && todos.map(todo => (
-        <li key={todo.id} onClick={() => toggleTodo(todo)}>
+        <li
+          key={todo.id}
+          onClick={() => {
+            toggleTodo(todo)
+            // or
+            toggleTodo
+              .onSuccess(() => {})
+              .onFailure(() => {})
+              .withMeta({})
+              .run(todo)
+          }}
+         >
           {todo.title}{' '}{todo.done ? '√' : ''}
         </li>
       ))}
@@ -178,6 +189,87 @@ const MaTodosState = rj({
   effect: () => fetch(`/user`).then(r => r.json()),
 })
 ```
+
+##### Customize mutations state shape using a `reducer`
+
+Default mutations don't have a state but sometimes is useful to track the mutation state, for example to show an indicator while saving or dispaly the error message when occurred.
+
+When you specified a `reducer` in the mutation config you enable the mutation state, your reducer is supposed to handle the standard rj actions:
+
+```js
+import { INIT, RUN, PENDING, SUCCESS, FAILURE } from 'react-rocketjump'
+```
+The actions dispatched to your reducer are only related to your mutation.
+
+Take this snippet:
+
+```js
+const MaTodosState = rj({
+  mutations: {
+    mutation1: {
+      effect,
+      updater,
+      reducer: reducer1,
+    },
+    mutation2: {
+      effect,
+      updater,
+      reducer: reducer2,
+    },
+  },
+  effect,
+})
+```
+
+The `reducer1` respond only to the action generated from `mutation1()` in the same way `reducer2` respond only to `mutation2()` actions. 
+
+Rocketjump auto namespace the action for your so you have only to responde to the standard rj actions.
+
+Mutations actions are the standard rj shape, in plus params are default added to your action metadata:
+
+```js
+{
+  type: INIT
+}
+
+{
+  type: PENDING,
+  payload: {
+    params, // the params with which your side effect was invoked
+  }
+  meta: {
+    params,
+  },
+}
+
+{
+  type: PENDING,
+  meta: {
+    params,
+  },
+}
+
+{
+  type: SUCCESS,
+  meta: {
+    params,
+  },
+  payload: {
+    data, // the result of your mutation side effect
+    params,
+  }
+}
+
+{
+  type: FAILURE,
+  meta: {
+    params,
+  },
+  payload // the rejection of your side effect
+}
+```
+
+
 
 #### `logger` :smiling_imp:
 
