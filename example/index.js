@@ -1,11 +1,12 @@
 import './index.css'
 import ReactDOM from 'react-dom'
 import React from 'react'
-import { rj } from 'react-rocketjump'
 import rjLogger from 'react-rocketjump/logger'
 import App from './App'
+// import { rj } from 'react-rocketjump'
 
-rj.flags.debugger = false
+// Disable the debugger code at all
+// rj.flags.debugger = false
 
 rjLogger()
 
