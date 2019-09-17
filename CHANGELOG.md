@@ -341,7 +341,39 @@ const MaTodosState = rj({
 
 ##### The standard mutation `rj.mutation.single`
 
-...
+Rj provide to you some standard mutations, that simply injects some defaults.
+
+The rj single mutation is mutation designed for a mutation that run one at time, for example a form submission.
+
+The default `takeEffect` is `exhaust`, and `reducer` handle a single loading/failure state with this shape:
+```js
+{
+  pending: Boolean,   // <-- Is my mutation effect in pending?
+  error: null|Error,  // <-- Last error from effect cleaned on every run.
+}
+```
+To use the single mutation:
+
+```js
+const MaTodosState = rj({
+  mutations: {
+    updateUserProfile: rj.mutation.single({
+      // takeEffect and reducer are injecte for you
+      effect: newProfile => fetch(`/user`, {
+         method: 'PATCH',
+         body: newProfile,
+      }).then(r => r.json()),
+      updater: 'updateData',
+    })
+  },
+  effect: () => fetch(`/user`).then(r => r.json()),
+  computed: {
+    todos: 'getData',
+    updatingProfile: '@mutation.updateUserProfile.pending',
+    updateProfileError: '@mutation.updateUserProfile.error',
+  },
+})
+```
 
 ##### The standard mutation `rj.mutation.multi`
 
