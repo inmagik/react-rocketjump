@@ -269,7 +269,21 @@ Mutations actions are the standard rj shape, in plus params are default added to
 }
 ```
 
+##### Select the mutations state
 
+...
+
+##### `computed` for mutations
+
+...
+
+##### The standard mutation `rj.mutation.single`
+
+...
+
+##### The standard mutation `rj.mutation.multi`
+
+...
 
 #### `logger` :smiling_imp:
 
