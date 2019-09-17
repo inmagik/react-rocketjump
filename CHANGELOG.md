@@ -377,7 +377,30 @@ const MaTodosState = rj({
 
 ##### The standard mutation `rj.mutation.multi`
 
-...
+The rj mutation multi is designed to ...
+
+```js
+const MaTodosState = rj(rjPlainList(), {
+  mutations: {
+    toggleTodo: rj.mutation.multi(
+      (todo => todo.id), // Make a string key from params
+      {
+        effect: todo => fetch(`/todos/${todo.id}`, {
+           method: 'PATCH',
+           body: { done: !todo.done }
+        }).then(r => r.json()),
+        updater: 'insertItem'
+      }
+    )
+  },
+  effect: () => fetch(`/todos`).then(r => r.json()),
+  computed: {
+    todos: 'getData',
+    savingTodos: '@mutations.toggleTodo.pendings',
+  }
+})
+```
+
 
 #### `logger` :smiling_imp:
 
