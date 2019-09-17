@@ -128,7 +128,7 @@ const TodoList = ({ username }) => {
       .onSuccess((todos) => {
         console.log('Reload Y todos!', todos)
       })
-      .onFailire((error) => {
+      .onFailure((error) => {
         console.error("Can't reload Y todos sorry...", error)
       })
       .run()
@@ -183,7 +183,7 @@ const TodoList = ({ username }) => {
       .onSuccess((newTodo) => {
         console.log('Todo added!', newTodo)
       })
-      .onFailire((error) => {
+      .onFailure((error) => {
         console.error("Can't add todo sorry...", error)
       })
       .run(values)
