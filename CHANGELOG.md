@@ -149,9 +149,9 @@ const MaTodosState = rj({
 
 ##### Mutations `effectCaller`
 
-You can speciefied a `effectCaller` to your mutation, you can use `rj.configured()` as well.
+You can speciefied an `effectCaller` to your mutation, you can use `rj.configured()` as well.
 
-If your main config has an `effectCaller` configured the mutation use it unnless an `effectCaller` is specified in the mutation config or explici set to `false`.
+If your main config has an `effectCaller` configured the mutation use it unnless an `effectCaller` is specified in the mutation config or explicit set to `false`.
 
 ```js
 const MaTodosState = rj({
