@@ -101,7 +101,9 @@ const MaTodosState = rj(rjPlainList(), {
 ##### `updateData(newData)`
 
 For help you write less code we introduced a new standard action creator `updateData` that simply update data of your rj state.
+
 This isn't an effect action so it hasn't the builder.
+
 With `updateData` you write less code in your mutations:
 
 ```js
@@ -114,6 +116,31 @@ const MaTodosState = rj({
       }).then(r => r.json()),
       // Update the state using the login from insertItem(effectResult)
       updater: 'updateData'
+    } 
+  }
+  effect: () => fetch(`/user`).then(r => r.json()),
+})
+```
+
+##### Mutations side effect model
+
+You can change the default side effect model with the same logic of main rj effect:
+
+https://inmagik.github.io/react-rocketjump/docs/api_rj#takeeffect
+
+The default side effect model applied is `every` you can change it for example:
+
+```js
+const MaTodosState = rj({
+  mutations: {
+    updateUserProfile:{
+      effect: newProfile => fetch(`/user`, {
+         method: 'PATCH',
+         body: newProfile,
+      }).then(r => r.json()),
+      updater: 'updateData',
+      // ignore all the updateUserProfile() while effect is in peding
+      takeEffect: 'exhaust',
     } 
   }
   effect: () => fetch(`/user`).then(r => r.json()),
