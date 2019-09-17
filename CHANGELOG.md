@@ -6,6 +6,8 @@ This release does not contain breaking changes, but it introduces a lot of new f
 #### `mutations` :broken_heart: :fire: :metal:
 The main great feature of rj v2 is the support for mutations.
 
+##### Basic mutations
+
 Mutations add an additional option to the rj config object called `mutations` (only allowed in the last config object, as it follows the same rules of the `effect` configuration option), where you can configure your mutation behaviours.
 
 What is a mutation?
@@ -75,6 +77,49 @@ function MaTodos() {
   )
 }
 ```
+
+##### The mutations updater
+
+The updater can also be a string with the name of action creator used to update the state, all the rj actions generated during recursion are valid action names even if come from plugins.
+
+```js
+const MaTodosState = rj(rjPlainList(), {
+  mutations: {
+    toggleTodo:{
+      effect: todo => fetch(`/todos/${todo.id}`, {
+         method: 'PATCH',
+         body: { done: !todo.done }
+      }).then(r => r.json()),
+      // Update the state using the login from insertItem(effectResult)
+      updater: 'insertItem'
+    } 
+  }
+  effect: () => fetch(`/todos`).then(r => r.json()),
+})
+```
+
+##### `updateData(newData)`
+
+For help you write less code we introduced a new standard action creator `updateData` that simply update data of your rj state.
+This isn't an effect action so it hasn't the builder.
+With `updateData` you write less code in your mutations:
+
+```js
+const MaTodosState = rj({
+  mutations: {
+    updateUserProfile:{
+      effect: newProfile => fetch(`/user`, {
+         method: 'PATCH',
+         body: newProfile,
+      }).then(r => r.json()),
+      // Update the state using the login from insertItem(effectResult)
+      updater: 'updateData'
+    } 
+  }
+  effect: () => fetch(`/user`).then(r => r.json()),
+})
+```
+
 
 #### `logger` :smiling_imp:
 
