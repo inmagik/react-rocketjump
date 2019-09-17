@@ -4,6 +4,7 @@ import { enhanceReducer, makeMutationsReducer } from './reducer'
 import { enancheComputeState } from './computed'
 import { enhanceMakeObservable } from './sideEffects'
 import { enhanceActionCreators } from './actionCreators'
+import { enhanceMakeSelectors } from './selectors'
 
 export function checkMutationsConfig(rjConfig) {
   if (
@@ -64,6 +65,7 @@ export function enhanceFinalExportWithMutations(
     actionCreators,
     reducer,
     computeState,
+    makeSelectors,
   } = rjEnhancedObject
 
   const enhancedReducer = enhanceReducer(mutations, reducer, actionCreators)
@@ -91,6 +93,7 @@ export function enhanceFinalExportWithMutations(
       computed
     ),
     reducer: withMutationsReducer,
+    makeSelectors: enhanceMakeSelectors(mutations, makeSelectors),
     actionCreators: enhanceActionCreators(mutations, actionCreators),
     makeRxObservable: enhanceMakeObservable(
       mutations,
