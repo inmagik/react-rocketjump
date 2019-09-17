@@ -38,7 +38,7 @@ const MaTodosState = rj({
         data: state.data.map(todo => todo.id === updatedTodo ? updatedTodo : todo),
       })
     } 
-  }
+  },
   effect: () => fetch(`/todos`).then(r => r.json()),
 })
 ```
@@ -93,7 +93,7 @@ const MaTodosState = rj(rjPlainList(), {
       // Update the state using the login from insertItem(effectResult)
       updater: 'insertItem'
     } 
-  }
+  },
   effect: () => fetch(`/todos`).then(r => r.json()),
 })
 ```
@@ -117,12 +117,12 @@ const MaTodosState = rj({
       // Update the state using the login from insertItem(effectResult)
       updater: 'updateData'
     } 
-  }
+  },
   effect: () => fetch(`/user`).then(r => r.json()),
 })
 ```
 
-##### Mutations side effect model
+##### Mutations side effect model `takeEffect`
 
 You can change the default side effect model with the same logic of main rj effect:
 
@@ -142,11 +142,42 @@ const MaTodosState = rj({
       // ignore all the updateUserProfile() while effect is in peding
       takeEffect: 'exhaust',
     } 
-  }
+  },
   effect: () => fetch(`/user`).then(r => r.json()),
 })
 ```
 
+##### Mutations `effectCaller`
+
+You can speciefied a `effectCaller` to your mutation, you can use `rj.configured()` as well.
+
+If your main config has an `effectCaller` configured the mutation use it unnless an `effectCaller` is specified in the mutation config or explici set to `false`.
+
+```js
+const MaTodosState = rj({
+  mutations: {
+    // mutation1 use rj.configured() as effect caller
+    mutation1: {
+      effect,
+      updater,
+    },
+    // mutation2 use myAwesomeCaller as effect caller
+    mutation2: {
+      effect,
+      updater,
+      effectCaller: myAwesomeCaller,
+    },
+    // mutation3 don't use any effect caller
+    mutation3: {
+      effect,
+      updater,
+      effectCaller: false,
+    } 
+  },
+  effectCaller: rj.configured(),
+  effect: () => fetch(`/user`).then(r => r.json()),
+})
+```
 
 #### `logger` :smiling_imp:
 
