@@ -1,5 +1,5 @@
 ## 2.0.0
-###### *?*
+###### *September 19, 2019*
 
 This release does not contain breaking changes, but it introduces a lot of new features, awesome stuff, some performance improvements and it improves the rj stability.
 
@@ -37,14 +37,14 @@ const MaTodosState = rj({
         ...state,
         data: state.data.map(todo => todo.id === updatedTodo ? updatedTodo : todo),
       })
-    } 
+    }
   },
   effect: () => fetch(`/todos`).then(r => r.json()),
 })
 ```
 Yeah you have written your first mutation!
 
-Ok, but how can I use mutations? 
+Ok, but how can I use mutations?
 
 For every configured mutation rj crafts an action creator, using the keys in the `mutations` object as names, to the action creators bag.
 
@@ -65,7 +65,7 @@ import { MaTodosState } from './localstate'
 
 function MaTodos() {
   const [{ data: todos }, { toggleTodo }] = useRunRj(MaTodosState)
-  
+
   return (
     <ul>
       {todos && todos.map(todo => (
@@ -103,7 +103,7 @@ const MaTodosState = rj(rjPlainList(), {
       }).then(r => r.json()),
       // Update the state using the login from insertItem(effectResult)
       updater: 'insertItem'
-    } 
+    }
   },
   effect: () => fetch(`/todos`).then(r => r.json()),
 })
@@ -127,7 +127,7 @@ const MaTodosState = rj({
       }).then(r => r.json()),
       // Update the state using the login from insertItem(effectResult)
       updater: 'updateData'
-    } 
+    }
   },
   effect: () => fetch(`/user`).then(r => r.json()),
 })
@@ -152,7 +152,7 @@ const MaTodosState = rj({
       updater: 'updateData',
       // ignore all the updateUserProfile() while effect is in peding
       takeEffect: 'exhaust',
-    } 
+    }
   },
   effect: () => fetch(`/user`).then(r => r.json()),
 })
@@ -183,7 +183,7 @@ const MaTodosState = rj({
       effect,
       updater,
       effectCaller: false,
-    } 
+    }
   },
   effectCaller: rj.configured(),
   effect: () => fetch(`/user`).then(r => r.json()),
@@ -303,10 +303,10 @@ const MaTodosState = rj({
          body: newProfile,
       }).then(r => r.json()),
       updater: 'updateData',
-      reducer: ({ pending: false }, action) => /* reducer logic */, 
+      reducer: ({ pending: false }, action) => /* reducer logic */,
       // ignore all the updateUserProfile() while effect is in peding
       takeEffect: 'exhaust',
-    } 
+    }
   },
   effect: () => fetch(`/user`).then(r => r.json()),
   computed: {
@@ -328,7 +328,7 @@ const MaTodosState = rj({
       updater: 'updateData',
       reducer: ({ pending: false }, action) => /* reducer logic */,
       takeEffect: 'exhaust',
-    } 
+    }
   },
   effect: () => fetch(`/user`).then(r => r.json()),
   computed: {
@@ -429,7 +429,7 @@ const MaTodosState = rj(rjPlainList(), {
 
 Yess, a [redux-logger](https://github.com/LogRocket/redux-logger) inspired logger for rj.
 
-Why a logger? Because as rj powered applications grow up in size, it becomes very difficult to track and debug all the effects and the rjs state updates. 
+Why a logger? Because as rj powered applications grow up in size, it becomes very difficult to track and debug all the effects and the rjs state updates.
 
 This, and some of us was missing a tools like redux logger or redux dev tools.
 
@@ -600,7 +600,7 @@ The value of state is:
 ```js
 {
   error: null, // state.error
-  secret: 23, 
+  secret: 23,
   todos: null, // state.data
 }
 ```
@@ -621,6 +621,3 @@ The computed config privided by the plugin is:
   pagination: 'getPagination',
 }
 ```
-
-
-
