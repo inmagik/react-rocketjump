@@ -271,9 +271,9 @@ Mutations actions have the standard rj shape, with the bonus that params are by 
 
 ##### Select the mutations state
 
-When you enable mutations for a rj object your state is sliced in two parts: the mutations' and the root's state.
+When you enable mutations for a rj object your state is sliced in two parts: the mutation's and the root's state.
 
-To select the root state, the usual rj state of v1.x, you have a special selector `getRoot`,
+To select the root state, the usual rj state of v1.x, you have a special selector `getRoot`:
 
 ```js
 const [state, actions] = useRunRj(MaRjObject, (state, { getRoot, getData }) => ({
@@ -377,7 +377,30 @@ const MaTodosState = rj({
 
 ##### The standard mutation `rj.mutation.multi`
 
-The rj mutation wrapper "multi" is designed to ...
+The rj multi mutation is designed for a mutation that may run multiple times in parallel, based on a "key based" logic:
+each run is identified by a key and if another effect with the same key is running the new run will be discarded.
+
+The first argument of `rj.mutation.multi` is a function that return this key from your params:
+
+```js
+(...params) => key
+```
+
+This is accomplished by using `groupByExhaust` as the default `takeEffect` for `rj.mutation.multi` that groups your effect using the key derived from arguments and ignore the same key while effect with same key is pending.
+
+The `reducer` handle multiple failures and loading states at time with the following shape:
+```js
+{
+  pendings: {
+    [key]: true|undefined,
+  },
+  errors: {
+    [key]: Error|undefined
+  }
+}
+```
+
+To use the multi mutation wrapper:
 
 ```js
 const MaTodosState = rj(rjPlainList(), {
