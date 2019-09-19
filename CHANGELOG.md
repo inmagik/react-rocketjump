@@ -8,7 +8,7 @@ The main great feature of rj v2 is the support for mutations.
 
 ##### Basic mutations
 
-Mutations add an additional option to the rj config object called `mutations` (only allowed in the last config object, as it follows the same rules of the `effect` configuration option), where you can configure your mutation behaviours.
+Mutations add an additional configuration option to the rj object called `mutations` (only allowed in the last config object, as it follows the same rules of the `effect` configuration option), where you can configure your mutation behaviours.
 
 What is a mutation?
 
@@ -21,7 +21,7 @@ const MaTodosState = rj({
   effect: () => fetch(`/todos`).then(r => r.json()),
 })
 ```
-Now if you want to toggle your todo with using api like *PATCH* `/todos/${id}`, you can write a mutation:
+Now if you want to toggle your todo with using some api like *PATCH* `/todos/${id}`, you can write a mutation:
 ```js
 const MaTodosState = rj({
   mutations: {
@@ -46,17 +46,17 @@ Yeah you have written your first mutation!
 
 Ok, but how can I use mutations? 
 
-For every configured mutation rj adds an action creator, using the keys as names, to the action creators bag.
+For every configured mutation rj crafts an action creator, using the keys in the `mutations` object as names, to the action creators bag.
 
 These action creators trigger the `effect` defined in the corresponding mutation and when the effect succedes they use the corresponding `updater` to update the (parent) state.
 
-Mutations action creators are effect actions and have the Builder as well.
+Mutations action creators are effect actions and can be invoked with the Builder as well.
 
 Mutations action creators are supported for all the React bindings `useRj`, `useRunRj` and `connectRj`.
 
 If the mutation name overwrites a preexisting action creator rj prints a warn in DEV.
 
-So for example this a dummy react component to toggle some todos using our RjObject:
+So for example this is a dummy react component that can be used to toggle some todos using our RjObject:
 
 ```js
 import React from 'react'
@@ -91,7 +91,7 @@ function MaTodos() {
 
 ##### The mutations updater
 
-The updater can also be a string with the name of action creator used to update the state, all the rj actions generated during recursion are valid action names even if come from plugins.
+The updater can also be a function (with the standard reducer signature `(state, action) => state`), or a string that must be the name of an action creator, which will be used to update the state. All the rj actions, even those added by plugins, are valid for this sake.
 
 ```js
 const MaTodosState = rj(rjPlainList(), {
@@ -111,11 +111,11 @@ const MaTodosState = rj(rjPlainList(), {
 
 ##### `updateData(newData)`
 
-For help you write less code we introduced a new standard action creator `updateData` that simply update data of your rj state.
+To help you write less code we introduced a new standard action creator `updateData` that simply updates data of your rj state (this update is done by overwriting the `data` prop of the state with the payload of the action).
 
-This isn't an effect action so it hasn't the builder.
+This isn't an effect action (and hence it cannot be used with the Builder).
 
-With `updateData` you write less code in your mutations:
+With `updateData` mutation's code usually becomes more compact, expecially when you deal with REST APIs:
 
 ```js
 const MaTodosState = rj({
@@ -133,13 +133,13 @@ const MaTodosState = rj({
 })
 ```
 
-##### Mutations side effect model `takeEffect`
+##### Mutations side effect model: `takeEffect`
 
-You can change the default side effect model with the same logic of main rj effect:
+You can change the default side effect model with the same logic as the main rj effect:
 
 https://inmagik.github.io/react-rocketjump/docs/api_rj#takeeffect
 
-The default side effect model applied is `every` you can change it for example:
+The default side effect model applied is `every`, but you can change it as you wish, for example you can write something like:
 
 ```js
 const MaTodosState = rj({
@@ -160,9 +160,9 @@ const MaTodosState = rj({
 
 ##### Mutations `effectCaller`
 
-You can speciefied an `effectCaller` to your mutation, you can use `rj.configured()` as well.
+You can specify an `effectCaller` for your mutation, and you can use `rj.configured()` as well.
 
-If your main config has an `effectCaller` configured the mutation use it unnless an `effectCaller` is specified in the mutation config or explicit set to `false`.
+If your main config has an `effectCaller` configured any mutation uses it unnless an `effectCaller` is specified in the mutation config. This last effect caller can be any valid `effectCaller` or `false` (this tells rj not to use any effect caller)
 
 ```js
 const MaTodosState = rj({
@@ -192,9 +192,9 @@ const MaTodosState = rj({
 
 ##### Customize mutations state shape using a `reducer`
 
-Default mutations don't have a state but sometimes is useful to track the mutation state, for example to show an indicator while saving or dispaly the error message when occurred.
+Mutations don't have a state by default but sometimes it is useful to track the mutation state, for example to show an indicator while saving or displaying the error message (when some error occures).
 
-When you specified a `reducer` in the mutation config you enable the mutation state, your reducer is supposed to handle the standard rj actions:
+When you specify a `reducer` in the mutation config you enable the mutation state, your reducer is supposed to handle the standard rj actions:
 
 ```js
 import { INIT, RUN, PENDING, SUCCESS, FAILURE } from 'react-rocketjump'
@@ -221,11 +221,11 @@ const MaTodosState = rj({
 })
 ```
 
-The `reducer1` respond only to the action generated from `mutation1()` in the same way `reducer2` respond only to `mutation2()` actions. 
+The `reducer1` responds only to the actions generated from `mutation1()`, and the same holds for `reducer2` with respect to `mutation2()`.
 
-Rocketjump auto namespace the action for your so you have only to responde to the standard rj actions.
+Rocketjump automatically namespaces the actions for you to avoid name clashes, so you have only to responde to the standard rj actions and rj will do the rest.
 
-Mutations actions are the standard rj shape, in plus params are default added to your action metadata:
+Mutations actions have the standard rj shape, with the bonus that params are by default added to your action metadata:
 
 ```js
 {
@@ -271,9 +271,9 @@ Mutations actions are the standard rj shape, in plus params are default added to
 
 ##### Select the mutations state
 
-When you enable mutations in your conf state your state is sliced in two parts the mutations and the root state.
+When you enable mutations for a rj object your state is sliced in two parts: the mutations' and the root's state.
 
-For select the root state, the normal rj state, you have a special selector `getRoot`,
+To select the root state, the usual rj state of v1.x, you have a special selector `getRoot`,
 
 ```js
 const [state, actions] = useRunRj(MaRjObject, (state, { getRoot, getData }) => ({
@@ -281,7 +281,7 @@ const [state, actions] = useRunRj(MaRjObject, (state, { getRoot, getData }) => (
 }))
 ```
 
-For select a specific mutation state you have another special selector `getMutation`:
+To select a specific mutation state you have another special selector `getMutation`:
 
 ```js
 const [state, actions] = useRunRj(MaRjObject, (state, { getMutation }) => ({
@@ -291,7 +291,7 @@ const [state, actions] = useRunRj(MaRjObject, (state, { getMutation }) => ({
 
 ##### `computed` for mutations
 
-When you enable mutations state `computed` for old computed still working as exptected.
+When you enable mutations state the `computed` configuration options for v1.x computed properties will still work as expected.
 
 This works as well:
 ```js
@@ -315,7 +315,7 @@ const MaTodosState = rj({
 })
 ```
 
-To compute the mutation state your have a special key `@mutation` followed by the path of your mutation:
+To involve a mutation state in some computed property you can use the special key `@mutation` followed by the path of your mutation (in the traditional lodash format):
 
 ```js
 const MaTodosState = rj({
@@ -341,18 +341,18 @@ const MaTodosState = rj({
 
 ##### The standard mutation `rj.mutation.single`
 
-Rj provide to you some standard mutations, that simply injects some defaults.
+Rj provides you some standard mutation wrappers, each of which simply injects some defaults.
 
-The rj single mutation is mutation designed for a mutation that run one at time, for example a form submission.
+The rj single mutation is mutation wrapper designed for a mutation that should have no overlapping runs, for example a form submission.
 
-The default `takeEffect` is `exhaust`, and `reducer` handle a single loading/failure state with this shape:
+The default `takeEffect` is `exhaust`, and `reducer` is configured to handle a single loading/failure state with this shape:
 ```js
 {
   pending: Boolean,   // <-- Is my mutation effect in pending?
   error: null|Error,  // <-- Last error from effect cleaned on every run.
 }
 ```
-To use the single mutation:
+To use the single mutation wrapper:
 
 ```js
 const MaTodosState = rj({
@@ -377,7 +377,7 @@ const MaTodosState = rj({
 
 ##### The standard mutation `rj.mutation.multi`
 
-The rj mutation multi is designed to ...
+The rj mutation wrapper "multi" is designed to ...
 
 ```js
 const MaTodosState = rj(rjPlainList(), {
