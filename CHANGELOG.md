@@ -386,9 +386,9 @@ The first argument of `rj.mutation.multi` is a function that return this key fro
 (...params) => key
 ```
 
-This is accomplished by using `groupByExhaust` as the default `takeEffect` for `rj.mutation.multi` that groups your effect using the key derived from arguments and ignore the same key while effect with same key is pending.
+This is accomplished by using `groupByExhaust` as the default `takeEffect` for `rj.mutation.multi` that groups your effect using the key derived from arguments, effects with the same keys are executed one at time, if an effect with a given key is in place the subsequent run that triggers the same key is ignored.
 
-The `reducer` handle multiple failures and loading states at time with the following shape:
+The default `reducer` handle multiple failures and loading states at time with the following shape:
 ```js
 {
   pendings: {
@@ -412,7 +412,7 @@ const MaTodosState = rj(rjPlainList(), {
            method: 'PATCH',
            body: { done: !todo.done }
         }).then(r => r.json()),
-        updater: 'insertItem'
+        updater: 'updateItem'
       }
     )
   },
