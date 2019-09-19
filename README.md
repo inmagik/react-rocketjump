@@ -163,7 +163,6 @@ export const TodosState = rj({
       })
     }
   },
-
   effect: (username = 'all') => fetch(`/api/todos/${username}`).then(r => r.json()),
 })
 
