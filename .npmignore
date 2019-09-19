@@ -3,6 +3,7 @@
 /example
 /src
 /scripts
+/assets
 .babel*
 .prettierrc
 .webpack.config.*
