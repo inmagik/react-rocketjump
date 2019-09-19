@@ -15,6 +15,8 @@ Benefits of using React RocketJump
 - the library detects when components are mounted or unmounted, so that no asynchronous code is run on unmounted components
 - extensible (but already powerful) and composable ecosystem of plugins to manage the most common and challenging tasks
 
+## HEADS UP! RJ v2 is out :fire: read the full [CHANGELOG](/CHANGELOG.md#200)
+
 ## Quick start
 
 ### Install
@@ -200,6 +202,33 @@ The full documentation with many examples and detailed information is mantained 
 [https://inmagik.github.io/react-rocketjump](https://inmagik.github.io/react-rocketjump)
 
 Be sure to check it out!!
+
+## Built-in logger
+Since v2 rj ships a [redux-logger](https://github.com/LogRocket/redux-logger) inspired logger designed to run only in DEV and helps you debugging rocketjumps.
+
+This is what it looks like:
+
+![Rj Logger Sample Screen](/assets/logger_rj_in_console.png)
+
+To enable it, just add this snippet to your `index.js`:
+
+```js
+import rjLogger from 'react-rocketjump/logger'
+
+// The logger don't log in PRODUCTION
+// (place this before ReactDOM.render)
+rjLogger()
+```
+
+To add a name to your RocketJump Object in the logger output simply add a `name` key in your rj config:
+
+```js
+const TomatoesState = rj({
+  effect,
+  // ... rj config ...
+  name: 'Tomatoes'
+})
+```
 
 ## Run example
 
