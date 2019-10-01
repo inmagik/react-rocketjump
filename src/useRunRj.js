@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import useRj from './useRj'
+import { isMaybe } from './deps'
 
 // Use a rocketjump and run it according to run arguments.
 // This is only a syntax sugar over useRj and useEffect,
@@ -16,9 +17,15 @@ export default function useRunRj(
   const { run, clean } = actions
 
   useEffect(() => {
-    run(...runArgs)
+    // has some maybe? If yes don't run effect
+    const shouldRun = !runArgs.some(isMaybe)
+
+    if (shouldRun) {
+      run(...runArgs)
+    }
+
     return () => {
-      if (shouldCleanOnNewEffect) {
+      if (shouldCleanOnNewEffect && shouldRun) {
         clean()
       }
     }
