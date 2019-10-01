@@ -22,6 +22,9 @@ export { default as compose } from './compose'
 // Scoped config of rocketjump
 export { default as ConfigureRj } from './ConfigureRj'
 
+// MagIK DeBps for useRunRj hook
+export { default as deps } from './deps'
+
 // make effect action
 export { makeLibraryAction as makeAction } from './actionCreators'
 
