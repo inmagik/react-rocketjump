@@ -47,7 +47,7 @@ const TodoList = props => {
   const [{
     data: todos, // <-- The result from effect, null at start
     pending,     // <-- Is effect in pending? false at start
-    error        // <-- The eventually error from side effect, null when side effect starts 
+    error        // <-- The eventually error from side effect, null when side effect starts
   }] = useRunRj(TodosState) // Run side effects on mount only
 
   return  (
@@ -76,7 +76,7 @@ export const TodosState = rj({
 
 import { useRunRj } from 'react-rocketjump'
 const TodoList = ({ username }) => {
-  
+
   // Every time the username changes the effect re-run
   // the previouse effect will be canceled if in pending
   const [
@@ -89,9 +89,67 @@ const TodoList = ({ username }) => {
       // stop the side effect
       cancel,
     }
-  ] = useRunRj(TodosState, [username]) 
-  
+  ] = useRunRj(TodosState, [username])
+
   // ...
+}
+```
+
+### Trigger side effects maybe :open_mouth: on values changes
+
+```js
+import { rj } from 'react-rocketjump'
+export const TodosState = rj({
+  effect: (username = 'all') => fetch(`/api/todos/${username}`).then(r => r.json()),
+})
+
+import { useRunRj, deps } from 'react-rocketjump'
+const TodoList = ({ username }) => {
+
+  // Every time the username changes the effect re-run
+  // the previouse effect will be canceled if in pending
+  const [
+    { data: todos, pending, error },
+    {
+      // run the sie effect
+      run,
+      // stop the side effect and clear the state
+      clean,
+      // stop the side effect
+      cancel,
+    }
+  ] = useRunRj(TodosState, [
+    deps.maybe(username) // if username is falsy deps tell useRj to
+                         // don't run your side effects
+  ])
+
+  // ...
+
+  // there are a lot of cool maybe like monad shortcuts
+
+  // use maybeAll to replace y deps array [] with all maybe values
+  // if username OR group are falsy don't run the side effect
+  useRunRj(deps.allMaybe(username, group))
+
+  // strict check 4 null
+  useRunRj([deps.maybeNull(username)])
+  useRunRj(deps.allMaybeNull(username, group))
+
+  // shortcut 4 lodash style get
+  // if user is falsy doesn't run otherwise runs with get(value, path)
+  useRunRj([deps.maybeGet(user, 'id')])
+
+  // ... you can always use the simple maybe to generated custom run
+  // conditions in a declarative fashion way
+  useRunRj([
+    (username && status !== 'banned')
+      ? username  // give the username as dep only if username
+                  // is not falsy and the status is not banned ...
+      : deps.maybe() // otherwise call maybe with nothing
+                     // and nothing is js means undefined so always
+                     // a false maybe
+  ])
+
 }
 ```
 
@@ -103,10 +161,10 @@ export const TodosState = rj({
   effect: (username = 'all') => fetch(`/api/todos/${username}`).then(r => r.json()),
 })
 
-import { useEffect } from 'react' 
+import { useEffect } from 'react'
 import { useRunRj } from 'react-rocketjump'
 const TodoList = ({ username }) => {
-  
+
   // useRj don't auto trigger side effects
   // Give you the state and actions generated from the RocketJump Object
   // is up to you to trigger sie effect
@@ -114,14 +172,14 @@ const TodoList = ({ username }) => {
   const [
     { data: todos, pending, error },
     { run }  
-  ] = useRj(TodosState, [username]) 
-  
+  ] = useRj(TodosState, [username])
+
   useEffect(() => {
     if (username) {
       run(username)
     }  
   }, [username])
-   
+
   function onTodosReload() {
     // or with callbacks
     run
@@ -135,7 +193,7 @@ const TodoList = ({ username }) => {
       })
       .run()
   }
-  
+
   // ...
 }
 ```
@@ -166,7 +224,7 @@ export const TodosState = rj({
   effect: (username = 'all') => fetch(`/api/todos/${username}`).then(r => r.json()),
 })
 
-import { useEffect } from 'react' 
+import { useEffect } from 'react'
 import { useRunRj } from 'react-rocketjump'
 const TodoList = ({ username }) => {
   const [
@@ -175,8 +233,8 @@ const TodoList = ({ username }) => {
       run,
       addTodo, // <-- Match the mutation name
     }  
-  ] = useRj(TodosState, [username]) 
-   
+  ] = useRj(TodosState, [username])
+
   // Mutations actions works as run, cancel and clean
   // trigger the realted side effects and update the state using give updater
   function handleSubmit(values) {
@@ -189,7 +247,7 @@ const TodoList = ({ username }) => {
       })
       .run(values)
   }
-  
+
   // ...
 }
 ```
