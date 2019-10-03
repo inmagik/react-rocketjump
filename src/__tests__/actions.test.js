@@ -204,7 +204,7 @@ describe('React-RocketJump actions', () => {
     expect(onFailure).toHaveBeenCalledTimes(1)
   })
 
-  it('should use plain meta data', async done => {
+  it('should use plain meta data', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -214,10 +214,7 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = makeRjComponent(rjState)
 
-    const onSuccess = () => {
-      expect(actionLog[0].meta).toEqual({ a: 1 })
-      done()
-    }
+    const onSuccess = jest.fn(() => {})
 
     await act(async () => {
       wrapper
@@ -226,9 +223,11 @@ describe('React-RocketJump actions', () => {
         .onSuccess(onSuccess)
         .run()
     })
+    expect(onSuccess).toHaveBeenCalled()
+    expect(actionLog[0].meta).toEqual({ a: 1 })
   })
 
-  it('should compose plain meta data', async done => {
+  it('should compose plain meta data', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -238,10 +237,7 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = makeRjComponent(rjState)
 
-    const onSuccess = () => {
-      expect(actionLog[0].meta).toEqual({ a: 2, b: 2, c: 3 })
-      done()
-    }
+    const onSuccess = jest.fn(() => {})
 
     await act(async () => {
       wrapper
@@ -252,9 +248,11 @@ describe('React-RocketJump actions', () => {
         .onSuccess(onSuccess)
         .run()
     })
+    expect(onSuccess).toHaveBeenCalled()
+    expect(actionLog[0].meta).toEqual({ a: 2, b: 2, c: 3 })
   })
 
-  it('should use meta data transform', async done => {
+  it('should use meta data transform', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -264,10 +262,7 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = makeRjComponent(rjState)
 
-    const onSuccess = () => {
-      expect(actionLog[0].meta).toEqual({})
-      done()
-    }
+    const onSuccess = jest.fn(() => {})
 
     await act(async () => {
       wrapper
@@ -277,9 +272,11 @@ describe('React-RocketJump actions', () => {
         .onSuccess(onSuccess)
         .run()
     })
+    expect(onSuccess).toHaveBeenCalled()
+    expect(actionLog[0].meta).toEqual({})
   })
 
-  it('should use meta data transform correctly', async done => {
+  it('should use meta data transform correctly', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -289,10 +286,7 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = makeRjComponent(rjState)
 
-    const onSuccess = () => {
-      expect(actionLog[0].meta).toEqual({ a: 2, b: 1 })
-      done()
-    }
+    const onSuccess = jest.fn(() => {})
 
     await act(async () => {
       wrapper
@@ -302,6 +296,8 @@ describe('React-RocketJump actions', () => {
         .onSuccess(onSuccess)
         .run()
     })
+    expect(onSuccess).toHaveBeenCalled()
+    expect(actionLog[0].meta).toEqual({ a: 2, b: 1 })
   })
 
   it('should allow action renaming', () => {
@@ -324,7 +320,7 @@ describe('React-RocketJump actions', () => {
     expect(wrapper.props()).not.toHaveProperty('clean')
   })
 
-  it('should allow action proxying', async done => {
+  it('should allow action proxying', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -342,17 +338,7 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = mount(<RjComponent />).find(Component)
 
-    const onSuccess = () => {
-      expect(actionLog[0]).toEqual({
-        type: 'SUCCESS',
-        meta: {},
-        payload: {
-          data: [{ id: 9, name: 'admin' }],
-          params: [2],
-        },
-      })
-      done()
-    }
+    const onSuccess = jest.fn(() => {})
 
     await act(async () => {
       wrapper
@@ -360,9 +346,19 @@ describe('React-RocketJump actions', () => {
         .onSuccess(onSuccess)
         .run(1)
     })
+
+    expect(actionLog[0]).toEqual({
+      type: 'SUCCESS',
+      meta: {},
+      payload: {
+        data: [{ id: 9, name: 'admin' }],
+        params: [2],
+      },
+    })
+    expect(onSuccess).toHaveBeenCalled()
   })
 
-  it('should allow action definition', async done => {
+  it('should allow action definition', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -380,17 +376,7 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = mount(<RjComponent />).find(Component)
 
-    const onSuccess = () => {
-      expect(actionLog[0]).toEqual({
-        type: 'SUCCESS',
-        meta: {},
-        payload: {
-          data: [{ id: 9, name: 'admin' }],
-          params: [2],
-        },
-      })
-      done()
-    }
+    const onSuccess = jest.fn(() => {})
 
     expect(wrapper.props()).toHaveProperty('run')
     expect(wrapper.props()).toHaveProperty('runDouble')
@@ -401,9 +387,18 @@ describe('React-RocketJump actions', () => {
         .onSuccess(onSuccess)
         .run(1)
     })
+    expect(onSuccess).toHaveBeenCalled()
+    expect(actionLog[0]).toEqual({
+      type: 'SUCCESS',
+      meta: {},
+      payload: {
+        data: [{ id: 9, name: 'admin' }],
+        params: [2],
+      },
+    })
   })
 
-  it('should allow action signature change', async done => {
+  it('should allow action signature change', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -421,17 +416,7 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = mount(<RjComponent />).find(Component)
 
-    const onSuccess = () => {
-      expect(actionLog[0]).toEqual({
-        type: 'SUCCESS',
-        meta: {},
-        payload: {
-          data: [{ id: 8, name: 'admin' }],
-          params: [1, 'admin'],
-        },
-      })
-      done()
-    }
+    const onSuccess = jest.fn(() => {})
 
     await act(async () => {
       wrapper
@@ -439,9 +424,18 @@ describe('React-RocketJump actions', () => {
         .onSuccess(onSuccess)
         .run({ id: 1, name: 'admin' })
     })
+    expect(onSuccess).toHaveBeenCalled()
+    expect(actionLog[0]).toEqual({
+      type: 'SUCCESS',
+      meta: {},
+      payload: {
+        data: [{ id: 8, name: 'admin' }],
+        params: [1, 'admin'],
+      },
+    })
   })
 
-  it('should allow meta management inside', async done => {
+  it('should allow meta management inside', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -459,17 +453,7 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = mount(<RjComponent />).find(Component)
 
-    const onSuccess = () => {
-      expect(actionLog[0]).toEqual({
-        type: 'SUCCESS',
-        meta: { z: 1 },
-        payload: {
-          data: [{ id: 8, name: 'admin' }],
-          params: [1, 'admin'],
-        },
-      })
-      done()
-    }
+    const onSuccess = jest.fn(() => {})
 
     await act(async () => {
       wrapper
@@ -477,9 +461,17 @@ describe('React-RocketJump actions', () => {
         .onSuccess(onSuccess)
         .run({ id: 1, name: 'admin' })
     })
+    expect(actionLog[0]).toEqual({
+      type: 'SUCCESS',
+      meta: { z: 1 },
+      payload: {
+        data: [{ id: 8, name: 'admin' }],
+        params: [1, 'admin'],
+      },
+    })
   })
 
-  it('should allow meta transform inside', async done => {
+  it('should allow meta transform inside', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -500,17 +492,7 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = mount(<RjComponent />).find(Component)
 
-    const onSuccess = () => {
-      expect(actionLog[0]).toEqual({
-        type: 'SUCCESS',
-        meta: { x: 1 },
-        payload: {
-          data: [{ id: 8, name: 'admin' }],
-          params: [1, 'admin'],
-        },
-      })
-      done()
-    }
+    const onSuccess = jest.fn(() => {})
 
     await act(async () => {
       wrapper
@@ -518,9 +500,18 @@ describe('React-RocketJump actions', () => {
         .onSuccess(onSuccess)
         .run({ id: 1, name: 'admin' })
     })
+    expect(onSuccess).toHaveBeenCalled()
+    expect(actionLog[0]).toEqual({
+      type: 'SUCCESS',
+      meta: { x: 1 },
+      payload: {
+        data: [{ id: 8, name: 'admin' }],
+        params: [1, 'admin'],
+      },
+    })
   })
 
-  it('should allow plain actions', () => {
+  it('should allow plain actions', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -539,7 +530,9 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = mount(<RjComponent />).find(Component)
 
-    wrapper.prop('custom')()
+    await act(async () => {
+      wrapper.prop('custom')()
+    })
 
     expect(actionLog[0]).toEqual({ type: 'CUSTOM' })
   })
@@ -671,7 +664,7 @@ describe('React-RocketJump actions', () => {
     expect(onFailure).toHaveBeenCalledTimes(1)
   })
 
-  it('should use meta in promise mode', async done => {
+  it('should use meta in promise mode', async () => {
     const actionLog = []
 
     const rjState = reactRj({
@@ -681,10 +674,7 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = makeRjComponent(rjState)
 
-    const onSuccess = () => {
-      expect(actionLog[0].meta).toEqual({})
-      done()
-    }
+    const onSuccess = jest.fn(() => {})
 
     await act(async () => {
       wrapper
@@ -694,6 +684,8 @@ describe('React-RocketJump actions', () => {
         .onSuccess(onSuccess)
         .asPromise()
     })
+    expect(onSuccess).toHaveBeenCalled()
+    expect(actionLog[0].meta).toEqual({})
   })
 
   it('should allow promises on plain actions (even if useless)', async () => {
@@ -715,7 +707,10 @@ describe('React-RocketJump actions', () => {
 
     const wrapper = mount(<RjComponent />).find(Component)
 
-    await wrapper.prop('custom').asPromise()
+    await act(async () => {
+      const p = wrapper.prop('custom').asPromise()
+      expect(p).toBeInstanceOf(Promise)
+    })
 
     expect(actionLog[0]).toEqual({ type: 'CUSTOM' })
   })
