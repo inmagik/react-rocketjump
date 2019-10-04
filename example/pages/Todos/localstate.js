@@ -1,11 +1,29 @@
 import { rj } from 'react-rocketjump'
+import { tap } from 'rxjs/operators'
 import rjPlainList from 'react-rocketjump/plugins/plainList'
 import request from 'superagent'
 
 export const API_URL = 'http://localhost:9001'
 
+// const rjPlainList2 = rj({
+//   // finalizeExport:
+// })
+
 export const TodosListState = rj(rjPlainList(), {
-  effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
+  effectCaller: rj.configured(),
+  effects: {
+    '': {
+      gesture: 'lastest',
+      fn: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
+    },
+    ALL_NIGHT: {
+      gesture: 'lastest',
+      fn: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
+    },
+  },
+  effectPipeline: a => {
+    return a.pipe(tap(a => console.log('Y shit', a)))
+  },
   mutations: {
     addStupidTodo: rj.mutation.single({
       effect: todo =>

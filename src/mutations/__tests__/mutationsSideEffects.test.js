@@ -1,4 +1,5 @@
-import { Subject } from 'rxjs'
+import { Subject, ReplaySubject } from 'rxjs'
+import { map, filter, tap, publish, share } from 'rxjs/operators'
 import rj from '../../rj'
 import { RUN, SUCCESS, PENDING } from '../../actionTypes'
 
@@ -258,6 +259,57 @@ describe('RJ mutations side effect model', () => {
       })
 
       done()
+    })
+  })
+
+  it('XXX', async () => {
+    const mockCallback = jest.fn()
+    const resolvesA = []
+    const mockEffectA = jest.fn(() => new Promise(r => resolvesA.push(r)))
+    const resolvesB = []
+    const mockEffectB = jest.fn(() => new Promise(r => resolvesB.push(r)))
+
+    const subject = new ReplaySubject()
+
+    const { makeRxObservable } = rj({
+      // mutations: {
+      //   mutationA: {
+      //     effect: mockEffectA,
+      //     updater: () => {},
+      //   },
+      //   mutationB: {
+      //     effect: mockEffectB,
+      //     updater: () => {},
+      //   },
+      // },
+      // effectPipeline: action$ => {
+      //   const a = action$.pipe(
+      //     tap(action => {
+      //       console.log('TAPPER!', action)
+      //     }),
+      //     publish()
+      //   )
+      //   a.connect()
+      //   return a
+      // },
+      effect: () => Promise.resolve(23),
+    })
+
+    // let o = subject.asObservable()
+    // o = o.pipe(
+    //   tap(a => {
+    //     console.log("T", a)
+    //   }),
+    //   publish(),
+    // )
+    // makeRxObservable(o).subscribe(a => console.log('~', a))
+
+    subject.next({
+      type: 'X',
+      // type: `${MUTATION_PREFIX}/mutationA/${RUN}`,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
     })
   })
 })

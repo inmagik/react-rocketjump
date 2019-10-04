@@ -18,6 +18,7 @@ export default function useRj(
   }
   const {
     makeRxObservable,
+    pipeActionStream,
     actionCreators,
     reducer,
     makeSelectors,
@@ -27,7 +28,12 @@ export default function useRj(
   // The last config or rj recursion rj({},rj(),..,{},{<THIS>})
   // used as debug hints
   const rjDebugInfo = rjObject.__rjconfig
-  const [state, dispatch] = useMiniRedux(reducer, makeRxObservable, rjDebugInfo)
+  const [state, dispatch] = useMiniRedux(
+    reducer,
+    makeRxObservable,
+    pipeActionStream,
+    rjDebugInfo
+  )
 
   // Bind actions \w dispatch
   const boundActionCreators = useConstant(() => {

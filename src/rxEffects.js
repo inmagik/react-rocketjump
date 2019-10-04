@@ -21,15 +21,20 @@ function filterNonEffectActions(action, prefix) {
 
 // Apply take effect only to RUN, CLEAN and CANCEL
 // if an action different from theese is emitted simply emit/dispatch them
-function chainOnlyOnEffectActions(action$, toObservableEffect, prefix) {
-  const pubblishAction$ = action$.pipe(publish())
-  pubblishAction$.connect()
+function chainOnlyOnEffectActions(
+  action$,
+  mergeObservable$,
+  toObservableEffect,
+  prefix
+) {
+  // const pubblishAction$ = action$.pipe(publish())
+  // pubblishAction$.connect()
 
   return merge(
     toObservableEffect(
-      pubblishAction$.pipe(filter(a => filterEffectActions(a, prefix)))
+      action$.pipe(filter(a => filterEffectActions(a, prefix)))
     ),
-    pubblishAction$.pipe(filter(a => filterNonEffectActions(a, prefix)))
+    mergeObservable$.pipe(filter(a => filterNonEffectActions(a, prefix)))
   )
 }
 
@@ -60,12 +65,14 @@ function mapToLatest(action$, mapActionToObserable, prefix) {
 
 export function takeEffectLatest(
   action$,
+  mergeObservable$,
   state$,
   mapActionToObserable,
   prefix
 ) {
   return chainOnlyOnEffectActions(
     action$,
+    mergeObservable$,
     effectAction$ =>
       effectAction$.pipe(
         mapToLatest(effectAction$, mapActionToObserable, prefix)
@@ -76,9 +83,16 @@ export function takeEffectLatest(
 
 export const TAKE_EFFECT_EVERY = 'every'
 
-export function takeEffectEvery(action$, state$, mapActionToObserable, prefix) {
+export function takeEffectEvery(
+  action$,
+  mergeObservable$,
+  state$,
+  mapActionToObserable,
+  prefix
+) {
   return chainOnlyOnEffectActions(
     action$,
+    mergeObservable$,
     effectAction$ =>
       effectAction$.pipe(
         mergeMap(action => {
@@ -135,12 +149,14 @@ export const TAKE_EFFECT_EXHAUST = 'exhaust'
 
 export function takeEffectExhaust(
   action$,
+  mergeObservable$,
   state$,
   mapActionToObserable,
   prefix
 ) {
   return chainOnlyOnEffectActions(
     action$,
+    mergeObservable$,
     effectAction$ =>
       actionToExhaustObservableEffect(
         effectAction$,
@@ -155,6 +171,7 @@ export const TAKE_EFFECT_GROUP_BY = 'groupBy'
 
 export function takeEffectGroupBy(
   action$,
+  mergeObservable$,
   state$,
   mapActionToObserable,
   effectTypeArgs,
@@ -169,6 +186,7 @@ export function takeEffectGroupBy(
   }
   return chainOnlyOnEffectActions(
     action$,
+    mergeObservable$,
     effectAction$ =>
       effectAction$.pipe(
         groupBy(groupByFn),
@@ -184,6 +202,7 @@ export const TAKE_EFFECT_GROUP_BY_EXHAUST = 'groupByExhaust'
 
 export function takeEffectGroupByExhaust(
   action$,
+  mergeObservable$,
   state$,
   mapActionToObserable,
   effectTypeArgs,
@@ -198,6 +217,7 @@ export function takeEffectGroupByExhaust(
   }
   return chainOnlyOnEffectActions(
     action$,
+    mergeObservable$,
     effectAction$ =>
       effectAction$.pipe(
         groupBy(groupByFn),

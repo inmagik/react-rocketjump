@@ -30,17 +30,17 @@ export function enhanceMakeObservable(
       {
         effect,
         takeEffect: takeEffect || 'every',
-        effectPipeline: [],
+        // effectPipeline: [],
         effectCaller: mutationEffectCaller,
       },
       prefix
     )
   })
 
-  return (action$, ...params) => {
-    let o$ = makeObservable(action$, ...params)
+  return (action$, state$, effectCaller) => {
+    let o$ = makeObservable(action$, state$, effectCaller)
     o$ = makeMutationsObsList.reduce((o$, makeMutationObs) => {
-      return makeMutationObs(o$, ...params)
+      return makeMutationObs(action$, state$, effectCaller, o$)
     }, o$)
     return o$
   }

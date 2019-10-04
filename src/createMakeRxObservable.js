@@ -24,13 +24,14 @@ import {
 const defaultEffectCaller = (call, ...args) => call(...args)
 
 export default function createMakeRxObservable(
-  { effect: effectCall, effectCaller, takeEffect, effectPipeline },
+  { effect: effectCall, effectCaller, takeEffect },
   prefix = ''
 ) {
   return function makeRxObservable(
-    originalAction$,
+    action$,
     state$,
-    placeholderEffectCaller
+    placeholderEffectCaller,
+    prevObservable$ // <---- The observable to merge along
   ) {
     // Place the placeholderEffectCaller from ConfigureRj
     // in the correct position of recursion chain
@@ -87,28 +88,56 @@ export default function createMakeRxObservable(
 
     const [effectType, ...effectTypeArgs] = arrayze(takeEffect)
 
-    const action$ = effectPipeline.reduce(
-      (action$, piper) => piper(action$, state$),
-      originalAction$
-    )
+    // const action$ = effectPipeline.reduce(
+    //   (action$, piper) => piper(action$, state$),
+    //   originalAction$
+    // )
+
+    // The prev observable to merge if no used the action$
+    const mergeObservable$ = prevObservable$ ? prevObservable$ : action$
 
     // Custom take effect
     if (typeof effectType === 'function') {
       // TODO: Maybe in future check the return value of
       // custom take effect and print some warning to help
       // developers to better debugging better rj configuration
-      return effectType(action$, state$, mapActionToObserable, prefix)
+      return effectType(
+        action$,
+        mergeObservable$,
+        state$,
+        mapActionToObserable,
+        prefix
+      )
     } else if (effectType === TAKE_EFFECT_LATEST) {
-      return takeEffectLatest(action$, state$, mapActionToObserable, prefix)
+      return takeEffectLatest(
+        action$,
+        mergeObservable$,
+        state$,
+        mapActionToObserable,
+        prefix
+      )
     } else if (effectType === TAKE_EFFECT_EVERY) {
-      return takeEffectEvery(action$, state$, mapActionToObserable, prefix)
+      return takeEffectEvery(
+        action$,
+        mergeObservable$,
+        state$,
+        mapActionToObserable,
+        prefix
+      )
       /*} else if (effectType === TAKE_EFFECT_QUEUE) {
       return takeEffectQueue(action$, state$, mapActionToObserable)*/
     } else if (effectType === TAKE_EFFECT_EXHAUST) {
-      return takeEffectExhaust(action$, state$, mapActionToObserable, prefix)
+      return takeEffectExhaust(
+        action$,
+        mergeObservable$,
+        state$,
+        mapActionToObserable,
+        prefix
+      )
     } else if (effectType === TAKE_EFFECT_GROUP_BY) {
       return takeEffectGroupBy(
         action$,
+        mergeObservable$,
         state$,
         mapActionToObserable,
         effectTypeArgs,
@@ -117,6 +146,7 @@ export default function createMakeRxObservable(
     } else if (effectType === TAKE_EFFECT_GROUP_BY_EXHAUST) {
       return takeEffectGroupByExhaust(
         action$,
+        mergeObservable$,
         state$,
         mapActionToObserable,
         effectTypeArgs,
