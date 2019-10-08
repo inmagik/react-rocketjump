@@ -196,7 +196,7 @@ export default function useMiniRedux(
           debugEmitter.onTeardown()
         }
       }
-      return subscription.unsubscribe()
+      subscription.unsubscribe()
     }
   }, [action$, dispatch$, debugEmitter])
 
