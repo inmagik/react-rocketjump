@@ -1,5 +1,5 @@
 import ConfigureRj from '../ConfigureRj'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { renderHook, act } from '@testing-library/react-hooks'
 import { rj } from '..'
 import useRj from '../useRj'
@@ -158,6 +158,46 @@ describe('ConfigureRj', () => {
 
     expect(result2.current[0]).toEqual({
       data: ['Rinne', 'Skaffo', 'Nonno', 'Giova'],
+    })
+  })
+  it('should inject the effect caller and update them at run time', async () => {
+    const mockEffect = jest.fn().mockResolvedValue(23)
+
+    const maRjState = rj({
+      effect: mockEffect,
+      effectCaller: rj.configured(),
+    })
+
+    function Wrapper({ children }) {
+      const [i, setI] = useState(0)
+      const caller = () => Promise.resolve(i)
+      useEffect(() => {
+        if (i < 1) {
+          setI(i => i + 1)
+        }
+      }, [i])
+      // i take values 0 then 1 then stop
+      return <ConfigureRj effectCaller={caller}>{children}</ConfigureRj>
+    }
+
+    const { result } = renderHook(
+      () =>
+        useRj(maRjState, (state, { getData }) => ({
+          data: getData(state),
+        })),
+      {
+        wrapper: Wrapper,
+      }
+    )
+
+    await act(async () => {
+      result.current[1].run()
+    })
+
+    expect(mockEffect).toHaveBeenCalledTimes(0)
+
+    expect(result.current[0]).toEqual({
+      data: 1,
     })
   })
   test.todo('Test also with connectRj')
