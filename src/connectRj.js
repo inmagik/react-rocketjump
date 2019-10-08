@@ -22,6 +22,7 @@ export default function connectRj(
     function ConnectFunction(props) {
       const {
         makeRxObservable,
+        pipeActionStream,
         actionCreators,
         reducer,
         makeSelectors,
@@ -35,6 +36,7 @@ export default function connectRj(
       const [state, dispatch] = useMiniRedux(
         reducer,
         makeRxObservable,
+        pipeActionStream,
         rjDebugInfo
       )
 

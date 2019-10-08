@@ -1,7 +1,7 @@
-import { Subject, ReplaySubject } from 'rxjs'
-import { map, filter, tap, publish, share } from 'rxjs/operators'
+import { tap } from 'rxjs/operators'
 import rj from '../../rj'
 import { RUN, SUCCESS, PENDING } from '../../actionTypes'
+import { createTestRJSubscription } from '../../testUtils'
 
 const MUTATION_PREFIX = '@MUTATION'
 
@@ -13,9 +13,7 @@ describe('RJ mutations side effect model', () => {
     const resolvesB = []
     const mockEffectB = jest.fn(() => new Promise(r => resolvesB.push(r)))
 
-    const subject = new Subject()
-
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       mutations: {
         mutationA: {
           effect: mockEffectA,
@@ -29,7 +27,7 @@ describe('RJ mutations side effect model', () => {
       effect: () => {},
     })
 
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: `${MUTATION_PREFIX}/mutationA/${RUN}`,
@@ -122,9 +120,7 @@ describe('RJ mutations side effect model', () => {
     const resolvesB = []
     const mockEffectB = jest.fn(() => new Promise(r => resolvesB.push(r)))
 
-    const subject = new Subject()
-
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       mutations: {
         mutationA: {
           effect: mockEffectA,
@@ -139,7 +135,7 @@ describe('RJ mutations side effect model', () => {
       effect: () => {},
     })
 
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: `${MUTATION_PREFIX}/mutationA/${RUN}`,
@@ -214,7 +210,7 @@ describe('RJ mutations side effect model', () => {
       return fn(...args).then(a => a.concat('Skaffo'))
     })
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       mutations: {
         killHumans: {
           effect: mockApi,
@@ -225,8 +221,7 @@ describe('RJ mutations side effect model', () => {
       effect: () => {},
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: `${MUTATION_PREFIX}/killHumans/${RUN}`,
@@ -262,54 +257,66 @@ describe('RJ mutations side effect model', () => {
     })
   })
 
-  // it('XXX', async () => {
-  //   const mockCallback = jest.fn()
-  //   const resolvesA = []
-  //   const mockEffectA = jest.fn(() => new Promise(r => resolvesA.push(r)))
-  //   const resolvesB = []
-  //   const mockEffectB = jest.fn(() => new Promise(r => resolvesB.push(r)))
-  //
-  //   const subject = new ReplaySubject()
-  //
-  //   const { makeRxObservable } = rj({
-  //     // mutations: {
-  //     //   mutationA: {
-  //     //     effect: mockEffectA,
-  //     //     updater: () => {},
-  //     //   },
-  //     //   mutationB: {
-  //     //     effect: mockEffectB,
-  //     //     updater: () => {},
-  //     //   },
-  //     // },
-  //     // effectPipeline: action$ => {
-  //     //   const a = action$.pipe(
-  //     //     tap(action => {
-  //     //       console.log('TAPPER!', action)
-  //     //     }),
-  //     //     publish()
-  //     //   )
-  //     //   a.connect()
-  //     //   return a
-  //     // },
-  //     effect: () => Promise.resolve(23),
-  //   })
-  //
-  //   // let o = subject.asObservable()
-  //   // o = o.pipe(
-  //   //   tap(a => {
-  //   //     console.log("T", a)
-  //   //   }),
-  //   //   publish(),
-  //   // )
-  //   // makeRxObservable(o).subscribe(a => console.log('~', a))
-  //
-  //   subject.next({
-  //     type: 'X',
-  //     // type: `${MUTATION_PREFIX}/mutationA/${RUN}`,
-  //     payload: { params: [] },
-  //     meta: {},
-  //     callbacks: {},
-  //   })
-  // })
+  it('should run side effects of rx only once', async () => {
+    const mockEffectA = jest.fn().mockResolvedValue(23)
+    const mockEffectB = jest.fn().mockResolvedValue(23)
+    const mockEffect = jest.fn().mockResolvedValue(23)
+    const mockTap = jest.fn()
+    const mockCallback = jest.fn()
+
+    const RjObject = rj({
+      mutations: {
+        mutationA: {
+          effect: mockEffectA,
+          updater: () => {},
+        },
+        mutationB: {
+          effect: mockEffectB,
+          updater: () => {},
+        },
+      },
+      effectPipeline: action$ => {
+        return action$.pipe(tap(mockTap))
+      },
+      effect: mockEffect,
+    })
+
+    const subject = createTestRJSubscription(RjObject, mockCallback)
+
+    subject.next({
+      type: `${MUTATION_PREFIX}/mutationA/${RUN}`,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    expect(mockEffectA).toHaveBeenCalledTimes(1)
+    expect(mockEffectB).toHaveBeenCalledTimes(0)
+    expect(mockEffect).toHaveBeenCalledTimes(0)
+    expect(mockTap).toHaveBeenCalledTimes(1)
+
+    subject.next({
+      type: `${MUTATION_PREFIX}/mutationB/${RUN}`,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    expect(mockTap).toHaveBeenCalledTimes(2)
+    expect(mockEffectA).toHaveBeenCalledTimes(1)
+    expect(mockEffectB).toHaveBeenCalledTimes(1)
+    expect(mockEffect).toHaveBeenCalledTimes(0)
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    expect(mockTap).toHaveBeenCalledTimes(3)
+    expect(mockEffectA).toHaveBeenCalledTimes(1)
+    expect(mockEffectB).toHaveBeenCalledTimes(1)
+    expect(mockEffect).toHaveBeenCalledTimes(1)
+  })
 })

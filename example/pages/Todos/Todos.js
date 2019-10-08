@@ -19,9 +19,9 @@ export default function AppTodos() {
       <button onClick={() => setCount(c => c + 1)} style={{ marginTop: 40 }}>
         {count}
       </button>
-      <ConfigureRj effectCaller={callMaMen}>
-        <Todos />
-      </ConfigureRj>
+      {/* <ConfigureRj effectCaller={callMaMen}> */}
+      <Todos />
+      {/* </ConfigureRj> */}
     </div>
   )
 }

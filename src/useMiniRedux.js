@@ -131,9 +131,10 @@ export default function useMiniRedux(
     // useful to change the "normal" action stream
     // ES:. here you can debounce, filter or other
     // stuff before the action trigger Y effect
-    const rjPipedActionObservable = pipeActionStream(actionObserable).pipe(
-      publish()
-    )
+    const rjPipedActionObservable = pipeActionStream(
+      actionObserable,
+      state$
+    ).pipe(publish())
 
     // Create the dispatch observable
     const [dispatchObservable, updateExtraSideEffectConfig] = makeObservable(

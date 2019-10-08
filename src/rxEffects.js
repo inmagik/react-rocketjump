@@ -2,7 +2,6 @@ import { CLEAN, CANCEL } from './actionTypes'
 import { of, concat, empty, merge } from 'rxjs'
 import {
   switchMap,
-  // publish,
   mergeMap,
   exhaustMap,
   // concatMap,
@@ -38,7 +37,7 @@ function mapToLatest(action$, mapActionToObserable, prefix) {
   })
 }
 
-export function takeEffectLatest(
+function takeEffectLatest(
   action$,
   state$,
   extraSideEffectObs$,
@@ -54,7 +53,7 @@ export function takeEffectLatest(
 
 export const TAKE_EFFECT_EVERY = 'every'
 
-export function takeEffectEvery(
+function takeEffectEvery(
   action$,
   state$,
   extraSideEffectObs$,
@@ -114,7 +113,7 @@ function actionToExhaustObservableEffect(
 
 export const TAKE_EFFECT_EXHAUST = 'exhaust'
 
-export function takeEffectExhaust(
+function takeEffectExhaust(
   action$,
   state$,
   extraSideEffectObs$,
@@ -132,7 +131,7 @@ export function takeEffectExhaust(
 
 export const TAKE_EFFECT_GROUP_BY = 'groupBy'
 
-export function takeEffectGroupBy(
+function takeEffectGroupBy(
   action$,
   state$,
   extraSideEffectObs$,
@@ -160,7 +159,7 @@ export function takeEffectGroupBy(
 
 export const TAKE_EFFECT_GROUP_BY_EXHAUST = 'groupByExhaust'
 
-export function takeEffectGroupByExhaust(
+function takeEffectGroupByExhaust(
   action$,
   state$,
   extraSideEffectObs$,
@@ -192,8 +191,8 @@ const RxEffects = {
   [TAKE_EFFECT_LATEST]: takeEffectLatest,
   [TAKE_EFFECT_EVERY]: takeEffectEvery,
   [TAKE_EFFECT_EXHAUST]: takeEffectExhaust,
-  [TAKE_EFFECT_GROUP_BY]: takeEffectExhaust,
-  [TAKE_EFFECT_GROUP_BY_EXHAUST]: takeEffectExhaust,
+  [TAKE_EFFECT_GROUP_BY]: takeEffectGroupBy,
+  [TAKE_EFFECT_GROUP_BY_EXHAUST]: takeEffectGroupByExhaust,
 }
 
 export default RxEffects

@@ -153,7 +153,7 @@ export default function createMakeRxObservable(
   }
 }
 
-// GioVa nel post fa freddo brrrrrrrrrrrrr
+// GioVa nel posto fa freddo brrrrrrrrrrrrr
 export function mergeCreateMakeRxObservable(...creators) {
   return (action$, state$, effectCaller) => {
     if (creators.length === 0) {
