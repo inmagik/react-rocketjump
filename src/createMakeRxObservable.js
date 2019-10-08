@@ -156,9 +156,11 @@ export default function createMakeRxObservable(
 // GioVa nel posto fa freddo brrrrrrrrrrrrr
 export function mergeCreateMakeRxObservable(...creators) {
   return (action$, state$, effectCaller) => {
-    if (creators.length === 0) {
-      throw new Error('You should provide at least one creator to merge.')
-    }
+    // TODO: Enable and test the following lines
+    // when expose mergeCreateMakeRxObservable as library function
+    // if (creators.length === 0) {
+    //   throw new Error('You should provide at least one creator to merge.')
+    // }
     const [firstCreator, ...otherCreators] = creators
     const [firstDispatch$, updateConfig] = firstCreator(
       action$,
