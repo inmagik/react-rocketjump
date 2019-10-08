@@ -2,7 +2,7 @@ import { rj } from '../../..'
 import rjMap from '..'
 import { PENDING, SUCCESS, FAILURE, CLEAN, RUN } from '../../../actionTypes'
 import { omit } from '../../../helpers'
-import { Subject } from 'rxjs'
+import { createTestRJSubscription } from '../../../testUtils'
 
 describe('Map Plugin', () => {
   it('should make map reducer', () => {
@@ -291,12 +291,12 @@ describe('Map Plugin', () => {
 
     const mockCallback = jest.fn()
 
-    const { actionCreators, makeRxObservable } = rj(rjMap(), {
+    const RjObject = rj(rjMap(), {
       effect: mockApi,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const { actionCreators } = RjObject
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next(omit(actionCreators.runKey(23), ['withMeta', 'extend']))
     subject.next(omit(actionCreators.runKey(32), ['withMeta', 'extend']))

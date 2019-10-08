@@ -32,4 +32,4 @@ export { makeLibraryAction as makeAction } from './actionCreators'
 export * from './actionTypes'
 
 // All rx effects
-export * from './rxEffects'
+export { default as RxEffects } from './rxEffects'

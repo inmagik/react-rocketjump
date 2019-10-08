@@ -61,6 +61,7 @@ class Bond extends React.Component {
 
 export default function App() {
   return (
+    // <React.StrictMode>
     <Router>
       <Bond>
         <Suspense fallback={<div>Loading ...</div>}>
@@ -71,5 +72,6 @@ export default function App() {
         </Suspense>
       </Bond>
     </Router>
+    // </React.StrictMode>
   )
 }
