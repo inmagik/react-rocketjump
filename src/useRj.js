@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useDebugValue } from 'react'
 import { isObjectRj } from 'rocketjump-core'
 import { useConstant } from './hooks'
 import useMiniRedux from './useMiniRedux'
@@ -24,6 +24,10 @@ export default function useRj(
     makeSelectors,
     computeState,
   } = rjObject
+
+  useDebugValue(
+    rjObject.__rjconfig.name ? `rj(${rjObject.__rjconfig.name})` : 'Rocks'
+  )
 
   // The last config or rj recursion rj({},rj(),..,{},{<THIS>})
   // used as debug hints

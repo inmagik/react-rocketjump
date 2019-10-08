@@ -121,7 +121,6 @@ function makeRecursionRjs(
 }
 
 function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
-  console.log('u', finalConfig, runConfig)
   // ~~ END OF RECURSION CHAIN  ~~
   const { sideEffect, computed, ...rjExport } = mergegAlongExport
 
@@ -153,6 +152,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
       actionCreators: {},
       makeSelectors: fn,
       makeRxObservable: fn,
+      pipeActionStream: fn,
     }
   */
   return enhanceFinalExportWithMutations(finalExport, mergegAlongExport)

@@ -1,5 +1,5 @@
-import { useEffect, useReducer, useContext, useMemo } from 'react'
-import { Subject, ReplaySubject } from 'rxjs'
+import { useEffect, useReducer, useContext, useRef } from 'react'
+import { ReplaySubject } from 'rxjs'
 import { publish } from 'rxjs/operators'
 import { useConstant } from './hooks'
 import ConfigureRjContext from './ConfigureRjContext'
@@ -18,11 +18,11 @@ export default function useMiniRedux(
   // debug information used as dev hints and other
   debugInfo
 ) {
-  // Debug RJ \w classy (not in PROD)
+  // Debug rj() \w classy (not in PROD)
   const debugEmitter = useConstant(() => createRjDebugEmitter(debugInfo))
 
   // STATE$
-  // emits state updates (used to build the $dispatchIntoReducer Observable)
+  // emits state updates (used to build the $dispatch Observable)
   const [stateSubject, state$] = useConstant(() => {
     const subject = new ReplaySubject()
     return [subject, subject.asObservable()]
@@ -101,139 +101,115 @@ export default function useMiniRedux(
     // No need in prod is directly the state
     state = stateAndIdx
   } else if (!flags.debugger) {
-    // No need in prod is directly the state
+    // Force turn off debugger features
     state = stateAndIdx
   } else {
     // Grab the piece of original state
     state = stateAndIdx.state
   }
 
-  // Extra shit from <ConfigureRj />
-  const extraConfig = useContext(ConfigureRjContext)
-
-  const [rockActionSubject, action$] = useConstant(() => {
-    const rockActionSubject = new Subject()
-    // const actionObserable = rockActionSubject.asObservable()
-    // Apply the effect pipeline
-    // useful to change the "normal" action stream
-    // ES:. here you can debounce, filter or other
-    // stuff before the action trigger Y effect
-    const rjPipedActionObservable = null //actionObserable
-    // .pipe(publish())
-    // rjPipedActionObservable.connect()
-    return [rockActionSubject, rjPipedActionObservable]
-  })
-
-  // Effect Action Observable
-  // emits effect actions
-  // pass through rj effect config for example { ...takeEffect: 'every' }
-  // make new observable
-  // dispatchIntoReducer$ = makeObservable(EFFECT_ACTION$, ...)
-  // the new observable dispatch the emitted actions into react useReducer state
-  // dispatchIntoReducer$.subscribe(action => dispatch(action))
-  const [dispatch$, lostObservable, lostSubscription] = useMemo(() => {
-    // used 4 catch shit between render phase and componentDidMount (useEffect)
-    const lostSubject = new ReplaySubject()
-    const lostObservable = lostSubject.asObservable()
-
-    const actionObserable = rockActionSubject.asObservable()
-    const rjPipedActionObservable = pipeActionStream(actionObserable).pipe(
-      publish()
-    )
-    rjPipedActionObservable.connect()
-
-    const lostSubscription = actionObserable.subscribe(a => lostSubject.next(a))
-
-    const dispatchObservable = makeObservable(
-      rjPipedActionObservable,
-      state$,
-      extraConfig ? extraConfig.effectCaller : undefined
-    )
-    return [dispatchObservable, lostObservable, lostSubscription]
-  }, [state$, action$, makeObservable, extraConfig, pipeActionStream])
-
-  useEffect(() => {
-    // Dispatch the action returned from observable
-    let adios = false
-
-    function handleDispatch(action) {
-      // Adios amigos
-      if (adios) {
-        return
-      }
-      console.log('~ Sub ~', action, adios)
-      // Erase callbacks before dispatch on reducer
-      // let successCallback
-      // if (action.successCallback) {
-      //   successCallback = action.successCallback
-      //   delete action.successCallback
-      // }
-      // let failureCallback
-      // if (action.failureCallback) {
-      //   failureCallback = action.failureCallback
-      //   delete action.failureCallback
-      // }
-      // // Dispatch the cleaned action
-      // dispatch(action)
-      // // Run the callbacks if needed
-      // if (successCallback) {
-      //   successCallback(action.payload.data)
-      // }
-      // if (failureCallback) {
-      //   failureCallback(action.payload)
-      // }
-    }
-
-    // connected action
-    // this guarantee that side effects in observable
-    // are excuted only one time
-    // the final dispatch observable is eavy merged shit ...
-    // action$.connect()
-    const subscription = dispatch$.subscribe(handleDispatch)
-    lostSubscription.unsubscribe()
-    lostObservable
-      .subscribe(a => {
-        console.log('Replay', a)
-        rockActionSubject.next(a)
-      })
-      .unsubscribe()
-
-    return () => {
-      adios = true
-      subscription.unsubscribe()
-    }
-  }, [dispatch$, rockActionSubject, lostObservable, lostSubscription])
-
-  // Dispatch to reducer or start an effect
-  const dispatchWithEffect = useConstant(() => action => {
-    if (isEffectAction(action)) {
-      // Emit action to given observable theese perform side
-      // effect and emit action dispatched above by subscription
-      // console.log('GO!', action)
-      rockActionSubject.next(action)
-    } else {
-      // Update the state \w given reducer
-      dispatch(action)
-    }
-  })
-
-  // Emit a state update to state$
+  // Emit a state update to state$ Observable
   // ... keep a reference of current state
   useEffect(() => {
     state$.value = state
     stateSubject.next(state)
   }, [state, state$, stateSubject])
 
-  // Say goodbye 2 debug emitter
+  // Extra shit from <ConfigureRj />
+  const extraConfig = useContext(ConfigureRjContext)
+
+  const [
+    actionSubject,
+    action$,
+    dispatch$,
+    updateExtraSideEffectConfig,
+  ] = useConstant(() => {
+    const subject = new ReplaySubject()
+    const actionObserable = subject.asObservable()
+
+    // Apply the effect pipeline
+    // useful to change the "normal" action stream
+    // ES:. here you can debounce, filter or other
+    // stuff before the action trigger Y effect
+    const rjPipedActionObservable = pipeActionStream(actionObserable).pipe(
+      publish()
+    )
+
+    // Create the dispatch observable
+    const [dispatchObservable, updateExtraSideEffectConfig] = makeObservable(
+      rjPipedActionObservable,
+      state$,
+      extraConfig ? extraConfig.effectCaller : undefined
+    )
+
+    return [
+      subject,
+      rjPipedActionObservable,
+      dispatchObservable,
+      updateExtraSideEffectConfig,
+    ]
+  })
+
+  // Update extra side effect config
+  const notUpdateOnFirstMount = useRef(true)
   useEffect(() => {
+    // Not update on first useEffect call because in alredy updated ...
+    if (notUpdateOnFirstMount.current) {
+      notUpdateOnFirstMount.current = false
+      return
+    }
+    updateExtraSideEffectConfig({
+      effectCaller: extraConfig.effectCaller,
+    })
+  }, [extraConfig, updateExtraSideEffectConfig])
+
+  // Subscription 2 dispatch$
+  useEffect(() => {
+    const subscription = dispatch$.subscribe(action => {
+      // Erase callbacks before dispatch on reducer
+      let successCallback
+      if (action.successCallback) {
+        successCallback = action.successCallback
+        delete action.successCallback
+      }
+      let failureCallback
+      if (action.failureCallback) {
+        failureCallback = action.failureCallback
+        delete action.failureCallback
+      }
+      // Dispatch the cleaned action
+      dispatch(action)
+      // Run the callbacks if needed
+      if (successCallback) {
+        successCallback(action.payload.data)
+      }
+      if (failureCallback) {
+        failureCallback(action.payload)
+      }
+    })
+    action$.connect()
+
     return () => {
       if (process.env.NODE_ENV !== 'production') {
         if (flags.debugger) {
           debugEmitter.onTeardown()
         }
       }
+      return subscription.unsubscribe()
     }
-  }, [debugEmitter])
+  }, [action$, dispatch$, debugEmitter])
+
+  // Dispatch to reducer or start an effect
+  const dispatchWithEffect = useConstant(() => action => {
+    if (isEffectAction(action)) {
+      // Emit action to given observable theese perform side
+      // effect and emit action dispatched above by subscription
+      actionSubject.next(action)
+    } else {
+      // Update the state \w given reducer
+      dispatch(action)
+    }
+  })
 
   return [state, dispatchWithEffect]
 }

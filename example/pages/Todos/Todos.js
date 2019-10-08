@@ -33,9 +33,9 @@ export function Todos() {
   ] = useRj(TodosListState)
   // addStupidTodo({})
   const [count, setCount] = useState(0)
-  // useEffect(() => {
-  run()
-  // }, [count])
+  useEffect(() => {
+    run()
+  }, [])
   console.log('Render')
 
   return (

@@ -11,16 +11,7 @@ export const API_URL = 'http://localhost:9001'
 
 export const TodosListState = rj(rjPlainList(), {
   effectCaller: rj.configured(),
-  effects: {
-    '': {
-      gesture: 'lastest',
-      fn: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
-    },
-    ALL_NIGHT: {
-      gesture: 'lastest',
-      fn: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
-    },
-  },
+  effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
   effectPipeline: a => {
     return a.pipe(tap(a => console.log('Y shit', a)))
   },
@@ -39,6 +30,7 @@ export const TodosListState = rj(rjPlainList(), {
       updater: 'deleteItem',
     }),
     toggleTodo: rj.mutation.multi(todo => todo.id, {
+      // effectCaller: false,
       effect: todo =>
         request
           .put(`${API_URL}/todos/${todo.id}`)

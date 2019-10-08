@@ -1,4 +1,4 @@
-import { withLatestFrom, map, publish } from 'rxjs/operators'
+import { withLatestFrom, map } from 'rxjs/operators'
 import { renderHook, act } from '@testing-library/react-hooks'
 import memoize from 'memoize-one'
 import rj from '../rj'
@@ -374,16 +374,13 @@ describe('useRj', () => {
 
     const rjStateObserver = rj({
       effectPipeline: (action$, state$) => {
-        const o = action$.pipe(
+        return action$.pipe(
           withLatestFrom(state$),
           map(([action, state]) => {
             testMaState(state)
             return action
           })
-          // publish()
         )
-        // o.connect()
-        return o
       },
     })
     const maRjState = rj(rjStateObserver, mockFn)
@@ -407,7 +404,7 @@ describe('useRj', () => {
     await act(async () => {
       result.current[1].run()
     })
-    // expect(mockFn).toHaveBeenCalledTimes(2)
+    expect(mockFn).toHaveBeenCalledTimes(2)
     expect(testMaState).nthCalledWith(2, {
       pending: true,
       data: null,

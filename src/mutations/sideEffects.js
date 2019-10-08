@@ -1,4 +1,6 @@
-import createMakeRxObservable from '../createMakeRxObservable'
+import createMakeRxObservable, {
+  mergeCreateMakeRxObservable,
+} from '../createMakeRxObservable'
 import { MUTATION_PREFIX } from './actionTypes'
 
 export function enhanceMakeObservable(
@@ -30,18 +32,11 @@ export function enhanceMakeObservable(
       {
         effect,
         takeEffect: takeEffect || 'every',
-        // effectPipeline: [],
         effectCaller: mutationEffectCaller,
       },
       prefix
     )
   })
 
-  return (action$, state$, effectCaller) => {
-    let o$ = makeObservable(action$, state$, effectCaller)
-    o$ = makeMutationsObsList.reduce((o$, makeMutationObs) => {
-      return makeMutationObs(action$, state$, effectCaller, o$)
-    }, o$)
-    return o$
-  }
+  return mergeCreateMakeRxObservable(makeObservable, ...makeMutationsObsList)
 }
