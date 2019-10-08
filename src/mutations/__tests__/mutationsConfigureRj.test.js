@@ -1,5 +1,5 @@
 import ConfigureRj from '../../ConfigureRj'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { renderHook, act } from '@testing-library/react-hooks'
 import { rj } from '../../index'
 import useRj from '../../useRj'
@@ -123,6 +123,52 @@ describe('ConfigureRj', () => {
       pending: false,
       error: null,
       data: 23,
+    })
+  })
+  it('should access configured effect caller and remains in sync while updates', async () => {
+    const mockEffect = jest.fn().mockResolvedValue(23)
+
+    const maRjState = rj({
+      mutations: {
+        mutationA: {
+          updater: (state, value) => ({ ...state, data: value }),
+          effect: () => Promise.resolve(23),
+        },
+      },
+      effect: mockEffect,
+      effectCaller: rj.configured(),
+    })
+
+    function Wrapper({ children }) {
+      const [i, setI] = useState(0)
+      const caller = () => Promise.resolve(i)
+      useEffect(() => {
+        if (i < 1) {
+          setI(i => i + 1)
+        }
+      }, [i])
+      // i take values 0 then 1 then stop
+      return <ConfigureRj effectCaller={caller}>{children}</ConfigureRj>
+    }
+
+    const { result } = renderHook(
+      () =>
+        useRj(maRjState, (state, { getData }) => ({
+          data: getData(state),
+        })),
+      {
+        wrapper: Wrapper,
+      }
+    )
+
+    await act(async () => {
+      result.current[1].mutationA()
+    })
+
+    expect(mockEffect).toHaveBeenCalledTimes(0)
+
+    expect(result.current[0]).toEqual({
+      data: 1,
     })
   })
 })

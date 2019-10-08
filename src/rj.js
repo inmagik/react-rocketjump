@@ -124,8 +124,13 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
   // ~~ END OF RECURSION CHAIN  ~~
   const { sideEffect, computed, ...rjExport } = mergegAlongExport
 
+  const { effectPipeline, ...sideEffectConfig } = sideEffect
+
   // Create the make rx observable function using merged side effect descriptor!
-  const makeRxObservable = createMakeRxObservable(sideEffect)
+  const makeRxObservable = createMakeRxObservable(sideEffectConfig)
+
+  const pipeActionStream = (action$, state$) =>
+    effectPipeline.reduce((action$, piper) => piper(action$, state$), action$)
 
   // Create the compute state function by computed config,
   // when no computed config is given return null is responsibility
@@ -136,6 +141,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
     ...rjExport,
     computeState,
     makeRxObservable,
+    pipeActionStream,
   }
 
   // Finally the rocketjump runnable state is created!
@@ -146,6 +152,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
       actionCreators: {},
       makeSelectors: fn,
       makeRxObservable: fn,
+      pipeActionStream: fn,
     }
   */
   return enhanceFinalExportWithMutations(finalExport, mergegAlongExport)

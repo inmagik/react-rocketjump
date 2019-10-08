@@ -1,8 +1,8 @@
 import rj from '../../../rj'
 import { makeAction } from '../../../index'
-import { Subject } from 'rxjs'
 import rjDebounce from '../index'
 import bindActionCreators from '../../../bindActionCreators'
+import { createTestRJSubscription } from '../../../testUtils'
 import { PENDING, SUCCESS, CLEAN, RUN } from '../../../actionTypes'
 
 jest.useFakeTimers()
@@ -17,14 +17,13 @@ describe('rjDebounce', () => {
 
     const mockCallback = jest.fn()
 
-    const { makeRxObservable, actionCreators } = rj(rjDebounce(200), {
+    const RjObject = rj(rjDebounce(200), {
       effect: mockApi,
       takeEffect: 'every',
     })
-
-    const subject = new Subject()
+    const { actionCreators } = RjObject
+    const subject = createTestRJSubscription(RjObject, mockCallback)
     const dispatch = action => subject.next(action)
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
     const { runDebounced, clean } = bindActionCreators(actionCreators, dispatch)
     runDebounced()
     runDebounced()
@@ -167,7 +166,7 @@ describe('rjDebounce', () => {
 
     const mockCallback = jest.fn()
 
-    const { makeRxObservable, actionCreators } = rj(rjDebounce(200), {
+    const RjObject = rj(rjDebounce(200), {
       effect: mockApi,
       actions: () => ({
         drago: () => makeAction('DRAGO'),
@@ -175,8 +174,8 @@ describe('rjDebounce', () => {
       takeEffect: 'every',
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const { actionCreators } = RjObject
+    const subject = createTestRJSubscription(RjObject, mockCallback)
     const dispatch = action => subject.next(action)
     const { run, drago } = bindActionCreators(actionCreators, dispatch, subject)
     drago()
@@ -269,7 +268,7 @@ describe('rjDebounce', () => {
 
     const mockCallback = jest.fn()
 
-    const { makeRxObservable, actionCreators } = rj(
+    const RjObject = rj(
       rjDebounce({
         time: 200,
         when: (prev, curr) => {
@@ -285,9 +284,9 @@ describe('rjDebounce', () => {
       }
     )
 
-    const subject = new Subject()
+    const { actionCreators } = RjObject
+    const subject = createTestRJSubscription(RjObject, mockCallback)
     const dispatch = action => subject.next(action)
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
     const { runDebounced } = bindActionCreators(actionCreators, dispatch)
     runDebounced({ q: 'G' })
     expect(mockApi).toBeCalledTimes(1)

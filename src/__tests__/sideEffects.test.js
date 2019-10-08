@@ -1,7 +1,7 @@
 import { rj } from '..'
-import { Subject } from 'rxjs'
 import { mergeMap, debounceTime, distinctUntilChanged } from 'rxjs/operators'
 import { PENDING, SUCCESS, FAILURE, CLEAN, RUN, CANCEL } from '../actionTypes'
+import { createTestRJSubscription } from '../testUtils'
 import {
   TAKE_EFFECT_EVERY,
   TAKE_EFFECT_GROUP_BY,
@@ -18,12 +18,11 @@ describe('RJ side effect model', () => {
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -64,12 +63,11 @@ describe('RJ side effect model', () => {
     const mockApi = jest.fn().mockResolvedValueOnce(1312)
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -111,12 +109,11 @@ describe('RJ side effect model', () => {
     const mockBadApi = jest.fn(() => Promise.reject('Something bad happened'))
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockBadApi,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -154,12 +151,11 @@ describe('RJ side effect model', () => {
     const mockApi = jest.fn().mockResolvedValueOnce(1)
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -180,12 +176,11 @@ describe('RJ side effect model', () => {
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -226,12 +221,11 @@ describe('RJ side effect model', () => {
     const mockBadApi = jest.fn(() => Promise.reject('Something bad happened'))
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockBadApi,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -269,12 +263,11 @@ describe('RJ side effect model', () => {
     const mockApi = jest.fn().mockResolvedValueOnce(1)
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -324,13 +317,12 @@ describe('RJ side effect model', () => {
       .mockResolvedValueOnce(23)
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: 'every',
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -430,13 +422,12 @@ describe('RJ side effect model', () => {
       .mockResolvedValueOnce(23)
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_EXHAUST,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -528,13 +519,12 @@ describe('RJ side effect model', () => {
     const mockApi = jest.fn()
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_EXHAUST,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: CLEAN,
@@ -566,13 +556,12 @@ describe('RJ side effect model', () => {
       .mockResolvedValueOnce(23)
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: 'every',
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -652,12 +641,11 @@ describe('RJ side effect model', () => {
       .mockResolvedValueOnce('Alice')
       .mockResolvedValueOnce('Bob')
     const mockCallback = jest.fn()
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -724,13 +712,12 @@ describe('RJ side effect model', () => {
 
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_EVERY,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -813,13 +800,12 @@ describe('RJ side effect model', () => {
           distinctUntilChanged()
         ),
     })
-    const { makeRxObservable } = rj(rjWithDebouce, {
+    const RjObject = rj(rjWithDebouce, {
       effect: mockApi,
       takeEffect: TAKE_EFFECT_EVERY,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -887,13 +873,12 @@ describe('RJ side effect model', () => {
 
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_EVERY,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -974,13 +959,12 @@ describe('RJ side effect model', () => {
   //
   //   const mockCallback = jest.fn()
   //
-  //   const { makeRxObservable } = rj({
+  //   const RjObject = rj({
   //     effect: mockApi,
   //     takeEffect: TAKE_EFFECT_QUEUE,
   //   })()
   //
-  //   const subject = new Subject()
-  //   makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+  // const subject = createTestRJSubscription(RjObject, mockCallback)
   //
   //   subject.next({
   //     type: RUN,
@@ -1070,13 +1054,12 @@ describe('RJ side effect model', () => {
 
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_EXHAUST,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -1173,13 +1156,12 @@ describe('RJ side effect model', () => {
 
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: [TAKE_EFFECT_GROUP_BY, action => action.meta.name],
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -1304,13 +1286,12 @@ describe('RJ side effect model', () => {
 
     const mockCallback = jest.fn()
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: [TAKE_EFFECT_GROUP_BY_EXHAUST, action => action.meta.name],
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -1421,14 +1402,12 @@ describe('RJ side effect model', () => {
         })
     )
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_GROUP_BY,
     })
 
-    const subject = new Subject()
-
-    expect(() => makeRxObservable(subject.asObservable())).toThrow()
+    expect(() => createTestRJSubscription(RjObject)).toThrow()
   })
 
   it('gets angry if no groupByExhaust function is injected', () => {
@@ -1442,14 +1421,12 @@ describe('RJ side effect model', () => {
         })
     )
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: TAKE_EFFECT_GROUP_BY_EXHAUST,
     })
 
-    const subject = new Subject()
-
-    expect(() => makeRxObservable(subject.asObservable())).toThrow()
+    expect(() => createTestRJSubscription(RjObject)).toThrow()
   })
 
   it('gets angry if unknown groupBy function is injected', () => {
@@ -1463,14 +1440,12 @@ describe('RJ side effect model', () => {
         })
     )
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: 'blabla',
     })
 
-    const subject = new Subject()
-
-    expect(() => makeRxObservable(subject.asObservable())).toThrow()
+    expect(() => createTestRJSubscription(RjObject)).toThrow()
   })
 
   it('call provided takeEffect when function is given', () => {
@@ -1481,13 +1456,12 @@ describe('RJ side effect model', () => {
       // is to avoid makeRxObservable to throw shit
       .mockImplementation(($o, mapTo$) => $o.pipe(mergeMap(mapTo$)))
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
       takeEffect: customMockTakeEffect,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(() => {})
+    const subject = createTestRJSubscription(RjObject)
 
     subject.next({
       type: RUN,
@@ -1504,12 +1478,11 @@ describe('RJ side effect model', () => {
     const mockApiResult = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     const onSuccess = () => {}
 
@@ -1536,12 +1509,11 @@ describe('RJ side effect model', () => {
     const mockCallback = jest.fn()
     const mockApi = jest.fn().mockRejectedValueOnce('Fuck')
 
-    const { makeRxObservable } = rj({
+    const RjObject = rj({
       effect: mockApi,
     })
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     const onFailure = () => {}
 
@@ -1577,7 +1549,7 @@ describe('RJ side effect model', () => {
       return fn(...args).then(a => a.concat('Vegas'))
     }
 
-    const { makeRxObservable } = rj(
+    const RjObject = rj(
       { effectCaller: callerA },
       { effectCaller: callerB },
       {
@@ -1585,8 +1557,7 @@ describe('RJ side effect model', () => {
       }
     )
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable()).subscribe(mockCallback)
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
     subject.next({
       type: RUN,
@@ -1637,7 +1608,7 @@ describe('RJ side effect model', () => {
       return fn(...args).then(a => a.concat('Vegas'))
     }
 
-    const { makeRxObservable } = rj(
+    const RjObject = rj(
       { effectCaller: callerA },
       { effectCaller: rj.configured() },
       { effectCaller: callerC },
@@ -1646,9 +1617,12 @@ describe('RJ side effect model', () => {
       }
     )
 
-    const subject = new Subject()
-    makeRxObservable(subject.asObservable(), null, callerB).subscribe(
-      mockCallback
+    const subject = createTestRJSubscription(
+      RjObject,
+      mockCallback,
+      undefined,
+      null,
+      callerB
     )
 
     subject.next({
@@ -1699,12 +1673,11 @@ describe('RJ side effect model', () => {
         resolve(err)
       })
 
-      const { makeRxObservable } = rj({
+      const RjObject = rj({
         effect: badApi,
       })
-
-      const subject = new Subject()
-      makeRxObservable(subject.asObservable()).subscribe(
+      const subject = createTestRJSubscription(
+        RjObject,
         mockCallback,
         mockError
       )

@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Todo from './Todo'
-import { useRunRj } from 'react-rocketjump'
+import { useRunRj, useRj, ConfigureRj } from 'react-rocketjump'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
@@ -8,15 +8,42 @@ import './Todos.css'
 function useXD() {
   return useRunRj(TodosListState)
 }
-export default function Todos() {
+export default function AppTodos() {
+  const [count, setCount] = useState(0)
+  function callMaMen(call, ...params) {
+    console.log('Call 4', count)
+    return call(...params)
+  }
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)} style={{ marginTop: 40 }}>
+        {count}
+      </button>
+      {/* <ConfigureRj effectCaller={callMaMen}> */}
+      <Todos />
+      {/* </ConfigureRj> */}
+    </div>
+  )
+}
+
+export function Todos() {
   const [
     { todos, loading, adding, deleting, updating },
-    { addStupidTodo, removeTodo, toggleTodo },
-  ] = useXD()
+    { addStupidTodo, removeTodo, toggleTodo, run },
+  ] = useRj(TodosListState)
+  // addStupidTodo({})
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    run()
+  }, [])
+  console.log('Render')
 
   return (
     <div className="todos">
       <h1>Ma REST Todos</h1>
+      <button onClick={() => setCount(c => c + 1)} style={{ marginTop: 40 }}>
+        {count}
+      </button>
       <h3>
         <a href={`${API_URL}/todos`}>
           {API_URL}
