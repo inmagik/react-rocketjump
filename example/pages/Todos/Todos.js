@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Todo from './Todo'
-import { useRunRj, useRj, ConfigureRj } from 'react-rocketjump'
+import { useRunRj, useRj, ConfigureRj, deps } from 'react-rocketjump'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
@@ -30,12 +30,12 @@ export function Todos() {
   const [
     { todos, loading, adding, deleting, updating },
     { addStupidTodo, removeTodo, toggleTodo, run },
-  ] = useRj(TodosListState)
+  ] = useRunRj(TodosListState, [])
   // addStupidTodo({})
   const [count, setCount] = useState(0)
-  useEffect(() => {
-    run()
-  }, [])
+  // useEffect(() => {
+  //   run()
+  // }, [])
   console.log('Render')
 
   return (
