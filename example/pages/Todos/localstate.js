@@ -1,20 +1,11 @@
 import { rj } from 'react-rocketjump'
-import { tap } from 'rxjs/operators'
 import rjPlainList from 'react-rocketjump/plugins/plainList'
 import request from 'superagent'
 
 export const API_URL = 'http://localhost:9001'
 
-// const rjPlainList2 = rj({
-//   // finalizeExport:
-// })
-
 export const TodosListState = rj(rjPlainList(), {
-  effectCaller: rj.configured(),
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
-  effectPipeline: a => {
-    return a.pipe(tap(a => console.log('Y shit', a)))
-  },
   mutations: {
     addStupidTodo: rj.mutation.single({
       effect: todo =>
@@ -30,7 +21,6 @@ export const TodosListState = rj(rjPlainList(), {
       updater: 'deleteItem',
     }),
     toggleTodo: rj.mutation.multi(todo => todo.id, {
-      // effectCaller: false,
       effect: todo =>
         request
           .put(`${API_URL}/todos/${todo.id}`)

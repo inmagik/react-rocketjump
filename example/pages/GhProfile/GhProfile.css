@@ -1,0 +1,71 @@
+
+.Gh-App {
+  padding-top: 45px;
+  font-family: sans-serif;
+}
+
+.Gh-TopBar {
+  position: fixed;
+  border-bottom: 1px solid lightgrey;
+  top: 0;
+  background: white;
+  height: 38px;
+  right: 0;
+  left: 0;
+  text-align: center;
+}
+.Gh-TopBar > h1 {
+  margin: 0;
+  padding: 0;
+}
+.Gh-Token {
+  top: 20px;
+  position: absolute;
+  right: 5px;
+}
+
+.Gh-SearchBox {
+  margin-top: 5px;
+  display: flex;
+}
+
+.Gh-SearchBox input {
+  width: 40%;
+  /* margin-left: auto; */
+  /* margin-right: auto; */
+  font-size: 20px;
+  outline: none;
+  border-radius: 3px;
+  padding: 5px;
+  border: 1px solid lightgrey;
+}
+
+.Gh-SearchBox input:focus {
+  border: 1px solid deepskyblue;
+}
+
+.Gh-ProfileInfo {
+  border: 1px solid lightgrey;
+  padding: 5px;
+  margin-top: 20px;
+  border-radius: 3px;
+  display: flex;
+}
+
+.Gh-ProfileBox {
+  flex: 2;
+}
+.Gh-ProfileBox h1 {
+  padding: 0;
+  margin: 0;
+  margin-top: 5px;
+  margin-bottom: 30px;
+}
+.Gh-Stars {
+  flex: 1;
+  /* background: green; */
+}
+.Gh-Followers {
+  flex: 1;
+  /* background: red; */
+}

@@ -1,4 +1,11 @@
-/* body {
-  font-family: monospace;
-  color: deepskyblue;
-} */
+* {
+  box-sizing: border-box;
+}
+
+.__back-btn {
+  top: 5px;
+  left: 5px;
+  position: fixed;
+  font-size: 14px;
+  z-index: 999;
+}

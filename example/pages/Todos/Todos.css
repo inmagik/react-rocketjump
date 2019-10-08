@@ -5,10 +5,6 @@
   margin-top: 50px;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 .todo-list {
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;

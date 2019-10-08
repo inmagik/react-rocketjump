@@ -11,7 +11,7 @@ const lazyExamples = examples.map(example =>
 )
 
 const BackButton = () => (
-  <div style={{ position: 'fixed', top: 5, left: 5, fontSize: 14 }}>
+  <div className="__back-btn">
     <Link to="/">{'<- Back 2 examples'}</Link>
   </div>
 )
@@ -31,8 +31,8 @@ function ListExamples() {
   )
 }
 
-function ExamplePage({ match }) {
-  const { example } = match.params
+function ExamplePage(props) {
+  const { example } = props.match.params
 
   const index = examples.indexOf(example)
 
@@ -45,32 +45,21 @@ function ExamplePage({ match }) {
   return (
     <>
       <BackButton />
-      <ExampleComponent />
+      <ExampleComponent {...props} />
     </>
   )
-}
-
-class Bond extends React.Component {
-  // componentDidCatch(shit) {
-  //   console.log('SHIT', shit)
-  // }
-  render() {
-    return this.props.children
-  }
 }
 
 export default function App() {
   return (
     // <React.StrictMode>
     <Router>
-      <Bond>
-        <Suspense fallback={<div>Loading ...</div>}>
-          <Switch>
-            <Route exact path="/" component={ListExamples} />
-            <Route path="/examples/:example" component={ExamplePage} />
-          </Switch>
-        </Suspense>
-      </Bond>
+      <Suspense fallback={<div>Loading ...</div>}>
+        <Switch>
+          <Route exact path="/" component={ListExamples} />
+          <Route path="/examples/:example" component={ExamplePage} />
+        </Switch>
+      </Suspense>
     </Router>
     // </React.StrictMode>
   )
