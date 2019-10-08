@@ -124,6 +124,15 @@ export default function useMiniRedux(
     dispatch$,
     updateExtraSideEffectConfig,
   ] = useConstant(() => {
+    // Why ReplaySubject?
+    // in the old useMiniRedux implementation
+    // subscription happened in the render phase
+    // but as says ma men @bvaughn for the correct work
+    // of upcoming async mode side effects are allowed 2 run
+    // in the commit phase ...
+    // Check this: https://github.com/facebook/react/tree/master/packages/use-subscription
+    // thanks 2 ReplaySubject the action dispatched between the render and commit phase
+    // are "re-played" and correct dispatched to our rx side effects or react reducer state
     const subject = new ReplaySubject()
     const actionObserable = subject.asObservable()
 
@@ -131,10 +140,15 @@ export default function useMiniRedux(
     // useful to change the "normal" action stream
     // ES:. here you can debounce, filter or other
     // stuff before the action trigger Y effect
-    const rjPipedActionObservable = pipeActionStream(
-      actionObserable,
-      state$
-    ).pipe(publish())
+    const rjPipedActionObservable = pipeActionStream(actionObserable, state$)
+      // this ensure that the side effects inside effectPipeline
+      // Es: tap(() => { sideEffect() })
+      // are excuted only once
+      // in the older implementation this mechanism was in
+      // createMakeRxObservable but this leads to a lot of bug and
+      // mysterious behaviours now pubblish are excuted only once
+      // in front of the original action observable
+      .pipe(publish())
 
     // Create the dispatch observable
     const [dispatchObservable, updateExtraSideEffectConfig] = makeObservable(
@@ -159,6 +173,9 @@ export default function useMiniRedux(
       notUpdateOnFirstMount.current = false
       return
     }
+    // Update the effect caller at run time <3
+    // Now <ConfigureRj effectCaller={() => {}} />
+    // can be an anonymous without breaking anything
     updateExtraSideEffectConfig({
       effectCaller: extraConfig.effectCaller,
     })
@@ -188,15 +205,17 @@ export default function useMiniRedux(
         failureCallback(action.payload)
       }
     })
+    // Ok now we are ready to handle shit from dispatch$ observable!
     action$.connect()
 
     return () => {
+      subscription.unsubscribe()
+      // Say good bye to debugger
       if (process.env.NODE_ENV !== 'production') {
         if (flags.debugger) {
           debugEmitter.onTeardown()
         }
       }
-      subscription.unsubscribe()
     }
   }, [action$, dispatch$, debugEmitter])
 
