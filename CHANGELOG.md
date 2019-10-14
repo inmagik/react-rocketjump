@@ -1,3 +1,25 @@
+## 2.1.0
+###### *???*
+
+...
+
+#### `deps` :broken_heart: :gem:
+
+One of the main goals of *rj* is to (try) to promoting
+the functional programming paradigm and most in general
+a declarative code approach instead of an imperative code approach.
+
+With this in mind we try to make `useRunRj` more powerful and declarative.
+
+Ok, the code boy.
+
+Try to imagine a situation when you need to *wait*
+a value to run an effect,
+typically when you have a sequence of *rjs* or a situation where your value
+can be valid or * maybe * can not.
+
+
+
 ## 2.0.0
 ###### *September 19, 2019*
 
