@@ -1,5 +1,7 @@
 import { renderHook, act } from '@testing-library/react-hooks'
+import { tap } from 'rxjs/operators'
 import * as deps from '../deps'
+import { RUN } from '../actionTypes'
 import rj from '../rj'
 import useRunRj from '../useRunRj'
 
@@ -265,5 +267,297 @@ describe('deps', () => {
       pending: false,
       error: null,
     })
+  })
+  it('should pass meta along with value', async () => {
+    let _resolves = []
+    const mockApi = jest.fn(
+      () =>
+        new Promise(resolve => {
+          _resolves.push(resolve)
+        })
+    )
+    const actionLog = jest.fn()
+
+    const MyRjState = rj({
+      effect: mockApi,
+      effectPipeline: a => a.pipe(tap(actionLog)),
+    })
+
+    const { rerender } = renderHook(
+      ({ id }) => useRunRj(MyRjState, [deps.meta(id, { giova: id })], false),
+      {
+        initialProps: {
+          id: 23,
+        },
+      }
+    )
+    expect(actionLog).toHaveBeenNthCalledWith(1, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [23],
+      },
+      meta: {
+        giova: 23,
+      },
+    })
+    await act(async () => _resolves[0]('Gio Va'))
+    // Api called \w
+    expect(mockApi).toHaveBeenNthCalledWith(1, 23)
+    rerender({ id: 1312 })
+    expect(mockApi).toHaveBeenNthCalledWith(2, 1312)
+    expect(actionLog).toHaveBeenNthCalledWith(2, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [1312],
+      },
+      meta: {
+        giova: 1312,
+      },
+    })
+    await act(async () => _resolves[1]('Gio Va'))
+  })
+  it('should pass meta along with value only when a dep change', async () => {
+    let _resolves = []
+    const mockApi = jest.fn(
+      () =>
+        new Promise(resolve => {
+          _resolves.push(resolve)
+        })
+    )
+    const actionLog = jest.fn()
+
+    const MyRjState = rj({
+      effect: mockApi,
+      effectPipeline: a => a.pipe(tap(actionLog)),
+    })
+
+    const { rerender } = renderHook(
+      ({ id, level }) =>
+        useRunRj(
+          MyRjState,
+          [
+            deps.meta(id, { giova: id }),
+            deps.meta(level, { is5Dan: level === 'giova' }),
+          ],
+          false
+        ),
+      {
+        initialProps: {
+          id: 23,
+          level: 'rinne',
+        },
+      }
+    )
+    expect(actionLog).toHaveBeenNthCalledWith(1, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [23, 'rinne'],
+      },
+      meta: {
+        giova: 23,
+        is5Dan: false,
+      },
+    })
+    await act(async () => _resolves[0]('Gio Va'))
+    // Api called \w
+    expect(mockApi).toHaveBeenNthCalledWith(1, 23, 'rinne')
+    rerender({ id: 1312, level: 'rinne' })
+    expect(mockApi).toHaveBeenNthCalledWith(2, 1312, 'rinne')
+    expect(actionLog).toHaveBeenNthCalledWith(2, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [1312, 'rinne'],
+      },
+      meta: {
+        giova: 1312,
+      },
+    })
+    await act(async () => _resolves[1]('Gio Va'))
+    rerender({ id: 1312, level: 'giova' })
+    expect(mockApi).toHaveBeenNthCalledWith(3, 1312, 'giova')
+    expect(actionLog).toHaveBeenNthCalledWith(3, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [1312, 'giova'],
+      },
+      meta: {
+        is5Dan: true,
+      },
+    })
+    await act(async () => _resolves[2]('Gio Va'))
+  })
+  it('should pass meta along with all values when specified', async () => {
+    let _resolves = []
+    const mockApi = jest.fn(
+      () =>
+        new Promise(resolve => {
+          _resolves.push(resolve)
+        })
+    )
+    const actionLog = jest.fn()
+
+    const MyRjState = rj({
+      effect: mockApi,
+      effectPipeline: a => a.pipe(tap(actionLog)),
+    })
+
+    const { rerender } = renderHook(
+      ({ id, level }) =>
+        useRunRj(
+          MyRjState,
+          deps.allMeta(
+            // Params
+            [id, level],
+            // Meta
+            { giova: id, is5Dan: level === 'giova' }
+          ),
+          false
+        ),
+      {
+        initialProps: {
+          id: 23,
+          level: 'rinne',
+        },
+      }
+    )
+    expect(actionLog).toHaveBeenNthCalledWith(1, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [23, 'rinne'],
+      },
+      meta: {
+        giova: 23,
+        is5Dan: false,
+      },
+    })
+    await act(async () => _resolves[0]('Gio Va'))
+    // Api called \w
+    expect(mockApi).toHaveBeenNthCalledWith(1, 23, 'rinne')
+    rerender({ id: 1312, level: 'rinne' })
+    expect(mockApi).toHaveBeenNthCalledWith(2, 1312, 'rinne')
+    expect(actionLog).toHaveBeenNthCalledWith(2, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [1312, 'rinne'],
+      },
+      meta: {
+        giova: 1312,
+        is5Dan: false,
+      },
+    })
+    await act(async () => _resolves[1]('Gio Va'))
+    rerender({ id: 1312, level: 'giova' })
+    expect(mockApi).toHaveBeenNthCalledWith(3, 1312, 'giova')
+    expect(actionLog).toHaveBeenNthCalledWith(3, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [1312, 'giova'],
+      },
+      meta: {
+        giova: 1312,
+        is5Dan: true,
+      },
+    })
+    await act(async () => _resolves[2]('Gio Va'))
+  })
+  it('should pass maybe meta along with value only when a dep change', async () => {
+    let _resolves = []
+    const mockApi = jest.fn(
+      () =>
+        new Promise(resolve => {
+          _resolves.push(resolve)
+        })
+    )
+    const actionLog = jest.fn()
+
+    const MyRjState = rj({
+      effect: mockApi,
+      effectPipeline: a => a.pipe(tap(actionLog)),
+    })
+
+    const { rerender } = renderHook(
+      ({ id, level }) =>
+        useRunRj(
+          MyRjState,
+          [
+            deps.maybe(id).meta({ giova: id }),
+            deps.meta(level, { is5Dan: level === 'giova' }),
+          ],
+          false
+        ),
+      {
+        initialProps: {
+          id: null,
+          level: 'rinne',
+        },
+      }
+    )
+    expect(mockApi).not.toHaveBeenCalled()
+    expect(actionLog).not.toHaveBeenCalled()
+    rerender({ id: 23, level: 'rinne' })
+    expect(actionLog).toHaveBeenNthCalledWith(1, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [23, 'rinne'],
+      },
+      meta: {
+        giova: 23,
+      },
+    })
+    expect(mockApi).toHaveBeenNthCalledWith(1, 23, 'rinne')
+    await act(async () => _resolves[0]('Gio Va'))
+    rerender({ id: 1312, level: 'giova' })
+    expect(mockApi).toHaveBeenNthCalledWith(2, 1312, 'giova')
+    expect(actionLog).toHaveBeenNthCalledWith(2, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [1312, 'giova'],
+      },
+      meta: {
+        giova: 1312,
+        is5Dan: true,
+      },
+    })
+    await act(async () => _resolves[1]('Gio Va'))
   })
 })

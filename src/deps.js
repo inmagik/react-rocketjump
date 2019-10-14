@@ -34,6 +34,8 @@ export const isNotRunValue = a => getDepValue(a) === NOT_RUN
 
 export const meta = (a, meta) => Run(a, meta)
 
+export const allMeta = (args, meta) => args.map(a => Run(a, meta))
+
 // Naybe run based on value
 export const maybe = a => (a ? Run(a) : NotRun())
 
