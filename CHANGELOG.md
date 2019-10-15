@@ -16,7 +16,70 @@ Ok, the code boy.
 Try to imagine a situation when you need to *wait*
 a value to run an effect,
 typically when you have a sequence of *rjs* or a situation where your value
-can be valid or * maybe * can not.
+can be valid or *maybe* can not.
+
+Take this snippet:
+
+```js
+function UserProfile({ id }) {
+  // Fetch the user info \w UserState rj
+  const [{ data: user}] = useRunRj(UserState, [id])
+  // Fetch the use company info \w CompanyState
+  // NOTE this code is broken becose user in null until the
+  // UserState's effect resolves
+  const [{ data: company }] = useRunRj(CompanyState, [user.companyId])
+}
+```
+
+You need to *wait* until `UserState`'s effect resolves before *run* `CompanyState`'s effect.
+
+Sure you can simply switch from `useRunRj` to `useRj`
+and implement it yourself:
+
+```js
+function UserProfile({ id }) {
+  // Fetch the user info \w UserState rj
+  const [{ data: user}] = useRunRj(UserState, [id])
+  // Fetch the use company info \w CompanyState
+  // This is OK
+  const [{ data: company }, { run, clean }] = useRj(CompanyState)
+  useEffect(() => {
+    if (user) {
+      run(user.companyId)
+      return clean()
+    }
+  },
+  // NOTE run and clean can be ommited because don't changes
+  // between renders but you can saftley add it to deps
+  // to make your linter happy
+  [user])
+}
+```
+
+Ok, but this code is not too declarative and you need to grab
+*run* and *clean* namespace them if needed and furthermore if * the * values
+increase you need to implement complicated condition.
+imagine if you can simply tell to `useRunRj`:
+"please don't run the effect until `user` has a value,
+when `user` is ok then *run* the effect, thanks."
+
+
+Now with `deps` you can:
+
+```js
+// Import the Magik deps from rj
+import { deps } from 'react-rocketjump'
+function UserProfile({ id }) {
+  // Fetch the user info \w UserState rj
+  const [{ data: user}] = useRunRj(UserState, [id])
+  // Fetch the use company info \w CompanyState
+  const [{ data: company }] = useRunRj(CompanyState,
+    // When user is not falsy run CompanyState
+    // with user.companyId as param
+    [deps.maybeGet(user, 'companyId')]
+  )
+}
+```
 
 
 

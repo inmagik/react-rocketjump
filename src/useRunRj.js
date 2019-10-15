@@ -1,33 +1,6 @@
 import { useEffect, useRef } from 'react'
 import useRj from './useRj'
-import { isNotRunValue, getDepValue, getDepMeta } from './deps'
-
-function getMeta(oldValues, newArgs) {
-  if (oldValues === null) {
-    // All changes
-    return newArgs.reduce(
-      (meta, arg, i) => ({
-        ...meta,
-        ...getDepMeta(newArgs[i]),
-      }),
-      {}
-    )
-  }
-  const oldValuesLen = oldValues.length
-  return newArgs.reduce((meta, arg, index) => {
-    if (index >= oldValuesLen || getDepValue(arg) !== oldValues[index]) {
-      const depMeta = getDepMeta(arg)
-      if (depMeta) {
-        return {
-          ...meta,
-          ...getDepMeta(arg),
-        }
-      }
-      return meta
-    }
-    return meta
-  }, {})
-}
+import { getRunValuesFromDeps, shouldRunDeps, getMetaFromDeps } from './deps'
 
 // Use a rocketjump and run it according to run arguments.
 // This is only a syntax sugar over useRj and useEffect,
@@ -43,15 +16,15 @@ export default function useRunRj(
   const actions = stateAndActions[1]
   const { run, clean } = actions
 
-  const runValues = runArgs.map(getDepValue)
+  const runValues = getRunValuesFromDeps(runArgs)
 
   const prevRunValues = useRef(null)
   useEffect(() => {
     // has some maybe? If yes don't run effect
-    const shouldRun = !runArgs.some(isNotRunValue)
+    const shouldRun = shouldRunDeps(runArgs)
 
     if (shouldRun) {
-      const meta = getMeta(prevRunValues.current, runArgs)
+      const meta = getMetaFromDeps(prevRunValues.current, runArgs)
       run.withMeta(meta).run(...runValues)
     }
 
