@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import useRj from './useRj'
 import { getRunValuesFromDeps, shouldRunDeps, getMetaFromDeps } from './deps'
 
@@ -12,23 +12,30 @@ export default function useRunRj(
   shouldCleanOnNewEffect = true,
   selectState
 ) {
-  const stateAndActions = useRj(rjObject, selectState)
-  const actions = stateAndActions[1]
-  const { run, clean } = actions
+  const [state, originalActions] = useRj(rjObject, selectState)
+  const { run, clean } = originalActions
+
+  const [withMeta, setWithMeta] = useState({})
+  const prevWithMeta = useRef(null)
 
   const runValues = getRunValuesFromDeps(runArgs)
-
   const prevRunValues = useRef(null)
+
   useEffect(() => {
     // has some maybe? If yes don't run effect
     const shouldRun = shouldRunDeps(runArgs)
 
     if (shouldRun) {
       const meta = getMetaFromDeps(prevRunValues.current, runArgs)
-      run.withMeta(meta).run(...runValues)
+      let hackRunWithMeta = {}
+      if (prevWithMeta.current && prevWithMeta.current !== withMeta) {
+        hackRunWithMeta = withMeta
+      }
+      run.withMeta({ ...meta, ...hackRunWithMeta }).run(...runValues)
     }
 
     prevRunValues.current = runValues
+    prevWithMeta.current = withMeta
 
     return () => {
       if (shouldCleanOnNewEffect && shouldRun) {
@@ -42,5 +49,13 @@ export default function useRunRj(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clean, run, shouldCleanOnNewEffect, ...runValues])
 
-  return stateAndActions
+  const actions = useMemo(
+    () => ({
+      ...originalActions,
+      withNextMeta: setWithMeta,
+    }),
+    [setWithMeta, originalActions]
+  )
+
+  return useMemo(() => [state, actions], [state, actions])
 }

@@ -692,7 +692,7 @@ describe('deps', () => {
       pending: false,
       error: null,
     })
-    rerender({ id: 1312, code: 'Albi', giova: 'isCoool' })
+    rerender({ id: 1312, code: 'Albi' })
     // Api called \w
     expect(mockApi).toHaveBeenNthCalledWith(1, 1312, 'Albi')
     expect(actionLog).toHaveBeenNthCalledWith(1, {
@@ -724,5 +724,94 @@ describe('deps', () => {
       pending: false,
       error: null,
     })
+  })
+  it('should permit hack next meta', async () => {
+    const actionLog = jest.fn()
+    let _resolves = []
+    const mockApi = jest.fn(
+      () =>
+        new Promise(resolve => {
+          _resolves.push(resolve)
+        })
+    )
+    const MyRjState = rj({
+      effect: mockApi,
+      effectPipeline: a => a.pipe(tap(actionLog)),
+    })
+
+    const { rerender, result } = renderHook(
+      ({ id }) =>
+        useRunRj(MyRjState, deps.allMaybe(deps.withMeta(id, { id })), false),
+      {
+        initialProps: {
+          id: false,
+        },
+      }
+    )
+    // Initial state
+    expect(result.current[0]).toEqual({
+      data: null,
+      pending: false,
+      error: null,
+    })
+    expect(mockApi).not.toHaveBeenCalled()
+    expect(actionLog).not.toHaveBeenCalled()
+    // Write some shit in data
+    await act(async () => {
+      result.current[1].updateData('~')
+    })
+    expect(result.current[0]).toEqual({
+      data: '~',
+      pending: false,
+      error: null,
+    })
+    await act(async () => {
+      result.current[1].withNextMeta({ id: 'HACK' })
+      rerender({ id: 1312 })
+    })
+    // Api called \w
+    expect(mockApi).toHaveBeenNthCalledWith(1, 1312)
+    expect(actionLog).toHaveBeenNthCalledWith(1, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [1312],
+      },
+      meta: {
+        id: 'HACK',
+      },
+    })
+    // Clean not called
+    expect(result.current[0]).toEqual({
+      data: '~',
+      pending: true,
+      error: null,
+    })
+    // Resolve the promise ....
+    await act(async () => _resolves[0]('Gio Va'))
+    // Effect succeded!
+    expect(result.current[0]).toEqual({
+      data: 'Gio Va',
+      pending: false,
+      error: null,
+    })
+    rerender({ id: 23 })
+    expect(actionLog).toHaveBeenNthCalledWith(2, {
+      type: RUN,
+      callbacks: {
+        onSucess: undefined,
+        onFailure: undefined,
+      },
+      payload: {
+        params: [23],
+      },
+      meta: {
+        id: 23,
+      },
+    })
+    await act(async () => _resolves[1]('Gio Va'))
   })
 })
