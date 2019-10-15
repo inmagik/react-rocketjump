@@ -1,7 +1,45 @@
 ## 2.1.0
-###### *???*
+###### *October 15, 2019*
 
-...
+This release improve the support for upcoming React async rendering feature.
+
+All subscription are applied in a saftley way following:
+https://github.com/facebook/react/tree/master/packages/use-subscription
+
+Furthermore *rxjs* / side effects logic has been
+completely rewrited and improved.
+
+There is only a mini **breaking change**:
+
+If your provided a custom *takeEffect* to `rj()` you have to update
+your signature from:
+
+```js
+rj({
+  // ...
+  takeEffect: (action$, state$, mapActionToObserable, prefix) => {}
+})
+```
+
+To:
+
+```js
+rj({
+  // ...
+  takeEffect: (
+    action$,
+    mergeObservable$,
+    state$,
+    extraSideEffectObs$,
+    mapActionToObserable,
+    prefix
+  ) => {}
+})
+```
+
+The other good news from this release are the *deps* for *useRunRj* and
+in general a tools for better handling *run* with *metadata* using
+React hooks.
 
 #### `deps` :broken_heart: :gem:
 
@@ -39,7 +77,7 @@ and implement it yourself:
 ```js
 function UserProfile({ id }) {
   // Fetch the user info \w UserState rj
-  const [{ data: user}] = useRunRj(UserState, [id])
+  const [{ data: user }] = useRunRj(UserState, [id])
   // Fetch the use company info \w CompanyState
   // This is OK
   const [{ data: company }, { run, clean }] = useRj(CompanyState)
@@ -57,9 +95,11 @@ function UserProfile({ id }) {
 ```
 
 Ok, but this code is not too declarative and you need to grab
-*run* and *clean* namespace them if needed and furthermore if * the * values
-increase you need to implement complicated condition.
-imagine if you can simply tell to `useRunRj`:
+*run* and *clean* namespace them if needed and furthermore if the values
+increase you need to implement more complicated conditions.
+
+Imagine if you can simply tell to `useRunRj`:
+
 "please don't run the effect until `user` has a value,
 when `user` is ok then *run* the effect, thanks."
 
@@ -71,9 +111,10 @@ Now with `deps` you can:
 import { deps } from 'react-rocketjump'
 function UserProfile({ id }) {
   // Fetch the user info \w UserState rj
-  const [{ data: user}] = useRunRj(UserState, [id])
+  const [{ data: user }] = useRunRj(UserState, [id])
   // Fetch the use company info \w CompanyState
-  const [{ data: company }] = useRunRj(CompanyState,
+  const [{ data: company }] = useRunRj(
+    CompanyState,
     // When user is not falsy run CompanyState
     // with user.companyId as param
     [deps.maybeGet(user, 'companyId')]
@@ -81,7 +122,141 @@ function UserProfile({ id }) {
 }
 ```
 
+There are a set functions to help you *run* effects *maybe*.
 
+Simply `maybe`:
+
+```js
+function UserProfile({ id }) {
+  // Fetch the user info \w UserState rj only when id is not falsy
+  const [{ data: user }] = useRunRj(UserState, [deps.maybe(id)])
+}
+```
+
+Strict *null* with `maybeNull`:
+
+```js
+function UserProfile({ id }) {
+  // Fetch the user info \w UserState rj only when id is not null
+  const [{ data: user }] = useRunRj(UserState, [deps.maybeNull(id)])
+}
+```
+
+Apply maybe check to all deps with `allMaybe`:
+
+```js
+function UserProfile({ id, role }) {
+  // If id OR role are falsy don't run effect
+  const [{ data: user }] = useRunRj(UserState, deps.allMaybe(
+    id,
+    role,
+  ))
+}
+```
+
+Apply maybe strict *null* check to all deps with `allMaybeNull`:
+
+```js
+function UserProfile({ id, role }) {
+  // If id OR role are null don't run effect
+  const [{ data: user }] = useRunRj(UserState, deps.allMaybeNull(
+    id,
+    role,
+  ))
+}
+```
+
+With `deps` you can also declarative set *meta*.
+
+Set *meta* on values changes:
+
+```js
+function Products({ idStock }) {
+  const [search, setSearch] = useState('')
+  const [{ data: user }] = useRunRj(ProductsState, [
+    idStock,
+    // run with meta debounced true only when search changes
+    // (the first run all values changes)
+    deps.withMeta(search, { debounced: true })
+  ])
+}
+```
+
+Set a set of *meta* on mount only:
+
+```js
+function Products({ idStock }) {
+  const [search, setSearch] = useState('')
+  const [{ data: user }] = useRunRj(ProductsState, [
+    idStock,
+    // run with meta debounced true only when search changes
+    // (the first run all values changes)
+    deps.withMeta(search, { debounced: true }),
+    // on mount debounced is false
+    deps.withMetaOnMount({ debounced: false }),
+  ])
+}
+```
+
+Set a set of *meta* on always:
+
+```js
+function Products({ idStock, trackId }) {
+  const [search, setSearch] = useState('')
+  const [{ data: user }] = useRunRj(ProductsState, [
+    idStock,
+    // run with meta debounced true only when search changes
+    // (the first run all values changes)
+    deps.withMeta(search, { debounced: true }),
+    // on mount debounced is false
+    deps.withMetaOnMount({ debounced: false }),
+    // trackId always applied
+    deps.withAlwaysMeta({ trackId })
+  ])
+}
+```
+
+You can combine `deps`:
+
+```js
+function Products({ idStock, trackId }) {
+  const [{ data: user }] = useRunRj(ProductsState,
+    // if idStock is falsy don't run effect
+    // else run effect with idStock meta
+    [deps.withMeta(deps.maybe(idStock), { trackId })],
+    // OR
+    [deps.maybe(idStock).withMeta({ trackId })]
+    // OR
+    [deps.maybe(deps.withMeta(idStock, { trackId }))]
+    // OR
+    deps.allMaybe(deps.withMeta(idStock, { trackId }))
+  )
+}
+```
+
+To help you deal with complex condition or edge cases `useRunRj` add
+a special *action* to hack the next meta:
+
+```js
+function Products() {
+  const [search, setSearch] = useState('')
+  const [{ data: user }, { withNextMeta }] = useRunRj(ProductsState, [
+    // run with meta debounced true only when search changes
+    // (the first run all values changes)
+    deps.withMeta(search, { debounced: true }),
+    // on mount debounced is false
+    deps.withMetaOnMount({ debounced: false }),
+  ])
+
+  // When user type in and setSearch in triggered
+  // aplly run debounced ... when he user click clearSearch
+  // button apply a non debounced run
+  function clearSearch() {
+    withNextMeta({ debounced: false })
+    setSearch('')
+  }
+}
+```
 
 ## 2.0.0
 ###### *September 19, 2019*

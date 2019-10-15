@@ -22,11 +22,12 @@ export default function useRunRj(
   const prevRunValues = useRef(null)
 
   useEffect(() => {
-    // has some maybe? If yes don't run effect
+    // Should run?
     const shouldRun = shouldRunDeps(runArgs)
 
     if (shouldRun) {
       const meta = getMetaFromDeps(prevRunValues.current, runArgs)
+      // Add meta only if setWithMeta in called along with last args update
       let hackRunWithMeta = {}
       if (prevWithMeta.current && prevWithMeta.current !== withMeta) {
         hackRunWithMeta = withMeta
