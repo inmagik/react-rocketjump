@@ -73,8 +73,8 @@ function useReduxStateObserver(_, rjObject) {
         stateSubject.next(nextState)
       }
     }
-    const unsub = store.subscribe(checkForUpdates)
     checkForUpdates()
+    const unsub = store.subscribe(checkForUpdates)
     return unsub
   }, [stateSubject, state$, name, store])
 
