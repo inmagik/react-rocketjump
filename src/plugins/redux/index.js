@@ -59,18 +59,22 @@ function useReduxStateObserver(_, rjObject) {
   const [stateSubject, state$] = useConstant(() => {
     const subject = new ReplaySubject()
     const stateObs = subject.asObservable()
-    stateObs.value = sliceRjState(store.getState(), name)
+    const state = sliceRjState(store.getState(), name)
+    stateObs.value = state
+    subject.next(state)
     return [subject, stateObs]
   })
 
   useEffect(() => {
-    const unsub = store.subscribe(() => {
+    function checkForUpdates() {
       const nextState = sliceRjState(store.getState(), name)
       if (nextState !== state$.value) {
         state$.value = nextState
         stateSubject.next(nextState)
       }
-    })
+    }
+    const unsub = store.subscribe(checkForUpdates)
+    checkForUpdates()
     return unsub
   }, [stateSubject, state$, name, store])
 

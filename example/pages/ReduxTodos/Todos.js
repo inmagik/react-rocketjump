@@ -11,7 +11,7 @@ export default function ReduxTodos() {
   return (
     <>
       <Todos />
-      <Todos />
+      {/* <Todos /> */}
     </>
   )
 }
