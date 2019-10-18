@@ -5,10 +5,10 @@ import { ajax } from 'rxjs/ajax'
 const API_URL = 'https://api.github.com'
 
 export const GhUserState = rj(
-  rjCache({
-    ns: 'ghusers',
-    size: 1000,
-  }),
+  // rjCache({
+  //   ns: 'ghusers',
+  //   size: 1000,
+  // }),
   {
     name: 'GitHub User',
     effectCaller: rj.configured(),

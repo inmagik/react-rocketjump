@@ -21,6 +21,10 @@
         "title": "Connecting RocketJumps",
         "sidebar_label": "Connecting RocketJumps"
       },
+      "api_mutations": {
+        "title": "Mutations",
+        "sidebar_label": "Mutations"
+      },
       "api_rj": {
         "title": "RocketJump constructor",
         "sidebar_label": "RocketJump constructor"

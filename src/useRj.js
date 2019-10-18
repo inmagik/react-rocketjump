@@ -1,60 +1,15 @@
 import { useMemo, useDebugValue } from 'react'
 import { isObjectRj } from 'rocketjump-core'
 import { useConstant } from './hooks'
-import useMiniRedux from './useMiniRedux'
+import { createUseMiniRedux } from './useMiniRedux'
 import bindActionCreators from './bindActionCreators'
 
-export default function useRj(
-  // The returned value of rj(..., EFFECT)
-  rjObject,
-  // A function|undefined to select state
-  // (state, memoizedSelectors, derivedState) => newDerivedState
-  selectState
+function useDeriveStateFromState(
+  state,
+  memoizedSelectors,
+  selectState,
+  computeState
 ) {
-  if (!isObjectRj(rjObject)) {
-    throw new Error(
-      '[react-rocketjump] You should provide a rj object to useRj.'
-    )
-  }
-  const {
-    makeRxObservable,
-    pipeActionStream,
-    actionCreators,
-    reducer,
-    makeSelectors,
-    computeState,
-  } = rjObject
-
-  useDebugValue(
-    rjObject.__rjconfig.name ? `rj(${rjObject.__rjconfig.name})` : 'Rocks'
-  )
-
-  // The last config or rj recursion rj({},rj(),..,{},{<THIS>})
-  // used as debug hints
-  const rjDebugInfo = rjObject.__rjconfig
-  const [state, dispatch] = useMiniRedux(
-    reducer,
-    makeRxObservable,
-    pipeActionStream,
-    rjDebugInfo
-  )
-
-  // Bind actions \w dispatch
-  const boundActionCreators = useConstant(() => {
-    return bindActionCreators(actionCreators, dispatch)
-  }, [actionCreators, dispatch])
-
-  // Create per-rj-instance memoized selectors
-  const memoizedSelectors = useConstant(() => {
-    if (
-      typeof selectState === 'function' ||
-      typeof computeState === 'function'
-    ) {
-      return makeSelectors()
-    }
-  })
-
-  // Derive the state
   const derivedState = useMemo(() => {
     let derivedState = state
     if (typeof computeState === 'function') {
@@ -66,9 +21,75 @@ export default function useRj(
     return derivedState
   }, [state, memoizedSelectors, selectState, computeState])
 
-  // Memoize return value now can saftley used in React Context.Provider
-  return useMemo(() => [derivedState, boundActionCreators], [
-    derivedState,
-    boundActionCreators,
-  ])
+  return derivedState
 }
+
+const defaultUseRjImpl = {
+  useDeriveState: useDeriveStateFromState,
+}
+
+// You can override all useRj behaviours:
+// useReducer: rjObject -> [state, dispatch]
+// useStateObserver: state + rjObject -> state$
+// useDeriveState: state + selectors -> finalState
+export function createUseRj(customImpl = {}) {
+  const { useDeriveState, ...customUseMinixReduxImpl } = {
+    ...defaultUseRjImpl,
+    ...customImpl,
+  }
+  const useMiniRedux = createUseMiniRedux(customUseMinixReduxImpl)
+
+  return function useRj(
+    // The returned value of rj(..., EFFECT)
+    rjObject,
+    // A function|undefined to select state
+    // (state, memoizedSelectors, derivedState) => newDerivedState
+    selectState
+  ) {
+    if (!isObjectRj(rjObject)) {
+      throw new Error(
+        '[react-rocketjump] You should provide a rj object to useRj.'
+      )
+    }
+    const { actionCreators, makeSelectors, computeState } = rjObject
+
+    useDebugValue(
+      rjObject.__rjconfig.name ? `rj(${rjObject.__rjconfig.name})` : 'Rocks'
+    )
+
+    const [state, dispatch] = useMiniRedux(rjObject)
+
+    // Bind actions \w dispatch
+    const boundActionCreators = useConstant(() => {
+      return bindActionCreators(actionCreators, dispatch)
+    }, [actionCreators, dispatch])
+
+    // Create per-rj-instance memoized selectors
+    const memoizedSelectors = useConstant(() => {
+      if (
+        typeof selectState === 'function' ||
+        typeof computeState === 'function'
+      ) {
+        return makeSelectors()
+      }
+    })
+
+    // Derive the state
+    const derivedState = useDeriveState(
+      state,
+      memoizedSelectors,
+      selectState,
+      computeState,
+      rjObject
+    )
+
+    // Memoize return value now can saftley used in React Context.Provider
+    return useMemo(() => [derivedState, boundActionCreators], [
+      derivedState,
+      boundActionCreators,
+    ])
+  }
+}
+
+const useRj = createUseRj()
+export default useRj

@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import { useRunRj, deps, ConfigureRj } from 'react-rocketjump'
+// import { useRunRj, deps, ConfigureRj } from 'react-rocketjump'
+import { deps } from 'react-rocketjump'
+import { useRunRj } from 'react-rocketjump/plugins/redux'
 import { UsersState } from './localstate'
 
 export default function DataTable() {
@@ -9,9 +11,9 @@ export default function DataTable() {
   const [{ list: users }] = useRunRj(
     UsersState,
     [
-      deps.maybeNull(inputUsername).meta({ debounced: true }),
+      deps.maybeNull(inputUsername).withMeta({ debounced: true }),
       //.meta({ debounced: inputUsername !== '' }),
-      deps.meta(undefined, { debounced: false }),
+      deps.withMetaOnMount({ debounced: false }),
       // count > 0 ? deps.meta(count, { append: true }) : undefined,
     ],
     false

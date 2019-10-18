@@ -1,1 +1,1 @@
-export const MUTATION_PREFIX = '@MUTATION'
+export const MUTATION_PREFIX = '@rjMUTATION'

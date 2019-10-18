@@ -39,6 +39,8 @@
     "hoist-non-react-statics": "^3.3.0",
     "object-path-immutable": "^3.0.2",
     "query-string": "^6.7.0",
+    "react-redux": "^7.1.1",
+    "redux": "^4.0.4",
     "rocketjump-core": "^2.1.0",
     "rxjs": "^6.5.2"
   },

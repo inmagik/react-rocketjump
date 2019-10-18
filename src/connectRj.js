@@ -20,25 +20,12 @@ export default function connectRj(
       )
     }
     function ConnectFunction(props) {
-      const {
-        makeRxObservable,
-        pipeActionStream,
-        actionCreators,
-        reducer,
-        makeSelectors,
-        computeState,
-      } = rjObject
+      const { actionCreators, makeSelectors, computeState } = rjObject
 
       const rjDebugInfo = {
-        ...rjObject.__rjconfig,
         wrappedComponentName: WrappedComponent.name,
       }
-      const [state, dispatch] = useMiniRedux(
-        reducer,
-        makeRxObservable,
-        pipeActionStream,
-        rjDebugInfo
-      )
+      const [state, dispatch] = useMiniRedux(rjObject, rjDebugInfo)
 
       const memoizedSelectors = useConstant(() => {
         if (

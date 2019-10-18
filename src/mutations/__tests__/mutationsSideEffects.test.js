@@ -1,9 +1,8 @@
 import { tap } from 'rxjs/operators'
 import rj from '../../rj'
+import { MUTATION_PREFIX } from '../actionTypes'
 import { RUN, SUCCESS, PENDING } from '../../actionTypes'
 import { createTestRJSubscription } from '../../testUtils'
-
-const MUTATION_PREFIX = '@MUTATION'
 
 describe('RJ mutations side effect model', () => {
   it('should be use take effect every by default', async () => {

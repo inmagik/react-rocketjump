@@ -1,6 +1,8 @@
 import preval from 'babel-plugin-preval/macro'
+import { Provider } from 'react-redux'
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom'
 import React, { Suspense } from 'react'
+import store from './megaStore'
 
 const examples = preval`
   const fs = require('fs');
@@ -45,7 +47,9 @@ function ExamplePage(props) {
   return (
     <>
       <BackButton />
-      <ExampleComponent {...props} />
+      <div className="example-container">
+        <ExampleComponent {...props} />
+      </div>
     </>
   )
 }
@@ -53,14 +57,16 @@ function ExamplePage(props) {
 export default function App() {
   return (
     // <React.StrictMode>
-    <Router>
-      <Suspense fallback={<div>Loading ...</div>}>
-        <Switch>
-          <Route exact path="/" component={ListExamples} />
-          <Route path="/examples/:example" component={ExamplePage} />
-        </Switch>
-      </Suspense>
-    </Router>
+    <Provider store={store}>
+      <Router>
+        <Suspense fallback={<div>Loading ...</div>}>
+          <Switch>
+            <Route exact path="/" component={ListExamples} />
+            <Route path="/examples/:example" component={ExamplePage} />
+          </Switch>
+        </Suspense>
+      </Router>
+    </Provider>
     // </React.StrictMode>
   )
 }

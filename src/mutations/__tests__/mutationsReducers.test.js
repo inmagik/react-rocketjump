@@ -1,7 +1,6 @@
 import rj from '../../rj'
+import { MUTATION_PREFIX } from '../actionTypes'
 import { INIT, SUCCESS, FAILURE, PENDING } from '../../actionTypes'
-
-const MUTATION_PREFIX = '@MUTATION'
 
 describe('RJ mutations reducers', () => {
   it('should be generated only when reducer key is present', async () => {

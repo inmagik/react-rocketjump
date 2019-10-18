@@ -1,0 +1,28 @@
+.evolution-tree {
+  border-top: 1px;
+  border-top-style: dashed;
+  background: rgba(0, 4, 27, 0.75);
+  color: white;
+  min-height: 200px;
+}
+.evolution-root {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+.evolution-group {
+  display: flex;
+  justify-content: center;
+  text-align: left;
+}
+.evolution-name {
+  text-transform: capitalize;
+}
+.evolution-list > .evolution-group > .evolution-name {
+  width: 100%;
+}
+.arrow-evolution {
+  margin-left: 5px;
+  margin-right: 5px;
+  white-space: nowrap;
+}

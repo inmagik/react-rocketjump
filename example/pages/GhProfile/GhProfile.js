@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import { useRunRj, deps, ConfigureRj } from 'react-rocketjump'
+import { deps, ConfigureRj } from 'react-rocketjump'
+// import { useRunRj, deps, ConfigureRj } from 'react-rocketjump'
+import { useRunRj } from 'react-rocketjump/plugins/redux'
 import {
   GhUserState,
   GhUserStarsState,

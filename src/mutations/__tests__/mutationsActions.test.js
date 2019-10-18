@@ -2,9 +2,8 @@ import rj from '../../rj'
 import useRj from '../../useRj'
 import { isEffectAction } from '../../actionCreators'
 import { renderHook, act } from '@testing-library/react-hooks'
+import { MUTATION_PREFIX } from '../actionTypes'
 import '@testing-library/jest-dom/extend-expect'
-
-const MUTATION_PREFIX = '@MUTATION'
 
 describe('RJ mutations action creators', () => {
   it('should be generated from mutations and generate good actions', async () => {

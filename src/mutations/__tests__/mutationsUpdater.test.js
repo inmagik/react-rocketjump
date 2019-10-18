@@ -1,9 +1,8 @@
 import rj from '../../rj'
 import useRj from '../../useRj'
+import { MUTATION_PREFIX } from '../actionTypes'
 import { INIT } from '../../actionTypes'
 import { renderHook, act } from '@testing-library/react-hooks'
-
-const MUTATION_PREFIX = '@MUTATION'
 
 describe('RJ mutations updater', () => {
   it('should be called on mutation SUCCESS with current rj state and the effect result', async () => {

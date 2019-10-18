@@ -1,0 +1,10 @@
+.simple-pkm-card {
+  background: rgba(0, 4, 27, 0.75);
+  color: white;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.simple-pkm-card img {
+  filter: grayscale(80%);
+}

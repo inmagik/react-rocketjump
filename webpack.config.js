@@ -8,6 +8,7 @@ module.exports = {
     publicPath: '/',
   },
   devServer: {
+    hot: true,
     contentBase: './example',
     historyApiFallback: true,
     port: 9000,

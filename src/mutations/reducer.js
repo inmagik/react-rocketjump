@@ -49,12 +49,11 @@ function makeMutationReducer(mutation, name) {
     if (action.type === INIT) {
       return mutation.reducer(state, action)
     }
-    const pieces = (action.type || '').split('/')
-    if (pieces.length !== 3) {
-      return state
-    }
-    if (pieces[0] === MUTATION_PREFIX && pieces[1] === name) {
-      const decoupleType = pieces[2]
+    const prefix = MUTATION_PREFIX + '/' + name + '/'
+    const index = action.type.indexOf(prefix)
+    if (index !== -1) {
+      const type = action.type
+      const decoupleType = type.substr(index + prefix.length, type.length)
       return mutation.reducer(state, { ...action, type: decoupleType })
     }
     return state
