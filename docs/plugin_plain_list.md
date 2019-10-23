@@ -37,5 +37,17 @@ This plugin injects in the `selectors` bag the following selectors:
 * __getList__: returns the items contained in the page that is currently loaded (as an array)
 * __getCount__: returns the total number of items in the collection
 
+## Computed properties
+> This plugin uses [computed properties](api_rj.md)
+
+Properties exposed on the shadow state
+```js
+{
+    error: 'getError',
+    loading: 'isLoading',
+    list: 'getList',
+}
+```
+
 ## Provided plugins
 This plugin already embeds List Insert Plugin, List Update Plugin and List Delete Plugin, so you don't have to add them manually unless you need to perform some customization on them
