@@ -1,15 +1,28 @@
 {
   "docs": {
-    "Why React-RocketJump?": ["motivation"],
-    "Getting Started": ["installation", "quickstart", "concepts"],
-    "API": [
+    "Why React-RocketJump?": [
+      "motivation"
+    ],
+    "Getting Started": [
+      "installation",
+      "quickstart",
+      "concepts"
+    ],
+    "API | Defining": [
       "api_rj",
       "api_configure",
-      "api_connect",
-      "api_actions",
       "api_composition"
     ],
-    "Plugins": [
+    "API | Connecting": [
+      "usage_generalities",
+      "usage_userunrj",
+      "usage_userj",
+      "usage_connectrj"
+    ],
+    "API | Using": [
+      "api_actions"
+    ],
+    "API | Plugins": [
       "plugin_all",
       "plugin_list",
       "plugin_plain_list",
@@ -20,6 +33,8 @@
       "plugin_debounce",
       "plugin_writing"
     ],
-    "Tips & Tricks": ["tips_and_tricks"]
+    "Tips & Tricks": [
+      "tips_and_tricks"
+    ]
   }
 }
