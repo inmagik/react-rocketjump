@@ -82,6 +82,22 @@
       "tips_and_tricks": {
         "title": "Tips & Tricks",
         "sidebar_label": "Custom hooks"
+      },
+      "usage_connectrj": {
+        "title": "connectRj",
+        "sidebar_label": "connectRj"
+      },
+      "usage_generalities": {
+        "title": "Connecting RJ Objects",
+        "sidebar_label": "Generalities"
+      },
+      "usage_userj": {
+        "title": "useRj",
+        "sidebar_label": "useRj"
+      },
+      "usage_userunrj": {
+        "title": "useRunRj",
+        "sidebar_label": "useRunRj"
       }
     },
     "links": {
@@ -92,8 +108,10 @@
     "categories": {
       "Why React-RocketJump?": "Why React-RocketJump?",
       "Getting Started": "Getting Started",
-      "API": "API",
-      "Plugins": "Plugins",
+      "API | Defining": "API | Defining",
+      "API | Connecting": "API | Connecting",
+      "API | Using": "API | Using",
+      "API | Plugins": "API | Plugins",
       "Tips & Tricks": "Tips & Tricks"
     }
   },

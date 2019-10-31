@@ -152,6 +152,48 @@ const rjPart = rj({
 })
 ```
 
+### computed
+
+`{ [key: string]: string }`
+
+This configuration option allows to transform the state shape that will be exposed to the outside world (i.e. the React world) when a RocketJump object carrying it is connected (keep on reading, connection is explained in the next section). The value accepted by this property is a plain JavaScript objects whose keys are arbitrary strings and whose values are selector names (i.e. keys of the selector bag defined a couple of paragraphs above). From the engine point of view, setting this key means asking him to provide the outside world with a shadow state object. This object is derived from the original state (which is kept untouched behind the curtains) with the following logic: for each key in the `computed` property, take the associated selector and invoke it on the original state object; the output of this invocation will be the value associated to the current key in the shadow state.
+
+The computed prop is a opt-in prop: if the configuration object or any plugin defines it, the shadow state is created and there is no way to access props that the shadow state does not expose. If otherwise neither the config nor any plugin define it, the original state is directly exposed. Hence, when working with plugins, pay attention whether this prop is defined or not.
+
+If there are multiple definitions of the `computed` configuration property when building a `RocketJump object`, these are merged in the usual order (from innermost invocation to the outermost, from left to right in case of siblings)
+
+```js
+const myRjObject = rj({
+  effect: doSomethingAsync,
+  computed: {
+    result: 'getData'
+  }
+})
+```
+
+In this example, we have created a shadow state object with only the output of `getData(originalState)` exposed as a `result` property. This means we won't be able to access `isPending` or `error` (even if using selectors provided by *rocketjump*, this is impossible if fields are not included in the `computed` prop)
+
+Beware that you cannot bind a selector multiple times: if you do it, the latest binding in composition order wins. In the following example, only `yyy` will be defined in the connected `RocketJump Object` (this is done to prevent multiple evaluations of the same selector)
+
+```js
+const RjPart = ({
+  computed: {
+    xxx: 'getData'
+  }
+})
+
+const RjObject = (
+  RjPart, 
+  {
+    effect: doSomethingAsync,
+    computed: {
+      yyy: 'getData'
+    }
+  }
+)
+
+```
+
 ### composeReducer
 
 `((state, action) => state)[]`

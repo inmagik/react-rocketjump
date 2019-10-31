@@ -11,7 +11,7 @@ This is quite different from composition, since composition is described in Rock
 ## How it works?
 The `ConfigureRj` component can inject some configuration keys in RocketJump Objects that are connected to components in its subtree. This means that you can have multiple `<ConfigureRj />` components in your application, each one injecting a different configuration in a different subtree. `<ConfigureRj />` is implemented with React's `context` api, hence `<ConfigureRj />` components can also be nested, but be careful that differenct `<ConfigureRj />` components does not compose: the nearest parent wins. 
 
-Properties configured by `<ConfigureRj />` are treated like _default_ properties: if both a RocketJump Object and the `<ConfigureRj />` configuration define the same key, the one defined in RocketJumpObject takes priority.
+Properties configured by `<ConfigureRj />` are injected in a `RocketJump object` if and only if it accepts them explicitly by defining the configuration key in its configuration and assigning it the special value `rj.configured()`
 
 ## Sharable properties
 By now, the capability of `<ConfigureRj />` is limited to the `effectCaller` property. Introducing in the tree a `<ConfigureRj />` component with the `effectCaller` property set means that any component using a RocketJump Object (both with the `connectRj` hoc or the `useRj` hook) will inherit the `effectCaller` unless you explicitly define it in the RocketJump Object definition
@@ -26,6 +26,18 @@ By now, the capability of `<ConfigureRj />` is limited to the `effectCaller` pro
 This example shows how you can use the `<ConfigureRj />` API to easily implement authentication
 
 ```js
+// localstate.js
+import { rj } from "react-rocketjump"
+
+const MyCustomRj = rj({
+  effect: doSomethingAsync,
+  // the following allows a <ConfigureRj /> component to inject
+  // configuration into this RocketJump Object when it is used
+  // in a component nested inside the same <ConfigureRj /> 
+  effectCaller: rj.configured()
+})
+
+// my-component.js
 import React from 'react'
 import { ConfigureRj } from 'react-rocketjump'
 
