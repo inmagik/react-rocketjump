@@ -141,9 +141,13 @@ export function getRunValuesFromDeps(args) {
           if (a.skipRunValue()) {
             return runValues
           }
-          return runValues.concat(a.getValue())
+          runValues.push(a.getValue())
+          return runValues
         },
-        () => runValues.concat(a)
+        () => {
+          runValues.push(a)
+          return runValues
+        }
       ),
     []
   )
