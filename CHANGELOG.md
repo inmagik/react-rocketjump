@@ -1,3 +1,8 @@
+## 2.1.1
+###### *October 31, 2019*
+
+Fixed a bug with `useRunRj` and array deps that cause spread array values in effect arguments.
+
 ## 2.1.0
 ###### *October 15, 2019*
 
