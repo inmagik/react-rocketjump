@@ -80,6 +80,6 @@ Merged properties are merged using plain object assignment in composition order
 
 ### Overwrite properties
 
-> Overwrite property is only *takeEffect*
+> Overwrite properties are *takeEffect*, *name*
 
 Overwrite properties are not merged, the last configuration in composition order defining it wins

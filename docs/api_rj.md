@@ -107,6 +107,14 @@ const rjObject = rj(id =>
 )
 ```
 
+### name
+
+`string`
+
+A simple name for the RocketJump Object. This should be defined only when *effect* is defined, and its only effect is to include actions passing through any instance of the RocketJump Object in the [logger](debug_logger.md). That means that, whenever you instantiate a RocketJump Object with the *name* property set, it will attach to the logger and stream actions to it so that these are logged properly
+
+In composition, this property is a *overwrite* property (more info in [composition section](api_composition.md))
+
 ### actions
 
 `Object<Action> => Object<Action>`

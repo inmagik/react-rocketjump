@@ -34,6 +34,9 @@
       "plugin_debounce",
       "plugin_writing"
     ],
+    "API | Debug": [
+      "debug_logger"
+    ],
     "Tips & Tricks": [
       "tips_and_tricks"
     ]

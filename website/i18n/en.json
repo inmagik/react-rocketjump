@@ -41,6 +41,10 @@
         "title": "useRunRj",
         "sidebar_label": "useRunRj"
       },
+      "debug_logger": {
+        "title": "Logger",
+        "sidebar_label": "Logger"
+      },
       "installation": {
         "title": "Installation"
       },
@@ -116,6 +120,7 @@
       "API | Connecting": "API | Connecting",
       "API | Using": "API | Using",
       "API | Plugins": "API | Plugins",
+      "API | Debug": "API | Debug",
       "Tips & Tricks": "Tips & Tricks"
     }
   },
