@@ -5,10 +5,6 @@
     "previous": "Previous",
     "tagline": "Rocketjump your react! Manage state and side effects like a breeze",
     "docs": {
-      "api_actions": {
-        "title": "Using actions",
-        "sidebar_label": "Using actions"
-      },
       "api_composition": {
         "title": "RocketJump Composition",
         "sidebar_label": "Composition"
@@ -28,6 +24,22 @@
       "concepts": {
         "title": "General concepts",
         "sidebar_label": "General concepts"
+      },
+      "connect_connectrj": {
+        "title": "connectRj",
+        "sidebar_label": "connectRj"
+      },
+      "connect_generalities": {
+        "title": "Connecting RJ Objects",
+        "sidebar_label": "Generalities"
+      },
+      "connect_userj": {
+        "title": "useRj",
+        "sidebar_label": "useRj"
+      },
+      "connect_userunrj": {
+        "title": "useRunRj",
+        "sidebar_label": "useRunRj"
       },
       "installation": {
         "title": "Installation"
@@ -83,21 +95,13 @@
         "title": "Tips & Tricks",
         "sidebar_label": "Custom hooks"
       },
-      "usage_connectrj": {
-        "title": "connectRj",
-        "sidebar_label": "connectRj"
+      "usage_actions": {
+        "title": "Working with actions",
+        "sidebar_label": "Working with actions"
       },
-      "usage_generalities": {
-        "title": "Connecting RJ Objects",
-        "sidebar_label": "Generalities"
-      },
-      "usage_userj": {
-        "title": "useRj",
-        "sidebar_label": "useRj"
-      },
-      "usage_userunrj": {
-        "title": "useRunRj",
-        "sidebar_label": "useRunRj"
+      "usage_state": {
+        "title": "Working with state",
+        "sidebar_label": "Working with state"
       }
     },
     "links": {

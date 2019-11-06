@@ -821,7 +821,7 @@ const [{ data: product }] = useRunRj(
 )
 ```
 
-You can find documentation about `useRunRj` here: https://inmagik.github.io/react-rocketjump/docs/usage_userunrj
+You can find documentation about `useRunRj` here: https://inmagik.github.io/react-rocketjump/docs/connect_userunrj
 
 #### `computed` :heart:
 

@@ -14,13 +14,14 @@
       "api_composition"
     ],
     "API | Connecting": [
-      "usage_generalities",
-      "usage_userunrj",
-      "usage_userj",
-      "usage_connectrj"
+      "connect_generalities",
+      "connect_userunrj",
+      "connect_userj",
+      "connect_connectrj"
     ],
     "API | Using": [
-      "api_actions"
+      "usage_state",
+      "usage_actions"
     ],
     "API | Plugins": [
       "plugin_all",

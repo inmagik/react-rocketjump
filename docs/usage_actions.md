@@ -1,10 +1,33 @@
 ---
-id: api_actions
-title: Using actions
-sidebar_label: Using actions
+id: usage_actions
+title: Working with actions
+sidebar_label: Working with actions
 ---
 
-Once you have [connected your component with a RocketJump Object](api_connect.md), you have some actions bound to your props. There are two ways to trigger these actions: the _quicker_ way and the _rich_ way. The _quicker_ way is, ehm, quicker, but allows bare minimal configuration, while the _rich_ way is more verbose but allows to exploit the full power of React-RocketJump. Whether to use the former or the latter is a matter of need, each specific case may fit better with one or the other. However, you don't have to stick with an approach: you can select the best one any time you need to make a call.
+Once you have [connected your component with a RocketJump Object](connect_generalities.md), you have some actions bound to your props. There are two ways to trigger these actions: the _quicker_ way and the _rich_ way. The _quicker_ way is, ehm, quicker, but allows bare minimal configuration, while the _rich_ way is more verbose but allows to exploit the full power of React-RocketJump. Whether to use the former or the latter is a matter of need, each specific case may fit better with one or the other. However, you don't have to stick with an approach: you can select the best one any time you need to make a call.
+
+## Available actions
+By default, the library exposes the following actions in the action bag
+
+```js
+ActionBag.run           // triggers a new run of the effect
+ActionBag.clean         // stops any pending run and resets the state to its original value
+ActionBag.cancel        // stops any pending run 
+ActionBag.updateData    // writes in the `data` property of the state the passed argument
+```
+
+You can customize or add actions by means of the *actions* configuration property (or you can include a RocketJump partials that defines the *action* configuration property)
+
+The way you can access the action bag depends on the connection mechanism:
+- when using a HOC, the action bag is spread among properties
+- when using a HOOK, the action bag is returned as a plain object
+
+To avoid name clashes in HOC mode, you can pass to the connection a `mapActionsToProps` function with the following signature
+```js
+(actions: Object) => Object
+```
+
+This allows you to extract interesting actions from the action bag in object form and to rename them as you wish. The output of the function is spread among properties as the action bag. If you don't provide any function, the default action bag is spread.
 
 ## Quicker way: direct invocation
 
