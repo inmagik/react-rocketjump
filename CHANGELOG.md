@@ -498,7 +498,7 @@ Mutations actions have the standard rj shape, with the bonus that params are by 
 }
 
 {
-  type: PENDING,
+  type: RUN,
   payload: {
     params, // the params with which your side effect was invoked
   }

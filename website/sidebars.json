@@ -11,7 +11,8 @@
     "API | Defining": [
       "api_rj",
       "api_configure",
-      "api_composition"
+      "api_composition",
+      "api_mutations"
     ],
     "API | Connecting": [
       "connect_generalities",

@@ -364,7 +364,7 @@ const rjPart = rj({
 
 ### effectCaller
 
-`(effect, ...params) => Promise | (effect, ...params) => Observable | "noop"`
+`(effect, ...params) => Promise | (effect, ...params) => Observable`
 
 This setting is used to hook into the process of launching the effect, and can be used to alter its params or to add some more of them. The first argument is the `effect` to be called, and the subsequent arguments are the arguments the user sent in the `run` action. You can do everything you need here, the important thing is that you call the effect and return the Promise used to await for task completion, or an Rx Observable (this is useful if you are using rxJS Ajax). 
 
@@ -381,6 +381,16 @@ const rjPart = rj({
   effectCaller: (effect, ...params) => effect(TOKEN, ...params),
 })
 ```
+
+### mutations
+
+`Object`
+
+This setting is used to combine multiple side-effects working on the same data, like a bunch of tasks that write to a common state. This is useful, for instance, when you deal with REST APIs: you put as `effect` the `GET` call, and map all the other HTTP verbs on mutations, since, at the end, they are all tasks that write the same state.
+
+[Read the complete documentation about mutations](api_mutations.md)
+
+This property can be defined only in the same object defining the `effect` configuration property, so they are not involved in composition.
 
 ### takeEffect
 
