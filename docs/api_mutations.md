@@ -90,7 +90,7 @@ This is an optional setting:
 
 `string | [policy: string, ...arguments] | (observable: RxObservable, mapTo: action => RxObservable) => RxObservable`
 
-This setting is used to control what to do when more instances of a task are spawned concurrently. Its usage is identical to the omonimuos setting of the main RocketJump definition, so please refer to the description in the [rj constructor section](api_rj.md#takeEffect)
+This setting is used to control what to do when more instances of a task are spawned concurrently. Its usage is identical to the omonimuos setting of the main RocketJump definition, so please refer to the description in the [rj constructor section](api_rj.md#takeeffect)
 
 ### reducer
 
