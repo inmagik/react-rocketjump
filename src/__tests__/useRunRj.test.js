@@ -207,14 +207,24 @@ describe('useRunRj', () => {
     })
   })
 
-  it('should mantein the same return instance while state remain the same', () => {
-    const MaRjState = rj(() => {})
+  it('should mantein the same return instance while state remain the same', async () => {
+    let _resolves
+    const MaRjState = rj(
+      () =>
+        new Promise(resolve => {
+          _resolves = resolve
+        })
+    )
 
     const { result, rerender } = renderHook(() => useRunRj(MaRjState))
 
+    await act(async () => _resolves('BaBu'))
+
     let out = result.current
 
-    rerender({ giova: 23 })
+    await act(async () => {
+      rerender({ giova: 23 })
+    })
 
     expect(out).toBe(result.current)
   })
