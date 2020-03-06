@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks'
 import { tap } from 'rxjs/operators'
-import * as deps from '../deps'
+import { deps } from 'rocketjump-core'
 import { RUN } from '../actionTypes'
 import rj from '../rj'
 import useRunRj from '../useRunRj'
