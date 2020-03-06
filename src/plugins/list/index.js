@@ -1,5 +1,6 @@
 import { rj } from '../../index'
-import { get, getOrSelect } from '../../helpers'
+import { get } from 'rocketjump-core/utils'
+import { getOrSelect } from '../../helpers'
 import { SUCCESS } from '../../actionTypes'
 import rjListInsert from '../listInsert/index'
 import rjListUpdate from '../listUpdate/index'

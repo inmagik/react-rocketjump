@@ -1,5 +1,4 @@
-import { proxyObject, kompose } from 'rocketjump-core/utils'
-import { get } from '../helpers'
+import { proxyObject, kompose, get } from 'rocketjump-core/utils'
 
 // Add some utils selectors
 function makeMutationsSelectors() {

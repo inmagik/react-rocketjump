@@ -1,6 +1,6 @@
 {
   "name": "react-rocketjump",
-  "version": "2.1.1",
+  "version": "2.2.0-rc1",
   "description": "Rocketjump your react! Manage state and side effects like a breeze",
   "main": "lib/index.cjs.js",
   "module": "lib/index.esm.js",
@@ -39,7 +39,7 @@
     "hoist-non-react-statics": "^3.3.0",
     "object-path-immutable": "^3.0.2",
     "query-string": "^6.7.0",
-    "rocketjump-core": "^2.1.0",
+    "rocketjump-core": "^3.0.0-rc4",
     "rxjs": "^6.5.2"
   },
   "devDependencies": {

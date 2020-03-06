@@ -7383,10 +7383,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rocketjump-core@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/rocketjump-core/-/rocketjump-core-2.1.0.tgz#594746f447d460676214e48b8004c71fdfa64d13"
-  integrity sha512-/UvynYBDyqusEsUzfGsUS2zhD22IVH1j1DUqIY14Ewx85hNoySNmV31qp9Py/Nc/5wuFCsRynTDU0jLVJZw4XA==
+rocketjump-core@^3.0.0-rc4:
+  version "3.0.0-rc4"
+  resolved "https://registry.yarnpkg.com/rocketjump-core/-/rocketjump-core-3.0.0-rc4.tgz#4c3aab44c5b3248bd2d480d90d7993a66ced71bd"
+  integrity sha512-gtFKLQj4miotGIZPoXFQG6hSNiB1BLEqrr7ishGX81eHl6aP+wQkUwNo6Tb9px82ucMlErcy5x6EqzG+GjJSDA==
 
 rollup-plugin-babel@^4.3.3:
   version "4.3.3"
