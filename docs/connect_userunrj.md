@@ -1,5 +1,5 @@
 ---
-id: usage_userunrj
+id: connect_userunrj
 title: useRunRj
 sidebar_label: useRunRj
 ---
@@ -25,15 +25,15 @@ const Component = props => {
 }
 ```
 
-`rjObject`: output of the call to a `RocketJump Constructor`, refer to [defining RocketJump Objects](www.google.com) section
+`rjObject`: output of the call to a `RocketJump Constructor`, refer to [defining RocketJump Objects](api_rj.md) section
 
 `deps` is the aforementioned *dependencies* array. You can pass any JavaScript array with any content (provided you can deal with it in the implementation of the `effect` property of the `rjObject` argument), or you can decide to opt-in for *automatic dependency management* (see later). Either way, the items you put in this array will be the arguments with which your effect will be invoked.
 
 `shouldCleanBeforeRun`, if set to `true`, instructs the hook to run the `clean` action before triggering `run` (except for the first run, when no clean is triggered)
 
-`mapStateToProps` is a function that is used to modify the shape of the state before returning it to the component. The role of this function is to extract information from the state and to shape it as needed by the component. To understand this function, you should read [working with state](www.google.com).
+`mapStateToProps` is a function that is used to modify the shape of the state before returning it to the component. The role of this function is to extract information from the state and to shape it as needed by the component. To understand this function, you should read [working with state](usage_state.md).
 
-For what you can do with `state` refer to [working with state](www.google.com), and for what you can do with `actions` to `working with actions`(www.google.com)
+For what you can do with `state` refer to [working with state](usage_state.md), and for what you can do with `actions` to [working with actions](usage_actions.md)
 
 This is a very simple example of how this hook is expected to be used
 

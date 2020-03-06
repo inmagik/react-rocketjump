@@ -498,7 +498,7 @@ Mutations actions have the standard rj shape, with the bonus that params are by 
 }
 
 {
-  type: PENDING,
+  type: RUN,
   payload: {
     params, // the params with which your side effect was invoked
   }
@@ -821,7 +821,7 @@ const [{ data: product }] = useRunRj(
 )
 ```
 
-You can find documentation about `useRunRj` here: https://inmagik.github.io/react-rocketjump/docs/usage_userunrj
+You can find documentation about `useRunRj` here: https://inmagik.github.io/react-rocketjump/docs/connect_userunrj
 
 #### `computed` :heart:
 

@@ -1,5 +1,5 @@
 ---
-id: usage_connectrj
+id: connect_connectrj
 title: connectRj
 sidebar_label: connectRj
 ---
@@ -21,13 +21,13 @@ const ConnectedComponent = connectRj(
   mapDispatchToProps
 )(Component)
 ```
-`rjObject`: output of the call to a `RocketJump Constructor`, refer to [defining RocketJump Objects](www.google.com) section
+`rjObject`: output of the call to a `RocketJump Constructor`, refer to [defining RocketJump Objects](api_rj.md) section
 
-`mapStateToProps` is a function that is used to modify the shape of the state before spreading it in component props. The role of this function is to extract information from the state and to shape it as needed by the component. To understand this function, you should read [working with state](www.google.com).
+`mapStateToProps` is a function that is used to modify the shape of the state before spreading it in component props. The role of this function is to extract information from the state and to shape it as needed by the component. To understand this function, you should read [working with state](usage_state.md).
 
-`mapActionsToProps` is a function that is used to modify the shape of the action bag before spreading it in component props. This is mainly meant to rename actions, avoiding name clashes. Its expected value is a function that accepts a plain JavaScript object (which contains as props action name and functions as values) and return another object with the same rationale, but possibly different keys. Before trying to write this function, please read [working with actions](www.google.com)
+`mapActionsToProps` is a function that is used to modify the shape of the action bag before spreading it in component props. This is mainly meant to rename actions, avoiding name clashes. Its expected value is a function that accepts a plain JavaScript object (which contains as props action name and functions as values) and return another object with the same rationale, but possibly different keys. Before trying to write this function, please read [working with actions](usage_actions.md)
 
-For what you can do with `state` refer to [working with state](www.google.com), and for what you can do with `actions` to `working with actions`(www.google.com). Please note that `state` and `actions` are not props passed to &lt;Component /&gt;, but are spread so that their keys are props. If you want to have `state` and `actions` as props, you should do something like this
+For what you can do with `state` refer to [working with state](usage_state.md), and for what you can do with `actions` to [working with actions](usage_actions.md). Please note that `state` and `actions` are not props passed to &lt;Component /&gt;, but are spread so that their keys are props. If you want to have `state` and `actions` as props, you should do something like this
 
 ```js
 import { connectRj } from 'react-rocketjump'

@@ -1,5 +1,5 @@
 ---
-id: usage_generalities
+id: connect_generalities
 title: Connecting RJ Objects
 sidebar_label: Generalities
 ---
@@ -18,6 +18,6 @@ Once a RockerJump Object is connected to a component, you get back two useful ob
 You can read more about `state` and `action` in the following section, now let's focus with the main alternatives the library offers to connect the *rocketjump* world and the *react* world
 
 You can choose several options to instantiate a RocketJump Object:
-- [useRj hook](usage_userj.md), which is the most simple (and most customizable)
-- [useRunRj hook](usage_userunrj.md), which is a very descriptive and powerful solution for many common cases
-- [connectRj HOC](usage_connectrj.md), which is a legacy solution to work with class based components
+- [useRj hook](connect_userj.md), which is the most simple (and most customizable)
+- [useRunRj hook](connect_userunrj.md), which is a very descriptive and powerful solution for many common cases
+- [connectRj HOC](connect_connectrj.md), which is a legacy solution to work with class based components
