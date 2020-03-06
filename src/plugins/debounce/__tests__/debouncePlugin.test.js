@@ -1,7 +1,7 @@
+import { bindActionCreators } from 'rocketjump-core'
 import rj from '../../../rj'
 import { makeAction } from '../../../index'
 import rjDebounce from '../index'
-import bindActionCreators from '../../../bindActionCreators'
 import { createTestRJSubscription } from '../../../testUtils'
 import { PENDING, SUCCESS, CLEAN, RUN } from '../../../actionTypes'
 

@@ -33,7 +33,7 @@ export { default as compose } from './compose'
 export { default as ConfigureRj } from './ConfigureRj'
 
 // make effect action
-export { makeLibraryAction as makeAction } from './actionCreators'
+export { makeLibraryAction as makeAction } from 'rocketjump-core'
 
 // All action types
 export * from './actionTypes'

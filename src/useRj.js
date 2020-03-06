@@ -1,8 +1,7 @@
 import { useMemo, useDebugValue } from 'react'
-import { isObjectRj } from 'rocketjump-core'
+import { isObjectRj, bindActionCreators } from 'rocketjump-core'
 import { useConstant } from './hooks'
 import useMiniRedux from './useMiniRedux'
-import bindActionCreators from './bindActionCreators'
 
 export default function useRj(
   // The returned value of rj(..., EFFECT)

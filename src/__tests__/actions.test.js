@@ -1,10 +1,10 @@
 import React from 'react'
 import { act } from 'react-dom/test-utils'
+import { isEffectAction } from 'rocketjump-core'
 import { rj as reactRj, connectRj } from '..'
 import Enzyme, { mount, shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import { RUN, CLEAN, CANCEL, SUCCESS, UPDATE_DATA } from '../actionTypes'
-import { isEffectAction } from '../actionCreators'
 
 Enzyme.configure({ adapter: new Adapter() })
 
