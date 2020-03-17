@@ -1,6 +1,6 @@
 import React from 'react'
 import { act } from 'react-dom/test-utils'
-import { isEffectAction } from 'rocketjump-core'
+import { isEffectAction, deps } from 'rocketjump-core'
 import { rj as reactRj, connectRj } from '..'
 import Enzyme, { mount, shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
@@ -713,5 +713,100 @@ describe('React-RocketJump actions', () => {
     })
 
     expect(actionLog[0]).toEqual({ type: 'CUSTOM' })
+  })
+
+  it('should squash deps values from actions', async () => {
+    const actionLog = []
+
+    const rjState = reactRj({
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+
+    await act(async () => {
+      wrapper.prop('run')(
+        1,
+        2,
+        deps.maybe(23),
+        deps.maybeGet({ age: 88 }, 'age'),
+        deps.withMeta(99),
+        deps.withAlwaysMeta({})
+      )
+    })
+
+    expect(actionLog[0]).toEqual({
+      type: RUN,
+      payload: {
+        params: [1, 2, 23, 88, 99],
+      },
+      meta: {},
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+  })
+
+  it('should squash deps values from actions', async () => {
+    const actionLog = []
+
+    const rjState = reactRj({
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+
+    await act(async () => {
+      wrapper.prop('run')(
+        1,
+        2,
+        deps.maybe(23).withMeta({ giova: 33 }),
+        deps.maybeGet({ age: 88 }, 'age'),
+        deps.withMeta(99, { babu: 23 }),
+        deps.withAlwaysMeta({ x: 'xd' })
+      )
+    })
+
+    expect(actionLog[0]).toEqual({
+      type: RUN,
+      payload: {
+        params: [1, 2, 23, 88, 99],
+      },
+      meta: {
+        giova: 33,
+        babu: 23,
+        x: 'xd',
+      },
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+  })
+
+  it('should skip actions according to deps', async () => {
+    const actionLog = []
+
+    const rjState = reactRj({
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+
+    await act(async () => {
+      wrapper.prop('run')(
+        1,
+        2,
+        deps.maybe(0).withMeta({ giova: 33 }),
+        deps.maybeGet({ age: 88 }, 'age'),
+        deps.withMeta(99, { babu: 23 }),
+        deps.withAlwaysMeta({ x: 'xd' })
+      )
+    })
+    expect(actionLog).toEqual([])
   })
 })
