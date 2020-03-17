@@ -34,5 +34,8 @@ export { makeLibraryAction as makeAction } from 'rocketjump-core'
 // All action types
 export * from './actionTypes'
 
+// All types checks
+export * from './types'
+
 // All rx effects
 export { default as RxEffects } from './rxEffects'

@@ -1,5 +1,6 @@
 import rj from '../rj'
-import { isPartialRj, isObjectRj } from 'rocketjump-core'
+import { isObjectRj as strictIsObjectRj } from '../types'
+import { isPartialRj, isObjectRj, forgeRocketJump } from 'rocketjump-core'
 
 describe('rj constructor', () => {
   it('should produce rj object when called with effect or a function', () => {
@@ -124,5 +125,25 @@ describe('rj constructor', () => {
     }).toThrowError(
       /\[react-rocketjump\] you can't pass an rj object as argument./
     )
+  })
+
+  it('should have strict isObjectRj', () => {
+    const dubRj = forgeRocketJump({
+      shouldRocketJump: () => true, // single invocation
+      makeRunConfig: () => null, // no run config
+      makeRecursionRjs: rjs => rjs, // don't touch configs
+      makeExport: (_, config, rjExport = {}) => {
+        return {
+          giova: 23,
+        }
+      },
+      finalizeExport: rjExport => ({ ...rjExport }), // don't hack config
+    })
+
+    expect(strictIsObjectRj(dubRj())).toBe(false)
+    expect(isObjectRj(dubRj())).toBe(true)
+
+    expect(strictIsObjectRj(rj(() => 2))).toBe(true)
+    expect(isObjectRj(rj(() => 2))).toBe(true)
   })
 })
