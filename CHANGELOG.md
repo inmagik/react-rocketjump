@@ -1,5 +1,5 @@
 ## 2.2.0
-###### *March X, 2019*
+###### *March 18, 2019*
 
 No breaking changes only new features.
 
