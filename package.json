@@ -39,7 +39,7 @@
     "hoist-non-react-statics": "^3.3.0",
     "object-path-immutable": "^3.0.2",
     "query-string": "^6.7.0",
-    "rocketjump-core": "^3.0.0-rc5",
+    "rocketjump-core": "^3.0.0",
     "rxjs": "^6.5.2"
   },
   "devDependencies": {
@@ -88,8 +88,7 @@
     "webpack-dev-server": "^3.3.1"
   },
   "peerDependencies": {
-    "react": "^16.8.0",
-    "react-dom": "^16.8.0"
+    "react": "^16.8.0"
   },
   "husky": {
     "hooks": {
