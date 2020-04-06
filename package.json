@@ -39,7 +39,7 @@
     "hoist-non-react-statics": "^3.3.0",
     "object-path-immutable": "^3.0.2",
     "query-string": "^6.7.0",
-    "rocketjump-core": "^3.0.0",
+    "rocketjump-core": "/Users/fuma/projects/rocketjump-core/rocketjump-core-0.0.0-experimental-c170.tgz",
     "rxjs": "^6.5.2"
   },
   "devDependencies": {

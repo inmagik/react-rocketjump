@@ -3,6 +3,7 @@ import {
   isPartialRj,
   isObjectRj,
   createComputeState,
+  enhanceWithPlugins,
 } from 'rocketjump-core'
 import makeExport from './export'
 import createMakeRxObservable from './createMakeRxObservable'
@@ -124,9 +125,18 @@ function makeRecursionRjs(
   return recursionRjs
 }
 
-function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
+function finalizeExport(mergegAlongExport, runConfig, finalConfig, plugIns) {
   // ~~ END OF RECURSION CHAIN  ~~
-  const { sideEffect, computed, ...rjExport } = mergegAlongExport
+
+  // Hack export before finalize them
+  // you can hook into them to for example change the priority of standard
+  // rj recursion ...
+  const startExport = enhanceWithPlugins(
+    plugIns,
+    mergegAlongExport,
+    'hackExportBeforeFinalize'
+  )
+  const { sideEffect, computed, ...rjExport } = startExport
 
   const { effectPipeline, ...sideEffectConfig } = sideEffect
 
@@ -159,7 +169,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
       pipeActionStream: fn,
     }
   */
-  return enhanceFinalExportWithMutations(finalExport, mergegAlongExport)
+  return enhanceFinalExportWithMutations(finalExport, startExport)
 }
 
 export default forgeRocketJump({

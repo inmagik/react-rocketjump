@@ -7395,6 +7395,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
+rocketjump-core@/Users/fuma/projects/rocketjump-core/rocketjump-core-0.0.0-experimental-c170.tgz:
+  version "0.0.0-experimental-c170"
+  resolved "/Users/fuma/projects/rocketjump-core/rocketjump-core-0.0.0-experimental-c170.tgz#733fb7af975a98ea791ae33c7e507f324f2970ff"
+
 rocketjump-core@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/rocketjump-core/-/rocketjump-core-3.0.0.tgz#069c782ec55f9be4956713ba0a7f97074306500b"
