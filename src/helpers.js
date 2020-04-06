@@ -1,6 +1,14 @@
 import immutable from 'object-path-immutable'
 import { get } from 'rocketjump-core/utils'
 
+export function isPromise(obj) {
+  return (
+    !!obj &&
+    (typeof obj === 'object' || typeof obj === 'function') &&
+    typeof obj.then === 'function'
+  )
+}
+
 export function set(obj, path, value) {
   return immutable.set(obj, path, value)
 }

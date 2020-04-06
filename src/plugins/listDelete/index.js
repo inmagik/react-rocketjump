@@ -10,7 +10,7 @@ const rjListDelete = (config = {}) => {
   const identity = config.identity || defaultIdentity
   const path = config.path || 'data'
 
-  return rj({
+  return rj.pure({
     actions: () => ({
       deleteItem: item => ({ type: TYPE, item }),
     }),

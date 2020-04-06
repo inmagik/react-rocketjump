@@ -12,22 +12,48 @@ const callToken = (call, ...args) => {
   return promise
 }
 
+rj
+  .setGlobalRjs
+  // rjAjax({
+  //   baseUrl: API_URL,
+  // }),
+  ()
+
+rj.setPluginsDefault({
+  'AJAX+RxJs': [{ baseUrl: API_URL }],
+})
+
 export const TodosListState = rj(
-  rj({
-    effectCaller: callToken,
-  }),
-  rjAjax(),
+  // rjAjax({
+  //   baseUrl: API_URL,
+  // }),
+  // rj({
+  //   effectCaller: callToken,
+  // }),
   // rj({
   //   effectCaller: (call, ...args) => {
   //     console.log('CALL ME', args)
   //     return call(...args)
   //   }
   // }),
+  // rjAjax({
+  //   baseUrl: API_URL,
+  // }),
+  // rjAjax({
+  //   baseUrl: 'GN'
+  // }),
+  rjAjax(),
   rjPlainList(),
   {
-    // effectCaller: callToken,
+    effectCaller: callToken,
     // effect: t => () => request.get(`${API_URL}/todos?t=${t}`).then(({ body }) => body),
-    effect: () => `${API_URL}/todos`,
+    effect: t => () => ({
+      url: `/todos`,
+      // url: `${API_URL}/todos`,
+      headers: {
+        Authorization: `JWT ${t}`,
+      },
+    }),
     mutations: {
       addStupidTodo: rj.mutation.single({
         // effect: todo =>
@@ -36,7 +62,7 @@ export const TodosListState = rj(
         //   .send(todo)
         //   .then(({ body }) => body),
         effect: todo => ({
-          url: `${API_URL}/todos`,
+          url: '/todos',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -72,3 +98,4 @@ export const TodosListState = rj(
     name: 'MaTodos',
   }
 )
+console.log('X', TodosListState)

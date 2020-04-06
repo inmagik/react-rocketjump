@@ -1,8 +1,17 @@
-import { of, from, concat, throwError, merge, BehaviorSubject } from 'rxjs'
+import {
+  of,
+  from,
+  concat,
+  throwError,
+  merge,
+  BehaviorSubject,
+  isObservable,
+} from 'rxjs'
 import { map, catchError, filter } from 'rxjs/operators'
 import { squashExportValue } from 'rocketjump-core'
 import { SUCCESS, FAILURE, PENDING, RUN, CLEAN, CANCEL } from './actionTypes'
 import { arrayze } from 'rocketjump-core/utils'
+import { isPromise } from './helpers'
 import RxEffects from './rxEffects'
 
 const defaultEffectCaller = (call, ...args) => call(...args)
@@ -74,9 +83,19 @@ export default function createMakeRxObservable(
       const { payload, meta, callbacks } = action
       const params = payload.params
 
+      const effectResult = callEffect(effectCall, ...params)
+
+      if (!(isPromise(effectResult) || isObservable(effectResult))) {
+        throw new Error(
+          '[react-rocketjump] The effect result is expect ' +
+            `to be Promise or RxObservable but a ${typeof effectResult} ` +
+            `was given. Please check your effect and effectCaller logic.`
+        )
+      }
+
       return concat(
         of({ type: prefix + PENDING, meta }),
-        from(callEffect(effectCall, ...params)).pipe(
+        from(effectResult).pipe(
           map(data => ({
             type: prefix + SUCCESS,
             payload: { data, params },
