@@ -1,4 +1,4 @@
-import { get } from '../helpers'
+import { get } from 'rocketjump-core/utils'
 
 const COMPUTED_MUTATION_PREFIX = '@mutation'
 

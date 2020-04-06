@@ -1,5 +1,6 @@
 import { rj } from '../../index'
-import { set, get } from '../../helpers'
+import { get } from 'rocketjump-core/utils'
+import { set } from '../../helpers'
 
 const TYPE = 'RJ_LIST_DELETE'
 

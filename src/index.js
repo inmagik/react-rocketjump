@@ -1,9 +1,6 @@
 // Our main builder the MagIK rj()
 import rj from './rj'
 
-// MagIK DeBps for useRunRj hook
-import * as allDeps from './deps'
-
 // All rj helpers
 import * as configHelpers from './configHelpers'
 
@@ -19,9 +16,8 @@ export { rj }
 export { default as useRj } from './useRj'
 export { default as useRunRj } from './useRunRj'
 
-// Exports DeBps
-const deps = { ...allDeps } // Remove es6 module shit
-export { deps }
+// Export MagIK DeBps for useRunRj hook
+export { deps } from 'rocketjump-core'
 
 // HOC
 export { default as connectRj } from './connectRj'
@@ -33,10 +29,13 @@ export { default as compose } from './compose'
 export { default as ConfigureRj } from './ConfigureRj'
 
 // make effect action
-export { makeLibraryAction as makeAction } from './actionCreators'
+export { makeLibraryAction as makeAction } from 'rocketjump-core'
 
 // All action types
 export * from './actionTypes'
+
+// All types checks
+export * from './types'
 
 // All rx effects
 export { default as RxEffects } from './rxEffects'

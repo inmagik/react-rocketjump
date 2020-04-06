@@ -8,8 +8,8 @@ import {
   composeReducers,
   kompose,
   arrayze,
+  invertKeys,
 } from 'rocketjump-core/utils'
-import { invertKeys } from './helpers'
 import DefaultActionCreators from './actionCreators'
 import defaultReducer from './reducer'
 import defaultMakeSelectors from './selectors'

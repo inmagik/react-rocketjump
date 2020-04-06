@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
-import { isObjectRj } from 'rocketjump-core'
+import { isObjectRj, bindActionCreators } from 'rocketjump-core'
 import hoistStatics from 'hoist-non-react-statics'
-import bindActionCreators from './bindActionCreators'
 import { useConstant } from './hooks'
 import useMiniRedux from './useMiniRedux'
 

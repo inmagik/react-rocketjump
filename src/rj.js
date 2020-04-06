@@ -1,7 +1,11 @@
-import { forgeRocketJump, isPartialRj, isObjectRj } from 'rocketjump-core'
+import {
+  forgeRocketJump,
+  isPartialRj,
+  isObjectRj,
+  createComputeState,
+} from 'rocketjump-core'
 import makeExport from './export'
 import createMakeRxObservable from './createMakeRxObservable'
-import createComputeState from './createComputeState'
 import {
   enhanceFinalExportWithMutations,
   checkMutationsConfig,

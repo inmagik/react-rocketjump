@@ -140,7 +140,7 @@ describe('RJ mutations computed', () => {
       const { result } = renderHook(() => useRj(MaRjState))
       // eslint-disable-next-line no-unused-vars
       const { skinny } = result.current[0]
-    }).toThrow(/\[react-rocketjump\]/)
+    }).toThrow(/\[rocketjump\]/)
   })
 
   it('should get angry when miss mutation key of computed', async () => {

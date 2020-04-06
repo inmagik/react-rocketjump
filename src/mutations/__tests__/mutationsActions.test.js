@@ -1,6 +1,6 @@
+import { isEffectAction } from 'rocketjump-core'
 import rj from '../../rj'
 import useRj from '../../useRj'
-import { isEffectAction } from '../../actionCreators'
 import { renderHook, act } from '@testing-library/react-hooks'
 import '@testing-library/jest-dom/extend-expect'
 

@@ -1,5 +1,5 @@
+import { makeLibraryAction } from 'rocketjump-core'
 import { RUN } from '../actionTypes'
-import { makeLibraryAction } from '../actionCreators'
 import { MUTATION_PREFIX } from './actionTypes'
 
 // Make the action creater that trigger a mutation side effects
