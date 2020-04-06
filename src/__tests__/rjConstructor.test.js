@@ -58,7 +58,10 @@ describe('rj constructor', () => {
       /\[react-rocketjump\] effect should be defined only once, in the last argument/
     )
     expect(() => {
-      rj(() => 23, () => 777)
+      rj(
+        () => 23,
+        () => 777
+      )
     }).toThrowError(
       /\[react-rocketjump\] effect should be defined only once, in the last argument/
     )
@@ -119,9 +122,12 @@ describe('rj constructor', () => {
     }).toThrowError(/\[react-rocketjump\] you can't invoke a partialRj/)
 
     expect(() => {
-      rj(rj(() => 23), {
-        reducer: r => r,
-      })()
+      rj(
+        rj(() => 23),
+        {
+          reducer: r => r,
+        }
+      )()
     }).toThrowError(
       /\[react-rocketjump\] you can't pass an rj object as argument./
     )

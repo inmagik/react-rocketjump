@@ -1,3 +1,8 @@
+## 2.2.1
+##### *April 6th, 2019*
+
+No breaking changes, only security fixes
+
 ## 2.2.0
 ###### *March 18, 2019*
 

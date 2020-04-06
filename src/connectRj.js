@@ -28,10 +28,15 @@ export default function connectRj(
         computeState,
       } = rjObject
 
-      const rjDebugInfo = {
-        ...rjObject.__rjconfig,
-        wrappedComponentName: WrappedComponent.name,
-      }
+      const wrappedComponentName = WrappedComponent.name
+      const rjDebugInfo = useMemo(
+        () => ({
+          ...rjObject.__rjconfig,
+          wrappedComponentName,
+        }),
+        [wrappedComponentName]
+      )
+
       const [state, dispatch] = useMiniRedux(
         reducer,
         makeRxObservable,

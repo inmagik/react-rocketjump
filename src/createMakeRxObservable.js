@@ -88,7 +88,7 @@ export default function createMakeRxObservable(
       if (!(isPromise(effectResult) || isObservable(effectResult))) {
         return throwError(
           'The effect result is expect ' +
-            `to be Promise or RxObservable but a ${typeof effectResult} ` +
+            `to be a Promise or an RxObservable but a ${typeof effectResult} ` +
             `was given. Please check your effect and effectCaller logic.`
         )
       }

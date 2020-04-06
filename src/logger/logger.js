@@ -134,7 +134,7 @@ export default function rjLogger() {
 
       const error = event.payload
 
-      console.error(`[react-rocketjump]  ${componentLocation}  ${error}`)
+      console.error(`[react-rocketjump] in ${componentLocation}\n  ${error}`)
     }
   })
 }
