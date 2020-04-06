@@ -45,15 +45,16 @@ export const TodosListState = rj(
   rjAjax(),
   rjPlainList(),
   {
-    effectCaller: callToken,
+    // effectCaller: callToken,
+    effect: t => 23,
     // effect: t => () => request.get(`${API_URL}/todos?t=${t}`).then(({ body }) => body),
-    effect: t => () => ({
-      url: `/todos`,
-      // url: `${API_URL}/todos`,
-      headers: {
-        Authorization: `JWT ${t}`,
-      },
-    }),
+    // effect: t => () => ({
+    //   url: `/todos`,
+    //   // url: `${API_URL}/todos`,
+    //   headers: {
+    //     Authorization: `JWT ${t}`,
+    //   },
+    // }),
     mutations: {
       addStupidTodo: rj.mutation.single({
         // effect: todo =>

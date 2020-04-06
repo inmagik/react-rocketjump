@@ -183,28 +183,46 @@ export default function useMiniRedux(
 
   // Subscription 2 dispatch$
   useEffect(() => {
-    const subscription = dispatch$.subscribe(action => {
-      // Erase callbacks before dispatch on reducer
-      let successCallback
-      if (action.successCallback) {
-        successCallback = action.successCallback
-        delete action.successCallback
+    const subscription = dispatch$.subscribe(
+      action => {
+        // Erase callbacks before dispatch on reducer
+        let successCallback
+        if (action.successCallback) {
+          successCallback = action.successCallback
+          delete action.successCallback
+        }
+        let failureCallback
+        if (action.failureCallback) {
+          failureCallback = action.failureCallback
+          delete action.failureCallback
+        }
+        // Dispatch the cleaned action
+        dispatch(action)
+        // Run the callbacks if needed
+        if (successCallback) {
+          successCallback(action.payload.data)
+        }
+        if (failureCallback) {
+          failureCallback(action.payload)
+        }
+      },
+      error => {
+        // Detailed info about error ...
+        let errorStr = 'An error was occured during your effect'
+        if (debugInfo.name) {
+          errorStr += ` located in rocketjump ${debugInfo.name}.`
+        } else {
+          errorStr += '.'
+        }
+        if (process.env.NODE_ENV !== 'production' && flags.debugger) {
+          debugEmitter.onError(errorStr)
+        } else {
+          console.error(`[react-rocketjump] ${errorStr}`)
+        }
+
+        throw error
       }
-      let failureCallback
-      if (action.failureCallback) {
-        failureCallback = action.failureCallback
-        delete action.failureCallback
-      }
-      // Dispatch the cleaned action
-      dispatch(action)
-      // Run the callbacks if needed
-      if (successCallback) {
-        successCallback(action.payload.data)
-      }
-      if (failureCallback) {
-        failureCallback(action.payload)
-      }
-    })
+    )
     // Ok now we are ready to handle shit from dispatch$ observable!
     action$.connect()
 
@@ -217,7 +235,7 @@ export default function useMiniRedux(
         }
       }
     }
-  }, [action$, dispatch$, debugEmitter])
+  }, [action$, dispatch$, debugEmitter, debugInfo])
 
   // Dispatch to reducer or start an effect
   const dispatchWithEffect = useConstant(() => action => {

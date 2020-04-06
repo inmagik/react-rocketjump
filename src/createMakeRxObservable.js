@@ -86,8 +86,8 @@ export default function createMakeRxObservable(
       const effectResult = callEffect(effectCall, ...params)
 
       if (!(isPromise(effectResult) || isObservable(effectResult))) {
-        throw new Error(
-          '[react-rocketjump] The effect result is expect ' +
+        return throwError(
+          'The effect result is expect ' +
             `to be Promise or RxObservable but a ${typeof effectResult} ` +
             `was given. Please check your effect and effectCaller logic.`
         )
