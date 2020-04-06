@@ -1,4 +1,9 @@
-import { RJ_DISPATCH_EVENT, RJ_INIT_EVENT, RJ_TEARDOWN_EVENT } from './events'
+import {
+  RJ_DISPATCH_EVENT,
+  RJ_INIT_EVENT,
+  RJ_TEARDOWN_EVENT,
+  RJ_ERROR_EVENT,
+} from './events'
 import { AllRjEventsSubject } from './debugger'
 
 class RjDebugEventEmitter {
@@ -23,6 +28,10 @@ class RjDebugEventEmitter {
 
   onActionDispatched(action, prevState, nextState) {
     this.emit(RJ_DISPATCH_EVENT, { action, prevState, nextState })
+  }
+
+  onError(error) {
+    this.emit(RJ_ERROR_EVENT, error)
   }
 
   onTeardown() {

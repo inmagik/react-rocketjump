@@ -3,6 +3,7 @@ import {
   RJ_DISPATCH_EVENT,
   RJ_INIT_EVENT,
   RJ_TEARDOWN_EVENT,
+  RJ_ERROR_EVENT,
 } from '../debugger/index'
 
 function whereMyRjIsIvoked(wrappedComponentName) {
@@ -90,15 +91,19 @@ export default function rjLogger() {
     } else if (event.type === RJ_DISPATCH_EVENT) {
       const { info, trackId } = event.meta
       const index = rjLives.indexOf(info)
+      const location = whereUsed[trackId]
+
+      const rjName = info.name || `${index + 1}°`
+      const { component, rjFn, hooks } = location
+      const componentLocation = `%c${component}%c${hooks.map(
+        h => `  ${h}()`
+      )}  ${rjFn}(${rjName})`
+
       const color = colors[trackId % colors.length]
       const { action, prevState, nextState } = event.payload
-      const rjName = info.name || `${index + 1}°`
-      const { component, rjFn, hooks } = whereUsed[trackId]
 
       console.groupCollapsed(
-        `%c${component}%c${hooks.map(
-          h => `  ${h}()`
-        )}  ${rjFn}(${rjName})  %caction %c${action.type}`,
+        `${componentLocation}  %caction %c${action.type}`,
         'color: #80338a;font-weight:normal',
         `color:${color};font-weight:normal`,
         'color:grey;font-weight:lighter;',
@@ -116,6 +121,20 @@ export default function rjLogger() {
       //   lastRjConfig: info
       // })
       console.groupEnd()
+    } else if (event.type === RJ_ERROR_EVENT) {
+      const { info, trackId } = event.meta
+      const index = rjLives.indexOf(info)
+      const location = whereUsed[trackId]
+
+      const rjName = info.name || `${index + 1}°`
+      const { component, rjFn, hooks } = location
+      const componentLocation = `${component}${hooks.map(
+        h => `  ${h}()`
+      )}  ${rjFn}(${rjName})`
+
+      const error = event.payload
+
+      console.error(`[react-rocketjump] in ${componentLocation}\n  ${error}`)
     }
   })
 }
