@@ -1,5 +1,5 @@
 ## 2.3.0
-##### *April 7th, 2019*
+##### *April 7th, 2020*
 
 Improved error logging, during effect.
 
@@ -28,12 +28,12 @@ Even better when **rj logger** is enabled:
 
 
 ## 2.2.1
-##### *April 6th, 2019*
+##### *April 6th, 2020*
 
 No breaking changes, only security fixes
 
 ## 2.2.0
-###### *March 18, 2019*
+###### *March 18, 2020*
 
 No breaking changes only new features.
 
