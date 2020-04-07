@@ -1,6 +1,8 @@
 import { rj } from 'react-rocketjump'
+import { tap } from 'rxjs/operators'
 import rjPlainList from 'react-rocketjump/plugins/plainList'
 import rjAjax from 'react-rocketjump/plugins/ajax'
+import rjWithRoutines from 'react-rocketjump/plugins/routines'
 import request from 'superagent'
 
 export const API_URL = 'http://localhost:9001'
@@ -19,11 +21,19 @@ rj
   // }),
   ()
 
-rj.setPluginsDefault({
+rj.setPluginsDefaults({
   'AJAX+RxJs': [{ baseUrl: API_URL }],
 })
+rj.addNamespace(
+  'api',
+  rjWithRoutines(),
+  rj(rjAjax(), {
+    // effectCaller: callToken,
+  }),
+  rjPlainList()
+)
 
-export const TodosListState = rj(
+export const TodosListState = rj.ns.api(
   // rjAjax({
   //   baseUrl: API_URL,
   // }),
@@ -42,19 +52,20 @@ export const TodosListState = rj(
   // rjAjax({
   //   baseUrl: 'GN'
   // }),
-  rjAjax(),
-  rjPlainList(),
+  // rjAjax(),
+  // rjPlainList(),
   {
+    effectPipeline: action => action.pipe(tap(x => console.log('TAP', x))),
     // effectCaller: callToken,
-    effect: t => 23,
+    // effect: t => 23,
     // effect: t => () => request.get(`${API_URL}/todos?t=${t}`).then(({ body }) => body),
-    // effect: t => () => ({
-    //   url: `/todos`,
-    //   // url: `${API_URL}/todos`,
-    //   headers: {
-    //     Authorization: `JWT ${t}`,
-    //   },
-    // }),
+    effect: () => ({
+      url: `/todos`,
+      // url: `${API_URL}/todos`,
+      headers: {
+        // Authorization: `JWT ${t}`,
+      },
+    }),
     mutations: {
       addStupidTodo: rj.mutation.single({
         // effect: todo =>

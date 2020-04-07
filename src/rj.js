@@ -4,6 +4,7 @@ import {
   isObjectRj,
   createComputeState,
   enhanceWithPlugins,
+  enhanceFinalExportWithPlugins,
 } from 'rocketjump-core'
 import makeExport from './export'
 import createMakeRxObservable from './createMakeRxObservable'
@@ -151,7 +152,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig, plugIns) {
   // of useRj, connectRj, .. to check for null
   const computeState = createComputeState(computed)
 
-  const finalExport = {
+  let finalExport = {
     ...rjExport,
     computeState,
     makeRxObservable,
@@ -169,13 +170,25 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig, plugIns) {
       pipeActionStream: fn,
     }
   */
-  return enhanceFinalExportWithMutations(finalExport, startExport)
+  // TODO: MOVE MUTATION TO A "CORE" PLUGIN
+  finalExport = enhanceFinalExportWithMutations(finalExport, startExport)
+  return enhanceFinalExportWithPlugins(
+    finalExport,
+    runConfig,
+    finalConfig,
+    plugIns
+  )
 }
 
-export default forgeRocketJump({
-  shouldRocketJump,
-  makeRunConfig,
-  makeRecursionRjs,
-  makeExport,
-  finalizeExport,
-})
+const FORGED_IN_STELL_PLUGINS = []
+
+export default forgeRocketJump(
+  {
+    shouldRocketJump,
+    makeRunConfig,
+    makeRecursionRjs,
+    makeExport,
+    finalizeExport,
+  },
+  FORGED_IN_STELL_PLUGINS
+)

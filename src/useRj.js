@@ -22,6 +22,7 @@ export default function useRj(
     reducer,
     makeSelectors,
     computeState,
+    routine,
   } = rjObject
 
   useDebugValue(
@@ -31,7 +32,7 @@ export default function useRj(
   // The last config or rj recursion rj({},rj(),..,{},{<THIS>})
   // used as debug hints
   const rjDebugInfo = rjObject.__rjconfig
-  const [state, dispatch] = useMiniRedux(
+  const [state, dispatch, actionObservable] = useMiniRedux(
     reducer,
     makeRxObservable,
     pipeActionStream,
@@ -66,8 +67,15 @@ export default function useRj(
   }, [state, memoizedSelectors, selectState, computeState])
 
   // Memoize return value now can saftley used in React Context.Provider
-  return useMemo(() => [derivedState, boundActionCreators], [
+  const rjExe = useMemo(() => [derivedState, boundActionCreators], [
     derivedState,
     boundActionCreators,
   ])
+
+  // ... Ora che ho perso la vista ... ci vedo di più
+  if (typeof routine === 'function') {
+    routine(actionObservable, state, memoizedSelectors, boundActionCreators)
+  }
+
+  return rjExe
 }

@@ -249,5 +249,5 @@ export default function useMiniRedux(
     }
   })
 
-  return [state, dispatchWithEffect]
+  return [state, dispatchWithEffect, action$]
 }

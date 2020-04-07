@@ -9,7 +9,7 @@ export default function Todos() {
   const [
     { todos, loading, adding, deleting, updating },
     { addStupidTodo, removeTodo, toggleTodo },
-  ] = useRunRj(TodosListState)
+  ] = useRunRj(TodosListState, [], false)
 
   return (
     <div className="todos">

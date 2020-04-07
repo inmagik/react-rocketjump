@@ -165,7 +165,14 @@ export default function createMakeRxObservable(
           effectTypeArgs,
           prefix
         ),
-        mergeObservable$.pipe(filter(a => filterNonEffectActions(a, prefix)))
+        mergeObservable$.pipe(
+          filter(a => {
+            if (a.meta && a.meta.ignoreDispatch) {
+              return false
+            }
+            return filterNonEffectActions(a, prefix)
+          })
+        )
       )
     }
     return [dispatchObservable, config => extraSideEffectSubject.next(config)]
