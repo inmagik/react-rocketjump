@@ -6,7 +6,7 @@ import { enhanceMakeObservable } from './sideEffects'
 import { enhanceActionCreators } from './actionCreators'
 import { enhanceMakeSelectors } from './selectors'
 
-export function checkMutationsConfig(rjConfig) {
+function checkMutationsConfig(rjConfig) {
   if (
     typeof rjConfig.mutations === 'object' &&
     rjConfig.mutations !== null &&
@@ -39,7 +39,7 @@ function makeMutationsExport(mutations) {
   )
 }
 
-export function enhanceMakeExportWithMutations(rjConfig, extendExport) {
+function enhanceMakeExportWithMutations(extendExport, rjConfig) {
   // Set mutations config
   if (rjConfig.mutations) {
     return {
@@ -51,10 +51,7 @@ export function enhanceMakeExportWithMutations(rjConfig, extendExport) {
   return extendExport
 }
 
-export function enhanceFinalExportWithMutations(
-  rjObject,
-  { computed, sideEffect }
-) {
+function enhanceFinalExportWithMutations(rjObject, { computed, sideEffect }) {
   const { mutations, ...rjEnhancedObject } = rjObject
   if (!mutations) {
     return rjEnhancedObject
@@ -102,3 +99,12 @@ export function enhanceFinalExportWithMutations(
     ),
   }
 }
+
+const Mutations = {
+  name: 'Mutations',
+  checkObjectConfig: checkMutationsConfig,
+  makeExport: enhanceMakeExportWithMutations,
+  finalizeExport: enhanceFinalExportWithMutations,
+}
+
+export default Mutations

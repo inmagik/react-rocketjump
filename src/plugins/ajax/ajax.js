@@ -67,7 +67,7 @@ const rjAjaxRxJs = rj.plugin(
   },
   {
     name: 'AJAX+RxJs',
-    makeExport: (runConfig, rjConfig, extendExport) => {
+    makeExport: (extendExport, rjConfig) => {
       // simply ovverride ajax config when given :D
       const withAjaxExport = { ...extendExport }
       if (rjConfig.ajaxRx) {

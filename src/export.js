@@ -10,15 +10,14 @@ import {
   arrayze,
   invertKeys,
 } from 'rocketjump-core/utils'
-import { enhanceMakeExportWithPlugins } from 'rocketjump-core'
+import { enhanceWithPlugins } from 'rocketjump-core'
 import DefaultActionCreators from './actionCreators'
 import defaultReducer from './reducer'
 import defaultMakeSelectors from './selectors'
-import { enhanceMakeExportWithMutations } from './mutations/index'
 
 // Make the exports
 // take a extended export (the return of this function)
-export default (runConfig, rjConfig, extendExport = {}, plugIns) => {
+export default (_, rjConfig, extendExport = {}, plugIns) => {
   // Make side effect descriptor exports
   let sideEffect
   if (!extendExport.sideEffect) {
@@ -91,7 +90,7 @@ export default (runConfig, rjConfig, extendExport = {}, plugIns) => {
     computed = { ...computed, ...invertKeys(rjConfig.computed) }
   }
 
-  let newExport = {
+  const newExport = {
     ...extendExport,
     sideEffect,
     reducer,
@@ -100,6 +99,5 @@ export default (runConfig, rjConfig, extendExport = {}, plugIns) => {
     computed,
   }
 
-  newExport = enhanceMakeExportWithMutations(rjConfig, newExport)
-  return enhanceMakeExportWithPlugins(runConfig, rjConfig, newExport, plugIns)
+  return enhanceWithPlugins(plugIns, newExport, 'makeExport', [rjConfig])
 }

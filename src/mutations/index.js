@@ -1,1 +1,1 @@
-export * from './mutations'
+export { default } from './mutations'

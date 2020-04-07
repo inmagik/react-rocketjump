@@ -4,16 +4,12 @@ import {
   isObjectRj,
   createComputeState,
   enhanceWithPlugins,
-  enhanceFinalExportWithPlugins,
 } from 'rocketjump-core'
 import makeExport from './export'
 import createMakeRxObservable from './createMakeRxObservable'
-import {
-  enhanceFinalExportWithMutations,
-  checkMutationsConfig,
-} from './mutations/index'
+import Mutations from './mutations/index'
 
-function shouldRocketJump(partialRjsOrConfigs) {
+function shouldRocketJump(partialRjsOrConfigs, plugIns) {
   let hasEffectConfigured = false
   for (let partialRjOrConfig of partialRjsOrConfigs) {
     // Parital allowed
@@ -36,7 +32,11 @@ function shouldRocketJump(partialRjsOrConfigs) {
         }
         hasEffectConfigured = true
       }
-      checkMutationsConfig(partialRjOrConfig)
+      for (let plugin of plugIns) {
+        if (typeof plugin.checkObjectConfig === 'function') {
+          plugin.checkObjectConfig(partialRjOrConfig)
+        }
+      }
       continue
     }
     // A function effect
@@ -126,7 +126,7 @@ function makeRecursionRjs(
   return recursionRjs
 }
 
-function finalizeExport(mergegAlongExport, runConfig, finalConfig, plugIns) {
+function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
   // ~~ END OF RECURSION CHAIN  ~~
 
   // Hack export before finalize them
@@ -152,7 +152,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig, plugIns) {
   // of useRj, connectRj, .. to check for null
   const computeState = createComputeState(computed)
 
-  let finalExport = {
+  const finalExport = {
     ...rjExport,
     computeState,
     makeRxObservable,
@@ -170,25 +170,20 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig, plugIns) {
       pipeActionStream: fn,
     }
   */
-  // TODO: MOVE MUTATION TO A "CORE" PLUGIN
-  finalExport = enhanceFinalExportWithMutations(finalExport, startExport)
-  return enhanceFinalExportWithPlugins(
-    finalExport,
-    runConfig,
+  return enhanceWithPlugins(plugIns, finalExport, 'finalizeExport', [
+    startExport,
     finalConfig,
-    plugIns
-  )
+  ])
 }
 
-const FORGED_IN_STELL_PLUGINS = []
-
-export default forgeRocketJump(
-  {
-    shouldRocketJump,
-    makeRunConfig,
-    makeRecursionRjs,
-    makeExport,
-    finalizeExport,
-  },
-  FORGED_IN_STELL_PLUGINS
-)
+export default forgeRocketJump({
+  shouldRocketJump,
+  makeRunConfig,
+  makeRecursionRjs,
+  makeExport,
+  finalizeExport,
+  forgedPlugins: [
+    // Core RJ and always loved Mutations!!!
+    Mutations,
+  ],
+})
