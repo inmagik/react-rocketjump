@@ -1,3 +1,32 @@
+## 2.3.0
+##### *April 7th, 2019*
+
+Improved error logging, during effect.
+
+Take this code:
+```js
+rj({
+  name: 'MaTodos',
+  effect: () => 23,
+})
+```
+
+Before when this codes runs you see something like this in your console:
+
+![mistic error](/assets/mistic_error.png)
+
+
+> What the hell is this? Where come this error? Bad.
+
+Now the same error:
+
+![better error](/assets/better_error.png)
+
+Even better when **rj logger** is enabled:
+
+![event better error with logger](/assets/error_even_better_with_logger.png)
+
+
 ## 2.2.1
 ##### *April 6th, 2019*
 

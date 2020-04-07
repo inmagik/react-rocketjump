@@ -208,7 +208,7 @@ export default function useMiniRedux(
       },
       error => {
         // Detailed info about error ...
-        let errorStr = 'An error was occured during your effect'
+        let errorStr = 'An error occured during your effect'
         if (debugInfo.name) {
           errorStr += ` located in rocketjump ${debugInfo.name}.`
         } else {
