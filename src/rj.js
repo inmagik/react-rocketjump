@@ -8,6 +8,7 @@ import {
 import makeExport from './export'
 import createMakeRxObservable from './createMakeRxObservable'
 import Mutations from './mutations/index'
+import Routines from './routines'
 
 function shouldRocketJump(partialRjsOrConfigs, plugIns) {
   let hasEffectConfigured = false
@@ -185,5 +186,7 @@ export default forgeRocketJump({
   forgedPlugins: [
     // Core RJ and always loved Mutations!!!
     Mutations,
+    // routine react hook 4 rj!
+    Routines,
   ],
 })

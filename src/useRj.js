@@ -66,16 +66,14 @@ export default function useRj(
     return derivedState
   }, [state, memoizedSelectors, selectState, computeState])
 
-  // Memoize return value now can saftley used in React Context.Provider
-  const rjExe = useMemo(() => [derivedState, boundActionCreators], [
-    derivedState,
-    boundActionCreators,
-  ])
-
   // ... Ora che ho perso la vista ... ci vedo di più
   if (typeof routine === 'function') {
     routine(actionObservable, state, memoizedSelectors, boundActionCreators)
   }
 
-  return rjExe
+  // Memoize return value now can saftley used in React Context.Provider
+  return useMemo(() => [derivedState, boundActionCreators], [
+    derivedState,
+    boundActionCreators,
+  ])
 }

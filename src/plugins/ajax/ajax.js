@@ -12,44 +12,56 @@ function isPromise(obj) {
   )
 }
 
-// TODO: query string
-function mapToAjax(config, descr) {
-  if (isObservable(descr) || isPromise(descr)) {
-    return descr
-  }
-  console.log('MAP 2 AJAX', descr, config)
+const makeAjaxConfig = (descr, config = {}) => {
   if (typeof descr === 'string') {
-    return ajax({
+    return {
       url: (config.baseUrl || '') + descr,
-    }).pipe(map(r => r.response))
+    }
   }
   if (typeof descr === 'object' && descr !== null) {
-    return ajax({
+    return {
       ...descr,
       url:
         typeof descr.url === 'string'
           ? (config.baseUrl || '') + descr.url
           : descr.url,
-    }).pipe(map(r => r.response))
+    }
   }
   return null
 }
 
-const DefaultAjaxConfig = {
-  baseUrl: null, // Default no overrid
+function mapToAjax(config, descr) {
+  if (isObservable(descr) || isPromise(descr)) {
+    return descr
+  }
+  const toAjaxConfig = makeAjaxConfig(descr, config)
+  if (toAjaxConfig) {
+    return config.responseMap(config.ajaxAdapter(toAjaxConfig))
+  }
+  return descr
 }
 
-const rjAjaxRxJs = rj.plugin(
+const DefaultAjaxPluginConfig = {
+  baseUrl: null, // Default no override
+  ajaxAdapter: ajax,
+  responseMap: o => o.pipe(map(r => r.response)),
+  injectToken: a => a,
+}
+
+export const rjAjax = rj.plugin(
   (config = {}) => {
     const ajaxRxConfig = {
-      ...DefaultAjaxConfig,
+      ...DefaultAjaxPluginConfig,
       ...config,
     }
     return rj.pure({
-      ajaxRx: {
+      ajax: {
         config: ajaxRxConfig,
+        authEffectCaller: (callFn, t) => (...args) => {
+          const request = callFn(...args)
+          return config.injectToken(makeAjaxConfig(request), t)
+        },
         effectCaller: (callFn, ...args) => {
-          console.log('Caller AJAX')
           let response = callFn(...args)
           // Prev effect caller has added an order to our effect...
           // NOTE: This approach is not right at all but works
@@ -66,25 +78,24 @@ const rjAjaxRxJs = rj.plugin(
     })
   },
   {
-    name: 'AJAX+RxJs',
+    name: 'AJAX',
     makeExport: (extendExport, rjConfig) => {
       // simply ovverride ajax config when given :D
-      const withAjaxExport = { ...extendExport }
-      if (rjConfig.ajaxRx) {
-        withAjaxExport.ajaxRx = rjConfig.ajaxRx
+      if (rjConfig.ajax) {
+        const withAjaxExport = { ...extendExport }
+        withAjaxExport.ajax = rjConfig.ajax
+        return withAjaxExport
       }
-      return { ...withAjaxExport }
+      return extendExport
     },
     hackExportBeforeFinalize: endExport => {
-      console.log('U.u', endExport)
-      // return endExport
       return {
         ...endExport,
         sideEffect: {
           ...endExport.sideEffect,
           effectCaller: exportEffectCaller(
             endExport.sideEffect.effectCaller,
-            endExport.ajaxRx.effectCaller
+            endExport.ajax.effectCaller
           ),
         },
       }
@@ -92,4 +103,18 @@ const rjAjaxRxJs = rj.plugin(
   }
 )
 
-export default rjAjaxRxJs
+export const rjAjaxAuth = rj.plugin(() => rj(), {
+  name: 'AJAX+AUTH',
+  hackExportBeforeFinalize: endExport => {
+    return {
+      ...endExport,
+      sideEffect: {
+        ...endExport.sideEffect,
+        effectCaller: exportEffectCaller(
+          endExport.sideEffect.effectCaller,
+          endExport.ajax.authEffectCaller
+        ),
+      },
+    }
+  },
+})
