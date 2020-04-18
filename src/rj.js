@@ -177,12 +177,17 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
   ])
 }
 
+function hackRjObject(rjObject, plugIns) {
+  return enhanceWithPlugins(plugIns, rjObject, 'hackRjObject')
+}
+
 export default forgeRocketJump({
   shouldRocketJump,
   makeRunConfig,
   makeRecursionRjs,
   makeExport,
   finalizeExport,
+  hackRjObject,
   forgedPlugins: [
     // Core RJ and always loved Mutations!!!
     Mutations,

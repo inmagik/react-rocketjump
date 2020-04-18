@@ -7555,13 +7555,13 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rocketjump-core@/Users/fuma/projects/rocketjump-core/rocketjump-core-0.0.0-experimental-c178.tgz:
-  version "0.0.0-experimental-c178"
-  resolved "/Users/fuma/projects/rocketjump-core/rocketjump-core-0.0.0-experimental-c178.tgz#4bc92a0eadea6eacbc391e56a7f8f5aa26092172"
+rocketjump-core@/Users/fuma/projects/rocketjump-core/rocketjump-core-0.0.0-experimental-c1711.tgz:
+  version "0.0.0-experimental-c1711"
+  resolved "/Users/fuma/projects/rocketjump-core/rocketjump-core-0.0.0-experimental-c1711.tgz#e3846f12b0368f8714aba2c00eb438b1f149456b"
 
-"rocketjump-core@file:../rocketjump-core/rocketjump-core-0.0.0-experimental-c177.tgz":
-  version "0.0.0-experimental-c177"
-  resolved "file:../rocketjump-core/rocketjump-core-0.0.0-experimental-c177.tgz#d91c293213b845e7dfac0219271038c03cd19951"
+"rocketjump-core@file:../rocketjump-core/rocketjump-core-0.0.0-experimental-c1710.tgz":
+  version "0.0.0-experimental-c1710"
+  resolved "file:../rocketjump-core/rocketjump-core-0.0.0-experimental-c1710.tgz#58a6813cfb6e48b692bd86308bdaf5d5c28a4e57"
 
 rollup-plugin-babel@^4.3.3:
   version "4.4.0"
