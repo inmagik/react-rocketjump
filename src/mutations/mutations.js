@@ -1,7 +1,6 @@
 import { exportEffectCaller } from '../sideEffectDescriptor'
-import combineReducers from '../combineReducers'
 import { enhanceReducer, makeMutationsReducer } from './reducer'
-import { enancheComputeState } from './computed'
+import { createMutationsSelectorsForComputed } from './computed'
 import { enhanceMakeObservable } from './sideEffects'
 import { enhanceActionCreators } from './actionCreators'
 import { enhanceMakeSelectors } from './selectors'
@@ -51,45 +50,45 @@ function enhanceMakeExportWithMutations(extendExport, rjConfig) {
   return extendExport
 }
 
-function enhanceFinalExportWithMutations(rjObject, { computed, sideEffect }) {
-  const { mutations, ...rjEnhancedObject } = rjObject
+function enhanceReducerWithMutations(reducer, rjExport) {
+  const { mutations, actionCreators } = rjExport
+  if (mutations) {
+    return enhanceReducer(mutations, reducer, actionCreators)
+  }
+  return reducer
+}
+
+function combineReducersWithMutations(rjExport) {
+  const { mutations } = rjExport
+  if (mutations) {
+    const mutationsReducer = makeMutationsReducer(mutations)
+    if (mutationsReducer) {
+      return {
+        mutations: mutationsReducer,
+      }
+    }
+  }
+}
+
+function mutationsSelectorsForComputed(rjExport) {
+  const { mutations, computed } = rjExport
+  if (computed && mutations) {
+    return createMutationsSelectorsForComputed(computed, mutations)
+  }
+}
+
+function enhanceFinalExportWithMutations(
+  rjObject,
+  { computed, mutations, sideEffect }
+) {
   if (!mutations) {
-    return rjEnhancedObject
+    return rjObject
   }
 
-  const {
-    makeRxObservable,
-    actionCreators,
-    reducer,
-    computeState,
-    makeSelectors,
-  } = rjEnhancedObject
-
-  const enhancedReducer = enhanceReducer(mutations, reducer, actionCreators)
-  const mutationsReducer = makeMutationsReducer(mutations)
-
-  let hasMutationsState
-  let withMutationsReducer
-  if (mutationsReducer === null) {
-    hasMutationsState = false
-    withMutationsReducer = enhancedReducer
-  } else {
-    hasMutationsState = true
-    withMutationsReducer = combineReducers({
-      root: enhancedReducer,
-      mutations: mutationsReducer,
-    })
-  }
+  const { makeRxObservable, actionCreators, makeSelectors } = rjObject
 
   return {
-    ...rjEnhancedObject,
-    computeState: enancheComputeState(
-      mutations,
-      hasMutationsState,
-      computeState,
-      computed
-    ),
-    reducer: withMutationsReducer,
+    ...rjObject,
     makeSelectors: enhanceMakeSelectors(mutations, makeSelectors),
     actionCreators: enhanceActionCreators(mutations, actionCreators),
     makeRxObservable: enhanceMakeObservable(
@@ -104,6 +103,9 @@ const Mutations = {
   name: 'Mutations',
   checkObjectConfig: checkMutationsConfig,
   makeExport: enhanceMakeExportWithMutations,
+  enhanceReducer: enhanceReducerWithMutations,
+  combineReducers: combineReducersWithMutations,
+  selectorsForComputed: mutationsSelectorsForComputed,
   finalizeExport: enhanceFinalExportWithMutations,
 }
 

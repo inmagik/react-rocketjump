@@ -2,7 +2,7 @@ import { get } from 'rocketjump-core/utils'
 
 const COMPUTED_MUTATION_PREFIX = '@mutation'
 
-function createWithMutationsComputeState(computed, mutations) {
+export function createMutationsSelectorsForComputed(computed, mutations) {
   const computedKeys = Object.keys(computed)
   const mutationsSelectors = computedKeys
     .filter(k => k.indexOf(COMPUTED_MUTATION_PREFIX) === 0)
@@ -30,50 +30,8 @@ function createWithMutationsComputeState(computed, mutations) {
 
       return {
         ...selectors,
-        [key]: state => get(state, path),
+        [key]: state => get(state, `mutations.${path}`),
       }
     }, {})
-
-  return function computeState(state, selectors) {
-    return computedKeys.reduce((computedState, selectorName) => {
-      const keyName = computed[selectorName]
-      if (mutationsSelectors[selectorName]) {
-        const mutationSelector = mutationsSelectors[selectorName]
-        return {
-          ...computedState,
-          [keyName]: mutationSelector(state.mutations),
-        }
-      }
-      const selector = selectors[selectorName]
-      if (selector === undefined) {
-        throw new Error(
-          `[react-rocketjump] you specified a non existing selector [${selectorName}] ` +
-            `check your computed config.`
-        )
-      }
-      return {
-        ...computedState,
-        [keyName]: selector(state.root),
-      }
-    }, {})
-  }
-}
-
-export function enancheComputeState(
-  mutations,
-  hasMutationsState,
-  computeState,
-  computed
-) {
-  if (!hasMutationsState) {
-    return computeState
-  }
-  if (!computeState) {
-    return state => state.root
-  }
-  const withMutationsComputeState = createWithMutationsComputeState(
-    computed,
-    mutations
-  )
-  return (state, selectors) => withMutationsComputeState(state, selectors)
+  return mutationsSelectors
 }

@@ -1,5 +1,6 @@
 import { useMemo, useDebugValue } from 'react'
-import { isObjectRj, bindActionCreators } from 'rocketjump-core'
+import { bindActionCreators } from 'rocketjump-core'
+import { isObjectRj } from './types'
 import { useConstant } from './hooks'
 import useMiniRedux from './useMiniRedux'
 
@@ -48,7 +49,8 @@ export default function useRj(
   const memoizedSelectors = useConstant(() => {
     if (
       typeof selectState === 'function' ||
-      typeof computeState === 'function'
+      typeof computeState === 'function' ||
+      typeof routine === 'function'
     ) {
       return makeSelectors()
     }
@@ -68,7 +70,7 @@ export default function useRj(
 
   // ... Ora che ho perso la vista ... ci vedo di più
   if (typeof routine === 'function') {
-    routine(actionObservable, state, memoizedSelectors, boundActionCreators)
+    routine(state, memoizedSelectors, boundActionCreators, actionObservable)
   }
 
   // Memoize return value now can saftley used in React Context.Provider

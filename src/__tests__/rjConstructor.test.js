@@ -135,6 +135,7 @@ describe('rj constructor', () => {
 
   it('should have strict isObjectRj', () => {
     const dubRj = forgeRocketJump({
+      mark: Symbol('DUB'),
       shouldRocketJump: () => true, // single invocation
       makeRunConfig: () => null, // no run config
       makeRecursionRjs: rjs => rjs, // don't touch configs

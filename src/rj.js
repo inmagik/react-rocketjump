@@ -2,9 +2,12 @@ import {
   forgeRocketJump,
   isPartialRj,
   isObjectRj,
-  createComputeState,
   enhanceWithPlugins,
+  createObjectFromPlugins,
+  createComputeState,
 } from 'rocketjump-core'
+import { kompose, mapValues } from 'rocketjump-core/utils'
+import combineReducers from './combineReducers'
 import makeExport from './export'
 import createMakeRxObservable from './createMakeRxObservable'
 import Mutations from './mutations/index'
@@ -138,7 +141,76 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
     mergegAlongExport,
     'hackExportBeforeFinalize'
   )
-  const { sideEffect, computed, ...rjExport } = startExport
+
+  const {
+    reducer: baseReducer,
+    makeSelectors: baseMakeSelectors,
+    actionCreators,
+    sideEffect,
+    computed,
+  } = startExport
+
+  // Reducer ++ By PLUGINS
+  const enhancedReducer = enhanceWithPlugins(
+    plugIns,
+    baseReducer,
+    'enhanceReducer',
+    [startExport]
+  )
+
+  // Create an Object of reducers for combineReducers By PLUGINS
+  const reducersByKey = createObjectFromPlugins(plugIns, 'combineReducers', [
+    startExport,
+  ])
+
+  // Create an Object of selectors for computeState
+  const selectorsForComputed = createObjectFromPlugins(
+    plugIns,
+    'selectorsForComputed',
+    [startExport]
+  )
+
+  let reducer = enhancedReducer
+  let makeSelectors = baseMakeSelectors
+
+  // Create the compute state function by computed config,
+  // when no computed config is given return null is responsibility
+  // of useRj, connectRj, .. to check for null
+  let computeState = createComputeState(computed, selectorsForComputed)
+
+  if (Object.keys(reducersByKey).length > 0) {
+    // Got extra state from plugIns!
+
+    // Warn if plugins try to use [root] key
+    if (process.env.NODE_ENV !== 'production') {
+      if (typeof reducersByKey.root === 'function') {
+        console.warn(
+          '[react-rocketjump] You specified a [root] key in yur combineReducers ' +
+            'plugin config, but this a reserved keyword for the base rocketjump state ' +
+            'and will be overwritten, please choose another key.'
+        )
+      }
+    }
+
+    // Combine the and add the base reducer as [root]
+    reducer = combineReducers({
+      ...reducersByKey,
+      root: enhancedReducer,
+    })
+
+    // PATCH selectors to select from [root] path
+    makeSelectors = kompose(baseMakeSelectors, selectors =>
+      mapValues(selectors, (selector, key) => (state, ...args) =>
+        selector(state.root, ...args)
+      )
+    )
+
+    // When no computed but extra state create a fake
+    // computeState to slice the root state
+    if (computeState === null) {
+      computeState = state => state.root
+    }
+  }
 
   const { effectPipeline, ...sideEffectConfig } = sideEffect
 
@@ -148,29 +220,16 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
   const pipeActionStream = (action$, state$) =>
     effectPipeline.reduce((action$, piper) => piper(action$, state$), action$)
 
-  // Create the compute state function by computed config,
-  // when no computed config is given return null is responsibility
-  // of useRj, connectRj, .. to check for null
-  const computeState = createComputeState(computed)
-
   const finalExport = {
-    ...rjExport,
+    reducer,
+    makeSelectors,
+    actionCreators,
     computeState,
     makeRxObservable,
     pipeActionStream,
   }
 
   // Finally the rocketjump runnable state is created!
-  /*
-    {
-      reducer: fn,
-      computeState: fn|null
-      actionCreators: {},
-      makeSelectors: fn,
-      makeRxObservable: fn,
-      pipeActionStream: fn,
-    }
-  */
   return enhanceWithPlugins(plugIns, finalExport, 'finalizeExport', [
     startExport,
     finalConfig,
@@ -182,6 +241,7 @@ function hackRjObject(rjObject, plugIns) {
 }
 
 export default forgeRocketJump({
+  mark: Symbol('RJxReact'),
   shouldRocketJump,
   makeRunConfig,
   makeRecursionRjs,
