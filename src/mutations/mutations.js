@@ -1,7 +1,7 @@
 import { exportEffectCaller } from '../sideEffectDescriptor'
 import { enhanceReducer, makeMutationsReducer } from './reducer'
 import { createMutationsSelectorsForComputed } from './computed'
-import { enhanceMakeObservable } from './sideEffects'
+import { extraMutationsSideEffects } from './sideEffects'
 import { enhanceActionCreators } from './actionCreators'
 import { enhanceMakeSelectors } from './selectors'
 
@@ -85,17 +85,12 @@ function enhanceFinalExportWithMutations(
     return rjObject
   }
 
-  const { makeRxObservable, actionCreators, makeSelectors } = rjObject
+  const { actionCreators, makeSelectors } = rjObject
 
   return {
     ...rjObject,
     makeSelectors: enhanceMakeSelectors(mutations, makeSelectors),
     actionCreators: enhanceActionCreators(mutations, actionCreators),
-    makeRxObservable: enhanceMakeObservable(
-      mutations,
-      makeRxObservable,
-      sideEffect.effectCaller
-    ),
   }
 }
 
@@ -106,6 +101,7 @@ const Mutations = {
   enhanceReducer: enhanceReducerWithMutations,
   combineReducers: combineReducersWithMutations,
   selectorsForComputed: mutationsSelectorsForComputed,
+  extraSideEffects: extraMutationsSideEffects,
   finalizeExport: enhanceFinalExportWithMutations,
 }
 

@@ -70,7 +70,13 @@ export default function useRj(
 
   // ... Ora che ho perso la vista ... ci vedo di più
   if (typeof routine === 'function') {
-    routine(state, memoizedSelectors, boundActionCreators, actionObservable)
+    routine(
+      state,
+      derivedState,
+      memoizedSelectors,
+      boundActionCreators,
+      actionObservable
+    )
   }
 
   // Memoize return value now can saftley used in React Context.Provider

@@ -2,7 +2,6 @@ import { rj } from '../../index'
 import { isObservable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { ajax } from 'rxjs/ajax'
-import { exportEffectCaller } from '../../sideEffectDescriptor'
 
 function isPromise(obj) {
   return (
@@ -72,26 +71,16 @@ const rjAjax = rj.plugin(
 
       return newExport
     },
-    hackExportBeforeFinalize: endExport => {
-      let effectCaller = exportEffectCaller(
-        endExport.sideEffect.effectCaller,
-        endExport.ajax.effectCaller
-      )
+    appendEffectCallers: rjExport => {
+      const extraCallers = []
 
-      if (endExport.ajaxAuth) {
-        effectCaller = exportEffectCaller(
-          effectCaller,
-          endExport.ajax.authEffectCaller
-        )
+      extraCallers.push(rjExport.ajax.effectCaller)
+
+      if (rjExport.ajaxAuth) {
+        extraCallers.push(rjExport.ajax.authEffectCaller)
       }
 
-      return {
-        ...endExport,
-        sideEffect: {
-          ...endExport.sideEffect,
-          effectCaller,
-        },
-      }
+      return extraCallers
     },
   },
   (config = {}) => {

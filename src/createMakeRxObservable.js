@@ -54,10 +54,12 @@ function filterNonEffectActions(action, prefix) {
   return EffectActions.map(a => prefix + a).indexOf(action.type) === -1
 }
 
-export default function createMakeRxObservable(
-  { effect: effectCall, effectCaller, takeEffect },
-  prefix = ''
-) {
+export default function createMakeRxObservable({
+  effect: effectCall,
+  effectCaller,
+  takeEffect,
+  prefix = '',
+}) {
   return function makeRxObservable(
     action$,
     state$,

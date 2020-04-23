@@ -4,12 +4,16 @@ import {
   isObjectRj,
   enhanceWithPlugins,
   createObjectFromPlugins,
+  createListFromPlugins,
   createComputeState,
 } from 'rocketjump-core'
+import { exportEffectCaller } from './sideEffectDescriptor'
 import { kompose, mapValues } from 'rocketjump-core/utils'
 import combineReducers from './combineReducers'
 import makeExport from './export'
-import createMakeRxObservable from './createMakeRxObservable'
+import createMakeRxObservable, {
+  mergeCreateMakeRxObservable,
+} from './createMakeRxObservable'
 import Mutations from './mutations/index'
 import Routines from './routines'
 
@@ -136,7 +140,7 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
   // Hack export before finalize them
   // you can hook into them to for example change the priority of standard
   // rj recursion ...
-  const startExport = enhanceWithPlugins(
+  const rjExport = enhanceWithPlugins(
     plugIns,
     mergegAlongExport,
     'hackExportBeforeFinalize'
@@ -148,26 +152,26 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
     actionCreators,
     sideEffect,
     computed,
-  } = startExport
+  } = rjExport
 
   // Reducer ++ By PLUGINS
   const enhancedReducer = enhanceWithPlugins(
     plugIns,
     baseReducer,
     'enhanceReducer',
-    [startExport]
+    [rjExport]
   )
 
   // Create an Object of reducers for combineReducers By PLUGINS
   const reducersByKey = createObjectFromPlugins(plugIns, 'combineReducers', [
-    startExport,
+    rjExport,
   ])
 
   // Create an Object of selectors for computeState
   const selectorsForComputed = createObjectFromPlugins(
     plugIns,
     'selectorsForComputed',
-    [startExport]
+    [rjExport]
   )
 
   let reducer = enhancedReducer
@@ -214,13 +218,53 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
 
   const { effectPipeline, ...sideEffectConfig } = sideEffect
 
+  // Append effectCaller to others callers
+  // Apply this callers to ALL sideEffects even defined by plugins
+  // maybe this behaviour can be costumized from outside
+  const effectCallersToAppend = createListFromPlugins(
+    plugIns,
+    'appendEffectCallers',
+    [rjExport]
+  )
+
+  // effectCaller++
+  const enhanceEffectCaller = baseCaller =>
+    effectCallersToAppend.reduce(
+      (finalCaller, iterCaller) => exportEffectCaller(finalCaller, iterCaller),
+      baseCaller
+    )
+
   // Create the make rx observable function using merged side effect descriptor!
-  const makeRxObservable = createMakeRxObservable(sideEffectConfig)
+  const mainMakeRxObservable = createMakeRxObservable({
+    ...sideEffectConfig,
+    prefix: '',
+    effectCaller: enhanceEffectCaller(sideEffectConfig.effectCaller),
+  })
+
+  // RX++
+  const extraSideEffects = createListFromPlugins(plugIns, 'extraSideEffects', [
+    rjExport,
+  ])
+
+  const extraMakeObs = extraSideEffects.map(sideEffectConfig =>
+    createMakeRxObservable({
+      ...sideEffectConfig,
+      effectCaller: enhanceEffectCaller(sideEffectConfig.effectCaller),
+    })
+  )
+
+  console.log('E', extraSideEffects, extraMakeObs)
+
+  const makeRxObservable = mergeCreateMakeRxObservable(
+    mainMakeRxObservable,
+    ...extraMakeObs
+  )
+  console.log('~', makeRxObservable)
 
   const pipeActionStream = (action$, state$) =>
     effectPipeline.reduce((action$, piper) => piper(action$, state$), action$)
 
-  const finalExport = {
+  const rawRjObject = {
     reducer,
     makeSelectors,
     actionCreators,
@@ -230,8 +274,8 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
   }
 
   // Finally the rocketjump runnable state is created!
-  return enhanceWithPlugins(plugIns, finalExport, 'finalizeExport', [
-    startExport,
+  return enhanceWithPlugins(plugIns, rawRjObject, 'finalizeExport', [
+    rjExport,
     finalConfig,
   ])
 }

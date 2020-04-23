@@ -1,14 +1,9 @@
-import createMakeRxObservable, {
-  mergeCreateMakeRxObservable,
-} from '../createMakeRxObservable'
 import { MUTATION_PREFIX } from './actionTypes'
 
-export function enhanceMakeObservable(
-  mutations,
-  makeObservable,
-  parentEffectCaller
-) {
-  const makeMutationsObsList = Object.keys(mutations).map(name => {
+export function extraMutationsSideEffects({ mutations, sideEffect }) {
+  const parentEffectCaller = sideEffect.effectCaller
+
+  return Object.keys(mutations).map(name => {
     const { effect, takeEffect, effectCaller } = mutations[name]
     const prefix = `${MUTATION_PREFIX}/${name}/`
 
@@ -28,15 +23,11 @@ export function enhanceMakeObservable(
       mutationEffectCaller = parentEffectCaller
     }
 
-    return createMakeRxObservable(
-      {
-        effect,
-        takeEffect: takeEffect || 'every',
-        effectCaller: mutationEffectCaller,
-      },
-      prefix
-    )
+    return {
+      effect,
+      takeEffect: takeEffect || 'every',
+      effectCaller: mutationEffectCaller,
+      prefix,
+    }
   })
-
-  return mergeCreateMakeRxObservable(makeObservable, ...makeMutationsObsList)
 }
