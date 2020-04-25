@@ -1,3 +1,4 @@
+import blamer from 'rocketjump-core/blamer.macro'
 import {
   of,
   from,
@@ -88,11 +89,15 @@ export default function createMakeRxObservable({
       const effectResult = callEffect(effectCall, ...params)
 
       if (!(isPromise(effectResult) || isObservable(effectResult))) {
-        return throwError(
-          'The effect result is expect ' +
-            `to be a Promise or an RxObservable but a ${typeof effectResult} ` +
-            `was given. Please check your effect and effectCaller logic.`
-        )
+        if (process.env.NODE_ENV === 'production') {
+          return throwError('bad effect result')
+        } else {
+          return throwError(
+            'The effect result is expect ' +
+              `to be a Promise or an RxObservable but a ${typeof effectResult} ` +
+              `was given. Please check your effect and effectCaller logic.`
+          )
+        }
       }
 
       return concat(
@@ -149,7 +154,8 @@ export default function createMakeRxObservable({
     } else {
       // Invalid effect type
       if (RxEffects[effectType] === undefined) {
-        throw new Error(
+        blamer(
+          '[rj-config-error]',
           `[react-rocketjump] takeEffect: ${takeEffect} is an invalid effect.`
         )
       }
@@ -187,7 +193,7 @@ export function mergeCreateMakeRxObservable(...creators) {
     // TODO: Enable and test the following lines
     // when expose mergeCreateMakeRxObservable as library function
     // if (creators.length === 0) {
-    //   throw new Error('You should provide at least one creator to merge.')
+    //   blamer('[rj-config-error]','You should provide at least one creator to merge.')
     // }
     const [firstCreator, ...otherCreators] = creators
     const [firstDispatch$, updateConfig] = firstCreator(

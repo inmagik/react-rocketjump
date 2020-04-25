@@ -1,3 +1,4 @@
+import blamer from 'rocketjump-core/blamer.macro'
 import { CLEAN, CANCEL } from './actionTypes'
 import { of, concat, empty, merge } from 'rxjs'
 import {
@@ -141,7 +142,8 @@ function takeEffectGroupBy(
 ) {
   const groupByFn = effectTypeArgs[0]
   if (typeof groupByFn !== 'function') {
-    throw new Error(
+    blamer(
+      '[rj-config-error]',
       '[react-rj] when you choose the groupBy ' +
         'takeEffect you must provide a function to group by the effect.'
     )
@@ -169,7 +171,8 @@ function takeEffectGroupByExhaust(
 ) {
   const groupByFn = effectTypeArgs[0]
   if (typeof groupByFn !== 'function') {
-    throw new Error(
+    blamer(
+      '[rj-config-error]',
       '[react-rj] when you choose the groupByExhaust ' +
         'takeEffect you must provide a function to group by the effect.'
     )

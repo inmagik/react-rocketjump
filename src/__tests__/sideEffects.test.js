@@ -14,7 +14,10 @@ jest.useFakeTimers()
 
 describe('RJ side effect model', () => {
   it('should run an async api and dispatch PENDING and SUCCESS actions when resolved', done => {
-    const mockApiResult = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
+    const mockApiResult = [
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' },
+    ]
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
     const mockCallback = jest.fn()
 
@@ -172,7 +175,10 @@ describe('RJ side effect model', () => {
   })
 
   it('should dispatch meta along with actions', done => {
-    const mockApiResult = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
+    const mockApiResult = [
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' },
+    ]
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
     const mockCallback = jest.fn()
 
@@ -795,10 +801,7 @@ describe('RJ side effect model', () => {
 
     const rjWithDebouce = rj({
       effectPipeline: action$ =>
-        action$.pipe(
-          debounceTime(200),
-          distinctUntilChanged()
-        ),
+        action$.pipe(debounceTime(200), distinctUntilChanged()),
     })
     const RjObject = rj(rjWithDebouce, {
       effect: mockApi,
@@ -1475,7 +1478,10 @@ describe('RJ side effect model', () => {
 
   it('emit successCallback along action when SUCCESS is produced', async () => {
     const mockCallback = jest.fn()
-    const mockApiResult = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
+    const mockApiResult = [
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' },
+    ]
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
 
     const RjObject = rj({

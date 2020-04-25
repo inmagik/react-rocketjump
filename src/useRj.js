@@ -1,3 +1,4 @@
+import blamer from 'rocketjump-core/blamer.macro'
 import { useMemo, useDebugValue } from 'react'
 import { bindActionCreators } from 'rocketjump-core'
 import { isObjectRj } from './types'
@@ -12,7 +13,8 @@ export default function useRj(
   selectState
 ) {
   if (!isObjectRj(rjObject)) {
-    throw new Error(
+    blamer(
+      '[rj-runtime-error] useRj',
       '[react-rocketjump] You should provide a rj object to useRj.'
     )
   }

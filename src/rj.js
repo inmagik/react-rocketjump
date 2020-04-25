@@ -1,3 +1,4 @@
+import blamer from 'rocketjump-core/blamer.macro'
 import {
   forgeRocketJump,
   isPartialRj,
@@ -26,7 +27,8 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
     }
     // Rj Object not allowed
     if (isObjectRj(partialRjOrConfig)) {
-      throw new Error(
+      blamer(
+        '[rj-config-error]',
         `[react-rocketjump] you can't pass an rj object as argument.`
       )
     }
@@ -34,7 +36,8 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
     if (partialRjOrConfig !== null && typeof partialRjOrConfig === 'object') {
       if (typeof partialRjOrConfig.effect === 'function') {
         if (hasEffectConfigured) {
-          throw new Error(
+          blamer(
+            '[rj-config-error]',
             '[react-rocketjump] effect should be defined only once, in the last argument.'
           )
         }
@@ -50,7 +53,8 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
     // A function effect
     if (typeof partialRjOrConfig === 'function') {
       if (hasEffectConfigured) {
-        throw new Error(
+        blamer(
+          '[rj-config-error]',
           '[react-rocketjump] effect should be defined only once, in the last argument.'
         )
       }
@@ -58,7 +62,8 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
       continue
     }
     // Bad shit as config
-    throw new Error(
+    blamer(
+      '[rj-config-error]',
       '[react-rocketjump] you can pass only config object or rj partial to rj constructor.'
     )
   }
@@ -88,7 +93,8 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
 
   // Not defined at last
   if (hasEffectConfigured) {
-    throw new Error(
+    blamer(
+      '[rj-config-error]',
       '[react-rocketjump] effect should be defined only once, in the last argument.'
     )
   }
@@ -128,7 +134,10 @@ function makeRecursionRjs(
   })
 
   if (!hasEffectConfigured && isLastRjInvocation) {
-    throw new Error(`[react-rocketjump] you can't invoke a partialRj.`)
+    blamer(
+      '[rj-config-error]',
+      `[react-rocketjump] you can't invoke a partialRj.`
+    )
   }
 
   return recursionRjs

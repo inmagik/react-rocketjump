@@ -12,6 +12,7 @@ const vendors = []
     Object.keys(pkg.dependencies),
     Object.keys(pkg.peerDependencies),
     'rxjs/operators',
+    'rxjs/ajax',
     'rocketjump-core/utils',
   )
 
