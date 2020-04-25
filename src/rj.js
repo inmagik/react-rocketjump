@@ -253,13 +253,10 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
     })
   )
 
-  console.log('E', extraSideEffects, extraMakeObs)
-
   const makeRxObservable = mergeCreateMakeRxObservable(
     mainMakeRxObservable,
     ...extraMakeObs
   )
-  console.log('~', makeRxObservable)
 
   const pipeActionStream = (action$, state$) =>
     effectPipeline.reduce((action$, piper) => piper(action$, state$), action$)

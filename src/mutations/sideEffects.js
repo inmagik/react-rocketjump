@@ -1,6 +1,10 @@
 import { MUTATION_PREFIX } from './actionTypes'
 
 export function extraMutationsSideEffects({ mutations, sideEffect }) {
+  // No extra side effects
+  if (!mutations) {
+    return null
+  }
   const parentEffectCaller = sideEffect.effectCaller
 
   return Object.keys(mutations).map(name => {
