@@ -1,3 +1,4 @@
+import blamer from 'rocketjump-core/blamer.macro'
 import { exportEffectCaller } from '../sideEffectDescriptor'
 import { enhanceReducer, makeMutationsReducer } from './reducer'
 import { createMutationsSelectorsForComputed } from './computed'
@@ -11,7 +12,8 @@ function checkMutationsConfig(rjConfig) {
     rjConfig.mutations !== null &&
     typeof rjConfig.effect !== 'function'
   ) {
-    throw new Error(
+    blamer(
+      '[rj-config-error] @mutations',
       '[react-rocketjump] @mutations must be defined along with effect, ' +
         'please check your config.'
     )

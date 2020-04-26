@@ -1,3 +1,4 @@
+import blamer from 'rocketjump-core/blamer.macro'
 import React, { useMemo } from 'react'
 import { isObjectRj, bindActionCreators } from 'rocketjump-core'
 import hoistStatics from 'hoist-non-react-statics'
@@ -14,7 +15,8 @@ export default function connectRj(
 ) {
   return function wrapWithConnect(WrappedComponent) {
     if (!isObjectRj(rjObject)) {
-      throw new Error(
+      blamer(
+        '[rj-config-error]',
         '[react-rocketjump] You should provide a rj object to connectRj.'
       )
     }

@@ -1,3 +1,4 @@
+import blamer from 'rocketjump-core/blamer.macro'
 import { rj, makeAction } from '../../index'
 import { of, from } from 'rxjs'
 import { map, filter, tap } from 'rxjs/operators'
@@ -8,13 +9,22 @@ const defaultKey = (...args) => JSON.stringify(args)
 
 const rjCache = (config) => {
   if (!config.ns) {
-    throw new Error('RjCache requires the ns property to be set')
+    blamer(
+      '[rj-config-error] @rjCache',
+      'RjCache requires the ns property to be set'
+    )
   }
   if (config.ns.includes('$')) {
-    throw new Error('RjCache ns cannot contain the $ symbol')
+    blamer(
+      '[rj-config-error] @rjCache',
+      'RjCache ns cannot contain the $ symbol'
+    )
   }
   if (!config.size) {
-    throw new Error('RjCache needs a cache size to be defined')
+    blamer(
+      '[rj-config-error] @rjCache',
+      'RjCache needs a cache size to be defined'
+    )
   }
   const ns = config.ns
   const size = config.size

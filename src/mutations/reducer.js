@@ -1,3 +1,4 @@
+import blamer from 'rocketjump-core/blamer.macro'
 import { SUCCESS, INIT } from '../actionTypes'
 import { MUTATION_PREFIX } from './actionTypes'
 import combineReducers from '../combineReducers'
@@ -12,7 +13,8 @@ export function enhanceReducer(mutations, reducer, actionCreators) {
     if (typeof mutation.updater === 'string') {
       const actionCreator = actionCreators[mutation.updater]
       if (typeof actionCreator !== 'function') {
-        throw new Error(
+        blamer(
+          '[rj-config-error] @mutations',
           `[react-rocketjump] @mutations you provide a non existing ` +
             `action creator [${mutation.updater}] as updater for mutation [${name}].`
         )
@@ -22,7 +24,8 @@ export function enhanceReducer(mutations, reducer, actionCreators) {
     } else if (typeof mutation.updater === 'function') {
       update = (state, action) => mutation.updater(state, action.payload.data)
     } else {
-      throw new Error(
+      blamer(
+        '[rj-config-error] @mutations',
         '[react-rocketjump] @mutations you should provide at least ' +
           `an effect and an updater to mutation config [${name}].`
       )
