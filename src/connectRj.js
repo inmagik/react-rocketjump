@@ -1,11 +1,10 @@
-import blamer from 'rocketjump-core/blamer.macro'
 import React, { useMemo } from 'react'
 import { isObjectRj, bindActionCreators } from 'rocketjump-core'
 import hoistStatics from 'hoist-non-react-statics'
 import { useConstant } from './hooks'
 import useMiniRedux from './useMiniRedux'
 
-const defaultMapActionsToProps = a => a
+const defaultMapActionsToProps = (a) => a
 
 export default function connectRj(
   // The returned value of rj(..., EFFECT)
@@ -15,8 +14,7 @@ export default function connectRj(
 ) {
   return function wrapWithConnect(WrappedComponent) {
     if (!isObjectRj(rjObject)) {
-      blamer(
-        '[rj-config-error]',
+      throw new Error(
         '[react-rocketjump] You should provide a rj object to connectRj.'
       )
     }

@@ -1,4 +1,3 @@
-import blamer from 'rocketjump-core/blamer.macro'
 import {
   forgeRocketJump,
   isPartialRj,
@@ -27,8 +26,7 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
     }
     // Rj Object not allowed
     if (isObjectRj(partialRjOrConfig)) {
-      blamer(
-        '[rj-config-error]',
+      throw new Error(
         `[react-rocketjump] you can't pass an rj object as argument.`
       )
     }
@@ -36,8 +34,7 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
     if (partialRjOrConfig !== null && typeof partialRjOrConfig === 'object') {
       if (typeof partialRjOrConfig.effect === 'function') {
         if (hasEffectConfigured) {
-          blamer(
-            '[rj-config-error]',
+          throw new Error(
             '[react-rocketjump] effect should be defined only once, in the last argument.'
           )
         }
@@ -53,8 +50,7 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
     // A function effect
     if (typeof partialRjOrConfig === 'function') {
       if (hasEffectConfigured) {
-        blamer(
-          '[rj-config-error]',
+        throw new Error(
           '[react-rocketjump] effect should be defined only once, in the last argument.'
         )
       }
@@ -62,8 +58,7 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
       continue
     }
     // Bad shit as config
-    blamer(
-      '[rj-config-error]',
+    throw new Error(
       '[react-rocketjump] you can pass only config object or rj partial to rj constructor.'
     )
   }
@@ -93,8 +88,7 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
 
   // Not defined at last
   if (hasEffectConfigured) {
-    blamer(
-      '[rj-config-error]',
+    throw new Error(
       '[react-rocketjump] effect should be defined only once, in the last argument.'
     )
   }
@@ -115,7 +109,7 @@ function makeRecursionRjs(
 ) {
   let hasEffectConfigured = false
 
-  const recursionRjs = partialRjsOrConfigs.map(partialRjOrConfig => {
+  const recursionRjs = partialRjsOrConfigs.map((partialRjOrConfig) => {
     if (typeof partialRjOrConfig === 'function') {
       // A Partial RJ
       if (isPartialRj(partialRjOrConfig)) {
@@ -134,10 +128,7 @@ function makeRecursionRjs(
   })
 
   if (!hasEffectConfigured && isLastRjInvocation) {
-    blamer(
-      '[rj-config-error]',
-      `[react-rocketjump] you can't invoke a partialRj.`
-    )
+    throw new Error(`[react-rocketjump] you can't invoke a partialRj.`)
   }
 
   return recursionRjs
@@ -212,7 +203,7 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
     })
 
     // PATCH selectors to select from [root] path
-    makeSelectors = kompose(baseMakeSelectors, selectors =>
+    makeSelectors = kompose(baseMakeSelectors, (selectors) =>
       mapValues(selectors, (selector, key) => (state, ...args) =>
         selector(state.root, ...args)
       )
@@ -221,7 +212,7 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
     // When no computed but extra state create a fake
     // computeState to slice the root state
     if (computeState === null) {
-      computeState = state => state.root
+      computeState = (state) => state.root
     }
   }
 
@@ -237,7 +228,7 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
   )
 
   // effectCaller++
-  const enhanceEffectCaller = baseCaller =>
+  const enhanceEffectCaller = (baseCaller) =>
     effectCallersToAppend.reduce(
       (finalCaller, iterCaller) => exportEffectCaller(finalCaller, iterCaller),
       baseCaller
@@ -255,7 +246,7 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
     rjExport,
   ])
 
-  const extraMakeObs = extraSideEffects.map(sideEffectConfig =>
+  const extraMakeObs = extraSideEffects.map((sideEffectConfig) =>
     createMakeRxObservable({
       ...sideEffectConfig,
       effectCaller: enhanceEffectCaller(sideEffectConfig.effectCaller),
@@ -292,6 +283,7 @@ function hackRjObject(rjObject, plugIns) {
 
 export default forgeRocketJump({
   mark: Symbol('RJxReact'),
+  enableGlobals: true,
   shouldRocketJump,
   makeRunConfig,
   makeRecursionRjs,

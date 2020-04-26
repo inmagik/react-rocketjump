@@ -184,7 +184,7 @@ export default function useMiniRedux(
   // Subscription 2 dispatch$
   useEffect(() => {
     const subscription = dispatch$.subscribe(
-      action => {
+      (action) => {
         // Erase callbacks before dispatch on reducer
         let successCallback
         if (action.successCallback) {
@@ -206,7 +206,7 @@ export default function useMiniRedux(
           failureCallback(action.payload)
         }
       },
-      error => {
+      (error) => {
         // Detailed info about error ...
         let errorStr = 'An error was occured during your effect'
         if (debugInfo.name) {
@@ -238,7 +238,7 @@ export default function useMiniRedux(
   }, [action$, dispatch$, debugEmitter, debugInfo])
 
   // Dispatch to reducer or start an effect
-  const dispatchWithEffect = useConstant(() => action => {
+  const dispatchWithEffect = useConstant(() => (action) => {
     if (isEffectAction(action)) {
       // Emit action to given observable theese perform side
       // effect and emit action dispatched above by subscription

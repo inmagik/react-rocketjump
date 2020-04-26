@@ -43,7 +43,7 @@ function mapToAjax(config, descr) {
 const DefaultAjaxPluginConfig = {
   baseUrl: null, // Default no override
   adapter: ajax,
-  responseMap: o => o.pipe(map(r => r.response)),
+  responseMap: (o) => o.pipe(map((r) => r.response)),
   injectAuth: null,
 }
 
@@ -71,7 +71,7 @@ const rjAjax = rj.plugin(
 
       return newExport
     },
-    appendEffectCallers: rjExport => {
+    appendEffectCallers: (rjExport) => {
       const extraCallers = []
 
       extraCallers.push(rjExport.ajax.effectCaller)

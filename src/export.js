@@ -74,7 +74,7 @@ export default (_, rjConfig, extendExport = {}, plugIns) => {
     makeSelectors = extendExport.makeSelectors
   }
   if (makeSelectors) {
-    makeSelectors = kompose(makeSelectors, selectors =>
+    makeSelectors = kompose(makeSelectors, (selectors) =>
       proxyObject(selectors, rjConfig.selectors)
     )
   }

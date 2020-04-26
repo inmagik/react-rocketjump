@@ -2,5 +2,5 @@
   "name": "react-rocketjump/plugins/ajax",
   "private": true,
   "main": "../../lib/plugins/ajax/index.cjs.js",
-  "module": "../../lib/plugins/ajax/index.esm.js"
+  "module": "../../lib/plugins/ajax/index.es.js"
 }

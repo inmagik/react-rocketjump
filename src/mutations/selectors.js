@@ -9,7 +9,7 @@ function makeMutationsSelectors() {
 
 export function enhanceMakeSelectors(mutations, makeSelectors) {
   // Compose makeSelectors as rj export does ...
-  return kompose(makeSelectors, selectors =>
+  return kompose(makeSelectors, (selectors) =>
     proxyObject(selectors, makeMutationsSelectors)
   )
 }

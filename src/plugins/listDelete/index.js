@@ -12,9 +12,9 @@ const rjListDelete = (config = {}) => {
 
   return rj.pure({
     actions: () => ({
-      deleteItem: item => ({ type: TYPE, item }),
+      deleteItem: (item) => ({ type: TYPE, item }),
     }),
-    reducer: oldReducer => (state, action) => {
+    reducer: (oldReducer) => (state, action) => {
       if (action.type === TYPE) {
         const paginationPath = path
           .split('.')
@@ -31,7 +31,7 @@ const rjListDelete = (config = {}) => {
           )
         }
         let list = get(state, path)
-        if (list) list = list.filter(listItem => !identity(action, listItem))
+        if (list) list = list.filter((listItem) => !identity(action, listItem))
         return set(state, path, list)
       }
       return oldReducer(state, action)

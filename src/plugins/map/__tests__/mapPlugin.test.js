@@ -155,7 +155,7 @@ describe('Map Plugin', () => {
 
     const spyRj = () =>
       rj({
-        reducer: oldReducer => (state, action) =>
+        reducer: (oldReducer) => (state, action) =>
           spy(state, action, oldReducer),
       })
 
@@ -282,7 +282,7 @@ describe('Map Plugin', () => {
     })
   })
 
-  it('should use a proper take effect', done => {
+  it('should use a proper take effect', (done) => {
     const mockApi = jest
       .fn()
       .mockResolvedValueOnce('Alice')
@@ -422,7 +422,7 @@ describe('Map Plugin', () => {
   it('should use a custom keymaker function', () => {
     const { reducer } = rj(
       rjMap({
-        key: action => action.meta.name,
+        key: (action) => action.meta.name,
       }),
       {
         effect: () => Promise.resolve(1),
@@ -498,7 +498,7 @@ describe('Map Plugin', () => {
   it('should be able to take a custom data transform function', () => {
     const { reducer } = rj(
       rjMap({
-        dataTransform: data => ({ ...data, name: data.name.toUpperCase() }),
+        dataTransform: (data) => ({ ...data, name: data.name.toUpperCase() }),
       }),
       {
         effect: () => Promise.resolve(1),

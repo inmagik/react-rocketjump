@@ -1,6 +1,6 @@
 import React from 'react'
 import Todo from './Todo'
-import { useRunRj } from 'react-rocketjump'
+import { useRunRj, deps } from 'react-rocketjump'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
@@ -27,9 +27,9 @@ export default function Todos() {
       )}
       {todos && (
         <NewTodo
-          onSubmit={todo => {
+          onSubmit={(todo) => {
             addStupidTodo
-              .onSuccess(todo => {
+              .onSuccess((todo) => {
                 console.log('Todo Added!', todo)
               })
               .run(todo)
@@ -39,7 +39,7 @@ export default function Todos() {
       )}
       <div className="todo-list">
         {todos &&
-          todos.map(todo => (
+          todos.map((todo) => (
             <Todo
               saving={updating[todo.id] || deleting[todo.id]}
               onToggle={toggleTodo}

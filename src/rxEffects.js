@@ -1,4 +1,3 @@
-import blamer from 'rocketjump-core/blamer.macro'
 import { CLEAN, CANCEL } from './actionTypes'
 import { of, concat, empty, merge } from 'rxjs'
 import {
@@ -16,7 +15,7 @@ function takeUntilCancelAction(action$, prefix) {
   return takeUntil(
     action$.pipe(
       filter(
-        action =>
+        (action) =>
           action.type === prefix + CLEAN || action.type === prefix + CANCEL
       )
     )
@@ -89,7 +88,7 @@ function actionToExhaustObservableEffect(
 ) {
   return merge(
     action$.pipe(
-      mergeMap(action => {
+      mergeMap((action) => {
         if (action.type === prefix + CANCEL || action.type === prefix + CLEAN) {
           return of(action)
         } else {
@@ -142,15 +141,14 @@ function takeEffectGroupBy(
 ) {
   const groupByFn = effectTypeArgs[0]
   if (typeof groupByFn !== 'function') {
-    blamer(
-      '[rj-config-error]',
+    throw new Error(
       '[react-rj] when you choose the groupBy ' +
         'takeEffect you must provide a function to group by the effect.'
     )
   }
   return action$.pipe(
     groupBy(groupByFn),
-    mergeMap($group =>
+    mergeMap(($group) =>
       $group.pipe(
         withLatestFrom(extraSideEffectObs$),
         mapToLatest($group, mapActionToObserable, prefix)
@@ -171,15 +169,14 @@ function takeEffectGroupByExhaust(
 ) {
   const groupByFn = effectTypeArgs[0]
   if (typeof groupByFn !== 'function') {
-    blamer(
-      '[rj-config-error]',
+    throw new Error(
       '[react-rj] when you choose the groupByExhaust ' +
         'takeEffect you must provide a function to group by the effect.'
     )
   }
   return action$.pipe(
     groupBy(groupByFn),
-    mergeMap($group =>
+    mergeMap(($group) =>
       actionToExhaustObservableEffect(
         $group,
         extraSideEffectObs$,

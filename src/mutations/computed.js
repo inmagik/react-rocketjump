@@ -1,4 +1,3 @@
-import blamer from 'rocketjump-core/blamer.macro'
 import { get } from 'rocketjump-core/utils'
 
 const COMPUTED_MUTATION_PREFIX = '@mutation'
@@ -6,7 +5,7 @@ const COMPUTED_MUTATION_PREFIX = '@mutation'
 export function createMutationsSelectorsForComputed(computed, mutations) {
   const computedKeys = Object.keys(computed)
   const mutationsSelectors = computedKeys
-    .filter(k => k.indexOf(COMPUTED_MUTATION_PREFIX) === 0)
+    .filter((k) => k.indexOf(COMPUTED_MUTATION_PREFIX) === 0)
     .reduce((selectors, key) => {
       const path = key.substr(
         key.indexOf(COMPUTED_MUTATION_PREFIX) +
@@ -18,14 +17,12 @@ export function createMutationsSelectorsForComputed(computed, mutations) {
 
       // Catch bad computed config before run rj
       if (mutations[mutationName] === undefined) {
-        blamer(
-          '[rj-config-error] @rjCache ',
+        throw new Error(
           `[react-rocketjump] you specified a non existing mutation [${mutationName}] ` +
             `in your computed config.`
         )
       } else if (mutations[mutationName].reducer === undefined) {
-        blamer(
-          '[rj-config-error] @rjCache ',
+        throw new Error(
           `[react-rocketjump] you specified a mutation [${mutationName}] ` +
             `with no state in your computed config.`
         )
@@ -33,7 +30,7 @@ export function createMutationsSelectorsForComputed(computed, mutations) {
 
       return {
         ...selectors,
-        [key]: state => get(state, `mutations.${path}`),
+        [key]: (state) => get(state, `mutations.${path}`),
       }
     }, {})
   return mutationsSelectors

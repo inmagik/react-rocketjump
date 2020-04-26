@@ -17,7 +17,7 @@ describe('Rj multi mutation', () => {
 
     const MaRjState = rj({
       mutations: {
-        submitForm: multiMuation(p => p, {
+        submitForm: multiMuation((p) => p, {
           effect: mockEffect,
           updater: () => {},
         }),

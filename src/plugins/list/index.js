@@ -1,4 +1,3 @@
-import blamer from 'rocketjump-core/blamer.macro'
 import { rj } from '../../index'
 import { get } from 'rocketjump-core/utils'
 import { getOrSelect } from '../../helpers'
@@ -52,20 +51,19 @@ const makeListDataReducer = (
 
 // Selectors for a list
 const makeListSelectors = (getData, pageSize) => {
-  const getList = state => {
+  const getList = (state) => {
     const data = getData(state)
     return data === null ? null : data.list
   }
 
-  const getCount = state => {
+  const getCount = (state) => {
     const data = getData(state)
     return data === null ? null : data.pagination.count
   }
 
   const getNumPages = (state, overridePageSize = pageSize) => {
     if (overridePageSize === undefined) {
-      blamer(
-        '[rj-config-error] @rjList',
+      throw new Error(
         '[reactRj - rjList] Please pass a pageSize argument to getNumPages' +
           'selector or define a default page size (config.pageSize)'
       )
@@ -74,32 +72,32 @@ const makeListSelectors = (getData, pageSize) => {
     return count === null ? null : Math.ceil(count / overridePageSize)
   }
 
-  const hasNext = state => {
+  const hasNext = (state) => {
     const data = getData(state)
     return data === null ? false : data.pagination.next !== null
   }
 
-  const hasPrev = state => {
+  const hasPrev = (state) => {
     const data = getData(state)
     return data === null ? false : data.pagination.previous !== null
   }
 
-  const getNext = state => {
+  const getNext = (state) => {
     const data = getData(state)
     return data === null ? null : data.pagination.next
   }
 
-  const getPrev = state => {
+  const getPrev = (state) => {
     const data = getData(state)
     return data === null ? null : data.pagination.previous
   }
 
-  const getCurrent = state => {
+  const getCurrent = (state) => {
     const data = getData(state)
     return data === null ? null : data.pagination.current
   }
 
-  const getPagination = state => ({
+  const getPagination = (state) => ({
     count: getCount(state),
     numPages: getNumPages(state),
     hasNext: hasNext(state),
@@ -125,8 +123,7 @@ const makeListSelectors = (getData, pageSize) => {
 // RJ List
 const rjList = (config = {}) => {
   if (!config.pagination)
-    blamer(
-      '[rj-config-error] @rjList',
+    throw new Error(
       '[reactRj - rjList] Please define a pagination adapter (config.pagination)'
     )
   const dataReducer = makeListDataReducer(
@@ -140,7 +137,7 @@ const rjList = (config = {}) => {
     rjListDelete({ path: 'data.list' }),
     {
       selectors: ({ getData }) => makeListSelectors(getData, config.pageSize),
-      reducer: oldReducer => (state, action) => {
+      reducer: (oldReducer) => (state, action) => {
         if (action.type === SUCCESS) {
           return {
             ...state,

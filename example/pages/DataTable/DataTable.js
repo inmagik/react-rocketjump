@@ -19,15 +19,15 @@ export default function DataTable() {
 
   return (
     <div style={{ paddingTop: 20 }}>
-      <button onClick={() => setCount(c => c + 1)}>{count}</button>
+      <button onClick={() => setCount((c) => c + 1)}>{count}</button>
       <input
         type="text"
         value={inputUsername}
-        onChange={e => setInputUsername(e.target.value)}
+        onChange={(e) => setInputUsername(e.target.value)}
       />
       {users && (
         <div>
-          {users.map(user => (
+          {users.map((user) => (
             <div key={user.id}>{user.name}</div>
           ))}
         </div>

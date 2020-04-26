@@ -7,7 +7,7 @@ describe('useRunRj', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -67,7 +67,7 @@ describe('useRunRj', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -151,7 +151,7 @@ describe('useRunRj', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -211,7 +211,7 @@ describe('useRunRj', () => {
     let _resolves
     const MaRjState = rj(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves = resolve
         })
     )

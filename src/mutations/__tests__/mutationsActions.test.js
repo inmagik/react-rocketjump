@@ -21,7 +21,7 @@ describe('RJ mutations action creators', () => {
           updater: () => {},
         },
       },
-      reducer: r => (state, action) => {
+      reducer: (r) => (state, action) => {
         actionLog.push(action)
         return r(state, action)
       },
@@ -38,7 +38,7 @@ describe('RJ mutations action creators', () => {
     })
 
     type = `${MUTATION_PREFIX}/killHumans/RUN`
-    action = actionLog.filter(a => a.type === type)[0]
+    action = actionLog.filter((a) => a.type === type)[0]
     expect(action).toEqual({
       type,
       payload: {
@@ -58,7 +58,7 @@ describe('RJ mutations action creators', () => {
       result.current[1].cookSpaghetti({ k: 23 })
     })
     type = `${MUTATION_PREFIX}/cookSpaghetti/RUN`
-    action = actionLog.filter(a => a.type === type)[0]
+    action = actionLog.filter((a) => a.type === type)[0]
     expect(action).toEqual({
       type,
       payload: {

@@ -8,7 +8,7 @@ describe('RJ mutations state', () => {
       mutations: {
         killHumans: {
           effect: () => Promise.resolve(23),
-          updater: s => s,
+          updater: (s) => s,
           reducer: (state = { giova: 23 }, action) => state,
         },
       },
@@ -28,14 +28,14 @@ describe('RJ mutations state', () => {
       mutations: {
         killHumans: {
           effect: () => Promise.resolve(23),
-          updater: s => s,
+          updater: (s) => s,
           reducer: (state = { giova: 23 }, action) => state,
         },
       },
       effect: () => Promise.resolve(1312),
     })
 
-    const { result } = renderHook(() => useRj(maRjState, state => state))
+    const { result } = renderHook(() => useRj(maRjState, (state) => state))
     expect(result.current[0]).toEqual({
       root: {
         pending: false,
@@ -53,7 +53,7 @@ describe('RJ mutations state', () => {
       mutations: {
         killHumans: {
           effect: () => Promise.resolve(23),
-          updater: s => s,
+          updater: (s) => s,
           reducer: (state = { giova: 23 }, action) => state,
         },
       },
@@ -74,7 +74,7 @@ describe('RJ mutations state', () => {
       mutations: {
         killHumans: {
           effect: () => Promise.resolve(23),
-          updater: s => s,
+          updater: (s) => s,
           reducer: (state = { giova: 23 }, action) => state,
         },
       },
@@ -95,7 +95,7 @@ describe('RJ mutations state', () => {
       mutations: {
         killHumans: {
           effect: () => Promise.resolve(23),
-          updater: s => s,
+          updater: (s) => s,
           reducer: (state = { giova: 23 }, action) => state,
         },
       },

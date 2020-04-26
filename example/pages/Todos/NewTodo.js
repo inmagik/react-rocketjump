@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 export default function NewTodo({ adding, onSubmit }) {
   const [title, setTitle] = useState('')
 
-  const submitTodo = e => {
+  const submitTodo = (e) => {
     e.preventDefault()
     onSubmit({ title: title, done: false })
     setTitle('')
@@ -17,7 +17,7 @@ export default function NewTodo({ adding, onSubmit }) {
         placeholder="What to do ma friend?"
         value={title}
         type="text"
-        onChange={e => setTitle(e.target.value)}
+        onChange={(e) => setTitle(e.target.value)}
       />
     </form>
   )

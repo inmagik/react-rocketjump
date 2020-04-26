@@ -1,4 +1,3 @@
-import blamer from 'rocketjump-core/blamer.macro'
 import { rj, makeAction } from '../../index'
 import { of, from } from 'rxjs'
 import { map, filter, tap } from 'rxjs/operators'
@@ -7,24 +6,15 @@ import { SessionStorageStore } from './stores'
 
 const defaultKey = (...args) => JSON.stringify(args)
 
-const rjCache = config => {
+const rjCache = (config) => {
   if (!config.ns) {
-    blamer(
-      '[rj-config-error] @rjCache',
-      'RjCache requires the ns property to be set'
-    )
+    throw new Error('RjCache requires the ns property to be set')
   }
   if (config.ns.includes('$')) {
-    blamer(
-      '[rj-config-error] @rjCache',
-      'RjCache ns cannot contain the $ symbol'
-    )
+    throw new Error('RjCache ns cannot contain the $ symbol')
   }
   if (!config.size) {
-    blamer(
-      '[rj-config-error] @rjCache',
-      'RjCache needs a cache size to be defined'
-    )
+    throw new Error('RjCache needs a cache size to be defined')
   }
   const ns = config.ns
   const size = config.size
@@ -41,21 +31,21 @@ const rjCache = config => {
         return of(provider.get(k))
       } else {
         return from(effectFn(...args)).pipe(
-          map(result => {
+          map((result) => {
             provider.set(k, result)
             return result
           })
         )
       }
     },
-    effectPipeline: action$ =>
+    effectPipeline: (action$) =>
       action$.pipe(
-        tap(action => {
+        tap((action) => {
           if (action.type === '$reset-cache') {
             provider.clear()
           }
         }),
-        filter(action => action.type !== '$reset-cache')
+        filter((action) => action.type !== '$reset-cache')
       ),
   })
 }

@@ -85,13 +85,13 @@ describe('ConfigureRj', () => {
     const mockEffect = jest.fn().mockResolvedValue(['Rinne'])
 
     const callerA = jest.fn((fn, ...args) => {
-      return fn(...args).then(a => a.concat('Giova'))
+      return fn(...args).then((a) => a.concat('Giova'))
     })
     const callerB = jest.fn((fn, ...args) => {
-      return fn(...args).then(a => a.concat('Skaffo'))
+      return fn(...args).then((a) => a.concat('Skaffo'))
     })
     const callerC = jest.fn((fn, ...args) => {
-      return fn(...args).then(a => a.concat('Nonno'))
+      return fn(...args).then((a) => a.concat('Nonno'))
     })
 
     const maRjState = rj(
@@ -173,7 +173,7 @@ describe('ConfigureRj', () => {
       const caller = () => Promise.resolve(i)
       useEffect(() => {
         if (i < 1) {
-          setI(i => i + 1)
+          setI((i) => i + 1)
         }
       }, [i])
       // i take values 0 then 1 then stop

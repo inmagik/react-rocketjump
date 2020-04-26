@@ -5,7 +5,7 @@ import rjListUpdate from '../listUpdate/index'
 import rjListDelete from '../listDelete/index'
 
 // Data reducer for a list paginated
-export const makeListDataReducer = customListReducer => {
+export const makeListDataReducer = (customListReducer) => {
   const defaultListReducer = (prevState, { payload: { data }, meta }) => {
     const newList = data
     if (meta && meta.append) {
@@ -26,10 +26,10 @@ export const makeListDataReducer = customListReducer => {
 }
 
 // Selectors for a list
-export const makeListSelectors = getData => {
+export const makeListSelectors = (getData) => {
   const getList = getData
 
-  const getCount = state => {
+  const getCount = (state) => {
     const data = getList(state)
     return data === null ? null : data.length
   }
@@ -45,7 +45,7 @@ const rjPlainList = (config = {}) => {
   const dataReducer = makeListDataReducer(config.customListReducer)
   return rj.pure(rjListInsert(), rjListUpdate(), rjListDelete(), {
     selectors: ({ getData }) => makeListSelectors(getData),
-    reducer: oldReducer => (state, action) => {
+    reducer: (oldReducer) => (state, action) => {
       if (action.type === SUCCESS) {
         return {
           ...state,

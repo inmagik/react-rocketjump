@@ -1,4 +1,3 @@
-import blamer from 'rocketjump-core/blamer.macro'
 import {
   of,
   from,
@@ -49,10 +48,10 @@ class ExtraSideEffectSubject extends BehaviorSubject {
 
 const EffectActions = [CLEAN, RUN, CANCEL]
 function filterEffectActions(action, prefix) {
-  return EffectActions.map(a => prefix + a).indexOf(action.type) !== -1
+  return EffectActions.map((a) => prefix + a).indexOf(action.type) !== -1
 }
 function filterNonEffectActions(action, prefix) {
-  return EffectActions.map(a => prefix + a).indexOf(action.type) === -1
+  return EffectActions.map((a) => prefix + a).indexOf(action.type) === -1
 }
 
 export default function createMakeRxObservable({
@@ -89,28 +88,24 @@ export default function createMakeRxObservable({
       const effectResult = callEffect(effectCall, ...params)
 
       if (!(isPromise(effectResult) || isObservable(effectResult))) {
-        if (process.env.NODE_ENV === 'production') {
-          return throwError('bad effect result')
-        } else {
-          return throwError(
-            'The effect result is expect ' +
-              `to be a Promise or an RxObservable but a ${typeof effectResult} ` +
-              `was given. Please check your effect and effectCaller logic.`
-          )
-        }
+        return throwError(
+          'The effect result is expect ' +
+            `to be a Promise or an RxObservable but a ${typeof effectResult} ` +
+            `was given. Please check your effect and effectCaller logic.`
+        )
       }
 
       return concat(
         of({ type: prefix + PENDING, meta }),
         from(effectResult).pipe(
-          map(data => ({
+          map((data) => ({
             type: prefix + SUCCESS,
             payload: { data, params },
             meta,
             // Callback runned from the subscribtion in the react hook
             successCallback: callbacks ? callbacks.onSuccess : undefined,
           })),
-          catchError(error => {
+          catchError((error) => {
             // Avoid headache
             if (
               error instanceof TypeError ||
@@ -154,8 +149,7 @@ export default function createMakeRxObservable({
     } else {
       // Invalid effect type
       if (RxEffects[effectType] === undefined) {
-        blamer(
-          '[rj-config-error]',
+        throw new Error(
           `[react-rocketjump] takeEffect: ${takeEffect} is an invalid effect.`
         )
       }
@@ -166,7 +160,7 @@ export default function createMakeRxObservable({
       // if an action different from theese is emitted simply emit/dispatch them
       dispatchObservable = merge(
         createEffect(
-          action$.pipe(filter(a => filterEffectActions(a, prefix))),
+          action$.pipe(filter((a) => filterEffectActions(a, prefix))),
           state$,
           extraSideEffectObs$,
           mapActionToObserable,
@@ -174,7 +168,7 @@ export default function createMakeRxObservable({
           prefix
         ),
         mergeObservable$.pipe(
-          filter(a => {
+          filter((a) => {
             if (a.meta && a.meta.ignoreDispatch) {
               return false
             }
@@ -183,7 +177,7 @@ export default function createMakeRxObservable({
         )
       )
     }
-    return [dispatchObservable, config => extraSideEffectSubject.next(config)]
+    return [dispatchObservable, (config) => extraSideEffectSubject.next(config)]
   }
 }
 
@@ -193,7 +187,7 @@ export function mergeCreateMakeRxObservable(...creators) {
     // TODO: Enable and test the following lines
     // when expose mergeCreateMakeRxObservable as library function
     // if (creators.length === 0) {
-    //   blamer('[rj-config-error]','You should provide at least one creator to merge.')
+    //   throw new Error('You should provide at least one creator to merge.')
     // }
     const [firstCreator, ...otherCreators] = creators
     const [firstDispatch$, updateConfig] = firstCreator(
@@ -217,7 +211,8 @@ export function mergeCreateMakeRxObservable(...creators) {
 
     return [
       dispatch$,
-      config => configUpdaters.forEach(updateConfig => updateConfig(config)),
+      (config) =>
+        configUpdaters.forEach((updateConfig) => updateConfig(config)),
     ]
   }
 }
