@@ -1,13 +1,4 @@
-function makeRoutineHook(routineList) {
-  if (routineList.length === 1) {
-    return routineList[0]
-  }
-  return (...args) => {
-    for (const routine of routineList) {
-      routine(...args)
-    }
-  }
-}
+import { merge } from 'rxjs'
 
 const Routines = {
   name: 'Routines',
@@ -20,14 +11,34 @@ const Routines = {
     }
     return extendExport
   },
-  finalizeExport: (finalExport, startExport, finalConfig) => {
-    if (startExport.routine) {
-      return {
-        ...finalExport,
-        routine: makeRoutineHook(startExport.routine),
-      }
+  extraSideEffects: (rjExport, { getRootState }) => {
+    // No need to create routines
+    if (!rjExport.routine || rjExport.routine.length === 0) {
+      return null
     }
-    return finalExport
+
+    const { routine } = rjExport
+
+    return routine.map((makeRoutineObs) => {
+      return function createMakeRxObx() {
+        return function makeObx(
+          actionObx,
+          stateObx,
+          placeholderEffectCaller,
+          prevObservable
+        ) {
+          const routineObs = makeRoutineObs(
+            actionObx,
+            stateObx,
+            // Helpers.....
+            {
+              getRootState,
+            }
+          )
+          return [merge(routineObs, prevObservable)]
+        }
+      }
+    })
   },
 }
 

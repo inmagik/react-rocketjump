@@ -191,6 +191,8 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
   // of useRj, connectRj, .. to check for null
   let computeState = createComputeState(computed, selectorsForComputed)
 
+  let getRootState = (state) => state
+
   if (Object.keys(reducersByKey).length > 0) {
     // Got extra state from plugIns!
 
@@ -223,6 +225,8 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
     if (computeState === null) {
       computeState = (state) => state.root
     }
+
+    getRootState = (state) => state.root
   }
 
   const { effectPipeline, ...sideEffectConfig } = sideEffect
@@ -253,14 +257,22 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
   // RX++
   const extraSideEffects = createListFromPlugins(plugIns, 'extraSideEffects', [
     rjExport,
+    {
+      getRootState,
+    },
   ])
 
-  const extraMakeObs = extraSideEffects.map((sideEffectConfig) =>
-    createMakeRxObservable({
-      ...sideEffectConfig,
+  const extraMakeObs = extraSideEffects.map((sideEffectConfigOrCreator) => {
+    if (typeof sideEffectConfigOrCreator === 'function') {
+      return sideEffectConfigOrCreator({
+        effectCaller: enhanceEffectCaller(sideEffectConfig.effectCaller),
+      })
+    }
+    return createMakeRxObservable({
+      ...sideEffectConfigOrCreator,
       effectCaller: enhanceEffectCaller(sideEffectConfig.effectCaller),
     })
-  )
+  })
 
   const makeRxObservable = mergeCreateMakeRxObservable(
     mainMakeRxObservable,
@@ -301,7 +313,7 @@ export default forgeRocketJump({
   forgedPlugins: [
     // Core RJ and always loved Mutations!!!
     Mutations,
-    // routine react hook 4 rj!
+    // routine hack Y RX
     Routines,
   ],
 })

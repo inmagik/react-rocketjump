@@ -11,15 +11,17 @@ import { INIT } from './actionTypes'
 // A "mini" redux
 // a reducer for handle state
 // and the roboust rxjs to handle complex side effecs in a pure, declarative, fancy way!
-export default function useMiniRedux(
+function useMiniRedux(
   reducer,
   makeObservable,
   pipeActionStream,
   // debug information used as dev hints and other
-  debugInfo
+  debugInfo,
+  debugEmitter
 ) {
+  // TODO REMOVE IN PROD if
   // Debug rj() \w classy (not in PROD)
-  const debugEmitter = useConstant(() => createRjDebugEmitter(debugInfo))
+  // const debugEmitter = useConstant(() => createRjDebugEmitter(debugInfo))
 
   // STATE$
   // emits state updates (used to build the $dispatch Observable)
@@ -38,7 +40,9 @@ export default function useMiniRedux(
       if (!flags.debugger) {
         return initialState
       }
+      // TODO
       // In DEV call the debug emitter
+      // DEV IF
       debugEmitter.onStateInitialized(initialState)
       // NOTE
       // First this mad shit happends only in DEV
@@ -54,7 +58,6 @@ export default function useMiniRedux(
       // one this stuff in only in DEV and don't change the other behaviurs
       // of how the state bheave.
       // the original ideas was from mad man Albi 1312.
-      //
       // kepp a reference of current "dispatch index"
       // and the same value in reducer state
       state$.__dispatchIndex = 0
@@ -249,5 +252,31 @@ export default function useMiniRedux(
     }
   })
 
-  return [state, dispatchWithEffect, action$]
+  return [state, dispatchWithEffect]
 }
+
+let useMiniReduxExport
+if (process.env.NODE_ENV !== 'production') {
+  useMiniReduxExport = function useMiniReduxWithDebugEmitter(
+    reducer,
+    makeObservable,
+    pipeActionStream,
+    // debug information used as dev hints and other
+    debugInfo
+  ) {
+    // Debug rj() \w classy (not in PROD)
+    const debugEmitter = useConstant(() => createRjDebugEmitter(debugInfo))
+
+    return useMiniRedux(
+      reducer,
+      makeObservable,
+      pipeActionStream,
+      debugInfo,
+      debugEmitter
+    )
+  }
+} else {
+  useMiniReduxExport = useMiniRedux
+}
+
+export default useMiniReduxExport

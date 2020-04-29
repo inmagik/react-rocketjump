@@ -92,18 +92,15 @@ const rjAjax = rj.plugin(
       ajax: {
         config: ajaxRxConfig,
         authEffectCaller: (callFn, ...authArgs) => (...args) => {
-          console.log('~~~AJAXAUH')
           const request = callFn(...args)
           return config.injectAuth(makeAjaxConfig(request), ...authArgs)
         },
         effectCaller: (callFn, ...args) => {
-          console.log('~~~AJAX')
           let response = callFn(...args)
           // Prev effect caller has added an order to our effect...
           // NOTE: This approach is not right at all but works
           // fine for 90% of common use...
           if (typeof response === 'function') {
-            console.log('O.o')
             return (...args) => {
               const nextOrderResponse = response(...args)
               return mapToAjax(ajaxRxConfig, nextOrderResponse)

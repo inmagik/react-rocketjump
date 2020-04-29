@@ -32,11 +32,9 @@ function whereMyRjIsIvoked(wrappedComponentName) {
   let hooks = []
   let rjFn = ''
 
-  // console.log(stack)
   for (let i = 0; i < stack.length; i++) {
     const [functionName] = stack[i]
-    // console.log(functionName)
-    if (!startedMainHook && functionName === 'useMiniRedux') {
+    if (!startedMainHook && functionName === 'useMiniReduxWithDebugEmitter') {
       startedMainHook = true
     } else if (startedMainHook) {
       if (rjHooks.indexOf(functionName) !== -1) {

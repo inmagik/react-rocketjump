@@ -8,12 +8,23 @@ import './Todos.css'
 export default function Todos() {
   const [
     { todos, loading, adding, deleting, updating },
-    { addStupidTodo, removeTodo, toggleTodo },
+    { addStupidTodo, removeTodo, toggleTodo, wsSend, clean, run },
   ] = useRunRj(TodosListState)
 
   return (
     <div className="todos">
       <h1>Ma REST Todos</h1>
+      <div>
+        <div className="action-button-rj">
+          <button onClick={() => clean()}>CLEAN</button>
+        </div>
+        <div className="action-button-rj">
+          <button onClick={() => run()}>RUN</button>
+        </div>
+        <div className="action-button-rj">
+          <button onClick={() => wsSend('DRAGO')}>@WS/SEND</button>
+        </div>
+      </div>
       <h3>
         <a href={`${API_URL}/todos`}>
           {API_URL}
