@@ -257,20 +257,18 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
   // RX++
   const extraSideEffects = createListFromPlugins(plugIns, 'extraSideEffects', [
     rjExport,
-    {
-      getRootState,
-    },
   ])
 
   const extraMakeObs = extraSideEffects.map((sideEffectConfigOrCreator) => {
     if (typeof sideEffectConfigOrCreator === 'function') {
       return sideEffectConfigOrCreator({
-        effectCaller: enhanceEffectCaller(sideEffectConfig.effectCaller),
+        // Effects helpers ...
+        getRootState,
       })
     }
     return createMakeRxObservable({
       ...sideEffectConfigOrCreator,
-      effectCaller: enhanceEffectCaller(sideEffectConfig.effectCaller),
+      effectCaller: enhanceEffectCaller(sideEffectConfigOrCreator.effectCaller),
     })
   })
 

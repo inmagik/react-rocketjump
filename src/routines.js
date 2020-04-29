@@ -11,7 +11,7 @@ const Routines = {
     }
     return extendExport
   },
-  extraSideEffects: (rjExport, { getRootState }) => {
+  extraSideEffects: (rjExport) => {
     // No need to create routines
     if (!rjExport.routine || rjExport.routine.length === 0) {
       return null
@@ -20,7 +20,7 @@ const Routines = {
     const { routine } = rjExport
 
     return routine.map((makeRoutineObs) => {
-      return function createMakeRxObx() {
+      return function createMakeRxObx({ getRootState }) {
         return function makeObx(
           actionObx,
           stateObx,
