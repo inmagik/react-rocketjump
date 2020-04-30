@@ -206,7 +206,7 @@ function handleOptFailure(reducer, state, action) {
     )
   })
 
-  // append new actions
+  // Append new action
   nextActions.push({
     committed: true,
     action,
@@ -233,28 +233,25 @@ function handleOptFailure(reducer, state, action) {
     nextSnapshot = null
     nextActions = []
   } else {
-    // 0 - 1
-    // or
-    // 0 - 1 - 1 - 1
-    // Prev actions without failed RUN and new FAILURE
-    const allActions = nextActions
-
-    nextActions = nextActions.slice(firstNonCommitIndex)
-
-    if (nextActions.length === 0) {
-      // State reconcillied
-      nextSnapshot = null
-    } else if (firstNonCommitIndex === 0) {
+    if (firstNonCommitIndex === 0) {
+      console.log('Keep Snap')
       // No need to change old snap
       nextSnapshot = snapshot
     } else {
       // 0 - 1 - 1 - 1
+      console.log('Squoash')
       nextSnapshot = applyActionsOnSnapshot(
         snapshot,
-        allActions.slice(0, firstNonCommitIndex).map((a) => a.action),
+        nextActions.slice(0, firstNonCommitIndex).map((a) => a.action),
         reducer
       )
     }
+
+    // 0 - 1
+    // or
+    // 0 - 1 - 1 - 1
+    // from
+    nextActions = nextActions.slice(firstNonCommitIndex)
   }
 
   const nextState = reducer(state, action)
