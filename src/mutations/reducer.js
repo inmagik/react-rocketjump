@@ -116,7 +116,6 @@ export function optimisticMutationsReducer(state = DefaultOptState, action) {
 }
 
 function handleOptRun(reducer, state, action) {
-  console.log('Run Baby Run')
   const {
     optimisticMutations: { actions, snapshot },
   } = state
@@ -150,7 +149,6 @@ function getFirstNonCommittedIndex(actions) {
 }
 
 function handleOptSuccess(reducer, state, action) {
-  console.log('Success Bay')
   const {
     optimisticMutations: { actions, snapshot },
   } = state
@@ -207,14 +205,12 @@ function handleOptFailure(reducer, state, action) {
       a.action.type.endsWith(`/${RUN}`)
     )
   })
-  console.log('~~~FILTER', [...nextActions])
 
   // append new actions
   nextActions.push({
     committed: true,
     action,
   })
-  console.log('~~~FILTER w FAILURE', [...nextActions])
 
   // 0 - 1 - 1 - 0 - 1
   // FILTER:
@@ -230,10 +226,9 @@ function handleOptFailure(reducer, state, action) {
   )
 
   const firstNonCommitIndex = getFirstNonCommittedIndex(nextActions)
-  console.log('xxx', firstNonCommitIndex)
+
   let nextSnapshot
   if (firstNonCommitIndex === null) {
-    console.log('ALL COMMITED!')
     // All committed!
     nextSnapshot = null
     nextActions = []
@@ -241,6 +236,9 @@ function handleOptFailure(reducer, state, action) {
     // 0 - 1
     // or
     // 0 - 1 - 1 - 1
+    // Prev actions without failed RUN and new FAILURE
+    const allActions = nextActions
+
     nextActions = nextActions.slice(firstNonCommitIndex)
 
     if (nextActions.length === 0) {
@@ -253,7 +251,7 @@ function handleOptFailure(reducer, state, action) {
       // 0 - 1 - 1 - 1
       nextSnapshot = applyActionsOnSnapshot(
         snapshot,
-        nextActions.slice(0, firstNonCommitIndex).map((a) => a.action),
+        allActions.slice(0, firstNonCommitIndex).map((a) => a.action),
         reducer
       )
     }
