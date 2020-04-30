@@ -484,4 +484,470 @@ describe('RJ mutations reducers', () => {
       },
     })
   })
+  it('should be optimistic and revert failure regardless of actions orders', () => {
+    console.log('~~~~')
+    const MaRjState = rj({
+      mutations: {
+        toggle: {
+          optimistic: true,
+          effect: () => {},
+          updater: (state) => ({
+            ...state,
+            data: {
+              ...state.data,
+              done: !state.data.done,
+            },
+          }),
+        },
+      },
+      effect: () => {},
+      composeReducer: (state, action) => {
+        if (action.type === 'JJ') {
+          return {
+            ...state,
+            data: {
+              ...state.data,
+              j: state.data.j + 1,
+            },
+          }
+        }
+        return state
+      },
+    })
+
+    const { reducer } = MaRjState
+    let state = reducer(undefined, { type: INIT })
+    state = reducer(state, {
+      type: SUCCESS,
+      payload: { data: { done: true, j: 0 } },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: true,
+          j: 0,
+        },
+      },
+      optimisticMutations: {
+        actions: [],
+        snapshot: null,
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+      payload: { params: [] },
+      meta: {
+        optimisticMutation: 1,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: false,
+          j: 0,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 1,
+              },
+            },
+            committed: false,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: 'JJ',
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: false,
+          j: 1,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 1,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: 'JJ',
+            },
+            committed: true,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+      payload: { params: [] },
+      meta: {
+        optimisticMutation: 2,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: true,
+          j: 1,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 1,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: 'JJ',
+            },
+            committed: true,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 2,
+              },
+            },
+            committed: false,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: 'JJ',
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: true,
+          j: 2,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 1,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: 'JJ',
+            },
+            committed: true,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 2,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: 'JJ',
+            },
+            committed: true,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+      payload: { params: [] },
+      meta: {
+        optimisticMutation: 3,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: false,
+          j: 2,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 1,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: 'JJ',
+            },
+            committed: true,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 2,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: 'JJ',
+            },
+            committed: true,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 3,
+              },
+            },
+            committed: false,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+      payload: { params: [] },
+      meta: {
+        optimisticMutation: 2,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: true,
+          j: 2,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 1,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: 'JJ',
+            },
+            committed: true,
+          },
+          {
+            action: {
+              type: 'JJ',
+            },
+            committed: true,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 3,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 2,
+              },
+            },
+            committed: true,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+      payload: { params: [] },
+      meta: {
+        optimisticMutation: 1,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: false,
+          j: 2,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 3,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 2,
+              },
+            },
+            committed: true,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+              payload: { params: [] },
+              meta: {
+                optimisticMutation: 1,
+              },
+            },
+            committed: true,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 2,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+      payload: { params: [] },
+      meta: {
+        optimisticMutation: 3,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: true,
+          j: 2,
+        },
+      },
+      optimisticMutations: {
+        actions: [],
+        snapshot: null,
+      },
+    })
+  })
 })
