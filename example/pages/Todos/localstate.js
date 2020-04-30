@@ -40,15 +40,24 @@ export const TodosListState = rj(
         updater: 'deleteItem',
       }),
       toggleTodo: rj.mutation.multi((todo) => todo.id, {
+        optimistic: true,
+        takeEffect: 'every',
         effect: (todo) =>
           request
-            .put(`${API_URL}/todos/${todo.id}`)
+            .put(`${API_URL}/todos/${todo.id}X`) //${Math.floor(Math.random() * 2) === 0 ? '~~' : ''}`)
             .send({
               ...todo,
               done: !todo.done,
             })
             .then(({ body }) => body),
-        updater: 'updateItem',
+        updater: (state, updateTodo) => ({
+          ...state,
+          data: state.data.map((todo) =>
+            todo.id === updateTodo.id
+              ? { ...updateTodo, done: !updateTodo.done }
+              : todo
+          ),
+        }),
       }),
     },
     computed: {

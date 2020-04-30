@@ -1,6 +1,11 @@
 import blamer from 'rocketjump-core/blamer.macro'
 import { exportEffectCaller } from '../sideEffectDescriptor'
-import { enhanceReducer, makeMutationsReducer } from './reducer'
+import {
+  enhanceReducer,
+  makeMutationsReducer,
+  optimisticMutationsHor,
+  optimisticMutationsReducer,
+} from './reducer'
 import { createMutationsSelectorsForComputed } from './computed'
 import { extraMutationsSideEffects } from './sideEffects'
 import { enhanceActionCreators } from './actionCreators'
@@ -63,12 +68,24 @@ function enhanceReducerWithMutations(reducer, rjExport) {
 function combineReducersWithMutations(rjExport) {
   const { mutations } = rjExport
   if (mutations) {
+    let reducersToCombine
+
     const mutationsReducer = makeMutationsReducer(mutations)
     if (mutationsReducer) {
-      return {
-        mutations: mutationsReducer,
-      }
+      reducersToCombine = reducersToCombine || {}
+      reducersToCombine.mutations = mutationsReducer
     }
+
+    const hasSomeOptimisticMutations = Object.keys(mutations).some(
+      (name) => mutations[name].optimistic === true
+    )
+    if (hasSomeOptimisticMutations) {
+      // Enable optimistic reducer...
+      reducersToCombine = reducersToCombine || {}
+      reducersToCombine.optimisticMutations = optimisticMutationsReducer
+    }
+
+    return reducersToCombine
   }
 }
 
@@ -89,8 +106,17 @@ function enhanceFinalExportWithMutations(
 
   const { actionCreators, makeSelectors } = rjObject
 
+  let reducer = rjObject.reducer
+  const hasSomeOptimisticMutations = Object.keys(mutations).some(
+    (name) => mutations[name].optimistic === true
+  )
+  if (hasSomeOptimisticMutations) {
+    reducer = optimisticMutationsHor(reducer, mutations)
+  }
+
   return {
     ...rjObject,
+    reducer,
     makeSelectors: enhanceMakeSelectors(mutations, makeSelectors),
     actionCreators: enhanceActionCreators(mutations, actionCreators),
   }

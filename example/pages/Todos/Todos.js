@@ -52,7 +52,8 @@ export default function Todos() {
         {todos &&
           todos.map((todo) => (
             <Todo
-              saving={updating[todo.id] || deleting[todo.id]}
+              // saving={updating[todo.id] || deleting[todo.id]}
+              saving={deleting[todo.id]}
               onToggle={toggleTodo}
               onRemove={removeTodo}
               key={todo.id}
