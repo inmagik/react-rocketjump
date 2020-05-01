@@ -1784,6 +1784,9 @@ describe('RJ mutations reducers', () => {
     })
     state = reducer(state, {
       type: 'JJ',
+      meta: {
+        mutationID: 1, // IGNORED
+      },
     })
     expect(state).toEqual({
       root: {
@@ -1825,6 +1828,9 @@ describe('RJ mutations reducers', () => {
           {
             action: {
               type: 'JJ',
+              meta: {
+                mutationID: 1, // IGNORED
+              },
             },
             committed: true,
           },
@@ -1886,6 +1892,9 @@ describe('RJ mutations reducers', () => {
           {
             action: {
               type: 'JJ',
+              meta: {
+                mutationID: 1, // IGNORED
+              },
             },
             committed: true,
           },
@@ -1941,6 +1950,9 @@ describe('RJ mutations reducers', () => {
           {
             action: {
               type: 'JJ',
+              meta: {
+                mutationID: 1, // IGNORED
+              },
             },
             committed: true,
           },
@@ -1996,6 +2008,9 @@ describe('RJ mutations reducers', () => {
           {
             action: {
               type: 'JJ',
+              meta: {
+                mutationID: 1, // IGNORED
+              },
             },
             committed: true,
           },
