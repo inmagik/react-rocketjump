@@ -2,7 +2,7 @@ import { makeLibraryAction } from 'rocketjump-core'
 import { RUN } from '../actionTypes'
 import { MUTATION_PREFIX } from './actionTypes'
 
-let mutationIdx = 0
+let mutationIDCounter = 0
 
 // Make the action creater that trigger a mutation side effects
 function makeActionCreator(name, mutation) {
@@ -10,8 +10,8 @@ function makeActionCreator(name, mutation) {
     const meta = {
       params,
     }
-    if (mutation.optimistic === true) {
-      meta.optimisticMutation = ++mutationIdx
+    if (typeof mutation.optimisticResult === 'function') {
+      meta.mutationID = ++mutationIDCounter
     }
     return makeLibraryAction(
       `${MUTATION_PREFIX}/${name}/${RUN}`,

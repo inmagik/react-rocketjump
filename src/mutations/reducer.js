@@ -19,20 +19,10 @@ export function enhanceReducer(mutations, reducer, actionCreators) {
             `action creator [${mutation.updater}] as updater for mutation [${name}].`
         )
       }
-      if (mutation.optimistic === true) {
-        update = (state, action) =>
-          reducer(state, actionCreator(...action.payload.params))
-      } else {
-        update = (state, action) =>
-          reducer(state, actionCreator(action.payload.data))
-      }
+      update = (state, action) =>
+        reducer(state, actionCreator(action.payload.data))
     } else if (typeof mutation.updater === 'function') {
-      if (mutation.optimistic === true) {
-        update = (state, action) =>
-          mutation.updater(state, ...action.payload.params)
-      } else {
-        update = (state, action) => mutation.updater(state, action.payload.data)
-      }
+      update = (state, action) => mutation.updater(state, action.payload.data)
     } else {
       blamer(
         '[rj-config-error] @mutations',
@@ -41,17 +31,26 @@ export function enhanceReducer(mutations, reducer, actionCreators) {
       )
     }
 
-    let type
-    if (mutation.optimistic === true) {
-      type = `${MUTATION_PREFIX}/${name}/${RUN}`
-    } else {
-      type = `${MUTATION_PREFIX}/${name}/${SUCCESS}`
-    }
-
-    return {
+    const type = `${MUTATION_PREFIX}/${name}/${SUCCESS}`
+    const nextHanlders = {
       ...all,
       [type]: update,
     }
+
+    // Optmistic updater!
+    if (typeof mutation.optimisticResult === 'function') {
+      const type = `${MUTATION_PREFIX}/${name}/${RUN}`
+      nextHanlders[type] = (state, action) => {
+        const optimisticData = mutation.optimisticResult(
+          ...action.payload.params
+        )
+        return update(state, {
+          payload: { data: optimisticData },
+        })
+      }
+    }
+
+    return nextHanlders
   }, {})
 
   return (prevState, action) => {
@@ -154,16 +153,24 @@ function handleOptSuccess(reducer, state, action) {
   } = state
 
   // Commit action
+  // SWAP THE RUN \W SUCCESS KEEP ORDER BUT USE SERVER RESPONSE
   let nextActions = actions.map((a) => {
-    if (a.action?.meta?.optimisticMutation === action.meta.optimisticMutation) {
+    if (a.action?.meta?.mutationID === action.meta.mutationID) {
       return {
-        ...a,
         committed: true,
+        action,
       }
     } else {
       return a
     }
   })
+
+  // Commited root state \w SUCCESS from SERVER
+  const commitedRootState = applyActionsOnSnapshot(
+    snapshot,
+    nextActions.map((a) => a.action),
+    reducer
+  )
 
   const firstNonCommitIndex = getFirstNonCommittedIndex(nextActions)
 
@@ -186,6 +193,7 @@ function handleOptSuccess(reducer, state, action) {
   const nextState = reducer(state, action)
   return {
     ...nextState,
+    root: commitedRootState,
     optimisticMutations: {
       snapshot: nextSnapshot,
       actions: nextActions,
@@ -200,7 +208,7 @@ function handleOptFailure(reducer, state, action) {
 
   // Remove failied RUN
   let nextActions = actions.filter(
-    (a) => a.action?.meta?.optimisticMutation !== action.meta.optimisticMutation
+    (a) => a.action?.meta?.mutationID !== action.meta.mutationID
   )
 
   // 0 - 1 - 1 - 0 - 1
@@ -209,7 +217,7 @@ function handleOptFailure(reducer, state, action) {
   // or
   // 0 - 1 - 1 - 1
 
-  // Rollbck to state without opt failed actions
+  // Rollback to state without opt failed actions
   const roolBackRootState = applyActionsOnSnapshot(
     snapshot,
     nextActions.map((a) => a.action),
@@ -251,7 +259,7 @@ function handleOptFailure(reducer, state, action) {
 
 export function optimisticMutationsHor(reducer, mutations) {
   return (state, action) => {
-    if (Number.isInteger(action?.meta?.optimisticMutation)) {
+    if (Number.isInteger(action?.meta?.mutationID)) {
       // OPT ACTIONS
 
       // Split into mutations pieces

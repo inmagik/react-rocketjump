@@ -77,7 +77,7 @@ function combineReducersWithMutations(rjExport) {
     }
 
     const hasSomeOptimisticMutations = Object.keys(mutations).some(
-      (name) => mutations[name].optimistic === true
+      (name) => typeof mutations[name].optimisticResult === 'function'
     )
     if (hasSomeOptimisticMutations) {
       // Enable optimistic reducer...
@@ -108,7 +108,7 @@ function enhanceFinalExportWithMutations(
 
   let reducer = rjObject.reducer
   const hasSomeOptimisticMutations = Object.keys(mutations).some(
-    (name) => mutations[name].optimistic === true
+    (name) => typeof mutations[name].optimisticResult === 'function'
   )
   if (hasSomeOptimisticMutations) {
     reducer = optimisticMutationsHor(reducer, mutations)
