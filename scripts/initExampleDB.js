@@ -27,6 +27,24 @@ if (!fs.existsSync(DB_PATH)) {
             title: 'Learn RocketJump',
           },
         ],
+        users: [
+          {
+            id: 1,
+            name: 'GioVa'
+          },
+          {
+            id: 2,
+            name: 'Skaff0'
+          },
+          {
+            id: 3,
+            name: 'ALB1312'
+          },
+          {
+            id: 4,
+            name: 'Mr0_TH3_B0ss'
+          },
+        ],
       },
       null,
       2
