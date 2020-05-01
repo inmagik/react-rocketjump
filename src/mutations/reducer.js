@@ -154,8 +154,17 @@ function handleOptSuccess(reducer, state, action) {
 
   // Commit action
   // SWAP THE RUN \W SUCCESS KEEP ORDER BUT USE SERVER RESPONSE
+  const mutationTypeRun = action.type
+    .split('/')
+    .slice(0, 2)
+    .concat(RUN)
+    .join('/')
   let nextActions = actions.map((a) => {
-    if (a.action?.meta?.mutationID === action.meta.mutationID) {
+    // FIXME FILTER 4 RUN!
+    if (
+      a.action.type === mutationTypeRun &&
+      a.action?.meta?.mutationID === action.meta.mutationID
+    ) {
       return {
         committed: true,
         action,
@@ -207,8 +216,15 @@ function handleOptFailure(reducer, state, action) {
   } = state
 
   // Remove failied RUN
+  const mutationTypeRun = action.type
+    .split('/')
+    .slice(0, 2)
+    .concat(RUN)
+    .join('/')
   let nextActions = actions.filter(
-    (a) => a.action?.meta?.mutationID !== action.meta.mutationID
+    (a) =>
+      a.action.type !== mutationTypeRun ||
+      a.action?.meta?.mutationID !== action.meta.mutationID
   )
 
   // 0 - 1 - 1 - 0 - 1

@@ -14,15 +14,17 @@ const Todo = ({ todo, saving = false, onToggle, onRemove, onIncrement }) => (
       </div>
       <div className="todo-title">{todo.title}</div>
     </div>
-    <button className="todo-increment" onClick={() => onIncrement(todo)}>
-      {todo.count}
-      <span role="img" aria-label="ping-pong">
-        🏓
-      </span>
-    </button>
-    <button className="todo-delete" onClick={() => onRemove(todo)}>
-      X
-    </button>
+    <div>
+      <button className="todo-increment" onClick={() => onIncrement(todo)}>
+        {todo.count}
+        <span role="img" aria-label="ping-pong">
+          🏓
+        </span>
+      </button>
+      <button className="todo-delete" onClick={() => onRemove(todo)}>
+        X
+      </button>
+    </div>
   </div>
 )
 

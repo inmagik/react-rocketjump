@@ -62,8 +62,13 @@
   text-align: right;
 }
 
-.todo.todo-done {
-  /* color: green; */
+.todo .todo-increment {
+  color: crimson;
+  margin-right: 20px;
+}
+.todo .todo-delete {
+  border-radius: 40%;
+  color: salmon;
 }
 .todo.todo-done .todo-circle {
   color: green;

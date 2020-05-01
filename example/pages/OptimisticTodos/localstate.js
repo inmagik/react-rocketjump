@@ -11,19 +11,26 @@ function isMyLuckyDay(chance) {
 export const TodosListState = rj(rjPlainList(), {
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
   mutations: {
-    addStupidTodo: rj.mutation.single({
-      effect: (todo) =>
+    addStupidTodo: {
+      optimisticResult: (todo) => ({
+        ...todo,
+        id: new Date().getTime(),
+      }),
+      effect: (todo, chance) =>
         request
-          .post(`${API_URL}/todos`)
+          .post(`${API_URL}/todos${isMyLuckyDay(chance)}`)
           .send(todo)
           .then(({ body }) => body),
       updater: 'insertItem',
-    }),
-    removeTodo: rj.mutation.multi((todo) => todo.id, {
-      effect: (todo) =>
-        request.delete(`${API_URL}/todos/${todo.id}`).then(() => todo),
+    },
+    removeTodo: {
+      optimisticResult: (todo) => todo,
+      effect: (todo, chance) =>
+        request
+          .delete(`${API_URL}/todos/${todo.id}${isMyLuckyDay(chance)}`)
+          .then(() => todo),
       updater: 'deleteItem',
-    }),
+    },
     incrementTodo: {
       optimisticResult: (todo) => ({
         ...todo,
@@ -39,7 +46,11 @@ export const TodosListState = rj(rjPlainList(), {
           .then(({ body }) => body),
       updater: 'updateItem',
     },
-    toggleTodo: rj.mutation.multi((todo) => todo.id, {
+    toggleTodo: {
+      optimisticResult: (todo) => ({
+        ...todo,
+        done: !todo.done,
+      }),
       effect: (todo, chance) =>
         request
           .put(`${API_URL}/todos/${todo.id}${isMyLuckyDay(chance)}`)
@@ -49,12 +60,9 @@ export const TodosListState = rj(rjPlainList(), {
           })
           .then(({ body }) => body),
       updater: 'updateItem',
-    }),
+    },
   },
   computed: {
-    adding: '@mutation.addStupidTodo.pending',
-    deleting: '@mutation.removeTodo.pendings',
-    updating: '@mutation.toggleTodo.pendings',
     todos: 'getData',
     loading: 'isPending',
   },

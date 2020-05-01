@@ -7,7 +7,7 @@ import './Todos.css'
 
 export default function Todos() {
   const [
-    { todos, loading, adding, deleting, updating },
+    { todos, loading },
     { addStupidTodo, removeTodo, toggleTodo, incrementTodo, clean, run },
   ] = useRunRj(TodosListState)
 
@@ -25,6 +25,13 @@ export default function Todos() {
       incrementTodo(todo, chance)
     },
     [incrementTodo, chance]
+  )
+
+  const handleRemoveTodo = useCallback(
+    (todo) => {
+      removeTodo(todo, chance)
+    },
+    [removeTodo, chance]
   )
 
   return (
@@ -75,19 +82,17 @@ export default function Todos() {
               .onSuccess((todo) => {
                 console.log('Todo Added!', todo)
               })
-              .run(todo)
+              .run(todo, chance)
           }}
-          adding={adding}
         />
       )}
       <div className="todo-list">
         {todos &&
           todos.map((todo) => (
             <Todo
-              saving={updating[todo.id] || deleting[todo.id]}
               onIncrement={handleIncrementTodo}
               onToggle={handleToggleTodo}
-              onRemove={removeTodo}
+              onRemove={handleRemoveTodo}
               key={todo.id}
               todo={todo}
             />
