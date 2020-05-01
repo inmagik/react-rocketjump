@@ -1,13 +1,71 @@
-import { isEffectAction } from 'rocketjump-core'
-import rj from '../../rj'
-import useRj from '../../useRj'
+import { isEffectAction, bindActionCreators } from 'rocketjump-core'
+import { RUN, PENDING, SUCCESS } from '../../actionTypes'
 import { renderHook, act } from '@testing-library/react-hooks'
 import '@testing-library/jest-dom/extend-expect'
 
 const MUTATION_PREFIX = '@MUTATION'
 
 describe('RJ mutations action creators', () => {
-  it('should be generated from mutations and generate good actions', async () => {
+  it('should be generated from mutations and generate good actions', () => {
+    let rj
+    jest.isolateModules(() => {
+      rj = require('../../rj').default
+    })
+    const mockDispatch = jest.fn()
+    const maRjState = rj({
+      mutations: {
+        killHumans: {
+          effect: () => Promise.resolve(23),
+          updater: () => {},
+        },
+        cookSpaghetti: {
+          effect: () => Promise.resolve(23),
+          updater: () => {},
+        },
+      },
+      effect: () => Promise.resolve(1312),
+    })
+    const boundActions = bindActionCreators(
+      maRjState.actionCreators,
+      mockDispatch
+    )
+    boundActions.killHumans('x')
+
+    expect(mockDispatch).nthCalledWith(1, {
+      type: `${MUTATION_PREFIX}/killHumans/${RUN}`,
+      payload: { params: ['x'] },
+      meta: {
+        params: ['x'],
+      },
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+
+    boundActions.cookSpaghetti('Yeah', 23)
+    expect(mockDispatch).nthCalledWith(2, {
+      type: `${MUTATION_PREFIX}/cookSpaghetti/${RUN}`,
+      payload: { params: ['Yeah', 23] },
+      meta: {
+        params: ['Yeah', 23],
+      },
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+  })
+
+  it('should be call root reducer with mutations RUN PENDING and eat SUCCESS cause handled by updater', async () => {
+    // Isolate version of optmistic updater counter
+    let rj
+    let useRj
+    jest.isolateModules(() => {
+      rj = require('../../rj').default
+      useRj = require('../../useRj').default
+    })
+
     const actionLog = []
 
     const maRjState = rj({
@@ -37,7 +95,7 @@ describe('RJ mutations action creators', () => {
       result.current[1].killHumans('Giova', 23)
     })
 
-    type = `${MUTATION_PREFIX}/killHumans/RUN`
+    type = `${MUTATION_PREFIX}/killHumans/${RUN}`
     action = actionLog.filter((a) => a.type === type)[0]
     expect(action).toEqual({
       type,
@@ -57,7 +115,7 @@ describe('RJ mutations action creators', () => {
     await act(async () => {
       result.current[1].cookSpaghetti({ k: 23 })
     })
-    type = `${MUTATION_PREFIX}/cookSpaghetti/RUN`
+    type = `${MUTATION_PREFIX}/cookSpaghetti/${RUN}`
     action = actionLog.filter((a) => a.type === type)[0]
     expect(action).toEqual({
       type,
@@ -73,9 +131,143 @@ describe('RJ mutations action creators', () => {
       },
     })
     expect(isEffectAction(action)).toBe(true)
+    // PENDING
+    type = `${MUTATION_PREFIX}/cookSpaghetti/${PENDING}`
+    action = actionLog.filter((a) => a.type === type)[0]
+    expect(action).toEqual({
+      type,
+      meta: {
+        params: [{ k: 23 }],
+      },
+    })
+    // NO SUCCESS
+    type = `${MUTATION_PREFIX}/cookSpaghetti/${SUCCESS}`
+    action = actionLog.filter((a) => a.type === type)[0]
+    expect(action).toBe(undefined)
+  })
+
+  it('should be call root reducer with optimistic mutations PENDING and SUCCESS and eat RUN cause handled by updater', async () => {
+    // Isolate version of optmistic updater counter
+    let rj
+    let useRj
+    jest.isolateModules(() => {
+      rj = require('../../rj').default
+      useRj = require('../../useRj').default
+    })
+    const actionLog = []
+
+    const maRjState = rj({
+      mutations: {
+        cookSpaghetti: {
+          optimistic: true,
+          effect: () => Promise.resolve('SPAGHETTI!'),
+          updater: () => {},
+        },
+      },
+      reducer: (r) => (state, action) => {
+        actionLog.push(action)
+        return r(state, action)
+      },
+      effect: () => Promise.resolve(1312),
+    })
+
+    const { result } = renderHook(() => useRj(maRjState))
+
+    let action
+    let type
+
+    await act(async () => {
+      result.current[1].cookSpaghetti({ k: 23 })
+    })
+    type = `${MUTATION_PREFIX}/cookSpaghetti/${RUN}`
+    action = actionLog.filter((a) => a.type === type)[0]
+    expect(action).toBe(undefined)
+    // PENDING
+    type = `${MUTATION_PREFIX}/cookSpaghetti/${PENDING}`
+    action = actionLog.filter((a) => a.type === type)[0]
+    expect(action).toEqual({
+      type,
+      meta: {
+        optimisticMutation: 1,
+        params: [{ k: 23 }],
+      },
+    })
+    // SUCCESS
+    type = `${MUTATION_PREFIX}/cookSpaghetti/${SUCCESS}`
+    action = actionLog.filter((a) => a.type === type)[0]
+    expect(action).toEqual({
+      type,
+      payload: {
+        data: 'SPAGHETTI!',
+        params: [{ k: 23 }],
+      },
+      meta: {
+        optimisticMutation: 1,
+        params: [{ k: 23 }],
+      },
+    })
+  })
+
+  it('should be generated from mutations and generate good optimistic actions', () => {
+    let rj
+    jest.isolateModules(() => {
+      rj = require('../../rj').default
+    })
+    const mockDispatch = jest.fn()
+    const maRjState = rj({
+      mutations: {
+        killHumans: {
+          optimistic: true,
+          effect: () => Promise.resolve(23),
+          updater: () => {},
+        },
+        cookSpaghetti: {
+          optimistic: true,
+          effect: () => Promise.resolve(23),
+          updater: () => {},
+        },
+      },
+      effect: () => Promise.resolve(1312),
+    })
+    const boundActions = bindActionCreators(
+      maRjState.actionCreators,
+      mockDispatch
+    )
+    boundActions.killHumans('x')
+
+    expect(mockDispatch).nthCalledWith(1, {
+      type: `${MUTATION_PREFIX}/killHumans/${RUN}`,
+      payload: { params: ['x'] },
+      meta: {
+        optimisticMutation: 1,
+        params: ['x'],
+      },
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+
+    boundActions.cookSpaghetti('Yeah', 23)
+    expect(mockDispatch).nthCalledWith(2, {
+      type: `${MUTATION_PREFIX}/cookSpaghetti/${RUN}`,
+      payload: { params: ['Yeah', 23] },
+      meta: {
+        optimisticMutation: 2,
+        params: ['Yeah', 23],
+      },
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
   })
 
   it('should be warn when a mutation override existing action creator', async () => {
+    let rj
+    jest.isolateModules(() => {
+      rj = require('../../rj').default
+    })
     const spy = jest.fn()
 
     console.warn = spy
