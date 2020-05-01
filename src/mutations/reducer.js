@@ -173,7 +173,6 @@ function handleOptSuccess(reducer, state, action) {
     nextSnapshot = null
     nextActions = []
   } else {
-    console.log('~~~~', firstNonCommitIndex)
     // Save a new snapshot appling actions unitl first non committed
     nextSnapshot = applyActionsOnSnapshot(
       snapshot,
