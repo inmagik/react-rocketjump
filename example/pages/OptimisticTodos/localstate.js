@@ -4,6 +4,10 @@ import request from 'superagent'
 
 export const API_URL = 'http://localhost:9001'
 
+function isMyLuckyDay(chance) {
+  return 1 + Math.floor(Math.random() * chance) === 1 ? '' : '~404~'
+}
+
 export const TodosListState = rj(rjPlainList(), {
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
   mutations: {
@@ -20,10 +24,25 @@ export const TodosListState = rj(rjPlainList(), {
         request.delete(`${API_URL}/todos/${todo.id}`).then(() => todo),
       updater: 'deleteItem',
     }),
-    toggleTodo: rj.mutation.multi((todo) => todo.id, {
-      effect: (todo) =>
+    incrementTodo: {
+      optimisticResult: (todo) => ({
+        ...todo,
+        count: todo.count + 1,
+      }),
+      effect: (todo, chance) =>
         request
-          .put(`${API_URL}/todos/${todo.id}`)
+          .put(`${API_URL}/todos/${todo.id}${isMyLuckyDay(chance)}`)
+          .send({
+            ...todo,
+            count: todo.count + 1,
+          })
+          .then(({ body }) => body),
+      updater: 'updateItem',
+    },
+    toggleTodo: rj.mutation.multi((todo) => todo.id, {
+      effect: (todo, chance) =>
+        request
+          .put(`${API_URL}/todos/${todo.id}${isMyLuckyDay(chance)}`)
           .send({
             ...todo,
             done: !todo.done,

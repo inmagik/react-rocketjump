@@ -1,6 +1,6 @@
 import React from 'react'
 import Todo from './Todo'
-import { useRunRj, deps } from 'react-rocketjump'
+import { useRunRj } from 'react-rocketjump'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
@@ -8,7 +8,7 @@ import './Todos.css'
 export default function Todos() {
   const [
     { todos, loading, adding, deleting, updating },
-    { addStupidTodo, removeTodo, toggleTodo, wsSend, clean, run },
+    { addStupidTodo, removeTodo, toggleTodo, clean, run },
   ] = useRunRj(TodosListState)
 
   return (
@@ -20,9 +20,6 @@ export default function Todos() {
         </div>
         <div className="action-button-rj">
           <button onClick={() => run()}>RUN</button>
-        </div>
-        <div className="action-button-rj">
-          <button onClick={() => wsSend('DRAGO')}>@WS/SEND</button>
         </div>
       </div>
       <h3>
@@ -52,8 +49,7 @@ export default function Todos() {
         {todos &&
           todos.map((todo) => (
             <Todo
-              // saving={updating[todo.id] || deleting[todo.id]}
-              saving={deleting[todo.id]}
+              saving={updating[todo.id] || deleting[todo.id]}
               onToggle={toggleTodo}
               onRemove={removeTodo}
               key={todo.id}

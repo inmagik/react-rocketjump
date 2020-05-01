@@ -11,16 +11,19 @@ if (!fs.existsSync(DB_PATH)) {
           {
             id: 1,
             done: true,
+            count: 0,
             title: 'Learn React',
           },
           {
             id: 2,
             done: true,
+            count: 0,
             title: 'Prepare dinner',
           },
           {
             id: 3,
             done: false,
+            count: 0,
             title: 'Learn RocketJump',
           },
         ],
