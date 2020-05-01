@@ -173,6 +173,7 @@ function handleOptSuccess(reducer, state, action) {
     nextSnapshot = null
     nextActions = []
   } else {
+    console.log('~~~~', firstNonCommitIndex)
     // Save a new snapshot appling actions unitl first non committed
     nextSnapshot = applyActionsOnSnapshot(
       snapshot,
@@ -199,18 +200,9 @@ function handleOptFailure(reducer, state, action) {
   } = state
 
   // Remove failied RUN
-  let nextActions = actions.filter((a) => {
-    return !(
-      a.action?.meta?.optimisticMutation === action.meta.optimisticMutation &&
-      a.action.type.endsWith(`/${RUN}`)
-    )
-  })
-
-  // Append new action
-  nextActions.push({
-    committed: true,
-    action,
-  })
+  let nextActions = actions.filter(
+    (a) => a.action?.meta?.optimisticMutation !== action.meta.optimisticMutation
+  )
 
   // 0 - 1 - 1 - 0 - 1
   // FILTER:
@@ -233,20 +225,13 @@ function handleOptFailure(reducer, state, action) {
     nextSnapshot = null
     nextActions = []
   } else {
-    if (firstNonCommitIndex === 0) {
-      console.log('Keep Snap')
-      // No need to change old snap
-      nextSnapshot = snapshot
-    } else {
-      // 0 - 1 - 1 - 1
-      console.log('Squoash')
-      nextSnapshot = applyActionsOnSnapshot(
-        snapshot,
-        nextActions.slice(0, firstNonCommitIndex).map((a) => a.action),
-        reducer
-      )
-    }
-
+    // 0 - 1 - 1 - 1
+    // Squash the action that will be removed into a new snap
+    nextSnapshot = applyActionsOnSnapshot(
+      snapshot,
+      nextActions.slice(0, firstNonCommitIndex).map((a) => a.action),
+      reducer
+    )
     // 0 - 1
     // or
     // 0 - 1 - 1 - 1
