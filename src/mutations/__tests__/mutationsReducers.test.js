@@ -74,11 +74,393 @@ describe('RJ mutations reducers', () => {
       }
     )
   })
+
   it('should be optimistic and revert failure', () => {
     const MaRjState = rj({
       mutations: {
         toggle: {
-          optimistic: true,
+          optimisticResult: (done) => !done,
+          effect: () => {},
+          updater: (state, done) => ({
+            ...state,
+            data: {
+              ...state.data,
+              done,
+            },
+          }),
+        },
+      },
+      effect: () => {},
+      composeReducer: (state, action) => {
+        if (action.type === 'JJ') {
+          return {
+            ...state,
+            data: {
+              ...state.data,
+              j: state.data.j + 1,
+            },
+          }
+        }
+        return state
+      },
+    })
+
+    const { reducer } = MaRjState
+    let state = reducer(undefined, { type: INIT })
+    state = reducer(state, {
+      type: SUCCESS,
+      payload: { data: { done: true, j: 0 } },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: true,
+          j: 0,
+        },
+      },
+      optimisticMutations: {
+        actions: [],
+        snapshot: null,
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+      payload: { params: [state.root.data.done] },
+      meta: {
+        mutationID: 1,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: false,
+          j: 0,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [true] },
+              meta: {
+                mutationID: 1,
+              },
+            },
+            committed: false,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+      payload: { params: [state.root.data.done] },
+      meta: {
+        mutationID: 2,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: true,
+          j: 0,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [true] },
+              meta: {
+                mutationID: 1,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [false] },
+              meta: {
+                mutationID: 2,
+              },
+            },
+            committed: false,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+      payload: { params: [state.root.data.done] },
+      meta: {
+        mutationID: 3,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: false,
+          j: 0,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [true] },
+              meta: {
+                mutationID: 1,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [false] },
+              meta: {
+                mutationID: 2,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [true] },
+              meta: {
+                mutationID: 3,
+              },
+            },
+            committed: false,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: 'JJ',
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: false,
+          j: 1,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [true] },
+              meta: {
+                mutationID: 1,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [false] },
+              meta: {
+                mutationID: 2,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [true] },
+              meta: {
+                mutationID: 3,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: 'JJ',
+            },
+            committed: true,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+      payload: { params: [] },
+      meta: {
+        mutationID: 1,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: false,
+          j: 1,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [false] },
+              meta: {
+                mutationID: 2,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [true] },
+              meta: {
+                mutationID: 3,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: 'JJ',
+            },
+            committed: true,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+      payload: { params: [] },
+      meta: {
+        mutationID: 2,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: false,
+          j: 1,
+        },
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
+              payload: { params: [true] },
+              meta: {
+                mutationID: 3,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: 'JJ',
+            },
+            committed: true,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: {
+            done: true,
+            j: 0,
+          },
+        },
+      },
+    })
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+      payload: { params: [] },
+      meta: {
+        mutationID: 3,
+      },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          done: true,
+          j: 1,
+        },
+      },
+      optimisticMutations: {
+        actions: [],
+        snapshot: null,
+      },
+    })
+  })
+
+  it('should be optimistic and revert failure also with stateful mutation', () => {
+    const MaRjState = rj({
+      mutations: {
+        toggle: {
+          optimisticResult: () => null, // 204 No Content
           effect: () => {},
           updater: (state) => ({
             ...state,
@@ -454,17 +836,18 @@ describe('RJ mutations reducers', () => {
       },
     })
   })
+
   it('should be optimistic and revert failure regardless of actions orders', () => {
     const MaRjState = rj({
       mutations: {
-        toggle: {
-          optimistic: true,
+        increment: {
+          optimisticResult: (counter) => counter + 1,
           effect: () => {},
-          updater: (state) => ({
+          updater: (state, counter) => ({
             ...state,
             data: {
               ...state.data,
-              done: !state.data.done,
+              counter,
             },
           }),
         },
@@ -488,14 +871,14 @@ describe('RJ mutations reducers', () => {
     let state = reducer(undefined, { type: INIT })
     state = reducer(state, {
       type: SUCCESS,
-      payload: { data: { done: true, j: 0 } },
+      payload: { data: { counter: 0, j: 0 } },
     })
     expect(state).toEqual({
       root: {
         pending: false,
         error: null,
         data: {
-          done: true,
+          counter: 0,
           j: 0,
         },
       },
@@ -505,8 +888,8 @@ describe('RJ mutations reducers', () => {
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-      payload: { params: [] },
+      type: `${MUTATION_PREFIX}/increment/${RUN}`,
+      payload: { params: [state.root.data.counter] },
       meta: {
         mutationID: 1,
       },
@@ -516,7 +899,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: false,
+          counter: 1,
           j: 0,
         },
       },
@@ -524,8 +907,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [0] },
               meta: {
                 mutationID: 1,
               },
@@ -537,7 +920,7 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            counter: 0,
             j: 0,
           },
         },
@@ -551,7 +934,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: false,
+          counter: 1,
           j: 1,
         },
       },
@@ -559,8 +942,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [0] },
               meta: {
                 mutationID: 1,
               },
@@ -578,15 +961,15 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            counter: 0,
             j: 0,
           },
         },
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-      payload: { params: [] },
+      type: `${MUTATION_PREFIX}/increment/${RUN}`,
+      payload: { params: [state.root.data.counter] },
       meta: {
         mutationID: 2,
       },
@@ -596,7 +979,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: true,
+          counter: 2,
           j: 1,
         },
       },
@@ -604,8 +987,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [0] },
               meta: {
                 mutationID: 1,
               },
@@ -620,8 +1003,8 @@ describe('RJ mutations reducers', () => {
           },
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [1] },
               meta: {
                 mutationID: 2,
               },
@@ -633,7 +1016,7 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            counter: 0,
             j: 0,
           },
         },
@@ -647,7 +1030,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: true,
+          counter: 2,
           j: 2,
         },
       },
@@ -655,8 +1038,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [0] },
               meta: {
                 mutationID: 1,
               },
@@ -671,8 +1054,8 @@ describe('RJ mutations reducers', () => {
           },
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [1] },
               meta: {
                 mutationID: 2,
               },
@@ -690,15 +1073,15 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            counter: 0,
             j: 0,
           },
         },
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-      payload: { params: [] },
+      type: `${MUTATION_PREFIX}/increment/${RUN}`,
+      payload: { params: [state.root.data.counter] },
       meta: {
         mutationID: 3,
       },
@@ -708,7 +1091,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: false,
+          counter: 3,
           j: 2,
         },
       },
@@ -716,8 +1099,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [0] },
               meta: {
                 mutationID: 1,
               },
@@ -732,8 +1115,8 @@ describe('RJ mutations reducers', () => {
           },
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [1] },
               meta: {
                 mutationID: 2,
               },
@@ -748,8 +1131,8 @@ describe('RJ mutations reducers', () => {
           },
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [2] },
               meta: {
                 mutationID: 3,
               },
@@ -761,14 +1144,14 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            counter: 0,
             j: 0,
           },
         },
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+      type: `${MUTATION_PREFIX}/increment/${FAILURE}`,
       payload: { params: [] },
       meta: {
         mutationID: 2,
@@ -779,7 +1162,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: true,
+          counter: 3,
           j: 2,
         },
       },
@@ -787,8 +1170,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [0] },
               meta: {
                 mutationID: 1,
               },
@@ -809,8 +1192,8 @@ describe('RJ mutations reducers', () => {
           },
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [2] },
               meta: {
                 mutationID: 3,
               },
@@ -822,15 +1205,15 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            counter: 0,
             j: 0,
           },
         },
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
-      payload: { params: [] },
+      type: `${MUTATION_PREFIX}/increment/${FAILURE}`,
+      payload: { params: [state.root.data.counter] },
       meta: {
         mutationID: 1,
       },
@@ -840,7 +1223,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: false,
+          counter: 3,
           j: 2,
         },
       },
@@ -848,8 +1231,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/increment/${RUN}`,
+              payload: { params: [2] },
               meta: {
                 mutationID: 3,
               },
@@ -861,14 +1244,14 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            counter: 0,
             j: 2,
           },
         },
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+      type: `${MUTATION_PREFIX}/increment/${FAILURE}`,
       payload: { params: [] },
       meta: {
         mutationID: 3,
@@ -879,7 +1262,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: true,
+          counter: 0,
           j: 2,
         },
       },
@@ -889,6 +1272,7 @@ describe('RJ mutations reducers', () => {
       },
     })
   })
+
   it('should be optimistic and commit success', () => {
     const MaRjState = rj({
       mutations: {
@@ -1213,17 +1597,18 @@ describe('RJ mutations reducers', () => {
       },
     })
   })
+
   it('should be optimistic and revert failure and commit success an keep state consistent', () => {
     const MaRjState = rj({
       mutations: {
-        toggle: {
-          optimistic: true,
+        create: {
+          optimisticResult: (name) => name,
           effect: () => {},
-          updater: (state) => ({
+          updater: (state, name) => ({
             ...state,
             data: {
               ...state.data,
-              done: !state.data.done,
+              gang: state.data.gang.concat(name),
             },
           }),
         },
@@ -1246,14 +1631,14 @@ describe('RJ mutations reducers', () => {
     let state = reducer(undefined, { type: INIT })
     state = reducer(state, {
       type: SUCCESS,
-      payload: { data: { done: true, j: 0 } },
+      payload: { data: { gang: [], j: 0 } },
     })
     expect(state).toEqual({
       root: {
         pending: false,
         error: null,
         data: {
-          done: true,
+          gang: [],
           j: 0,
         },
       },
@@ -1263,8 +1648,8 @@ describe('RJ mutations reducers', () => {
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-      payload: { params: [] },
+      type: `${MUTATION_PREFIX}/create/${RUN}`,
+      payload: { params: ['giova'] },
       meta: {
         mutationID: 1,
       },
@@ -1274,7 +1659,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: false,
+          gang: ['giova'],
           j: 0,
         },
       },
@@ -1282,8 +1667,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['giova'] },
               meta: {
                 mutationID: 1,
               },
@@ -1295,7 +1680,7 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            gang: [],
             j: 0,
           },
         },
@@ -1309,7 +1694,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: false,
+          gang: ['giova'],
           j: 1,
         },
       },
@@ -1317,8 +1702,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['giova'] },
               meta: {
                 mutationID: 1,
               },
@@ -1336,15 +1721,15 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            gang: [],
             j: 0,
           },
         },
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-      payload: { params: [] },
+      type: `${MUTATION_PREFIX}/create/${RUN}`,
+      payload: { params: ['rinne'] },
       meta: {
         mutationID: 2,
       },
@@ -1354,7 +1739,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: true,
+          gang: ['giova', 'rinne'],
           j: 1,
         },
       },
@@ -1362,8 +1747,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['giova'] },
               meta: {
                 mutationID: 1,
               },
@@ -1378,8 +1763,8 @@ describe('RJ mutations reducers', () => {
           },
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['rinne'] },
               meta: {
                 mutationID: 2,
               },
@@ -1391,7 +1776,7 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            gang: [],
             j: 0,
           },
         },
@@ -1405,7 +1790,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: true,
+          gang: ['giova', 'rinne'],
           j: 2,
         },
       },
@@ -1413,8 +1798,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['giova'] },
               meta: {
                 mutationID: 1,
               },
@@ -1429,8 +1814,8 @@ describe('RJ mutations reducers', () => {
           },
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['rinne'] },
               meta: {
                 mutationID: 2,
               },
@@ -1448,15 +1833,15 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            gang: [],
             j: 0,
           },
         },
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-      payload: { params: [] },
+      type: `${MUTATION_PREFIX}/create/${RUN}`,
+      payload: { params: ['babu'] },
       meta: {
         mutationID: 3,
       },
@@ -1466,7 +1851,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: false,
+          gang: ['giova', 'rinne', 'babu'],
           j: 2,
         },
       },
@@ -1474,8 +1859,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['giova'] },
               meta: {
                 mutationID: 1,
               },
@@ -1490,8 +1875,8 @@ describe('RJ mutations reducers', () => {
           },
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['rinne'] },
               meta: {
                 mutationID: 2,
               },
@@ -1506,8 +1891,8 @@ describe('RJ mutations reducers', () => {
           },
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['babu'] },
               meta: {
                 mutationID: 3,
               },
@@ -1519,15 +1904,15 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: true,
+            gang: [],
             j: 0,
           },
         },
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${SUCCESS}`,
-      payload: { params: [] },
+      type: `${MUTATION_PREFIX}/create/${SUCCESS}`,
+      payload: { data: 'giova' },
       meta: {
         mutationID: 1,
       },
@@ -1537,7 +1922,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: false,
+          gang: ['giova', 'rinne', 'babu'],
           j: 2,
         },
       },
@@ -1545,8 +1930,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['rinne'] },
               meta: {
                 mutationID: 2,
               },
@@ -1561,8 +1946,8 @@ describe('RJ mutations reducers', () => {
           },
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['babu'] },
               meta: {
                 mutationID: 3,
               },
@@ -1574,14 +1959,14 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: false,
+            gang: ['giova'],
             j: 1,
           },
         },
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${FAILURE}`,
+      type: `${MUTATION_PREFIX}/create/${FAILURE}`,
       payload: { params: [] },
       meta: {
         mutationID: 3,
@@ -1592,7 +1977,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: true,
+          gang: ['giova', 'rinne'],
           j: 2,
         },
       },
@@ -1600,8 +1985,8 @@ describe('RJ mutations reducers', () => {
         actions: [
           {
             action: {
-              type: `${MUTATION_PREFIX}/toggle/${RUN}`,
-              payload: { params: [] },
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['rinne'] },
               meta: {
                 mutationID: 2,
               },
@@ -1619,15 +2004,15 @@ describe('RJ mutations reducers', () => {
           pending: false,
           error: null,
           data: {
-            done: false,
+            gang: ['giova'],
             j: 1,
           },
         },
       },
     })
     state = reducer(state, {
-      type: `${MUTATION_PREFIX}/toggle/${SUCCESS}`,
-      payload: { params: [] },
+      type: `${MUTATION_PREFIX}/create/${SUCCESS}`,
+      payload: { data: 'rinne' },
       meta: {
         mutationID: 2,
       },
@@ -1637,7 +2022,7 @@ describe('RJ mutations reducers', () => {
         pending: false,
         error: null,
         data: {
-          done: true,
+          gang: ['giova', 'rinne'],
           j: 2,
         },
       },
@@ -1647,6 +2032,7 @@ describe('RJ mutations reducers', () => {
       },
     })
   })
+
   it('should be optimistic and honored the mutations state', () => {
     function singleMutationReducer(
       state = { pending: false, error: null, rcount: 0 },
@@ -1654,7 +2040,7 @@ describe('RJ mutations reducers', () => {
     ) {
       switch (action.type) {
         case PENDING: {
-          const rcount = state.rcount + action.meta.optimisticMutation
+          const rcount = state.rcount + action.meta.mutationID
           return {
             ...state,
             rcount,
@@ -1663,7 +2049,7 @@ describe('RJ mutations reducers', () => {
           }
         }
         case FAILURE: {
-          const rcount = state.rcount - action.meta.optimisticMutation
+          const rcount = state.rcount - action.meta.mutationID
           return {
             ...state,
             rcount,
@@ -1672,7 +2058,7 @@ describe('RJ mutations reducers', () => {
           }
         }
         case SUCCESS: {
-          const rcount = state.rcount - action.meta.optimisticMutation
+          const rcount = state.rcount - action.meta.mutationID
           return {
             ...state,
             rcount,
@@ -1687,7 +2073,7 @@ describe('RJ mutations reducers', () => {
       mutations: {
         toggle: {
           reducer: singleMutationReducer,
-          optimistic: true,
+          optimisticResult: () => null,
           effect: () => {},
           updater: (state) => ({
             ...state,

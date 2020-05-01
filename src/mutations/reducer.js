@@ -67,7 +67,7 @@ function makeMutationReducer(mutation, name) {
     if (action.type === INIT) {
       return mutation.reducer(state, action)
     }
-    const pieces = (action.type ?? '').split('/')
+    const pieces = action.type.split('/')
     if (pieces.length !== 3) {
       return state
     }
@@ -279,7 +279,7 @@ export function optimisticMutationsHor(reducer, mutations) {
       // OPT ACTIONS
 
       // Split into mutations pieces
-      const pieces = (action.type ?? '').split('/')
+      const pieces = action.type.split('/')
       if (pieces.length === 3 && pieces[0] === MUTATION_PREFIX) {
         const decoupleType = pieces[2]
         if (decoupleType === RUN) {

@@ -155,7 +155,7 @@ describe('RJ mutations updater', () => {
       {
         mutations: {
           muta: {
-            optimistic: true,
+            optimisticResult: (name) => name,
             effect: () => {},
             updater: 'fixMaState',
           },

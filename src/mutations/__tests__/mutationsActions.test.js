@@ -159,7 +159,7 @@ describe('RJ mutations action creators', () => {
     const maRjState = rj({
       mutations: {
         cookSpaghetti: {
-          optimistic: true,
+          optimisticResult: () => {},
           effect: () => Promise.resolve('SPAGHETTI!'),
           updater: () => {},
         },
@@ -188,24 +188,14 @@ describe('RJ mutations action creators', () => {
     expect(action).toEqual({
       type,
       meta: {
-        optimisticMutation: 1,
+        mutationID: 1,
         params: [{ k: 23 }],
       },
     })
     // SUCCESS
     type = `${MUTATION_PREFIX}/cookSpaghetti/${SUCCESS}`
     action = actionLog.filter((a) => a.type === type)[0]
-    expect(action).toEqual({
-      type,
-      payload: {
-        data: 'SPAGHETTI!',
-        params: [{ k: 23 }],
-      },
-      meta: {
-        optimisticMutation: 1,
-        params: [{ k: 23 }],
-      },
-    })
+    expect(action).toBe(undefined)
   })
 
   it('should be generated from mutations and generate good optimistic actions', () => {
@@ -217,12 +207,12 @@ describe('RJ mutations action creators', () => {
     const maRjState = rj({
       mutations: {
         killHumans: {
-          optimistic: true,
+          optimisticResult: () => null,
           effect: () => Promise.resolve(23),
           updater: () => {},
         },
         cookSpaghetti: {
-          optimistic: true,
+          optimisticResult: () => null,
           effect: () => Promise.resolve(23),
           updater: () => {},
         },
@@ -239,7 +229,7 @@ describe('RJ mutations action creators', () => {
       type: `${MUTATION_PREFIX}/killHumans/${RUN}`,
       payload: { params: ['x'] },
       meta: {
-        optimisticMutation: 1,
+        mutationID: 1,
         params: ['x'],
       },
       callbacks: {
@@ -253,7 +243,7 @@ describe('RJ mutations action creators', () => {
       type: `${MUTATION_PREFIX}/cookSpaghetti/${RUN}`,
       payload: { params: ['Yeah', 23] },
       meta: {
-        optimisticMutation: 2,
+        mutationID: 2,
         params: ['Yeah', 23],
       },
       callbacks: {
