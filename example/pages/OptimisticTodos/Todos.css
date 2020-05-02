@@ -77,3 +77,44 @@
 .todo.todo-done .todo-title {
   text-decoration: line-through;
 }
+
+.todos-opt-toasts-container {
+  top: 0;
+  bottom: 0;
+  position: fixed;
+  right: 0;
+  width: 20%;
+  overflow-y: auto;
+}
+.todos-opt-toast-error {
+  animation: fade 0.6s linear;
+  opacity: 1;
+  animation-name: fadeInOpacity;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in;
+  animation-duration: 1s;
+
+  margin-top: 5px;
+  border-radius: 5px;
+  margin-right: 5px;
+  height: 50px;
+  padding: 5px;
+  border: 1px solid wheat;
+  color: wheat;
+  background: crimson;
+  margin-bottom: 10px;
+}
+
+.todos-opt-toast-error.toast-fade-out {
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+@keyframes fadeInOpacity {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import Todo from './Todo'
+import ErrorToast from './ErrorToast'
 import { useRunRj } from 'react-rocketjump'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
@@ -11,31 +12,60 @@ export default function Todos() {
     { addStupidTodo, removeTodo, toggleTodo, incrementTodo, clean, run },
   ] = useRunRj(TodosListState)
 
+  const [errors, setErrors] = useState([])
+
   const [chance, setChance] = useState(1)
 
   const handleToggleTodo = useCallback(
     (todo) => {
-      toggleTodo(todo, chance)
+      toggleTodo
+        .onFailure((err) =>
+          setErrors((errors) =>
+            errors.concat({
+              message: `${err.message} // Can't toggle ${todo.title}`,
+            })
+          )
+        )
+        .run(todo, chance)
     },
     [toggleTodo, chance]
   )
 
   const handleIncrementTodo = useCallback(
     (todo) => {
-      incrementTodo(todo, chance)
+      incrementTodo
+        .onFailure((err) =>
+          setErrors((errors) =>
+            errors.concat({
+              message: `${err.message} // Can't increment ${todo.title} to ${
+                todo.count + 1
+              }`,
+            })
+          )
+        )
+        .run(todo, chance)
     },
     [incrementTodo, chance]
   )
 
   const handleRemoveTodo = useCallback(
     (todo) => {
-      removeTodo(todo, chance)
+      removeTodo
+        .onFailure((err) =>
+          setErrors((errors) =>
+            errors.concat({
+              message: `${err.message} // Can't rmove ${todo.title}`,
+            })
+          )
+        )
+        .run(todo, chance)
     },
     [removeTodo, chance]
   )
 
   return (
     <div className="todos">
+      <ErrorToast errors={errors} setErrors={setErrors} />
       <h1>
         Ma REST{' '}
         <span className="optimistic-todos-tagline">
@@ -79,6 +109,13 @@ export default function Todos() {
         <NewTodo
           onSubmit={(todo) => {
             addStupidTodo
+              .onFailure((err) =>
+                setErrors((errors) =>
+                  errors.concat({
+                    message: `${err.message} // Can't add ${todo.title}`,
+                  })
+                )
+              )
               .onSuccess((todo) => {
                 console.log('Todo Added!', todo)
               })
