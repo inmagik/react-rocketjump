@@ -160,7 +160,6 @@ function handleOptSuccess(reducer, state, action) {
     .concat(RUN)
     .join('/')
   let nextActions = actions.map((a) => {
-    // FIXME FILTER 4 RUN!
     if (
       a.action.type === mutationTypeRun &&
       a.action?.meta?.mutationID === action.meta.mutationID

@@ -45,7 +45,6 @@ function ErrorToast({ errors, setErrors, time = 1500 }) {
       timeouts.forEach((tid) => clearTimeout(tid))
     }
   }, [])
-  console.log('Render Errors', errors)
 
   return (
     <div className="todos-opt-toasts-container">
