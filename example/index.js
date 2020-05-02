@@ -8,6 +8,6 @@ import App from './App'
 // Disable the debugger code at all
 // rj.flags.debugger = false
 
-// rjLogger()
+rjLogger()
 
 ReactDOM.render(<App />, document.getElementById('root'))
