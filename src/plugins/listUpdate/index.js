@@ -12,7 +12,7 @@ const rjListUpdate = (config = {}) => {
   const updater = config.updater || defaultUpdater
   const path = config.path || 'data'
 
-  return rj.pure({
+  return rj({
     actions: () => ({
       updateItem: (item) => ({ type: TYPE, item }),
     }),

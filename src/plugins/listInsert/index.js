@@ -9,7 +9,7 @@ const defaultMerge = (action, list) => (list || []).concat([action.item])
 const rjListInsert = (config = {}) => {
   const path = config.path || 'data'
 
-  return rj.pure({
+  return rj({
     actions: () => ({
       insertItem: (item) => ({ type: TYPE, item }),
     }),

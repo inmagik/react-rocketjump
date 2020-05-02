@@ -31,7 +31,7 @@ const rjCache = (config) => {
   const store = new (config.store || SessionStorageStore)()
   const provider = new (config.provider || LRUCache)(ns, size, store)
   const key = config.key || defaultKey
-  return rj.pure({
+  return rj({
     actions: () => ({
       resetCache: () => makeAction('$reset-cache'),
     }),

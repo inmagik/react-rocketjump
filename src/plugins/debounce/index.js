@@ -14,7 +14,7 @@ const rjDebounce = (optionsOrTime = defaultOptions) => {
     options = { ...defaultOptions, ...optionsOrTime }
   }
 
-  return rj.pure({
+  return rj({
     actions: ({ run }) => ({
       runDebounced: (...args) =>
         run(...args).withMeta({

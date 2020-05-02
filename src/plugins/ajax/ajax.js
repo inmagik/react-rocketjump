@@ -49,7 +49,6 @@ const DefaultAjaxPluginConfig = {
 
 const rjAjax = rj.plugin(
   {
-    name: 'AJAX',
     makeExport: (extendExport, rjConfig) => {
       let newExport = extendExport
 
@@ -88,7 +87,7 @@ const rjAjax = rj.plugin(
       ...DefaultAjaxPluginConfig,
       ...config,
     }
-    return rj.pure({
+    return rj({
       ajax: {
         config: ajaxRxConfig,
         authEffectCaller: (callFn, ...authArgs) => (...args) => {

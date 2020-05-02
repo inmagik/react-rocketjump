@@ -7894,10 +7894,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rocketjump-core@^0.0.0-experimental-c1719:
-  version "0.0.0-experimental-c1719"
-  resolved "https://registry.yarnpkg.com/rocketjump-core/-/rocketjump-core-0.0.0-experimental-c1719.tgz#69fd1b6c41ae7ac091513fd95aecd81df343f32f"
-  integrity sha512-+BHwCPSGU32k+nwZQXqqHwb4Frtsi2IcTsA2BzMgjuTZswK56l1GoVvOmYmenGR+M4zRfHMmnVZ50shXZNAP0A==
+rocketjump-core@^0.0.0-experimental-c1720:
+  version "0.0.0-experimental-c1720"
+  resolved "https://registry.yarnpkg.com/rocketjump-core/-/rocketjump-core-0.0.0-experimental-c1720.tgz#66167bb7e8a42d2ab9fd0446e7f651b2eec8c068"
+  integrity sha512-twZoMVtIw6VNDr+HYJMCX9N2nIAdf2J73pbtJiIFbWnOcBDz6yJ+P6OyePaAgPQOv7sskKLaR+iK2XUYlB/e6g==
   dependencies:
     "@babel/runtime" "^7.9.2"
 

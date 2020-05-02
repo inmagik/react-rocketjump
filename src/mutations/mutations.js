@@ -123,7 +123,6 @@ function enhanceFinalExportWithMutations(
 }
 
 const Mutations = {
-  name: 'Mutations',
   checkObjectConfig: checkMutationsConfig,
   makeExport: enhanceMakeExportWithMutations,
   enhanceReducer: enhanceReducerWithMutations,

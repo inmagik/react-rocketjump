@@ -134,7 +134,7 @@ const rjList = (config = {}) => {
     config.customListReducer,
     config.customPaginationReducer
   )
-  return rj.pure(
+  return rj(
     rjListInsert({ path: 'data.list' }),
     rjListUpdate({ path: 'data.list' }),
     rjListDelete({ path: 'data.list' }),

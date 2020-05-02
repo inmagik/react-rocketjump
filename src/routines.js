@@ -1,7 +1,6 @@
 import { merge } from 'rxjs'
 
 const Routines = {
-  name: 'Routines',
   makeExport: (extendExport, rjConfig) => {
     if (typeof rjConfig.routine === 'function') {
       return {

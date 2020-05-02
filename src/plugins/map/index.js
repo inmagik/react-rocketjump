@@ -106,7 +106,7 @@ const makeMapSelectors = () => {
 }
 
 const rjMap = (mapConfig = {}) =>
-  rj.pure({
+  rj({
     actions: ({ run, clean }) => ({
       runKey: (id, ...params) => run(id, ...params).withMeta({ id }),
       cleanKey: (id) => clean(id).withMeta({ id }),

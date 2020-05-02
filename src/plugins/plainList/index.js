@@ -43,7 +43,7 @@ export const makeListSelectors = (getData) => {
 // RJ List
 const rjPlainList = (config = {}) => {
   const dataReducer = makeListDataReducer(config.customListReducer)
-  return rj.pure(rjListInsert(), rjListUpdate(), rjListDelete(), {
+  return rj(rjListInsert(), rjListUpdate(), rjListDelete(), {
     selectors: ({ getData }) => makeListSelectors(getData),
     reducer: (oldReducer) => (state, action) => {
       if (action.type === SUCCESS) {
