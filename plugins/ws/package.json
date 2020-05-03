@@ -1,0 +1,6 @@
+{
+  "name": "react-rocketjump/plugins/ws",
+  "private": true,
+  "main": "../../lib/plugins/ws/index.cjs.js",
+  "module": "../../lib/plugins/ws/index.es.js"
+}
