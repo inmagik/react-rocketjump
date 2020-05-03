@@ -1,4 +1,4 @@
-import blamer from 'rocketjump-core/blamer.macro'
+import invariant from '../../invariant'
 import { rj } from '../../index'
 import { get } from 'rocketjump-core/utils'
 import { getOrSelect } from '../../helpers'
@@ -63,13 +63,11 @@ const makeListSelectors = (getData, pageSize) => {
   }
 
   const getNumPages = (state, overridePageSize = pageSize) => {
-    if (overridePageSize === undefined) {
-      blamer(
-        '[rj-config-error] @rjList',
-        '[reactRj - rjList] Please pass a pageSize argument to getNumPages' +
-          'selector or define a default page size (config.pageSize)'
-      )
-    }
+    invariant(
+      overridePageSize !== undefined,
+      'rjList Please pass a pageSize argument to getNumPages' +
+        'selector or define a default page size (config.pageSize)'
+    )
     const count = getCount(state)
     return count === null ? null : Math.ceil(count / overridePageSize)
   }
@@ -124,11 +122,10 @@ const makeListSelectors = (getData, pageSize) => {
 
 // RJ List
 const rjList = (config = {}) => {
-  if (!config.pagination)
-    blamer(
-      '[rj-config-error] @rjList',
-      '[reactRj - rjList] Please define a pagination adapter (config.pagination)'
-    )
+  invariant(
+    config.pagination,
+    'rjList Please define a pagination adapter (config.pagination)'
+  )
   const dataReducer = makeListDataReducer(
     config.pagination,
     config.customListReducer,

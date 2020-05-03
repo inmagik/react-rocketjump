@@ -1,4 +1,4 @@
-import blamer from 'rocketjump-core/blamer.macro'
+import invariant from '../invariant'
 import { SUCCESS, INIT, RUN, FAILURE } from '../actionTypes'
 import { MUTATION_PREFIX } from './actionTypes'
 import combineReducers from '../combineReducers'
@@ -12,21 +12,19 @@ export function enhanceReducer(mutations, reducer, actionCreators) {
 
     if (typeof mutation.updater === 'string') {
       const actionCreator = actionCreators[mutation.updater]
-      if (typeof actionCreator !== 'function') {
-        blamer(
-          '[rj-config-error] @mutations',
-          `[react-rocketjump] @mutations you provide a non existing ` +
-            `action creator [${mutation.updater}] as updater for mutation [${name}].`
-        )
-      }
+      invariant(
+        typeof actionCreator === 'function',
+        `@mutations you provide a non existing ` +
+          `action creator [${mutation.updater}] as updater for mutation [${name}].`
+      )
       update = (state, action) =>
         reducer(state, actionCreator(action.payload.data))
     } else if (typeof mutation.updater === 'function') {
       update = (state, action) => mutation.updater(state, action.payload.data)
     } else {
-      blamer(
-        '[rj-config-error] @mutations',
-        '[react-rocketjump] @mutations you should provide at least ' +
+      invariant(
+        false,
+        '@mutations you should provide at least ' +
           `an effect and an updater to mutation config [${name}].`
       )
     }

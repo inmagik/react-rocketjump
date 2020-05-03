@@ -1931,6 +1931,11 @@ babel-loader@^8.0.6:
     pify "^4.0.1"
     schema-utils "^2.6.5"
 
+babel-plugin-dev-expression@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/babel-plugin-dev-expression/-/babel-plugin-dev-expression-0.2.2.tgz#c18de18a06150f9480edd151acbb01d2e65e999b"
+  integrity sha512-y32lfBif+c2FIh5dwGfcc/IfX5aw/Bru7Du7W2n17sJE/GJGAsmIk5DPW/8JOoeKpXW5evJfJOvRq5xkiS6vng==
+
 babel-plugin-dynamic-import-node@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-dynamic-import-node/-/babel-plugin-dynamic-import-node-2.3.0.tgz#f00f507bdaa3c3e3ff6e7e5e98d90a7acab96f7f"
@@ -7894,10 +7899,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rocketjump-core@^0.0.0-experimental-c1720:
-  version "0.0.0-experimental-c1720"
-  resolved "https://registry.yarnpkg.com/rocketjump-core/-/rocketjump-core-0.0.0-experimental-c1720.tgz#66167bb7e8a42d2ab9fd0446e7f651b2eec8c068"
-  integrity sha512-twZoMVtIw6VNDr+HYJMCX9N2nIAdf2J73pbtJiIFbWnOcBDz6yJ+P6OyePaAgPQOv7sskKLaR+iK2XUYlB/e6g==
+rocketjump-core@^0.0.0-experimental-c1722:
+  version "0.0.0-experimental-c1722"
+  resolved "https://registry.yarnpkg.com/rocketjump-core/-/rocketjump-core-0.0.0-experimental-c1722.tgz#2443a941b2fdb7824a43a7c9b5a7ecf069e0e345"
+  integrity sha512-TvaJSir2tUyYOceO4I5YjvZmJu8akIPNKfuSXTF45XQ/C5ISTqY1e2i4kY6uTDIxAgDc6HS8rV5PRFfnqXd3Fw==
   dependencies:
     "@babel/runtime" "^7.9.2"
 

@@ -1,4 +1,4 @@
-import blamer from 'rocketjump-core/blamer.macro'
+import invariant from './invariant'
 import { CLEAN, CANCEL } from './actionTypes'
 import { of, concat, empty, merge } from 'rxjs'
 import {
@@ -141,13 +141,12 @@ function takeEffectGroupBy(
   prefix
 ) {
   const groupByFn = effectTypeArgs[0]
-  if (typeof groupByFn !== 'function') {
-    blamer(
-      '[rj-config-error]',
-      '[react-rj] when you choose the groupBy ' +
-        'takeEffect you must provide a function to group by the effect.'
-    )
-  }
+  invariant(
+    typeof groupByFn === 'function',
+    'when you choose the groupBy ' +
+      'takeEffect you must provide a function to group by the effect.'
+  )
+
   return action$.pipe(
     groupBy(groupByFn),
     mergeMap(($group) =>
@@ -170,13 +169,11 @@ function takeEffectGroupByExhaust(
   prefix
 ) {
   const groupByFn = effectTypeArgs[0]
-  if (typeof groupByFn !== 'function') {
-    blamer(
-      '[rj-config-error]',
-      '[react-rj] when you choose the groupByExhaust ' +
-        'takeEffect you must provide a function to group by the effect.'
-    )
-  }
+  invariant(
+    typeof groupByFn === 'function',
+    'when you choose the groupByExhaust ' +
+      'takeEffect you must provide a function to group by the effect.'
+  )
   return action$.pipe(
     groupBy(groupByFn),
     mergeMap(($group) =>

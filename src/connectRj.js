@@ -1,4 +1,4 @@
-import blamer from 'rocketjump-core/blamer.macro'
+import invariant from './invariant'
 import React, { useMemo } from 'react'
 import { isObjectRj, bindActionCreators } from 'rocketjump-core'
 import hoistStatics from 'hoist-non-react-statics'
@@ -14,12 +14,10 @@ export default function connectRj(
   mapActionsToProps = defaultMapActionsToProps
 ) {
   return function wrapWithConnect(WrappedComponent) {
-    if (!isObjectRj(rjObject)) {
-      blamer(
-        '[rj-config-error]',
-        '[react-rocketjump] You should provide a rj object to connectRj.'
-      )
-    }
+    invariant(
+      isObjectRj(rjObject),
+      'You should provide a rj object to connectRj.'
+    )
     function ConnectFunction(props) {
       const {
         makeRxObservable,

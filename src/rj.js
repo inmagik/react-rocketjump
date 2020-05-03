@@ -1,4 +1,4 @@
-import blamer from 'rocketjump-core/blamer.macro'
+import invariant from './invariant'
 import {
   forgeRocketJump,
   isPartialRj,
@@ -26,21 +26,17 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
       continue
     }
     // Rj Object not allowed
-    if (isObjectRj(partialRjOrConfig)) {
-      blamer(
-        '[rj-config-error]',
-        `[react-rocketjump] you can't pass an rj object as argument.`
-      )
-    }
+    invariant(
+      !isObjectRj(partialRjOrConfig),
+      `you can't pass an rj object as argument.`
+    )
     // Config object is allowed
     if (partialRjOrConfig !== null && typeof partialRjOrConfig === 'object') {
       if (typeof partialRjOrConfig.effect === 'function') {
-        if (hasEffectConfigured) {
-          blamer(
-            '[rj-config-error]',
-            '[react-rocketjump] effect should be defined only once, in the last argument.'
-          )
-        }
+        invariant(
+          !hasEffectConfigured,
+          'effect should be defined only once, in the last argument.'
+        )
         hasEffectConfigured = true
       }
       for (let plugin of plugIns) {
@@ -52,19 +48,17 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
     }
     // A function effect
     if (typeof partialRjOrConfig === 'function') {
-      if (hasEffectConfigured) {
-        blamer(
-          '[rj-config-error]',
-          '[react-rocketjump] effect should be defined only once, in the last argument.'
-        )
-      }
+      invariant(
+        !hasEffectConfigured,
+        'effect should be defined only once, in the last argument.'
+      )
       hasEffectConfigured = true
       continue
     }
     // Bad shit as config
-    blamer(
-      '[rj-config-error]',
-      '[react-rocketjump] you can pass only config object or rj partial to rj constructor.'
+    invariant(
+      false,
+      'you can pass only config object or rj partial to rj constructor.'
     )
   }
 
@@ -92,12 +86,10 @@ function shouldRocketJump(partialRjsOrConfigs, plugIns) {
   }
 
   // Not defined at last
-  if (hasEffectConfigured) {
-    blamer(
-      '[rj-config-error]',
-      '[react-rocketjump] effect should be defined only once, in the last argument.'
-    )
-  }
+  invariant(
+    !hasEffectConfigured,
+    'effect should be defined only once, in the last argument.'
+  )
 
   return false
 }
@@ -133,12 +125,10 @@ function makeRecursionRjs(
     return partialRjOrConfig
   })
 
-  if (!hasEffectConfigured && isLastRjInvocation) {
-    blamer(
-      '[rj-config-error]',
-      `[react-rocketjump] you can't invoke a partialRj.`
-    )
-  }
+  invariant(
+    hasEffectConfigured || !isLastRjInvocation,
+    `you can't invoke a partialRj.`
+  )
 
   return recursionRjs
 }
@@ -196,6 +186,7 @@ function finalizeExport(mergegAlongExport, _, finalConfig, plugIns) {
   if (Object.keys(reducersByKey).length > 0) {
     // Got extra state from plugIns!
 
+    // TODO: USE warning
     // Warn if plugins try to use [root] key
     if (process.env.NODE_ENV !== 'production') {
       if (typeof reducersByKey.root === 'function') {

@@ -1,4 +1,4 @@
-import blamer from 'rocketjump-core/blamer.macro'
+import invariant from '../invariant'
 import { MUTATION_PREFIX } from './actionTypes'
 
 export function extraMutationsSideEffects({ mutations, sideEffect }) {
@@ -12,13 +12,11 @@ export function extraMutationsSideEffects({ mutations, sideEffect }) {
     const { effect, takeEffect, effectCaller } = mutations[name]
     const prefix = `${MUTATION_PREFIX}/${name}/`
 
-    if (typeof effect !== 'function') {
-      blamer(
-        '[rj-config-error] @mutations',
-        '[react-rocketjump] @mutations you should provide at least ' +
-          `an effect and an updater to mutation config [${name}].`
-      )
-    }
+    invariant(
+      typeof effect === 'function',
+      '@mutations you should provide at least ' +
+        `an effect and an updater to mutation config [${name}].`
+    )
 
     let mutationEffectCaller
     if (effectCaller) {

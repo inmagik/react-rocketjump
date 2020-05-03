@@ -1,4 +1,4 @@
-import blamer from 'rocketjump-core/blamer.macro'
+import invariant from '../../invariant'
 import { rj, makeAction } from '../../index'
 import { of, from } from 'rxjs'
 import { map, filter, tap } from 'rxjs/operators'
@@ -8,24 +8,9 @@ import { SessionStorageStore } from './stores'
 const defaultKey = (...args) => JSON.stringify(args)
 
 const rjCache = (config) => {
-  if (!config.ns) {
-    blamer(
-      '[rj-config-error] @rjCache',
-      'RjCache requires the ns property to be set'
-    )
-  }
-  if (config.ns.includes('$')) {
-    blamer(
-      '[rj-config-error] @rjCache',
-      'RjCache ns cannot contain the $ symbol'
-    )
-  }
-  if (!config.size) {
-    blamer(
-      '[rj-config-error] @rjCache',
-      'RjCache needs a cache size to be defined'
-    )
-  }
+  invariant(config.ns, 'RjCache requires the ns property to be set')
+  invariant(!config.ns.includes('$'), 'RjCache ns cannot contain the $ symbol')
+  invariant(config.size, 'RjCache needs a cache size to be defined')
   const ns = config.ns
   const size = config.size
   const store = new (config.store || SessionStorageStore)()

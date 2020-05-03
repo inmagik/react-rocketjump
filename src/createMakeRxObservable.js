@@ -1,4 +1,4 @@
-import blamer from 'rocketjump-core/blamer.macro'
+import invariant from './invariant'
 import {
   of,
   from,
@@ -153,12 +153,10 @@ export default function createMakeRxObservable({
       )
     } else {
       // Invalid effect type
-      if (RxEffects[effectType] === undefined) {
-        blamer(
-          '[rj-config-error]',
-          `[react-rocketjump] takeEffect: ${takeEffect} is an invalid effect.`
-        )
-      }
+      invariant(
+        RxEffects[effectType] !== undefined,
+        `takeEffect: ${takeEffect} is an invalid effect.`
+      )
 
       const createEffect = RxEffects[effectType]
 
@@ -190,11 +188,6 @@ export default function createMakeRxObservable({
 // GioVa nel posto fa freddo brrrrrrrrrrrrr
 export function mergeCreateMakeRxObservable(...creators) {
   return (action$, state$, effectCaller) => {
-    // TODO: Enable and test the following lines
-    // when expose mergeCreateMakeRxObservable as library function
-    // if (creators.length === 0) {
-    //   blamer('[rj-config-error]','You should provide at least one creator to merge.')
-    // }
     const [firstCreator, ...otherCreators] = creators
     const [firstDispatch$, updateConfig] = firstCreator(
       action$,

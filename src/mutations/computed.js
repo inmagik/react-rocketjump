@@ -1,4 +1,4 @@
-import blamer from 'rocketjump-core/blamer.macro'
+import invariant from '../invariant'
 import { get } from 'rocketjump-core/utils'
 
 const COMPUTED_MUTATION_PREFIX = '@mutation'
@@ -17,19 +17,16 @@ export function createMutationsSelectorsForComputed(computed, mutations) {
       const mutationName = firstDot === -1 ? path : path.substr(0, firstDot)
 
       // Catch bad computed config before run rj
-      if (mutations[mutationName] === undefined) {
-        blamer(
-          '[rj-config-error] @rjCache ',
-          `[react-rocketjump] you specified a non existing mutation [${mutationName}] ` +
-            `in your computed config.`
-        )
-      } else if (mutations[mutationName].reducer === undefined) {
-        blamer(
-          '[rj-config-error] @rjCache ',
-          `[react-rocketjump] you specified a mutation [${mutationName}] ` +
-            `with no state in your computed config.`
-        )
-      }
+      invariant(
+        mutations[mutationName] !== undefined,
+        `[react-rocketjump] you specified a non existing mutation [${mutationName}] ` +
+          `in your computed config.`
+      )
+      invariant(
+        mutations[mutationName].reducer !== undefined,
+        `[react-rocketjump] you specified a mutation [${mutationName}] ` +
+          `with no state in your computed config.`
+      )
 
       return {
         ...selectors,

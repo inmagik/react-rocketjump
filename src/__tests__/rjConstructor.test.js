@@ -1,8 +1,22 @@
 import rj from '../rj'
 import { isObjectRj as strictIsObjectRj } from '../types'
-import { isPartialRj, isObjectRj, forgeRocketJump } from 'rocketjump-core'
+import { isPartialRj, isObjectRj, forgeRocketJump, isRj } from 'rocketjump-core'
 
 describe('rj constructor', () => {
+  it('should be rj *.*', () => {
+    expect(isRj(rj)).toBe(true)
+  })
+  it('can be build a new rj with curried partial', () => {
+    const jr = rj.build(
+      rj({
+        actions: () => ({
+          jrSmith: () => 23,
+        }),
+      })
+    )
+    expect(isRj(jr)).toBe(true)
+    expect(jr({ effect: () => NaN }).actionCreators.jrSmith()).toBe(23)
+  })
   it('should produce rj object when called with effect or a function', () => {
     expect(isObjectRj(rj(() => 23))).toBe(true)
     expect(

@@ -1,4 +1,4 @@
-import blamer from 'rocketjump-core/blamer.macro'
+import invariant from '../invariant'
 import { exportEffectCaller } from '../sideEffectDescriptor'
 import {
   enhanceReducer,
@@ -12,17 +12,13 @@ import { enhanceActionCreators } from './actionCreators'
 import { enhanceMakeSelectors } from './selectors'
 
 function checkMutationsConfig(rjConfig) {
-  if (
-    typeof rjConfig.mutations === 'object' &&
-    rjConfig.mutations !== null &&
-    typeof rjConfig.effect !== 'function'
-  ) {
-    blamer(
-      '[rj-config-error] @mutations',
-      '[react-rocketjump] @mutations must be defined along with effect, ' +
-        'please check your config.'
-    )
-  }
+  invariant(
+    typeof rjConfig.mutations !== 'object' ||
+      rjConfig.mutations === null ||
+      typeof rjConfig.effect === 'function',
+    '@mutations must be defined along with effect, ' +
+      'please check your config.'
+  )
 }
 
 function makeMutationExport(mutation) {

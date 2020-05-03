@@ -40,7 +40,7 @@
     "hoist-non-react-statics": "^3.3.0",
     "object-path-immutable": "^3.0.2",
     "query-string": "^6.7.0",
-    "rocketjump-core": "^0.0.0-experimental-c1720",
+    "rocketjump-core": "^0.0.0-experimental-c1722",
     "rxjs": "^6.5.5"
   },
   "devDependencies": {
@@ -55,6 +55,7 @@
     "babel-eslint": "10.x",
     "babel-jest": "^25.4.0",
     "babel-loader": "^8.0.6",
+    "babel-plugin-dev-expression": "^0.2.2",
     "babel-plugin-macros": "^2.6.1",
     "babel-plugin-preval": "^3.0.1",
     "classnames": "^2.2.6",

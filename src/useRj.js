@@ -1,4 +1,4 @@
-import blamer from 'rocketjump-core/blamer.macro'
+import invariant from './invariant'
 import { useMemo, useDebugValue } from 'react'
 import { bindActionCreators } from 'rocketjump-core'
 import { isObjectRj } from './types'
@@ -12,12 +12,7 @@ export default function useRj(
   // (state, memoizedSelectors, derivedState) => newDerivedState
   selectState
 ) {
-  if (!isObjectRj(rjObject)) {
-    blamer(
-      '[rj-runtime-error] useRj',
-      '[react-rocketjump] You should provide a rj object to useRj.'
-    )
-  }
+  invariant(isObjectRj(rjObject), 'You should provide a rj object to useRj.')
   const {
     makeRxObservable,
     pipeActionStream,
