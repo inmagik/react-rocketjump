@@ -52,7 +52,7 @@ You can use `deps` in action creators:
 ```js
 const [data, actions] = useRj(RjObject)
 actions.run(deps.maybe(false)) // Don't run
-actions.run(deps.maybeGet({ name: 'GioVa' }, 'name')) // Don't run as 'GioVa'
+actions.run(deps.maybeGet({ name: 'GioVa' }, 'name')) // Run with 'GioVa'
 actions.run(deps.withMeta(23, { id: 23 })) // Run with 23 and meta { id: 23 }
 ```
 
