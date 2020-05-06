@@ -65,8 +65,8 @@ export default function rjWs(wsConfigArg = {}) {
           }
 
           // Should handle close?
-          if (wsConfig.onOpen) {
-            ws.addEventListener('open', () => {
+          if (wsConfig.onClose) {
+            ws.addEventListener('close', () => {
               // Dispatch on reducer
               subscriber.next({ type: '@WS/CLOSE' })
             })
