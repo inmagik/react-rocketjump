@@ -90,7 +90,7 @@ export default function createMakeRxObservable({
 
       if (!(isPromise(effectResult) || isObservable(effectResult))) {
         if (process.env.NODE_ENV === 'production') {
-          return throwError('bad effect result')
+          return throwError(`RJ bad effect result: ${typeof effectResult}`)
         } else {
           return throwError(
             'The effect result is expect ' +
