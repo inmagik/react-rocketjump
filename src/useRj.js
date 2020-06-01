@@ -8,7 +8,8 @@ export default function useRj(
   rjObject,
   // A function|undefined to select state
   // (state, memoizedSelectors, derivedState) => newDerivedState
-  selectState
+  selectState,
+  hydratePayload
 ) {
   if (!isObjectRj(rjObject)) {
     throw new Error(
@@ -35,6 +36,7 @@ export default function useRj(
     reducer,
     makeRxObservable,
     pipeActionStream,
+    hydratePayload,
     rjDebugInfo
   )
 

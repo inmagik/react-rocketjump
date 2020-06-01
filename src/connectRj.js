@@ -10,7 +10,8 @@ export default function connectRj(
   // The returned value of rj(..., EFFECT)
   rjObject,
   mapStateToProps,
-  mapActionsToProps = defaultMapActionsToProps
+  mapActionsToProps = defaultMapActionsToProps,
+  hydratePayload
 ) {
   return function wrapWithConnect(WrappedComponent) {
     if (!isObjectRj(rjObject)) {
@@ -41,6 +42,7 @@ export default function connectRj(
         reducer,
         makeRxObservable,
         pipeActionStream,
+        hydratePayload,
         rjDebugInfo
       )
 

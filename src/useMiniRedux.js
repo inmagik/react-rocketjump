@@ -6,7 +6,7 @@ import { useConstant } from './hooks'
 import ConfigureRjContext from './ConfigureRjContext'
 import createRjDebugEmitter from './debugger/emitter'
 import flags from './flags'
-import { INIT } from './actionTypes'
+import { INIT, HYDRATE } from './actionTypes'
 
 // A "mini" redux
 // a reducer for handle state
@@ -15,6 +15,7 @@ export default function useMiniRedux(
   reducer,
   makeObservable,
   pipeActionStream,
+  hydratePayload,
   // debug information used as dev hints and other
   debugInfo
 ) {
@@ -31,7 +32,13 @@ export default function useMiniRedux(
   // Init the reducer in the REDUX way
   // pass special INIT actions and undefined to our reducer
   function initReducer(initialArg) {
-    const initialState = reducer(initialArg, { type: INIT })
+    let initialState = reducer(initialArg, { type: INIT })
+    // if (hydratePayload) {
+    //   initialState = reducer(initialState, {
+    //     type: HYDRATE,
+    //     payload: hydratePayload,
+    //   })
+    // }
     if (process.env.NODE_ENV === 'production') {
       return initialState
     } else {

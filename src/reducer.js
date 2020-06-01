@@ -5,6 +5,7 @@ import {
   CLEAN,
   CANCEL,
   UPDATE_DATA,
+  HYDRATE,
 } from './actionTypes'
 
 // Barebone reducer for handle an async effect
@@ -30,6 +31,7 @@ export default function reducer(prevState = defaultState, action) {
         pending: false,
         error: action.payload,
       }
+    case HYDRATE:
     case SUCCESS:
       return {
         ...prevState,
