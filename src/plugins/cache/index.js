@@ -62,10 +62,10 @@ const rjCache = config => {
       resetCache: () => makeAction('$reset-cache'),
     }),
     effectCaller: (effectFn, cacheConfig, ...args) => {
-      const k = key(...args)
       if (!cacheConfig.cacheEnabled) {
-        return of(provider.get(k))
+        return from(effectFn(...args))
       }
+      const k = key(...args)
       if (provider.has(k)) {
         return of(provider.get(k))
       } else {

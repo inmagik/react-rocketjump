@@ -17,9 +17,9 @@ function Todos() {
     { todos, loading, adding, deleting, updating },
     { addStupidTodo, removeTodo, toggleTodo },
   ] = useRunRjCache(TodosListState, [query, 23], {
-    // cache: true,
-    // suspense: true,
-    // suspendOnNewEffect: true,
+    cache: true,
+    suspense: true,
+    suspendOnNewEffect: false,
   })
 
   // const [startTransition, isPending] = unstable_useTransition({
