@@ -1,7 +1,7 @@
 import { rj } from '../../index'
 import { get } from 'rocketjump-core/utils'
 import { getOrSelect } from '../../helpers'
-import { SUCCESS } from '../../actionTypes'
+import { SUCCESS, HYDRATE } from '../../actionTypes'
 import rjListInsert from '../listInsert/index'
 import rjListUpdate from '../listUpdate/index'
 import rjListDelete from '../listDelete/index'
@@ -138,14 +138,20 @@ const rjList = (config = {}) => {
     {
       selectors: ({ getData }) => makeListSelectors(getData, config.pageSize),
       reducer: oldReducer => (state, action) => {
-        if (action.type === SUCCESS) {
-          return {
-            ...state,
-            pending: false,
-            data: dataReducer(state.data, action),
-          }
-        } else {
-          return oldReducer(state, action)
+        switch (action.type) {
+          case HYDRATE:
+            return {
+              ...state,
+              data: dataReducer(null, action),
+            }
+          case SUCCESS:
+            return {
+              ...state,
+              pending: false,
+              data: dataReducer(state.data, action),
+            }
+          default:
+            return oldReducer(state, action)
         }
       },
       computed: {
