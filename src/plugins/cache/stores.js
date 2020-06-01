@@ -14,6 +14,14 @@ export class InMemoryStore {
   }
 }
 
+export function getInMemoryStoreState() {
+  return BACKEND
+}
+
+export function hydrateInMemoryStoreState(hydrateState) {
+  Object.assign(BACKEND, hydrateState)
+}
+
 export const clearInMemoryStore = () => {
   for (let k in BACKEND) {
     delete BACKEND[k]

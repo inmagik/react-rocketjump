@@ -100,5 +100,12 @@ export default (_, rjConfig, extendExport = {}) => {
     computed,
   }
 
+  // TODO: This sucks a lot in future make cache core
+  // or give a decent contract to plugins ....
+  // Set given config cache
+  if (rjConfig.cache) {
+    newExport.cache = rjConfig.cache
+  }
+
   return enhanceMakeExportWithMutations(rjConfig, newExport)
 }

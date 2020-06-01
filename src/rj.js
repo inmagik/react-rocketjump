@@ -148,6 +148,11 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
     pipeActionStream,
   }
 
+  // ... Add an per RJ Shared Cache
+  if (rjExport.cache) {
+    finalExport.cache = rjExport.cache(finalExport)
+  }
+
   // Finally the rocketjump runnable state is created!
   /*
     {

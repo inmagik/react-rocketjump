@@ -33,12 +33,12 @@ export default function useMiniRedux(
   // pass special INIT actions and undefined to our reducer
   function initReducer(initialArg) {
     let initialState = reducer(initialArg, { type: INIT })
-    // if (hydratePayload) {
-    //   initialState = reducer(initialState, {
-    //     type: HYDRATE,
-    //     payload: hydratePayload,
-    //   })
-    // }
+    if (hydratePayload) {
+      initialState = reducer(initialState, {
+        type: HYDRATE,
+        payload: hydratePayload,
+      })
+    }
     if (process.env.NODE_ENV === 'production') {
       return initialState
     } else {

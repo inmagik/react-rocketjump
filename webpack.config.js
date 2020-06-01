@@ -12,6 +12,7 @@ module.exports = {
     historyApiFallback: true,
     port: 9000,
   },
+  devtool: 'inline-source-map',
   module: {
     rules: [
       {
