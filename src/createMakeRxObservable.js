@@ -55,15 +55,17 @@ function filterNonEffectActions(action, prefix) {
 }
 
 export default function createMakeRxObservable(
-  { effect: effectCall, effectCaller, takeEffect },
+  { effect: effectCall, effectCaller, takeEffect: baseTakeEffect },
   prefix = ''
 ) {
   return function makeRxObservable(
     action$,
     state$,
     placeholderEffectCaller,
-    prevObservable$ // <---- The observable to merge along
+    overrideTakeEffect,
+    prevObservable$ // <---- The observable to merge along,
   ) {
+    const takeEffect = overrideTakeEffect || baseTakeEffect
     // Extra side effect configuration subject
     // used to emit changes on extra conf from outside world
     const extraSideEffectSubject = new ExtraSideEffectSubject(
@@ -83,7 +85,17 @@ export default function createMakeRxObservable(
       const { payload, meta, callbacks } = action
       const params = payload.params
 
-      const effectResult = callEffect(effectCall, ...params)
+      let finalCallEffect = callEffect
+      // TODO: This just sucks ... Please in @rj unify them
+      // and memo this operation ...
+      if (action.effectCaller) {
+        const runTimeCallerConf = makeRunTimeConfig(effectCaller, {
+          effectCaller: action.effectCaller,
+        })
+        finalCallEffect = runTimeCallerConf.callEffect
+        delete action.effectCaller
+      }
+      const effectResult = finalCallEffect(effectCall, ...params)
 
       if (!(isPromise(effectResult) || isObservable(effectResult))) {
         return throwError(
@@ -165,7 +177,14 @@ export default function createMakeRxObservable(
           effectTypeArgs,
           prefix
         ),
-        mergeObservable$.pipe(filter(a => filterNonEffectActions(a, prefix)))
+        mergeObservable$.pipe(
+          filter(a => {
+            if (a.meta && a.meta.ignoreDispatch) {
+              return false
+            }
+            return filterNonEffectActions(a, prefix)
+          })
+        )
       )
     }
     return [dispatchObservable, config => extraSideEffectSubject.next(config)]
@@ -174,7 +193,7 @@ export default function createMakeRxObservable(
 
 // GioVa nel posto fa freddo brrrrrrrrrrrrr
 export function mergeCreateMakeRxObservable(...creators) {
-  return (action$, state$, effectCaller) => {
+  return (action$, state$, effectCaller, takeEffect) => {
     // TODO: Enable and test the following lines
     // when expose mergeCreateMakeRxObservable as library function
     // if (creators.length === 0) {
@@ -184,7 +203,8 @@ export function mergeCreateMakeRxObservable(...creators) {
     const [firstDispatch$, updateConfig] = firstCreator(
       action$,
       state$,
-      effectCaller
+      effectCaller,
+      takeEffect
     )
 
     const [dispatch$, configUpdaters] = otherCreators.reduce(
@@ -193,6 +213,7 @@ export function mergeCreateMakeRxObservable(...creators) {
           action$,
           state$,
           effectCaller,
+          takeEffect,
           dispatch$
         )
         return [nextDispatch$, updaters.concat(updateConfig)]
