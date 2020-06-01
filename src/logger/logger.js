@@ -97,6 +97,7 @@ export default function rjLogger() {
       const { component, rjFn, hooks } = location
       const componentLocation = `%c${component}%c${hooks
         .map(h => `  ${h}()`)
+        .reverse()
         .join('')}  ${rjFn}(${rjName})`
 
       const color = colors[trackId % colors.length]
