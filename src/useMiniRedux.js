@@ -33,11 +33,20 @@ export default function useMiniRedux(
   // pass special INIT actions and undefined to our reducer
   function initReducer(initialArg) {
     let initialState = reducer(initialArg, { type: INIT })
+    if (process.env.NODE_ENV !== 'production' && flags.debugger) {
+      // In DEV call the debug emitter
+      debugEmitter.onStateInitialized(initialState)
+    }
     if (hydratePayload) {
-      initialState = reducer(initialState, {
+      const action = {
         type: HYDRATE,
         payload: hydratePayload,
-      })
+      }
+      const hydrateState = reducer(initialState, action)
+      if (process.env.NODE_ENV !== 'production' && flags.debugger) {
+        debugEmitter.onActionDispatched(action, initialState, hydrateState)
+      }
+      initialState = hydrateState
     }
     if (process.env.NODE_ENV === 'production') {
       return initialState
@@ -45,8 +54,6 @@ export default function useMiniRedux(
       if (!flags.debugger) {
         return initialState
       }
-      // In DEV call the debug emitter
-      debugEmitter.onStateInitialized(initialState)
       // NOTE
       // First this mad shit happends only in DEV
       // Second the reason of this magic shit is because
