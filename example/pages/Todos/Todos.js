@@ -2,8 +2,8 @@ import React, { useState, unstable_useTransition, Suspense } from 'react'
 import Todo from './Todo'
 import { useRunRj } from 'react-rocketjump'
 import {
-  useRjCache,
   useRunRjCache,
+  useRjCacheState,
   RjCacheError,
 } from 'react-rocketjump/plugins/cache'
 import { API_URL, TodosListState } from './localstate'
@@ -12,15 +12,16 @@ import './Todos.css'
 
 function Todos() {
   const [query, setQuery] = useState('')
-  // const [myQuery, setMyQuery] = useState('')
+  const [myQuery, setMyQuery] = useState('')
   const [
     { todos, loading, adding, deleting, updating },
-    { addStupidTodo, removeTodo, toggleTodo },
-  ] = useRunRjCache(TodosListState, [query, 23], {
+    { addStupidTodo, removeTodo, toggleTodo, prefetch },
+  ] = useRunRjCache(TodosListState, [myQuery, 23], {
     cache: true,
     suspense: true,
-    suspendOnNewEffect: false,
+    suspendOnNewEffect: true,
   })
+  console.log('RENDER', todos)
 
   // const [startTransition, isPending] = unstable_useTransition({
   //   timeoutMs: 3000,
@@ -35,7 +36,8 @@ function Todos() {
           const q = e.target.value
           setQuery(q)
           // startTransition(() => {
-          //   setMyQuery(q)
+          setMyQuery(q)
+          // prefetch([q, 23])
           // })
         }}
         value={query}

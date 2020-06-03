@@ -10,4 +10,4 @@ import App from './App'
 
 rjLogger()
 
-ReactDOM.render(<App />, document.getElementById('root'))
+ReactDOM.unstable_createRoot(document.getElementById('root')).render(<App />)

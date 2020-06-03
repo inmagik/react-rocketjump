@@ -103,25 +103,25 @@ export default function rjLogger() {
       const color = colors[trackId % colors.length]
       const { action, prevState, nextState } = event.payload
 
-      console.groupCollapsed(
+      console.log(
         `${componentLocation}  %caction %c${action.type}`,
         'color: #80338a;font-weight:normal',
         `color:${color};font-weight:normal`,
         'color:grey;font-weight:lighter;',
         'color:#464646;'
       )
-      console.log(`%cprev state`, 'color: grey;font-weight:normal;', prevState)
-      console.log(
-        `%caction ${pad(4)}`,
-        'color:deepskyblue;font-weight:normal;',
-        action
-      )
-      console.log(`%cnext state`, 'color: green;font-weight:normal;', nextState)
+      // console.log(`%cprev state`, 'color: grey;font-weight:normal;', prevState)
+      // console.log(
+      //   `%caction ${pad(4)}`,
+      //   'color:deepskyblue;font-weight:normal;',
+      //   action
+      // )
+      // console.log(`%cnext state`, 'color: green;font-weight:normal;', nextState)
       // console.log(`%c_rj ${pad(7)}`, 'color: grey', {
       //   debugTrackId: trackId,
       //   lastRjConfig: info
       // })
-      console.groupEnd()
+      // console.groupEnd()
     } else if (event.type === RJ_ERROR_EVENT) {
       const { info, trackId } = event.meta
       const index = rjLives.indexOf(info)

@@ -1,13 +1,22 @@
-import { useRef, useMemo, useEffect, useContext } from 'react'
+import {
+  useRef,
+  useMemo,
+  useEffect,
+  useCallback,
+  useContext,
+  useState,
+  unstable_useTransition,
+} from 'react'
 import { bindActionCreators, deps } from 'rocketjump-core'
 import { rj, makeAction } from '../../index'
 import { of, from, ReplaySubject } from 'rxjs'
 import { map, filter, tap } from 'rxjs/operators'
 import { LRUCache, FIFOCache } from './providers'
 import { InMemoryStore } from './stores'
-import { RUN, SUCCESS } from '../../actionTypes'
+import { RUN, SUCCESS, INIT, HYDRATE } from '../../actionTypes'
 import { getRunValuesFromDeps } from 'rocketjump-core'
 import ConfigureRjContext from '../../ConfigureRjContext'
+import { useConstant } from '../../hooks'
 import useRj from '../../useRj'
 import useRunRj from '../../useRunRj'
 
@@ -218,10 +227,6 @@ function useRjCacheData(rjObject, params = [], config = {}) {
         ...action.payload,
         params: [{ cacheEnabled }].concat(action.payload.params),
       }
-      nextAction.meta = {
-        cacheKey: key,
-        ...(action.meta || {}),
-      }
       if (effectCaller) {
         nextAction.effectCaller = effectCaller
       }
@@ -230,14 +235,33 @@ function useRjCacheData(rjObject, params = [], config = {}) {
     return bindActionCreators(actionCreators, dispatch)
   }, [
     actionCreators,
-    key,
     cache.sideEffect.actionsSubject,
     effectCaller,
     cacheEnabled,
   ])
 
+  const prefetch = useCallback(
+    params => {
+      const prefetchKey = cache.key(...params)
+      const promise = actions.run
+        .withMeta({
+          cacheKey: prefetchKey,
+        })
+        .onSuccess(() => {
+          cache.promisesPoll.delete(prefetchKey)
+        })
+        .onFailure(error => {
+          cache.promisesPoll.delete(prefetchKey)
+          cache.errorsPool.set(prefetchKey, error)
+        })
+        .asPromise(...params)
+      cache.promisesPoll.set(prefetchKey, promise)
+    },
+    [actions.run, cache]
+  )
+
   if (!cacheEnabled) {
-    return null
+    return [null, { prefetch }]
   }
 
   if (suspense && cache.errorsPool.has(key)) {
@@ -248,13 +272,15 @@ function useRjCacheData(rjObject, params = [], config = {}) {
 
   if (!cache.provider.has(key)) {
     if (!suspense) {
-      return null
+      return [null, { prefetch }]
     }
     if (cache.promisesPoll.has(key)) {
-      console.log('SUSPEND!')
       throw cache.promisesPoll.get(key)
     }
     const promise = actions.run
+      .withMeta({
+        cacheKey: key,
+      })
       .onSuccess(() => {
         cache.promisesPoll.delete(key)
       })
@@ -268,7 +294,53 @@ function useRjCacheData(rjObject, params = [], config = {}) {
   }
 
   const data = cache.provider.get(key)
-  return data
+  return [data, { prefetch }]
+}
+
+export function useRjCacheState(rjObject, params = [], config = {}) {
+  const { selectState } = config
+
+  const [cachedData, { prefetch }] = useRjCacheData(rjObject, params)
+
+  const actions = { prefetch }
+
+  const { reducer, makeSelectors, computeState } = rjObject
+
+  const stateShape = useMemo(() => reducer(undefined, { type: INIT }), [
+    reducer,
+  ])
+
+  const state = useMemo(() => {
+    return reducer(stateShape, {
+      type: HYDRATE,
+      payload: {
+        data: cachedData,
+      },
+    })
+  }, [cachedData, reducer, stateShape])
+
+  const memoizedSelectors = useConstant(() => {
+    if (
+      typeof selectState === 'function' ||
+      typeof computeState === 'function'
+    ) {
+      return makeSelectors()
+    }
+  })
+
+  // Derive the state
+  const derivedState = useMemo(() => {
+    let derivedState = state
+    if (typeof computeState === 'function') {
+      derivedState = computeState(state, memoizedSelectors)
+    }
+    if (typeof selectState === 'function') {
+      derivedState = selectState(state, memoizedSelectors, derivedState)
+    }
+    return derivedState
+  }, [state, memoizedSelectors, selectState, computeState])
+
+  return [derivedState, actions]
 }
 
 export function useRunRjCache(rjObject, paramsWithDeps = [], config = {}) {
@@ -303,7 +375,11 @@ export function useRunRjCache(rjObject, paramsWithDeps = [], config = {}) {
     cacheDataConfig.suspense = isFirstReactCommit.current
   }
 
-  const cachedData = useRjCacheData(rjObject, runParams, cacheDataConfig)
+  const [cachedData, { prefetch }] = useRjCacheData(
+    rjObject,
+    runParams,
+    cacheDataConfig
+  )
 
   let runArgs
   if (isFirstReactCommit.current && cachedData !== null) {
@@ -322,7 +398,7 @@ export function useRunRjCache(rjObject, paramsWithDeps = [], config = {}) {
   }, [])
 
   // Call useRunRj as usual, init them with data from cache
-  return useRunRj(
+  const [state, actions] = useRunRj(
     rjObject,
     runArgs,
     cleanOnNewEffect,
@@ -333,6 +409,8 @@ export function useRunRjCache(rjObject, paramsWithDeps = [], config = {}) {
         }
       : null
   )
+
+  return [state, { ...actions, prefetch }]
 }
 
 export default rjCache
