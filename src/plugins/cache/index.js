@@ -251,6 +251,7 @@ function useRjCacheData(rjObject, params = [], config = {}) {
       return null
     }
     if (cache.promisesPoll.has(key)) {
+      console.log('SUSPEND!')
       throw cache.promisesPoll.get(key)
     }
     const promise = actions.run
@@ -268,20 +269,6 @@ function useRjCacheData(rjObject, params = [], config = {}) {
 
   const data = cache.provider.get(key)
   return data
-}
-
-export function useRjCache(rjObject, params = [], config = {}) {
-  const { selectState } = config
-  const cachedData = useRjCacheData(rjObject, params, config)
-  return useRj(
-    rjObject,
-    selectState,
-    cachedData
-      ? {
-          data: cachedData,
-        }
-      : null
-  )
 }
 
 export function useRunRjCache(rjObject, paramsWithDeps = [], config = {}) {
