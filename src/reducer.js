@@ -32,6 +32,10 @@ export default function reducer(prevState = defaultState, action) {
         error: action.payload,
       }
     case HYDRATE:
+      return {
+        ...prevState,
+        data: action.payload.data,
+      }
     case SUCCESS:
       return {
         ...prevState,

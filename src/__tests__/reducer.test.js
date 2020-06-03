@@ -6,6 +6,7 @@ import {
   CLEAN,
   CANCEL,
   UPDATE_DATA,
+  HYDRATE,
 } from '../actionTypes'
 
 describe('Rocketjump reducer', () => {
@@ -99,6 +100,26 @@ describe('Rocketjump reducer', () => {
     ).toEqual({
       pending: false,
       data: { name: 'GioVa' },
+      error: null,
+    })
+  })
+
+  it('should handle HYDRATE actions', () => {
+    const prevState = {
+      pending: false,
+      data: { name: 'Albi' },
+      error: null,
+    }
+
+    const { reducer } = rj({
+      effect: () => Promise.resolve(1),
+    })
+
+    expect(
+      reducer(prevState, { type: HYDRATE, payload: { data: 'GioVa' } })
+    ).toEqual({
+      pending: false,
+      data: 'GioVa',
       error: null,
     })
   })

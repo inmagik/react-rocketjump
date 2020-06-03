@@ -3,6 +3,7 @@ import { renderHook, act } from '@testing-library/react-hooks'
 import memoize from 'memoize-one'
 import rj from '../rj'
 import useRj from '../useRj'
+import { HYDRATE } from '../actionTypes'
 
 describe('useRj', () => {
   it('should have the default state defined by rj', () => {
@@ -12,6 +13,50 @@ describe('useRj', () => {
 
     expect(result.current[0]).toEqual({
       data: null,
+      pending: false,
+      error: null,
+    })
+  })
+
+  it('should have the hydrate state defined by rj when hydrate payload is provided', () => {
+    const maRjState = rj(() => Promise.resolve(1312))
+
+    const { result } = renderHook(() =>
+      useRj(maRjState, null, {
+        data: 'GioVa Rul3s',
+      })
+    )
+
+    expect(result.current[0]).toEqual({
+      data: 'GioVa Rul3s',
+      pending: false,
+      error: null,
+    })
+  })
+
+  it('should hydrate state according to rj reducer', () => {
+    const maRjState = rj({
+      composeReducer: (state, action) => {
+        if (action.type === HYDRATE) {
+          return {
+            ...state,
+            data: `${action.payload.data} KILL ${action.payload.enemy}`,
+          }
+        }
+        return state
+      },
+      effect: () => Promise.resolve(1312),
+    })
+
+    const { result } = renderHook(() =>
+      useRj(maRjState, null, {
+        data: 'GioVa',
+        enemy: 'BaBu',
+      })
+    )
+
+    expect(result.current[0]).toEqual({
+      data: 'GioVa KILL BaBu',
       pending: false,
       error: null,
     })
