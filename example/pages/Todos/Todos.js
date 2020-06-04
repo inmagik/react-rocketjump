@@ -4,28 +4,40 @@ import { useRunRj } from 'react-rocketjump'
 import {
   useRunRjCache,
   useRjCacheState,
+  prefetchRj,
   RjCacheError,
 } from 'react-rocketjump/plugins/cache'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
 
+prefetchRj(TodosListState, ['', 23])
+
 function Todos() {
   const [query, setQuery] = useState('')
   const [myQuery, setMyQuery] = useState('')
   const [
-    { todos, loading, adding, deleting, updating },
-    { addStupidTodo, removeTodo, toggleTodo, prefetch },
+    { todos, loading, adding, deleting, updating, error23 },
+    { addStupidTodo, removeTodo, toggleTodo, prefetch, run, clearError },
   ] = useRunRjCache(TodosListState, [myQuery, 23], {
-    cache: true,
-    suspense: true,
-    suspendOnNewEffect: true,
+    // cache: true,
+    // suspense: false,
+    // suspendOnNewEffect: true,
   })
   console.log('RENDER', todos)
 
   // const [startTransition, isPending] = unstable_useTransition({
   //   timeoutMs: 3000,
   // })
+
+  if (error23) {
+    return (
+      <div>
+        <h1 style={{ color: 'red' }}>FUCK</h1>
+        <button onClick={() => clearError()}>CLEAR</button>
+      </div>
+    )
+  }
 
   return (
     <div className="todos">
@@ -95,21 +107,36 @@ class ErrorBoundary extends React.Component {
   }
 
   componentWillUnmount() {
-    if (this.state.error && this.state.error.clearRjError) {
-      this.state.error.clearRjError()
+    if (this.state.error && this.state.error.clearError) {
+      this.state.error.clearError()
+    }
+  }
+
+  clearError() {
+    if (this.state.error && this.state.error.clearError) {
+      this.state.error.clearError()
+      this.setState({
+        hasError: false,
+        error: null,
+      })
     }
   }
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback
+      return (
+        <div>
+          <h1 style={{ color: 'red' }}>FUCK</h1>
+          <button onClick={() => this.clearError()}>CLEAR</button>
+        </div>
+      )
     }
     return this.props.children
   }
 }
 export default function TodosApp() {
   return (
-    <ErrorBoundary fallback={<h1 style={{ color: 'red' }}>FUCK</h1>}>
+    <ErrorBoundary>
       <Suspense fallback={<h1>LOADING T0D0S</h1>}>
         <Todos />
       </Suspense>

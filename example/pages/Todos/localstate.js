@@ -46,6 +46,7 @@ export const TodosListState = rj(
       adding: '@mutation.addStupidTodo.pending',
       deleting: '@mutation.removeTodo.pendings',
       updating: '@mutation.toggleTodo.pendings',
+      error23: 'getError',
       todos: 'getData',
       loading: 'isPending',
     },

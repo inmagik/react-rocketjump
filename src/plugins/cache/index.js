@@ -5,7 +5,6 @@ import {
   useCallback,
   useContext,
   useState,
-  unstable_useTransition,
 } from 'react'
 import { bindActionCreators, deps } from 'rocketjump-core'
 import { rj, makeAction } from '../../index'
@@ -13,11 +12,10 @@ import { of, from, ReplaySubject } from 'rxjs'
 import { map, filter, tap } from 'rxjs/operators'
 import { LRUCache, FIFOCache } from './providers'
 import { InMemoryStore } from './stores'
-import { RUN, SUCCESS, INIT, HYDRATE } from '../../actionTypes'
+import { RUN, SUCCESS, INIT, HYDRATE, FAILURE } from '../../actionTypes'
 import { getRunValuesFromDeps } from 'rocketjump-core'
 import ConfigureRjContext from '../../ConfigureRjContext'
 import { useConstant } from '../../hooks'
-import useRj from '../../useRj'
 import useRunRj from '../../useRunRj'
 
 const defaultKey = (...args) => JSON.stringify(args)
@@ -199,6 +197,36 @@ function createCacheSideEffect(rjObject) {
   }
 }
 
+export function prefetchRj(rjObject, params = []) {
+  const { cache } = rjObject
+  const key = cache.key(...params)
+  const promise = new Promise((resolve, reject) => {
+    const action = {
+      type: RUN,
+      meta: {
+        cacheKey: key,
+      },
+      payload: {
+        params: [{ cacheEnabled: true }].concat(params),
+      },
+      callbacks: {
+        onFailure: error => {
+          cache.promisesPoll.delete(key)
+          cache.errorsPool.set(key, error)
+          reject(error)
+        },
+        onSuccess: data => {
+          cache.promisesPoll.delete(key)
+          resolve(data)
+        },
+      },
+    }
+    cache.sideEffect.actionsSubject.next(action)
+  })
+  cache.promisesPoll.set(key, promise)
+  return promise
+}
+
 function useRjCacheData(rjObject, params = [], config = {}) {
   if (!rjObject.cache) {
     throw new Error('You should add rjCache() plugin to your rj config.')
@@ -243,6 +271,9 @@ function useRjCacheData(rjObject, params = [], config = {}) {
   const prefetch = useCallback(
     params => {
       const prefetchKey = cache.key(...params)
+      if (cache.promisesPoll.has(prefetchKey)) {
+        return cache.promisesPoll.get(prefetchKey)
+      }
       const promise = actions.run
         .withMeta({
           cacheKey: prefetchKey,
@@ -256,23 +287,27 @@ function useRjCacheData(rjObject, params = [], config = {}) {
         })
         .asPromise(...params)
       cache.promisesPoll.set(prefetchKey, promise)
+      return promise
     },
     [actions.run, cache]
   )
+  let error = null
 
   if (!cacheEnabled) {
-    return [null, { prefetch }]
+    return [null, { prefetch }, { error, key }]
   }
 
-  if (suspense && cache.errorsPool.has(key)) {
-    const error = cache.errorsPool.get(key)
-    error.clearRjError = () => cache.errorsPool.delete(key)
-    throw error
+  if (cache.errorsPool.has(key)) {
+    error = cache.errorsPool.get(key)
+    if (suspense) {
+      error.clearError = () => cache.errorsPool.delete(key)
+      throw error
+    }
   }
 
   if (!cache.provider.has(key)) {
     if (!suspense) {
-      return [null, { prefetch }]
+      return [null, { prefetch }, { error, key }]
     }
     if (cache.promisesPoll.has(key)) {
       throw cache.promisesPoll.get(key)
@@ -294,30 +329,79 @@ function useRjCacheData(rjObject, params = [], config = {}) {
   }
 
   const data = cache.provider.get(key)
-  return [data, { prefetch }]
+  return [data, { prefetch }, { error, key }]
 }
 
 export function useRjCacheState(rjObject, params = [], config = {}) {
-  const { selectState } = config
+  const { selectState, suspense } = { suspense: true, ...config }
 
-  const [cachedData, { prefetch }] = useRjCacheData(rjObject, params)
+  // Get initial cache data or suspend
+  const cacheDataConfig = { cache: true, suspense: Boolean(suspense) }
 
-  const actions = { prefetch }
+  const [cachedData, { prefetch }, { error, key }] = useRjCacheData(
+    rjObject,
+    params,
+    cacheDataConfig
+  )
 
-  const { reducer, makeSelectors, computeState } = rjObject
+  const { reducer, makeSelectors, computeState, cache } = rjObject
+
+  const [trigger, setTrigger] = useState([0, 0])
+  const forceUpdate = useCallback(() => {
+    setTrigger(a => [a[0], a[1] + 1])
+  }, [])
+  const refetch = useCallback(() => {
+    setTrigger(a => [a[0] + 1, a[1]])
+  }, [])
+  const [fetchTrigger] = trigger
+
+  const clearError = useCallback(() => {
+    cache.errorsPool.delete(key)
+    forceUpdate()
+    refetch()
+  }, [cache.errorsPool, key, forceUpdate, refetch])
+
+  const actions = { prefetch, clearError }
+
+  useEffect(() => {
+    if (!suspense) {
+      let canceled = false
+      function handleUpdate() {
+        if (!canceled) {
+          forceUpdate()
+        }
+      }
+      prefetch(params).then(handleUpdate, handleUpdate)
+      return () => {
+        canceled = true
+      }
+    }
+    // TODO: REPLACE WITH A DEEP COMPARE .....
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...params, prefetch, suspense, fetchTrigger, forceUpdate])
 
   const stateShape = useMemo(() => reducer(undefined, { type: INIT }), [
     reducer,
   ])
 
   const state = useMemo(() => {
-    return reducer(stateShape, {
-      type: HYDRATE,
-      payload: {
-        data: cachedData,
-      },
-    })
-  }, [cachedData, reducer, stateShape])
+    let nextState = stateShape
+    if (cachedData) {
+      nextState = reducer(nextState, {
+        type: HYDRATE,
+        payload: {
+          data: cachedData,
+        },
+      })
+    }
+    if (error) {
+      nextState = reducer(nextState, {
+        type: FAILURE,
+        payload: error,
+      })
+    }
+    return nextState
+  }, [cachedData, reducer, stateShape, error])
 
   const memoizedSelectors = useConstant(() => {
     if (
@@ -410,7 +494,14 @@ export function useRunRjCache(rjObject, paramsWithDeps = [], config = {}) {
       : null
   )
 
-  return [state, { ...actions, prefetch }]
+  // Same API of useRjCacheState
+  // ... the vanilla rj alredy clear error on run...
+  // simply grab curry actual run args
+  const clearError = () => {
+    actions.run(...runArgs)
+  }
+
+  return [state, { ...actions, prefetch, clearError }]
 }
 
 export default rjCache
