@@ -97,9 +97,9 @@ const makeListSelectors = (getData, pageSize) => {
     return data === null ? null : data.pagination.current
   }
 
-  const getPagination = state => ({
+  const getPagination = (state, pageSize) => ({
     count: getCount(state),
-    numPages: getNumPages(state),
+    numPages: getNumPages(state, pageSize),
     hasNext: hasNext(state),
     hasPrev: hasPrev(state),
     current: getCurrent(state),
@@ -131,6 +131,15 @@ const rjList = (config = {}) => {
     config.customListReducer,
     config.customPaginationReducer
   )
+  const computed = {
+    error: 'getError',
+    loading: 'isLoading',
+    list: 'getList',
+  }
+  if (config.pageSize) {
+    computed.pagination = 'getPagination'
+  }
+
   return rj(
     rjListInsert({ path: 'data.list' }),
     rjListUpdate({ path: 'data.list' }),
@@ -154,12 +163,7 @@ const rjList = (config = {}) => {
             return oldReducer(state, action)
         }
       },
-      computed: {
-        error: 'getError',
-        loading: 'isLoading',
-        list: 'getList',
-        pagination: 'getPagination',
-      },
+      computed,
     }
   )
 }
