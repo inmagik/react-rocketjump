@@ -6,25 +6,27 @@ import {
   useRjCacheState,
   prefetchRj,
   RjCacheError,
+  usePrefetchRj,
 } from 'react-rocketjump/plugins/cache'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
 
-prefetchRj(TodosListState, ['', 23])
+// prefetchRj(TodosListState, ['', 23])
 
 function Todos() {
   const [query, setQuery] = useState('')
   const [myQuery, setMyQuery] = useState('')
   const [
     { todos, loading, adding, deleting, updating, error23 },
-    { addStupidTodo, removeTodo, toggleTodo, prefetch, run, clearError },
-  ] = useRunRjCache(TodosListState, [myQuery, 23], {
+    { addStupidTodo, removeTodo, toggleTodo, run, clearError },
+  ] = useRjCacheState(TodosListState, [myQuery, 23], {
     // cache: true,
     // suspense: false,
     // suspendOnNewEffect: true,
   })
   console.log('RENDER', todos)
+  const prefetch = usePrefetchRj(TodosListState)
 
   // const [startTransition, isPending] = unstable_useTransition({
   //   timeoutMs: 3000,
@@ -47,6 +49,7 @@ function Todos() {
         onChange={e => {
           const q = e.target.value
           setQuery(q)
+          prefetch([q, 23])
           // startTransition(() => {
           setMyQuery(q)
           // prefetch([q, 23])

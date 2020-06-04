@@ -227,6 +227,50 @@ export function prefetchRj(rjObject, params = []) {
   return promise
 }
 
+export function usePrefetchRj(rjObject) {
+  const { cache } = rjObject
+
+  // Extra shit from <ConfigureRj />
+  const extraConfig = useContext(ConfigureRjContext)
+  const effectCaller = extraConfig === null ? null : extraConfig.effectCaller
+
+  const prefetch = useCallback(
+    params => {
+      const key = cache.key(...params)
+      const promise = new Promise((resolve, reject) => {
+        const action = {
+          type: RUN,
+          meta: {
+            cacheKey: key,
+          },
+          payload: {
+            params: [{ cacheEnabled: true }].concat(params),
+          },
+          callbacks: {
+            onFailure: error => {
+              cache.promisesPoll.delete(key)
+              cache.errorsPool.set(key, error)
+              reject(error)
+            },
+            onSuccess: data => {
+              cache.promisesPoll.delete(key)
+              resolve(data)
+            },
+          },
+        }
+        if (effectCaller) {
+          action.effectCaller = effectCaller
+        }
+        cache.sideEffect.actionsSubject.next(action)
+      })
+      cache.promisesPoll.set(key, promise)
+      return promise
+    },
+    [cache, effectCaller]
+  )
+  return prefetch
+}
+
 function useRjCacheData(rjObject, params = [], config = {}) {
   if (!rjObject.cache) {
     throw new Error('You should add rjCache() plugin to your rj config.')
