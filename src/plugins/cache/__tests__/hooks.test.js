@@ -1,7 +1,11 @@
 import React, { Suspense } from 'react'
 import { renderHook, act } from '@testing-library/react-hooks'
 import rj from '../../../rj'
-import rjCache, { useRunRjCache, clearInMemoryStore } from '../index'
+import rjCache, {
+  useRunRjCache,
+  clearInMemoryStore,
+  usePrefetchRj,
+} from '../index'
 
 beforeEach(() => {
   clearInMemoryStore()
@@ -294,6 +298,64 @@ describe('useRunRjCache', () => {
     })
     expect(result.current[0]).toEqual({
       data: { effectData: 'Babu' },
+      pending: false,
+      error: null,
+    })
+  })
+})
+
+describe('usePrefetchRj', () => {
+  it('should prefetch an rj with given params', async () => {
+    const _resolves = []
+    const effect = jest.fn(
+      a =>
+        new Promise(resolve => {
+          _resolves.push(() => resolve({ effectData: a }))
+        })
+    )
+    const maRjState = rj(
+      rjCache({
+        ns: 'gang',
+        size: 2,
+      }),
+      {
+        effect,
+      }
+    )
+
+    function Wrapper({ children }) {
+      return <Suspense fallback={<div>loading</div>}>{children}</Suspense>
+    }
+
+    const { result: resultP } = renderHook(() => usePrefetchRj(maRjState), {
+      wrapper: Wrapper,
+    })
+    const prefetch = resultP.current
+
+    prefetch(['GioVa'])
+    expect(effect).toHaveBeenCalledTimes(1)
+    prefetch(['GioVa'])
+    expect(effect).toHaveBeenCalledTimes(1)
+
+    const { result, waitForNextUpdate } = renderHook(
+      ({ name }) => useRunRjCache(maRjState, [name]),
+      {
+        wrapper: Wrapper,
+        initialProps: { name: 'GioVa' },
+      }
+    )
+
+    expect(effect).toHaveBeenCalledTimes(1)
+
+    // Suspends
+    expect(result.current).toBe(null)
+    _resolves[0]()
+    await waitForNextUpdate()
+
+    expect(effect).toHaveBeenCalledTimes(1)
+
+    expect(result.current[0]).toEqual({
+      data: { effectData: 'GioVa' },
       pending: false,
       error: null,
     })

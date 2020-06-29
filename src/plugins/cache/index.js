@@ -233,10 +233,14 @@ export function usePrefetchRj(rjObject) {
   // Extra shit from <ConfigureRj />
   const extraConfig = useContext(ConfigureRjContext)
   const effectCaller = extraConfig === null ? null : extraConfig.effectCaller
-
   const prefetch = useCallback(
     params => {
       const key = cache.key(...params)
+
+      if (cache.promisesPoll.has(key)) {
+        return cache.promisesPoll.get(key)
+      }
+
       const promise = new Promise((resolve, reject) => {
         const action = {
           type: RUN,
