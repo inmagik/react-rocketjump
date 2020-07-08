@@ -18,7 +18,19 @@ import ConfigureRjContext from '../../ConfigureRjContext'
 import { useConstant } from '../../hooks'
 import useRunRj from '../../useRunRj'
 
-const defaultKey = (...args) => JSON.stringify(args)
+function stableReplacer(key, value) {
+  if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+    return Object.keys(value)
+      .sort()
+      .reduce((acc, k) => {
+        acc[k] = value[k]
+        return acc
+      }, {})
+  }
+  return value
+}
+
+const defaultKey = (...args) => JSON.stringify(args, stableReplacer)
 
 class MapProxyStore {
   constructor() {
