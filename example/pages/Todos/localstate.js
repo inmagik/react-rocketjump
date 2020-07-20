@@ -1,21 +1,20 @@
 import { rj } from 'react-rocketjump'
+import { ajax } from 'rxjs/ajax'
+import { rjCache } from 'react-rocketjump/plugins/cache/new'
 import rjPlainList from 'react-rocketjump/plugins/plainList'
-import rjCache, { getInMemoryStoreState } from 'react-rocketjump/plugins/cache'
 import request from 'superagent'
 
 export const API_URL = 'http://localhost:9001'
 
-console.log('OoO', getInMemoryStoreState(), 'OoO')
-
 export const TodosListState = rj(
-  rjPlainList(),
   rjCache({
-    ns: 'todos',
-    size: 50,
+    ns: 'Todos',
+    // cacheTime: 0,
+    cacheTime: 5 * 1000 * 60,
   }),
+  rjPlainList(),
   {
-    effect: (q = '') =>
-      request.get(`${API_URL}/todos?q=${q}`, {}).then(({ body }) => body),
+    effect: (q = '') => ajax.getJSON(`${API_URL}/todos?q=${q}`),
     mutations: {
       addStupidTodo: rj.mutation.single({
         effect: todo =>
@@ -46,7 +45,6 @@ export const TodosListState = rj(
       adding: '@mutation.addStupidTodo.pending',
       deleting: '@mutation.removeTodo.pendings',
       updating: '@mutation.toggleTodo.pendings',
-      error23: 'getError',
       todos: 'getData',
       loading: 'isPending',
     },
