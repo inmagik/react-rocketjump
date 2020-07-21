@@ -10,7 +10,7 @@ export const TodosListState = rj(
   rjCache({
     ns: 'Todos',
     // cacheTime: 0,
-    cacheTime: 5 * 1000 * 60,
+    cacheTime: 1000 * 90,
   }),
   rjPlainList(),
   {
@@ -22,7 +22,8 @@ export const TodosListState = rj(
             .post(`${API_URL}/todos`)
             .send(todo)
             .then(({ body }) => body),
-        updater: 'insertItem',
+        updater: s => s, //'insertItem',
+        // updater: 'insertItem',
       }),
       removeTodo: rj.mutation.multi(todo => todo.id, {
         effect: todo =>

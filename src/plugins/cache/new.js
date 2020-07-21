@@ -15,6 +15,7 @@ import {
   switchMap,
   delay,
 } from 'rxjs/operators'
+import { makeSideEffectDescriptor } from '../../sideEffectDescriptor'
 
 function stableReplacer(key, value) {
   if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
@@ -54,6 +55,11 @@ export const rjCache = config => {
   })
 }
 
+let cacheRunIdCounter = 0
+function makeUniqueCacheRunId() {
+  return cacheRunIdCounter++
+}
+
 function createMountedInstance(bucket, cb) {
   const mountedInstance = {}
 
@@ -62,7 +68,65 @@ function createMountedInstance(bucket, cb) {
     .pipe(skip(1), distinctUntilChanged())
     .subscribe(cb)
 
-  const effectSub = bucket.effectObservable.subscribe(action => {
+  let cacheRunId = null
+
+  mountedInstance.refreshInstance = () => {
+    if (bucket.instances.size === 1) {
+      if (!bucket.wasSuspended) {
+        cacheRunId = makeUniqueCacheRunId()
+        bucket.actions.run
+          .withMeta({
+            cacheRunId,
+          })
+          .run(...bucket.params)
+      } else {
+        bucket.wasSuspended = false
+      }
+    }
+  }
+
+  // const effectSub = bucket.effectObservable.subscribe(action => {
+  //   let successCallback
+  //   if (action.successCallback) {
+  //     successCallback = action.successCallback
+  //     delete action.successCallback
+  //   }
+  //   let failureCallback
+  //   if (action.failureCallback) {
+  //     failureCallback = action.failureCallback
+  //     delete action.failureCallback
+  //   }
+
+  //   bucket.dispatchToState(action)
+
+  //   if (successCallback) {
+  //     successCallback(action.payload.data)
+  //   }
+  //   if (failureCallback) {
+  //     failureCallback(action.payload)
+  //   }
+  // })
+
+  mountedInstance.clear = () => {
+    // console.log('Goodbye instance', mountedInstance)
+    // effectSub.unsubscribe()
+    stateSub.unsubscribe()
+    bucket.instances.delete(mountedInstance)
+    if (bucket.instances.size === 0) {
+      // If bucket ongoing run is from current rj instance cancel them ...
+      if (cacheRunId !== null && bucket.ongoingRun === cacheRunId) {
+        bucket.actions.cancel()
+      }
+      // console.log('GoodBye space cowboy')
+      bucket.gcSubject.next({ type: 'gc' })
+    }
+  }
+
+  return mountedInstance
+}
+
+function makeDispatchSubscription(dispatchFn) {
+  return action => {
     let successCallback
     if (action.successCallback) {
       successCallback = action.successCallback
@@ -74,7 +138,7 @@ function createMountedInstance(bucket, cb) {
       delete action.failureCallback
     }
 
-    bucket.dispatchToState(action)
+    dispatchFn(action)
 
     if (successCallback) {
       successCallback(action.payload.data)
@@ -82,20 +146,7 @@ function createMountedInstance(bucket, cb) {
     if (failureCallback) {
       failureCallback(action.payload)
     }
-  })
-
-  mountedInstance.clear = () => {
-    // console.log('Goodbye instance', mountedInstance)
-    effectSub.unsubscribe()
-    stateSub.unsubscribe()
-    bucket.instances.delete(mountedInstance)
-    if (bucket.instances.size === 0) {
-      // console.log('GoodBye space cowboy')
-      bucket.gcSubject.next({ type: 'gc' })
-    }
   }
-
-  return mountedInstance
 }
 
 function createBucket(cacheStore, rjObject, params, key) {
@@ -114,7 +165,6 @@ function createBucket(cacheStore, rjObject, params, key) {
     key,
     state: reducer(undefined, { type: INIT }),
     wasSuspended: false,
-    currentSuspenseSub: null,
     currentPromise: null,
     selectors: makeSelectors(),
     instances: new Set(),
@@ -135,7 +185,6 @@ function createBucket(cacheStore, rjObject, params, key) {
         : bucket.state
     bucket.stateSubject.next(nextState)
   }
-  bucket.stateObservable = bucket.stateSubject.asObservable()
 
   // Garbage Collector
   bucket.gcSubject = new Subject()
@@ -147,14 +196,9 @@ function createBucket(cacheStore, rjObject, params, key) {
       return empty()
     })
   )
-  const gcSub = bucket.gcObservable.subscribe(action => {
+  bucket.gcObservable.subscribe(action => {
     // Delete actual bucket from parent buckets map
     if (bucket.instances.size === 0) {
-      console.log('GC', key, bucket)
-      gcSub.unsubscribe()
-      if (bucket.currentSuspenseSub) {
-        bucket.currentSuspenseSub.unsubscribe()
-      }
       cacheStore.buckets.delete(key)
     }
   })
@@ -164,15 +208,17 @@ function createBucket(cacheStore, rjObject, params, key) {
   const actionsSubject = new Subject()
   const actionObserable = actionsSubject.asObservable()
 
-  bucket.effectObservable = makeRxObservable(
+  const stateObservable = bucket.stateSubject.asObservable()
+  const effectObservable = makeRxObservable(
     actionObserable,
-    bucket.stateObservable
+    stateObservable
   )[0].pipe(share())
+  effectObservable.subscribe(makeDispatchSubscription(bucket.dispatchToState))
 
   bucket.dispatch = action => {
     if (isEffectAction(action)) {
       if (action.type === RUN) {
-        bucket.ongoingRun = action.meta.runId ?? null
+        bucket.ongoingRun = action.meta.cacheRunId ?? null
       }
       // Emit action to given observable theese perform side
       // effect and emit action dispatched above by subscription
@@ -191,50 +237,20 @@ function createBucket(cacheStore, rjObject, params, key) {
       return bucket.currentPromise
     }
     bucket.wasSuspended = true
-    console.log('GO!')
-    bucket.currentSuspenseSub = bucket.effectObservable.subscribe(action => {
-      // TODO: MOVE
-      let successCallback
-      if (action.successCallback) {
-        successCallback = action.successCallback
-        delete action.successCallback
-      }
-      let failureCallback
-      if (action.failureCallback) {
-        failureCallback = action.failureCallback
-        delete action.failureCallback
-      }
-
-      bucket.dispatchToState(action)
-
-      if (successCallback) {
-        successCallback(action.payload.data)
-      }
-      if (failureCallback) {
-        failureCallback(action.payload)
-      }
-    })
-
-    // TODO: REMOVE THIS SHIT
     // FIXME: It's not safe to schedule a GC very lowe time
     // between render and commit react phase
-    // so schedule a MIN of seconds between the GC
     // GC is necessary to avoid leak when render is called but the commit
     // phase not so at least for this seconds Y cache expires
-    const EXTRA_GC_TIME_FOR_SUSPENSE = Math.max(
-      3 * 1000,
-      cacheOptions.cacheTime
-    )
+    // BUT FOR NOW WE ACCEPT THIS .... lol
+    // .. cause the cause of this leak is not so comune but you
+    // can still split multiple cahce witha <Provider />
+    // in large apps....
     bucket.currentPromise = bucket.actions.run
       .onSuccess(() => {
         bucket.currentPromise = null
-        bucket.currentSuspenseSub.unsubscribe()
-        bucket.gcSubject.next({ type: 'gc', time: EXTRA_GC_TIME_FOR_SUSPENSE })
       })
       .onFailure(() => {
         bucket.currentPromise = null
-        // bucket.currentSuspenseSub.unsubscribe()
-        bucket.gcSubject.next({ type: 'gc', time: EXTRA_GC_TIME_FOR_SUSPENSE })
       })
       .asPromise(...params)
     return bucket.currentPromise
@@ -243,36 +259,111 @@ function createBucket(cacheStore, rjObject, params, key) {
   bucket.subscribe = cb => {
     const mountedInstance = createMountedInstance(bucket, cb)
     bucket.instances.add(mountedInstance)
-
-    if (bucket.instances.size === 1) {
-      if (!bucket.wasSuspended) {
-        console.log('RUN ON SUB FOR', key, params)
-        bucket.actions.run(...params)
-      } else {
-        bucket.wasSuspended = false
-      }
-    }
-
+    mountedInstance.refreshInstance()
     return () => mountedInstance.clear()
   }
 
   return bucket
 }
 
+// TODO: IMPROVE!!!!!!
+function isPartialParamMatching(rjObject, params, matchParams) {
+  const { makeKey } = rjObject.cache
+  return makeKey(params.slice(0, matchParams.length)) === makeKey(matchParams)
+}
+
 function createCacheStore() {
   const cacheStore = {
+    // Lazy observable map of actions subjects ..
+    actionsMap: new Map(),
+    // Map of living buckets
     buckets: new Map(),
   }
 
-  cacheStore.makeActions = (rjObject, matchKey = '') => {
+  // TODO: Implement better match tequinique........
+
+  function dispatchToBucketsState(rjObject, action) {
+    // TODO: Add an option to skip buckets \w no instances attacched .....
+    // if (isEffectAction(action)) {
+    // return
+    // }
+    // TODO: Find a better name ....
+    const { dispatchMatchPredicate } = action.meta ?? {}
+    if (!dispatchMatchPredicate) {
+      return
+    }
+    cacheStore.buckets.forEach(bucket => {
+      // TODO: Improve matching ....
+      if (
+        bucket.rjObject.ns === rjObject.ns &&
+        dispatchMatchPredicate(bucket.params)
+      ) {
+        bucket.dispatchToState(action)
+      }
+    })
+  }
+
+  function makeActionsSubject(rjObject) {
+    const {
+      cache: { ns },
+      makeRxObservable,
+    } = rjObject
+
+    if (cacheStore.actionsMap.has(ns)) {
+      return cacheStore.actionsMap.get(ns)
+    }
+
+    const actionsSubject = new Subject()
+    const actionObserable = actionsSubject.asObservable()
+
+    // TODO: Improve obs....
+    const effectObservable = makeRxObservable(actionObserable, empty())[0].pipe(
+      share()
+    )
+    effectObservable.subscribe(
+      makeDispatchSubscription(action =>
+        dispatchToBucketsState(rjObject, action)
+      )
+    )
+    cacheStore.actionsMap.set(ns, actionsSubject)
+    return actionsSubject
+  }
+
+  cacheStore.invalidate = (rjObject, matchParams = []) => {
+    cacheStore.buckets.forEach(bucket => {
+      if (
+        bucket.rjObject.ns === rjObject.ns &&
+        isPartialParamMatching(rjObject, bucket.params, matchParams)
+      ) {
+        // TODO: Write better...
+        if (bucket.instances.size === 0) {
+          cacheStore.buckets.delete(bucket.key)
+        } else {
+          bucket.actions.run(...bucket.params)
+        }
+      }
+    })
+  }
+
+  cacheStore.makeActions = (rjObject, dispatchMatchPredicate) => {
+    const actionsSubject = makeActionsSubject(rjObject)
+
     function dispatch(action) {
-      // TODO: Add an option to skip buckets \w no instances attacched .....
-      cacheStore.buckets.forEach(bucket => {
-        // TODO: Improve matching ....
-        // if (bucket.key.indexOf(matchKey) === 0) {
-        bucket.dispatch(action)
-        // }
-      })
+      const multiMatchAction = {
+        ...action,
+        meta: {
+          ...action.meta,
+          dispatchMatchPredicate,
+        },
+      }
+      if (isEffectAction(action)) {
+        // Emit action to given observable theese perform side
+        // effect and emit action dispatched above by subscription
+        actionsSubject.next(multiMatchAction)
+      } else {
+        // Update the state \w given reducer
+        dispatchToBucketsState(rjObject, multiMatchAction)
+      }
     }
 
     return bindActionCreators(rjObject.actionCreators, dispatch)
@@ -291,8 +382,20 @@ function createCacheStore() {
   return cacheStore
 }
 
+// TODO:
+// - Stale time
+// - Check bug canceled bucket + refetch
+// - Option to always refetch on mount + bug swap last rj....
+// - Suspense + Error
+// - Always calculate promise ....
+// - Prefetch RJ
+// - effectCaller
+// - Override cache time + stale time on instance ...
+// - Provider .....
+// - refactoring
+
 // TODO: BaD NAME
-let bigCacheStore = createCacheStore()
+export const bigCacheStore = createCacheStore()
 
 console.log(bigCacheStore)
 
@@ -302,10 +405,21 @@ function useRerender() {
 }
 
 // TODO: handle params
-export function useRjActions(rjObject, params = []) {
+export function useRjActions(rjObject, matchParams = []) {
+  const matchParamsRef = useRef(matchParams)
+
+  useEffect(() => {
+    matchParamsRef.current = matchParams
+  })
+
+  const dispatchMatchPredicate = useCallback(
+    params => isPartialParamMatching(rjObject, params, matchParamsRef.current),
+    [rjObject]
+  )
+
   return useMemo(() => {
-    return bigCacheStore.makeActions(rjObject)
-  }, [rjObject])
+    return bigCacheStore.makeActions(rjObject, dispatchMatchPredicate)
+  }, [rjObject, dispatchMatchPredicate])
 }
 
 export function useRj(rjObject, params = [], config = {}) {

@@ -6,6 +6,7 @@ import {
   useLastRj,
   rjCache,
   useRjActions,
+  bigCacheStore,
 } from 'react-rocketjump/plugins/cache/new'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
@@ -65,12 +66,14 @@ function Todos() {
   const [
     { todos, adding, deleting, updating },
     { loading },
-    { addStupidTodo, removeTodo },
-  ] = useLastRj(TodosListState, [search], {
-    // suspense: true,
-  })
+    // { addStupidTodo, removeTodo },
+  ] = useLastRj(TodosListState, [search], {})
+  console.log('X', todos)
 
-  const { toggleTodo } = useRjActions(TodosListState)
+  const { toggleTodo, addStupidTodo, removeTodo } = useRjActions(TodosListState)
+
+  // function
+  // const [{ updating }, { toggleTodo }] = useRjMutations(TodosListState)
 
   // console.log('RENDER', todos)
   // cons
@@ -102,18 +105,19 @@ function Todos() {
           Loading <b>Y</b> todos...
         </div>
       )}
-      {/* {todos && (
+      {todos && (
         <NewTodo
           onSubmit={todo => {
             addStupidTodo
               .onSuccess(todo => {
                 console.log('Todo Added!', todo)
+                bigCacheStore.invalidate(TodosListState)
               })
               .run(todo)
           }}
           adding={adding}
         />
-      )} */}
+      )}
       <div className="todo-list">
         {todos &&
           todos.map(todo => (
