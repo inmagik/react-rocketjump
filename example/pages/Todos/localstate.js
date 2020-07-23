@@ -9,8 +9,8 @@ export const API_URL = 'http://localhost:9001'
 export const TodosListState = rj(
   rjCache({
     ns: 'Todos',
-    // cacheTime: 0,
-    cacheTime: 1000 * 90,
+    cacheTime: 0,
+    // cacheTime: 1000 * 90,
   }),
   rjPlainList(),
   {

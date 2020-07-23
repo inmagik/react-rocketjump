@@ -161,10 +161,10 @@ export default function createBucket(cacheStore, rjObject, params, key) {
     return bucket.currentPromise
   }
 
-  bucket.subscribe = cb => {
+  bucket.subscribe = (cb, config) => {
     const mountedInstance = createMountedInstance(bucket, cb)
     bucket.instances.add(mountedInstance)
-    mountedInstance.refreshInstance()
+    mountedInstance.refreshInstance(config)
     return () => mountedInstance.clear()
   }
 

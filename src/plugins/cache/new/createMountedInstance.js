@@ -9,8 +9,8 @@ export default function createMountedInstance(bucket, cb) {
 
   let cacheRunId = null
 
-  mountedInstance.refreshInstance = () => {
-    if (bucket.instances.size === 1) {
+  mountedInstance.refreshInstance = (config = {}) => {
+    if (bucket.instances.size === 1 || config.runOnMount === true) {
       if (!bucket.wasSuspended) {
         cacheRunId = bucket.run()
       } else {

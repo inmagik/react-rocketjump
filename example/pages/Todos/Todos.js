@@ -5,11 +5,14 @@ import {
   useRj,
   useLastRj,
   rjCache,
+  useFreshRj,
   useRjActions,
 } from 'react-rocketjump/plugins/cache/new'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
+
+const MemoTodos = React.memo(() => <Todos id="b" />)
 
 export default function TodosApp() {
   const [toggle, setToggle] = useState(true)
@@ -21,7 +24,10 @@ export default function TodosApp() {
         </button>
       </div>
       {/* <Gang /> */}
-      <Suspense fallback={<h1>FUCK</h1>}>{toggle ? <Todos /> : null}</Suspense>
+      <Suspense fallback={<h1>FUCK</h1>}>
+        {toggle ? <Todos id={'A'} /> : <Gang />}
+      </Suspense>
+      <MemoTodos id={'B'} />
     </div>
   )
 }
@@ -29,8 +35,7 @@ export default function TodosApp() {
 function Gang() {
   const [
     // Resolved state ...
-    { todos, adding, deleting, updating },
-    { loading },
+    { todos, adding, deleting, updating, loading },
     { addStupidTodo, removeTodo, toggleTodo },
   ] = useRj(TodosListState, [''])
 
@@ -59,19 +64,21 @@ function Gang() {
   )
 }
 
-function Todos() {
+function Todos({ id }) {
   const [count, setCount] = useState(0)
   const [search, setSearch] = useState('')
   const [
-    { todos, adding, deleting, updating },
-    { loading },
+    { todos, loading, adding, deleting, updating },
+    // { loading },
     // { addStupidTodo, removeTodo },
-  ] = useLastRj(TodosListState, [search], {})
-  console.log('X', todos)
+  ] = useFreshRj(TodosListState, [search], {
+    runOnMount: true,
+  })
+  console.log('TODOS RENDER', todos, loading, id)
 
   const { toggleTodo, addStupidTodo, removeTodo } = useRjActions(
-    TodosListState,
-    '23'
+    TodosListState
+    // '23'
   )
 
   // function
