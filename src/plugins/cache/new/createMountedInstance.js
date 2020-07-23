@@ -10,7 +10,10 @@ export default function createMountedInstance(bucket, cb) {
   let cacheRunId = null
 
   mountedInstance.refreshInstance = (config = {}) => {
-    if (bucket.instances.size === 1 || config.runOnMount === true) {
+    if (
+      (bucket.instances.size === 1 || config.runOnMount === true) &&
+      bucket.isStale()
+    ) {
       if (!bucket.wasSuspended) {
         cacheRunId = bucket.run()
       } else {
@@ -26,7 +29,7 @@ export default function createMountedInstance(bucket, cb) {
     bucket.instances.delete(mountedInstance)
     if (bucket.instances.size === 0) {
       // If bucket ongoing run is from current rj instance cancel them ...
-      if (cacheRunId !== null && bucket.ongoingRun === cacheRunId) {
+      if (cacheRunId !== null && bucket.lastRun === cacheRunId) {
         bucket.actions.cancel()
       }
       bucket.scheduleGC()

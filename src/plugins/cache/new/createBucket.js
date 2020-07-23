@@ -1,15 +1,16 @@
 import { BehaviorSubject, Subject, of, empty } from 'rxjs'
 import { switchMap, delay, share } from 'rxjs/operators'
 import { isEffectAction, bindActionCreators } from 'rocketjump-core'
-import { INIT, RUN } from '../../../actionTypes'
+import { INIT, RUN, SUCCESS } from '../../../actionTypes'
 import { makeDispatchWithCallbacks } from './utils'
 import createMountedInstance from './createMountedInstance'
+import { act } from '@testing-library/react'
 
 // Create an RJ Bukcet
 
 let cacheRunIdCounter = 0
 function makeUniqueCacheRunId() {
-  return cacheRunIdCounter++
+  return ++cacheRunIdCounter
 }
 
 // A bucket is
@@ -33,8 +34,10 @@ export default function createBucket(cacheStore, rjObject, params, key) {
     key,
     // Memo-selectors of rj object
     selectors: makeSelectors(),
-    // Handle the ongoing run id grubbed from action.metac.acheRunId
-    ongoingRun: null,
+    // Handle the last run id grubbed from action.metac.cacheRunId
+    lastRun: null,
+    // Timestamp of last success
+    lastSucccessAt: null,
     // Set of mounted instances
     instances: new Set(),
     // ...Suspense...
@@ -75,9 +78,16 @@ export default function createBucket(cacheStore, rjObject, params, key) {
     actionObserable,
     bucket.stateObservable
   )[0].pipe(share())
-  const effectSubscription = effectObservable.subscribe(
-    makeDispatchWithCallbacks(bucket.dispatchToState)
+  const dispatchWithCallbacks = makeDispatchWithCallbacks(
+    bucket.dispatchToState
   )
+  const effectSubscription = effectObservable.subscribe(action => {
+    dispatchWithCallbacks(action)
+    console.log('~~', action)
+    if (action.type === SUCCESS && action.meta.cacheRunId) {
+      bucket.lastSucccessAt = new Date().getTime()
+    }
+  })
 
   // Garbage Collector
   // schedule a GC in cache time if another GC job is scheduled
@@ -118,7 +128,7 @@ export default function createBucket(cacheStore, rjObject, params, key) {
   bucket.dispatch = action => {
     if (isEffectAction(action)) {
       if (action.type === RUN) {
-        bucket.ongoingRun = action.meta.cacheRunId ?? null
+        bucket.lastRun = action.meta.cacheRunId ?? null
       }
       // Emit action to given observable theese perform side
       // effect and emit action dispatched above by subscription
@@ -127,6 +137,14 @@ export default function createBucket(cacheStore, rjObject, params, key) {
       // Update the state \w given reducer
       bucket.dispatchToState(action)
     }
+  }
+
+  bucket.isStale = () => {
+    if (bucket.lastSucccessAt === null) {
+      return true
+    }
+    const currentTime = new Date().getTime()
+    return currentTime - bucket.lastSucccessAt > rjObject.cache.staleTime
   }
 
   // Rj Actions BAG !

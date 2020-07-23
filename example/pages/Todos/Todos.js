@@ -13,6 +13,8 @@ import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
 
+console.log('CACHE', cacheStore)
+
 const MemoTodos = React.memo(() => <Todos id="b" />)
 
 export default function TodosApp() {
@@ -48,15 +50,8 @@ function Gang() {
 
       <button
         onClick={() => {
-          const b1 = cacheStore.buildBucket(TodosListState, [''])
-          console.log(b1)
-          // b1.actions.run
-          //   .onSuccess(() => {
-          //     console.log('Success!')
-          //     // b1.scheduleGC()
-          //   })
-          //   .run()
-          b1.clear()
+          const b1 = cacheStore.buildBucket(TodosListState, ['23'])
+          b1.run()
         }}
       >
         CLEAR
@@ -84,7 +79,7 @@ function Gang() {
 
 function Todos({ id }) {
   const [count, setCount] = useState(0)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState('23')
   const [
     { todos, loading, adding, deleting, updating },
     // { loading },
