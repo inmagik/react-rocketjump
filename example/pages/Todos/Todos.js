@@ -33,15 +33,7 @@ export default function TodosApp() {
   )
 }
 
-const b1 = cacheStore.buildBucket(TodosListState, ['X'])
-console.log(b1)
-b1.actions.run
-  .onSuccess(() => {
-    console.log('Success!')
-    b1.scheduleGC()
-  })
-  .run()
-b1.scheduleGC()
+// b1.scheduleGC()
 
 function Gang() {
   const [
@@ -54,6 +46,21 @@ function Gang() {
     <div>
       <h1>GANG</h1>
 
+      <button
+        onClick={() => {
+          const b1 = cacheStore.buildBucket(TodosListState, [''])
+          console.log(b1)
+          // b1.actions.run
+          //   .onSuccess(() => {
+          //     console.log('Success!')
+          //     // b1.scheduleGC()
+          //   })
+          //   .run()
+          b1.clear()
+        }}
+      >
+        CLEAR
+      </button>
       {loading && (
         <div>
           Loading <b>Y</b> todos...

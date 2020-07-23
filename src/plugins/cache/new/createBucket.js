@@ -97,11 +97,19 @@ export default function createBucket(cacheStore, rjObject, params, key) {
     // Delete actual bucket from parent buckets map only
     // When no instances attached 2 bucket
     if (bucket.instances.size === 0) {
-      cacheStore.buckets.delete(key)
-      gcSubscription.unsubscribe()
-      effectSubscription.unsubscribe()
+      bucket.clear()
     }
   })
+
+  bucket.clear = () => {
+    bucket.instances.forEach(instance => {
+      instance.clear()
+    })
+    cacheStore.buckets.delete(key)
+    gcSubscription.unsubscribe()
+    effectSubscription.unsubscribe()
+  }
+
   bucket.scheduleGC = () => {
     gcSubject.next({ type: 'gc' })
   }
