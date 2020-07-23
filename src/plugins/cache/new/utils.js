@@ -2,7 +2,7 @@ export function makeDispatchWithCallbacks(dispatch, cacheStore) {
   return action => {
     const { successCallback, failureCallback, ...actionToDispatch } = action
 
-    dispatch(action, actionToDispatch)
+    dispatch(actionToDispatch)
 
     if (successCallback) {
       successCallback(action.payload.data, cacheStore)

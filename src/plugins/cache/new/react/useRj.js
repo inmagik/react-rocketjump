@@ -7,7 +7,10 @@ export default function useRj(rjObject, params = [], config = {}) {
   const bucket = cacheStore.buildBucket(rjObject, params)
 
   if (config.suspense) {
-    if (bucket.selectors.getData(bucket.state) === null) {
+    // TODO: FIX DA SHIT
+    if (
+      bucket.selectors.getData(bucket.selectors.getRoot(bucket.state)) === null
+    ) {
       throw bucket.suspensePromise()
     }
   }

@@ -6,6 +6,7 @@ import {
   useLastRj,
   rjCache,
   useFreshRj,
+  cacheStore,
   useRjActions,
 } from 'react-rocketjump/plugins/cache/new'
 import { API_URL, TodosListState } from './localstate'
@@ -24,13 +25,23 @@ export default function TodosApp() {
         </button>
       </div>
       {/* <Gang /> */}
-      <Suspense fallback={<h1>FUCK</h1>}>
+      <Suspense fallback={<h1>LOADING ~TODOS~</h1>}>
         {toggle ? <Todos id={'A'} /> : <Gang />}
       </Suspense>
-      <MemoTodos id={'B'} />
+      {/* <MemoTodos id={'B'} /> */}
     </div>
   )
 }
+
+const b1 = cacheStore.buildBucket(TodosListState, ['X'])
+console.log(b1)
+b1.actions.run
+  .onSuccess(() => {
+    console.log('Success!')
+    b1.scheduleGC()
+  })
+  .run()
+b1.scheduleGC()
 
 function Gang() {
   const [
@@ -71,8 +82,9 @@ function Todos({ id }) {
     { todos, loading, adding, deleting, updating },
     // { loading },
     // { addStupidTodo, removeTodo },
-  ] = useFreshRj(TodosListState, [search], {
-    runOnMount: true,
+  ] = useRj(TodosListState, [search], {
+    // runOnMount: true,
+    suspense: true,
   })
   console.log('TODOS RENDER', todos, loading, id)
 

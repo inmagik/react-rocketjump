@@ -67,6 +67,18 @@ export default function createBucket(cacheStore, rjObject, params, key) {
     stateSubject.next(nextState)
   }
 
+  // Action + Side Effects
+  const actionsSubject = new Subject()
+  const actionObserable = actionsSubject.asObservable()
+
+  const effectObservable = makeRxObservable(
+    actionObserable,
+    bucket.stateObservable
+  )[0].pipe(share())
+  const effectSubscription = effectObservable.subscribe(
+    makeDispatchWithCallbacks(bucket.dispatchToState)
+  )
+
   // Garbage Collector
   // schedule a GC in cache time if another GC job is scheduled
   // the GC cancel last job and re-start waiting cache time
@@ -81,26 +93,18 @@ export default function createBucket(cacheStore, rjObject, params, key) {
       return empty()
     })
   )
-  gcObservable.subscribe(action => {
+  const gcSubscription = gcObservable.subscribe(action => {
     // Delete actual bucket from parent buckets map only
     // When no instances attached 2 bucket
     if (bucket.instances.size === 0) {
       cacheStore.buckets.delete(key)
+      gcSubscription.unsubscribe()
+      effectSubscription.unsubscribe()
     }
   })
   bucket.scheduleGC = () => {
     gcSubject.next({ type: 'gc' })
   }
-
-  // Action + Side Effects
-  const actionsSubject = new Subject()
-  const actionObserable = actionsSubject.asObservable()
-
-  const effectObservable = makeRxObservable(
-    actionObserable,
-    bucket.stateObservable
-  )[0].pipe(share())
-  effectObservable.subscribe(makeDispatchWithCallbacks(bucket.dispatchToState))
 
   // Dispatch on state or trigger a side effect on rj object rx side effects
   bucket.dispatch = action => {
@@ -124,12 +128,10 @@ export default function createBucket(cacheStore, rjObject, params, key) {
   // Dispatch an good old RJ RUN action with current params
   bucket.run = () => {
     const cacheRunId = makeUniqueCacheRunId()
-    bucket.actions.run
+    bucket.currentPromise = bucket.actions.run
       .withMeta({
         cacheRunId,
       })
-      .run(...bucket.params)
-    bucket.currentPromise = bucket.actions.run
       .onSuccess(() => {
         bucket.currentPromise = null
       })
