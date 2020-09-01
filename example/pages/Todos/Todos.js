@@ -26,7 +26,7 @@ export default function TodosApp() {
           {toggle ? 'ON' : 'OFF'}
         </button>
       </div>
-      {/* <Gang /> */}
+      <Gang />
       <Suspense fallback={<h1>LOADING ~TODOS~</h1>}>
         {toggle ? <Todos id={'A'} /> : <Gang />}
       </Suspense>
@@ -79,12 +79,12 @@ function Gang() {
 
 function Todos({ id }) {
   const [count, setCount] = useState(0)
-  const [search, setSearch] = useState('23')
+  const [search, setSearch] = useState('')
   const [
-    { todos, loading, adding, deleting, updating },
-    // { loading },
+    { todos, adding, deleting, updating },
+    { loading },
     // { addStupidTodo, removeTodo },
-  ] = useRj(TodosListState, [search], {
+  ] = useLastRj(TodosListState, [search], {
     // runOnMount: true,
     suspense: true,
   })

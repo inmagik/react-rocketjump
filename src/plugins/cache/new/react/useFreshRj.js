@@ -4,15 +4,16 @@ import { useRerender } from './utils'
 import { PENDING, INIT } from '../../../../actionTypes'
 
 export default function useFreshRj(rjObject, params = [], config = {}) {
-  const lastConfig = useRef(config)
+  const lastConfigRef = useRef(config)
   const cacheStore = useCacheStore()
   const bucket = cacheStore.buildBucket(rjObject, params)
-  // Never shot stal shit ... if U ... want
+
+  // Never shot stal shit ...
   const isStaleDataRef = useRef(true)
   const prevStateRef = useRef(null)
 
   useEffect(() => {
-    lastConfig.current = config
+    lastConfigRef.current = config
   })
 
   if (config.suspense) {
@@ -24,10 +25,11 @@ export default function useFreshRj(rjObject, params = [], config = {}) {
   // TODO: SWHITCH TO USE MUTABLE SOURCE
   const rerender = useRerender()
   useEffect(() => {
+    const lastConfig = lastConfigRef.current
     prevStateRef.current = bucket.state
     // console.log(bucket.instances)
     isStaleDataRef.current =
-      bucket.instances.size === 0 || lastConfig.current.runOnMount
+      bucket.instances.size === 0 || lastConfig.runOnMount
     // eheheh the malus the extra render to be consistent baby!
     const unsub = bucket.subscribe(state => {
       const prevState = prevStateRef.current
@@ -42,8 +44,8 @@ export default function useFreshRj(rjObject, params = [], config = {}) {
         prevStateRef.current = state
       }
       rerender()
-    }, lastConfig.current)
-    if (!isStaleDataRef.current && !lastConfig.current.runOnMount) {
+    }, lastConfig)
+    if (!isStaleDataRef.current && !lastConfig.runOnMount) {
       rerender()
     }
     return unsub

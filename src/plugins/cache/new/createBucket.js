@@ -83,7 +83,6 @@ export default function createBucket(cacheStore, rjObject, params, key) {
   )
   const effectSubscription = effectObservable.subscribe(action => {
     dispatchWithCallbacks(action)
-    console.log('~~', action)
     if (action.type === SUCCESS && action.meta.cacheRunId) {
       bucket.lastSucccessAt = new Date().getTime()
     }

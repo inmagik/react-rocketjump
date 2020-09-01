@@ -10,7 +10,7 @@ export const TodosListState = rj(
   rjCache({
     ns: 'Todos',
     cacheTime: 0,
-    staleTime: 1000,
+    staleTime: 0,
     // cacheTime: 1000 * 90,
   }),
   rjPlainList(),
