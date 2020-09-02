@@ -8,7 +8,7 @@ export const API_URL = 'http://localhost:9001'
 export const UsersState = rj(
   rjPlainList(),
   rjDebounce({
-    time: 1300,
+    time: 400,
   }),
   {
     name: 'Evil System Users',
