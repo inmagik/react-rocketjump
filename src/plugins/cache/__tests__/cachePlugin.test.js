@@ -21,8 +21,8 @@ async function asyncForEach(array, callback) {
 }
 
 describe('Cache Plugin (Session - LRU)', () => {
-  const makeRjComponent = rjState => {
-    const Component = props => null
+  const makeRjComponent = (rjState) => {
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -143,7 +143,7 @@ describe('Cache Plugin (Session - LRU)', () => {
     const run = wrapper.prop('run')
 
     await act(async () => {
-      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async k => {
+      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
         return await run.asPromise(k)
       })
     })
@@ -277,7 +277,7 @@ describe('Cache Plugin (Session - LRU)', () => {
     const run = wrapper.prop('run')
 
     await act(async () => {
-      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async k => {
+      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
         return await run.asPromise(k)
       })
     })
@@ -310,7 +310,7 @@ describe('Cache Plugin (Session - LRU)', () => {
     const run = wrapper.prop('run')
 
     await act(async () => {
-      asyncForEach([1, 2, 3, 1, 3, 2, 1, 4, 1], async k => {
+      asyncForEach([1, 2, 3, 1, 3, 2, 1, 4, 1], async (k) => {
         return await run.asPromise(k)
       })
     })
@@ -363,8 +363,8 @@ describe('Cache Plugin (Session - LRU)', () => {
 })
 
 describe('Cache Plugin (Local - FIFO)', () => {
-  const makeRjComponent = rjState => {
-    const Component = props => null
+  const makeRjComponent = (rjState) => {
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -485,7 +485,7 @@ describe('Cache Plugin (Local - FIFO)', () => {
     const run = wrapper.prop('run')
 
     await act(async () => {
-      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async k => {
+      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
         return await run.asPromise(k)
       })
     })
@@ -619,7 +619,7 @@ describe('Cache Plugin (Local - FIFO)', () => {
     const run = wrapper.prop('run')
 
     await act(async () => {
-      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async k => {
+      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
         return await run.asPromise(k)
       })
     })
@@ -652,7 +652,7 @@ describe('Cache Plugin (Local - FIFO)', () => {
     const run = wrapper.prop('run')
 
     await act(async () => {
-      asyncForEach([1, 2, 3, 1, 3, 2, 1, 4, 1], async k => {
+      asyncForEach([1, 2, 3, 1, 3, 2, 1, 4, 1], async (k) => {
         return await run.asPromise(k)
       })
     })
@@ -705,8 +705,8 @@ describe('Cache Plugin (Local - FIFO)', () => {
 })
 
 describe('Cache Plugin (InMemory - LRU)', () => {
-  const makeRjComponent = rjState => {
-    const Component = props => null
+  const makeRjComponent = (rjState) => {
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -827,7 +827,7 @@ describe('Cache Plugin (InMemory - LRU)', () => {
     const run = wrapper.prop('run')
 
     await act(async () => {
-      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async k => {
+      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
         return await run.asPromise(k)
       })
     })
@@ -961,7 +961,7 @@ describe('Cache Plugin (InMemory - LRU)', () => {
     const run = wrapper.prop('run')
 
     await act(async () => {
-      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async k => {
+      asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
         return await run.asPromise(k)
       })
     })
@@ -994,7 +994,7 @@ describe('Cache Plugin (InMemory - LRU)', () => {
     const run = wrapper.prop('run')
 
     await act(async () => {
-      asyncForEach([1, 2, 3, 1, 3, 2, 1, 4, 1], async k => {
+      asyncForEach([1, 2, 3, 1, 3, 2, 1, 4, 1], async (k) => {
         return await run.asPromise(k)
       })
     })

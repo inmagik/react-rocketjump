@@ -6,7 +6,7 @@ const examples = preval`
   const fs = require('fs');
   module.exports = fs.readdirSync(__dirname + '/pages').filter(item => item[0] !== '.');
 `
-const lazyExamples = examples.map(example =>
+const lazyExamples = examples.map((example) =>
   React.lazy(() => import(`./pages/${example}`))
 )
 

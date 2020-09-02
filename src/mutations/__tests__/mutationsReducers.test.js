@@ -79,7 +79,7 @@ describe('RJ mutations reducers', () => {
     const MaRjState = rj({
       mutations: {
         toggle: {
-          optimisticResult: done => !done,
+          optimisticResult: (done) => !done,
           effect: () => {},
           updater: (state, done) => ({
             ...state,
@@ -462,7 +462,7 @@ describe('RJ mutations reducers', () => {
         toggle: {
           optimisticResult: () => null, // 204 No Content
           effect: () => {},
-          updater: state => ({
+          updater: (state) => ({
             ...state,
             data: {
               ...state.data,
@@ -841,7 +841,7 @@ describe('RJ mutations reducers', () => {
     const MaRjState = rj({
       mutations: {
         increment: {
-          optimisticResult: counter => counter + 1,
+          optimisticResult: (counter) => counter + 1,
           effect: () => {},
           updater: (state, counter) => ({
             ...state,
@@ -1277,7 +1277,7 @@ describe('RJ mutations reducers', () => {
     const MaRjState = rj({
       mutations: {
         toggle: {
-          optimisticResult: done => !done,
+          optimisticResult: (done) => !done,
           effect: () => {},
           updater: (state, done) => ({
             ...state,
@@ -1602,7 +1602,7 @@ describe('RJ mutations reducers', () => {
     const MaRjState = rj({
       mutations: {
         create: {
-          optimisticResult: name => name,
+          optimisticResult: (name) => name,
           effect: () => {},
           updater: (state, name) => ({
             ...state,
@@ -2090,7 +2090,7 @@ describe('RJ mutations reducers', () => {
           reducer: singleMutationReducer,
           optimisticResult: () => null,
           effect: () => {},
-          updater: state => ({
+          updater: (state) => ({
             ...state,
             data: {
               ...state.data,

@@ -9,8 +9,8 @@ import { RUN, CLEAN, CANCEL, SUCCESS, UPDATE_DATA } from '../actionTypes'
 Enzyme.configure({ adapter: new Adapter() })
 
 describe('React-RocketJump actions', () => {
-  const makeRjComponent = rjState => {
-    const Component = props => null
+  const makeRjComponent = (rjState) => {
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -42,7 +42,7 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+      reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
     const wrapper = makeRjComponent(rjState)
@@ -70,7 +70,8 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [CLEAN]),
+      reducer: (oldReducer) =>
+        makeActionObserver(oldReducer, actionLog, [CLEAN]),
     })
 
     const wrapper = makeRjComponent(rjState)
@@ -98,7 +99,7 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer =>
+      reducer: (oldReducer) =>
         makeActionObserver(oldReducer, actionLog, [CANCEL]),
     })
 
@@ -127,7 +128,7 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer =>
+      reducer: (oldReducer) =>
         makeActionObserver(oldReducer, actionLog, [UPDATE_DATA]),
     })
 
@@ -178,10 +179,7 @@ describe('React-RocketJump actions', () => {
     const onSuccess = jest.fn()
 
     await act(async () => {
-      wrapper
-        .prop('run')
-        .onSuccess(onSuccess)
-        .run()
+      wrapper.prop('run').onSuccess(onSuccess).run()
     })
     expect(onSuccess).toHaveBeenCalledTimes(1)
   })
@@ -196,10 +194,7 @@ describe('React-RocketJump actions', () => {
     const onFailure = jest.fn()
 
     await act(async () => {
-      wrapper
-        .prop('run')
-        .onFailure(onFailure)
-        .run()
+      wrapper.prop('run').onFailure(onFailure).run()
     })
     expect(onFailure).toHaveBeenCalledTimes(1)
   })
@@ -209,7 +204,7 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+      reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
     const wrapper = makeRjComponent(rjState)
@@ -217,11 +212,7 @@ describe('React-RocketJump actions', () => {
     const onSuccess = jest.fn(() => {})
 
     await act(async () => {
-      wrapper
-        .prop('run')
-        .withMeta({ a: 1 })
-        .onSuccess(onSuccess)
-        .run()
+      wrapper.prop('run').withMeta({ a: 1 }).onSuccess(onSuccess).run()
     })
     expect(onSuccess).toHaveBeenCalled()
     expect(actionLog[0].meta).toEqual({ a: 1 })
@@ -232,7 +223,7 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+      reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
     const wrapper = makeRjComponent(rjState)
@@ -257,7 +248,7 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+      reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
     const wrapper = makeRjComponent(rjState)
@@ -281,7 +272,7 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+      reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
     const wrapper = makeRjComponent(rjState)
@@ -292,7 +283,7 @@ describe('React-RocketJump actions', () => {
       wrapper
         .prop('run')
         .withMeta({ a: 1 })
-        .withMeta(oldMeta => ({ b: oldMeta.a, a: 2 }))
+        .withMeta((oldMeta) => ({ b: oldMeta.a, a: 2 }))
         .onSuccess(onSuccess)
         .run()
     })
@@ -305,7 +296,7 @@ describe('React-RocketJump actions', () => {
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
     })
 
-    const Component = props => null
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState, undefined, ({ run, clean }) => ({
       fetchTodos: run,
@@ -324,15 +315,15 @@ describe('React-RocketJump actions', () => {
     const actionLog = []
 
     const rjState = reactRj({
-      effect: id => Promise.resolve([{ id: id + 7, name: 'admin' }]),
+      effect: (id) => Promise.resolve([{ id: id + 7, name: 'admin' }]),
       actions: ({ run }) => ({
-        run: id => run(id * 2),
+        run: (id) => run(id * 2),
       }),
-      reducer: oldReducer =>
+      reducer: (oldReducer) =>
         makeActionObserver(oldReducer, actionLog, [SUCCESS]),
     })
 
-    const Component = props => null
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -341,10 +332,7 @@ describe('React-RocketJump actions', () => {
     const onSuccess = jest.fn(() => {})
 
     await act(async () => {
-      wrapper
-        .prop('run')
-        .onSuccess(onSuccess)
-        .run(1)
+      wrapper.prop('run').onSuccess(onSuccess).run(1)
     })
 
     expect(actionLog[0]).toEqual({
@@ -362,15 +350,15 @@ describe('React-RocketJump actions', () => {
     const actionLog = []
 
     const rjState = reactRj({
-      effect: id => Promise.resolve([{ id: id + 7, name: 'admin' }]),
+      effect: (id) => Promise.resolve([{ id: id + 7, name: 'admin' }]),
       actions: ({ run }) => ({
-        runDouble: id => run(id * 2),
+        runDouble: (id) => run(id * 2),
       }),
-      reducer: oldReducer =>
+      reducer: (oldReducer) =>
         makeActionObserver(oldReducer, actionLog, [SUCCESS]),
     })
 
-    const Component = props => null
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -382,10 +370,7 @@ describe('React-RocketJump actions', () => {
     expect(wrapper.props()).toHaveProperty('runDouble')
 
     await act(async () => {
-      wrapper
-        .prop('runDouble')
-        .onSuccess(onSuccess)
-        .run(1)
+      wrapper.prop('runDouble').onSuccess(onSuccess).run(1)
     })
     expect(onSuccess).toHaveBeenCalled()
     expect(actionLog[0]).toEqual({
@@ -404,13 +389,13 @@ describe('React-RocketJump actions', () => {
     const rjState = reactRj({
       effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
       actions: ({ run }) => ({
-        runObject: object => run(object.id, object.name),
+        runObject: (object) => run(object.id, object.name),
       }),
-      reducer: oldReducer =>
+      reducer: (oldReducer) =>
         makeActionObserver(oldReducer, actionLog, [SUCCESS]),
     })
 
-    const Component = props => null
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -441,13 +426,13 @@ describe('React-RocketJump actions', () => {
     const rjState = reactRj({
       effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
       actions: ({ run }) => ({
-        runObject: object => run(object.id, object.name).withMeta({ z: 1 }),
+        runObject: (object) => run(object.id, object.name).withMeta({ z: 1 }),
       }),
-      reducer: oldReducer =>
+      reducer: (oldReducer) =>
         makeActionObserver(oldReducer, actionLog, [SUCCESS]),
     })
 
-    const Component = props => null
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -477,16 +462,16 @@ describe('React-RocketJump actions', () => {
     const rjState = reactRj({
       effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
       actions: ({ run }) => ({
-        runObject: object =>
+        runObject: (object) =>
           run(object.id, object.name)
             .withMeta({ z: 1 })
             .withMeta(({ z }) => ({ x: z })),
       }),
-      reducer: oldReducer =>
+      reducer: (oldReducer) =>
         makeActionObserver(oldReducer, actionLog, [SUCCESS]),
     })
 
-    const Component = props => null
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState)(Component)
 
@@ -516,11 +501,11 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
-      reducer: oldReducer =>
+      reducer: (oldReducer) =>
         makeActionObserver(oldReducer, actionLog, ['CUSTOM']),
     })
 
-    const Component = props => null
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState, undefined, ({ run, clean }) => ({
       run,
@@ -542,11 +527,11 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
-      reducer: oldReducer =>
+      reducer: (oldReducer) =>
         makeActionObserver(oldReducer, actionLog, ['CUSTOM']),
     })
 
-    const Component = props => null
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState, undefined, ({ run, clean }) => ({
       run,
@@ -559,10 +544,7 @@ describe('React-RocketJump actions', () => {
     const onSuccess = jest.fn()
 
     await act(async () => {
-      wrapper
-        .prop('custom')
-        .onSuccess(onSuccess)
-        .run()
+      wrapper.prop('custom').onSuccess(onSuccess).run()
     })
 
     expect(actionLog[0]).toEqual({ type: 'CUSTOM' })
@@ -636,10 +618,7 @@ describe('React-RocketJump actions', () => {
     const onSuccess = jest.fn()
 
     await act(async () => {
-      await wrapper
-        .prop('run')
-        .asPromise()
-        .then(onSuccess)
+      await wrapper.prop('run').asPromise().then(onSuccess)
     })
     expect(onSuccess).toHaveBeenCalledTimes(1)
   })
@@ -669,7 +648,7 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+      reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
     const wrapper = makeRjComponent(rjState)
@@ -693,11 +672,11 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: (id, name) => Promise.resolve([{ id: id + 7, name: name }]),
-      reducer: oldReducer =>
+      reducer: (oldReducer) =>
         makeActionObserver(oldReducer, actionLog, ['CUSTOM']),
     })
 
-    const Component = props => null
+    const Component = (props) => null
 
     const RjComponent = connectRj(rjState, undefined, ({ run, clean }) => ({
       run,
@@ -720,7 +699,7 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+      reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
     const wrapper = makeRjComponent(rjState)
@@ -754,7 +733,7 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+      reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
     const wrapper = makeRjComponent(rjState)
@@ -792,7 +771,7 @@ describe('React-RocketJump actions', () => {
 
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
-      reducer: oldReducer => makeActionObserver(oldReducer, actionLog, [RUN]),
+      reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
     const wrapper = makeRjComponent(rjState)

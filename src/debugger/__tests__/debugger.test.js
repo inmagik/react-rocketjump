@@ -111,7 +111,7 @@ describe('RJ Debugger', () => {
     const configD = {
       effect: effectD,
       name: 'RjD',
-      reducer: r => () => ({ giova: 23 }),
+      reducer: (r) => () => ({ giova: 23 }),
     }
     const RjD = rj(configD)
 
@@ -400,7 +400,7 @@ describe('RJ Debugger', () => {
     RjDebugEvents.subscribe(mockCallback)
 
     const resolvesA = []
-    const effectA = () => new Promise(r => resolvesA.push(r))
+    const effectA = () => new Promise((r) => resolvesA.push(r))
     const configA = {
       effect: effectA,
       name: 'RjA',
@@ -408,7 +408,7 @@ describe('RJ Debugger', () => {
     const RjA = rj(configA)
 
     const resolvesB = []
-    const effectB = () => new Promise(r => resolvesB.push(r))
+    const effectB = () => new Promise((r) => resolvesB.push(r))
     const configB = {
       effect: effectB,
       name: 'RjB',
@@ -416,7 +416,7 @@ describe('RJ Debugger', () => {
     const RjB = rj(configB)
 
     const resolvesC = []
-    const effectC = () => new Promise(r => resolvesC.push(r))
+    const effectC = () => new Promise((r) => resolvesC.push(r))
     const configC = {
       effect: effectC,
       name: 'RjC',

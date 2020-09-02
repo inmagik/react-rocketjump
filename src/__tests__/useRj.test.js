@@ -52,7 +52,7 @@ describe('useRj', () => {
     )
 
     const { result } = renderHook(() =>
-      useRj(maRjState, state => ({
+      useRj(maRjState, (state) => ({
         ...state,
         maik: 1312,
       }))
@@ -177,7 +177,7 @@ describe('useRj', () => {
   it('should create a per-instance version of selectors to enable good memoization', () => {
     const mySelector = jest
       .fn()
-      .mockImplementation(n => (n === 0 ? 0 : n + 1300))
+      .mockImplementation((n) => (n === 0 ? 0 : n + 1300))
 
     const maRjState = rj(
       rj({
@@ -197,12 +197,12 @@ describe('useRj', () => {
           return prevState
         },
         actions: () => ({
-          gang: n => ({ type: 'GANG', payload: n }),
+          gang: (n) => ({ type: 'GANG', payload: n }),
           charlie: () => ({ type: 'CHARLIE' }),
         }),
         selectors: ({ getData }) => {
           const memoSelector = memoize(mySelector)
-          return { getMaik: state => memoSelector(getData(state)) }
+          return { getMaik: (state) => memoSelector(getData(state)) }
         },
       }),
       () => Promise.resolve(1312)
@@ -353,19 +353,19 @@ describe('useRj', () => {
       .fn()
       .mockImplementationOnce(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolves[0] = resolve
           })
       )
       .mockImplementationOnce(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolves[1] = resolve
           })
       )
       .mockImplementationOnce(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolves[2] = resolve
           })
       )

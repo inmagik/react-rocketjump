@@ -85,7 +85,7 @@ describe('RJ mutations updater', () => {
     const MaRjState = rj(
       rj({
         actions: () => ({
-          fixMaState: name => ({
+          fixMaState: (name) => ({
             type: 'FIX_MA',
             payload: name,
           }),
@@ -140,7 +140,7 @@ describe('RJ mutations updater', () => {
     const MaRjState = rj(
       rj({
         actions: () => ({
-          fixMaState: name => ({
+          fixMaState: (name) => ({
             type: 'FIX_MA',
             payload: name,
           }),
@@ -155,7 +155,7 @@ describe('RJ mutations updater', () => {
       {
         mutations: {
           muta: {
-            optimisticResult: name => name,
+            optimisticResult: (name) => name,
             effect: () => {},
             updater: 'fixMaState',
           },

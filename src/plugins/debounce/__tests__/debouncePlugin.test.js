@@ -8,7 +8,7 @@ import { PENDING, SUCCESS, CLEAN, RUN } from '../../../actionTypes'
 jest.useFakeTimers()
 
 describe('rjDebounce', () => {
-  it('should debouce run', done => {
+  it('should debouce run', (done) => {
     const mockApi = jest
       .fn()
       .mockResolvedValueOnce('Alice')
@@ -23,7 +23,7 @@ describe('rjDebounce', () => {
     })
     const { actionCreators } = RjObject
     const subject = createTestRJSubscription(RjObject, mockCallback)
-    const dispatch = action => subject.next(action)
+    const dispatch = (action) => subject.next(action)
     const { runDebounced, clean } = bindActionCreators(actionCreators, dispatch)
     runDebounced()
     runDebounced()
@@ -158,7 +158,7 @@ describe('rjDebounce', () => {
       done()
     })
   })
-  it('should ingore debounce on non debounced action', done => {
+  it('should ingore debounce on non debounced action', (done) => {
     const mockApi = jest
       .fn()
       .mockResolvedValueOnce('Alice')
@@ -176,7 +176,7 @@ describe('rjDebounce', () => {
 
     const { actionCreators } = RjObject
     const subject = createTestRJSubscription(RjObject, mockCallback)
-    const dispatch = action => subject.next(action)
+    const dispatch = (action) => subject.next(action)
     const { run, drago } = bindActionCreators(actionCreators, dispatch, subject)
     drago()
     drago()
@@ -259,7 +259,7 @@ describe('rjDebounce', () => {
       done()
     })
   })
-  it('should use the when option to decide when skip debounce', done => {
+  it('should use the when option to decide when skip debounce', (done) => {
     const mockApi = jest
       .fn()
       .mockResolvedValueOnce('Alice')
@@ -286,7 +286,7 @@ describe('rjDebounce', () => {
 
     const { actionCreators } = RjObject
     const subject = createTestRJSubscription(RjObject, mockCallback)
-    const dispatch = action => subject.next(action)
+    const dispatch = (action) => subject.next(action)
     const { runDebounced } = bindActionCreators(actionCreators, dispatch)
     runDebounced({ q: 'G' })
     expect(mockApi).toBeCalledTimes(1)

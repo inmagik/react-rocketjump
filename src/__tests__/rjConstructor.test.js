@@ -16,7 +16,7 @@ describe('rj constructor', () => {
       isObjectRj(
         rj(
           {
-            reducer: r => r,
+            reducer: (r) => r,
           },
           {
             effect: () => 23,
@@ -28,7 +28,7 @@ describe('rj constructor', () => {
       isObjectRj(
         rj(
           rj({
-            reducer: r => r,
+            reducer: (r) => r,
           }),
           {
             effect: () => 23,
@@ -51,7 +51,7 @@ describe('rj constructor', () => {
           effect: () => 23,
         },
         {
-          reducer: r => r,
+          reducer: (r) => r,
         }
       )
     }).toThrowError(
@@ -97,7 +97,7 @@ describe('rj constructor', () => {
     expect(
       isPartialRj(
         rj({
-          reducer: r => r,
+          reducer: (r) => r,
         })
       )
     ).toBe(true)
@@ -117,7 +117,7 @@ describe('rj constructor', () => {
 
     expect(() => {
       rj({
-        reducer: r => r,
+        reducer: (r) => r,
       })()
     }).toThrowError(/\[react-rocketjump\] you can't invoke a partialRj/)
 
@@ -125,7 +125,7 @@ describe('rj constructor', () => {
       rj(
         rj(() => 23),
         {
-          reducer: r => r,
+          reducer: (r) => r,
         }
       )()
     }).toThrowError(
@@ -137,13 +137,13 @@ describe('rj constructor', () => {
     const dubRj = forgeRocketJump({
       shouldRocketJump: () => true, // single invocation
       makeRunConfig: () => null, // no run config
-      makeRecursionRjs: rjs => rjs, // don't touch configs
+      makeRecursionRjs: (rjs) => rjs, // don't touch configs
       makeExport: (_, config, rjExport = {}) => {
         return {
           giova: 23,
         }
       },
-      finalizeExport: rjExport => ({ ...rjExport }), // don't hack config
+      finalizeExport: (rjExport) => ({ ...rjExport }), // don't hack config
     })
 
     expect(strictIsObjectRj(dubRj())).toBe(false)

@@ -156,7 +156,7 @@ function handleOptSuccess(reducer, state, action) {
     .slice(0, 2)
     .concat(RUN)
     .join('/')
-  let nextActions = actions.map(a => {
+  let nextActions = actions.map((a) => {
     if (
       a.action.type === mutationTypeRun &&
       a.action?.meta?.mutationID === action.meta.mutationID
@@ -173,7 +173,7 @@ function handleOptSuccess(reducer, state, action) {
   // Commited root state \w SUCCESS from SERVER
   const commitedRootState = applyActionsOnSnapshot(
     snapshot,
-    nextActions.map(a => a.action),
+    nextActions.map((a) => a.action),
     reducer
   )
 
@@ -188,7 +188,7 @@ function handleOptSuccess(reducer, state, action) {
     // Save a new snapshot appling actions unitl first non committed
     nextSnapshot = applyActionsOnSnapshot(
       snapshot,
-      nextActions.slice(0, firstNonCommitIndex).map(a => a.action),
+      nextActions.slice(0, firstNonCommitIndex).map((a) => a.action),
       reducer
     )
     // Take only action from first non committed
@@ -218,7 +218,7 @@ function handleOptFailure(reducer, state, action) {
     .concat(RUN)
     .join('/')
   let nextActions = actions.filter(
-    a =>
+    (a) =>
       a.action.type !== mutationTypeRun ||
       a.action?.meta?.mutationID !== action.meta.mutationID
   )
@@ -232,7 +232,7 @@ function handleOptFailure(reducer, state, action) {
   // Rollback to state without opt failed actions
   const roolBackRootState = applyActionsOnSnapshot(
     snapshot,
-    nextActions.map(a => a.action),
+    nextActions.map((a) => a.action),
     reducer
   )
 
@@ -248,7 +248,7 @@ function handleOptFailure(reducer, state, action) {
     // Squash the action that will be removed into a new snap
     nextSnapshot = applyActionsOnSnapshot(
       snapshot,
-      nextActions.slice(0, firstNonCommitIndex).map(a => a.action),
+      nextActions.slice(0, firstNonCommitIndex).map((a) => a.action),
       reducer
     )
     // 0 - 1

@@ -99,7 +99,7 @@ function makeRecursionRjs(
 ) {
   let hasEffectConfigured = false
 
-  const recursionRjs = partialRjsOrConfigs.map(partialRjOrConfig => {
+  const recursionRjs = partialRjsOrConfigs.map((partialRjOrConfig) => {
     if (typeof partialRjOrConfig === 'function') {
       // A Partial RJ
       if (isPartialRj(partialRjOrConfig)) {

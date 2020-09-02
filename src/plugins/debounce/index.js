@@ -21,7 +21,7 @@ const rjDebounce = (optionsOrTime = defaultOptions) => {
           debounced: true,
         }),
     }),
-    effectPipeline: action$ =>
+    effectPipeline: (action$) =>
       action$.pipe(
         scan((prev, current) => {
           // Shoud debounce ma run?
@@ -48,7 +48,7 @@ const rjDebounce = (optionsOrTime = defaultOptions) => {
           }
           return current
         }, null),
-        debounce(action => {
+        debounce((action) => {
           if (action.type === RUN && action.meta.debounced) {
             return timer(options.time)
           } else {

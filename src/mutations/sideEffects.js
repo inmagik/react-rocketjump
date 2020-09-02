@@ -8,7 +8,7 @@ export function enhanceMakeObservable(
   makeObservable,
   parentEffectCaller
 ) {
-  const makeMutationsObsList = Object.keys(mutations).map(name => {
+  const makeMutationsObsList = Object.keys(mutations).map((name) => {
     const { effect, takeEffect, effectCaller } = mutations[name]
     const prefix = `${MUTATION_PREFIX}/${name}/`
 

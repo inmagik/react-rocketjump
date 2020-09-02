@@ -146,7 +146,7 @@ describe('Rocketjump reducer', () => {
   it('should be proxable', () => {
     const { reducer } = rj({
       effect: () => Promise.resolve(),
-      reducer: givenReducer => {
+      reducer: (givenReducer) => {
         return (prevState, action) => {
           const nextState = givenReducer(prevState, action)
           if (action.type === SUCCESS) {

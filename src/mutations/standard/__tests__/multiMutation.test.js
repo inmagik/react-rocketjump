@@ -17,7 +17,7 @@ describe('Rj multi mutation', () => {
 
     const MaRjState = rj({
       mutations: {
-        submitForm: multiMuation(p => p, {
+        submitForm: multiMuation((p) => p, {
           effect: mockEffect,
           updater: () => {},
         }),
@@ -41,7 +41,7 @@ describe('Rj multi mutation', () => {
 
     expect(result.current[0].submitFormState).toEqual({
       pendings: {
-        '23': true,
+        23: true,
       },
       errors: {},
     })
@@ -52,7 +52,7 @@ describe('Rj multi mutation', () => {
     expect(mockEffect).toHaveBeenCalledTimes(1)
     expect(result.current[0].submitFormState).toEqual({
       pendings: {
-        '23': true,
+        23: true,
       },
       errors: {},
     })
@@ -63,8 +63,8 @@ describe('Rj multi mutation', () => {
     expect(mockEffect).toHaveBeenCalledTimes(2)
     expect(result.current[0].submitFormState).toEqual({
       pendings: {
-        '23': true,
-        '777': true,
+        23: true,
+        777: true,
       },
       errors: {},
     })
@@ -74,7 +74,7 @@ describe('Rj multi mutation', () => {
     })
     expect(result.current[0].submitFormState).toEqual({
       pendings: {
-        '777': true,
+        777: true,
       },
       errors: {},
     })
@@ -93,7 +93,7 @@ describe('Rj multi mutation', () => {
     expect(mockEffect).toHaveBeenCalledTimes(3)
     expect(result.current[0].submitFormState).toEqual({
       pendings: {
-        '1312': true,
+        1312: true,
       },
       errors: {},
     })
@@ -104,7 +104,7 @@ describe('Rj multi mutation', () => {
     expect(result.current[0].submitFormState).toEqual({
       pendings: {},
       errors: {
-        '1312': 'Bleah',
+        1312: 'Bleah',
       },
     })
   })

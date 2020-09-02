@@ -48,10 +48,10 @@ class ExtraSideEffectSubject extends BehaviorSubject {
 
 const EffectActions = [CLEAN, RUN, CANCEL]
 function filterEffectActions(action, prefix) {
-  return EffectActions.map(a => prefix + a).indexOf(action.type) !== -1
+  return EffectActions.map((a) => prefix + a).indexOf(action.type) !== -1
 }
 function filterNonEffectActions(action, prefix) {
-  return EffectActions.map(a => prefix + a).indexOf(action.type) === -1
+  return EffectActions.map((a) => prefix + a).indexOf(action.type) === -1
 }
 
 export default function createMakeRxObservable(
@@ -96,14 +96,14 @@ export default function createMakeRxObservable(
       return concat(
         of({ type: prefix + PENDING, meta }),
         from(effectResult).pipe(
-          map(data => ({
+          map((data) => ({
             type: prefix + SUCCESS,
             payload: { data, params },
             meta,
             // Callback runned from the subscribtion in the react hook
             successCallback: callbacks ? callbacks.onSuccess : undefined,
           })),
-          catchError(error => {
+          catchError((error) => {
             // Avoid headache
             if (
               error instanceof TypeError ||
@@ -158,17 +158,17 @@ export default function createMakeRxObservable(
       // if an action different from theese is emitted simply emit/dispatch them
       dispatchObservable = merge(
         createEffect(
-          action$.pipe(filter(a => filterEffectActions(a, prefix))),
+          action$.pipe(filter((a) => filterEffectActions(a, prefix))),
           state$,
           extraSideEffectObs$,
           mapActionToObserable,
           effectTypeArgs,
           prefix
         ),
-        mergeObservable$.pipe(filter(a => filterNonEffectActions(a, prefix)))
+        mergeObservable$.pipe(filter((a) => filterNonEffectActions(a, prefix)))
       )
     }
-    return [dispatchObservable, config => extraSideEffectSubject.next(config)]
+    return [dispatchObservable, (config) => extraSideEffectSubject.next(config)]
   }
 }
 
@@ -202,7 +202,8 @@ export function mergeCreateMakeRxObservable(...creators) {
 
     return [
       dispatch$,
-      config => configUpdaters.forEach(updateConfig => updateConfig(config)),
+      (config) =>
+        configUpdaters.forEach((updateConfig) => updateConfig(config)),
     ]
   }
 }

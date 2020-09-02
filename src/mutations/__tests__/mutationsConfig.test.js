@@ -15,7 +15,7 @@ describe('RJ mutations config', () => {
       rj({
         mutations: {
           giova: {
-            updater: a => a,
+            updater: (a) => a,
           },
         },
         effect: () => Promise.resolve(1312),
@@ -26,7 +26,7 @@ describe('RJ mutations config', () => {
       rj({
         mutations: {
           giova: {
-            effect: a => a,
+            effect: (a) => a,
           },
         },
         effect: () => Promise.resolve(1312),
@@ -37,8 +37,8 @@ describe('RJ mutations config', () => {
       rj({
         mutations: {
           giova: {
-            effect: a => a,
-            updater: a => a,
+            effect: (a) => a,
+            updater: (a) => a,
           },
         },
         effect: () => Promise.resolve(1312),

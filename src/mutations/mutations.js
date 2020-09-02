@@ -82,7 +82,7 @@ export function enhanceFinalExportWithMutations(
   }
 
   const hasSomeOptimisticMutations = Object.keys(mutations).some(
-    name => typeof mutations[name].optimisticResult === 'function'
+    (name) => typeof mutations[name].optimisticResult === 'function'
   )
   if (hasSomeOptimisticMutations) {
     // Enable optimistic reducer...

@@ -15,7 +15,7 @@ function takeUntilCancelAction(action$, prefix) {
   return takeUntil(
     action$.pipe(
       filter(
-        action =>
+        (action) =>
           action.type === prefix + CLEAN || action.type === prefix + CANCEL
       )
     )
@@ -88,7 +88,7 @@ function actionToExhaustObservableEffect(
 ) {
   return merge(
     action$.pipe(
-      mergeMap(action => {
+      mergeMap((action) => {
         if (action.type === prefix + CANCEL || action.type === prefix + CLEAN) {
           return of(action)
         } else {
@@ -148,7 +148,7 @@ function takeEffectGroupBy(
   }
   return action$.pipe(
     groupBy(groupByFn),
-    mergeMap($group =>
+    mergeMap(($group) =>
       $group.pipe(
         withLatestFrom(extraSideEffectObs$),
         mapToLatest($group, mapActionToObserable, prefix)
@@ -176,7 +176,7 @@ function takeEffectGroupByExhaust(
   }
   return action$.pipe(
     groupBy(groupByFn),
-    mergeMap($group =>
+    mergeMap(($group) =>
       actionToExhaustObservableEffect(
         $group,
         extraSideEffectObs$,

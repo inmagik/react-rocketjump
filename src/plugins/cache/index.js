@@ -6,7 +6,7 @@ import { SessionStorageStore } from './stores'
 
 const defaultKey = (...args) => JSON.stringify(args)
 
-const rjCache = config => {
+const rjCache = (config) => {
   if (!config.ns) {
     throw new Error('RjCache requires the ns property to be set')
   }
@@ -31,21 +31,21 @@ const rjCache = config => {
         return of(provider.get(k))
       } else {
         return from(effectFn(...args)).pipe(
-          map(result => {
+          map((result) => {
             provider.set(k, result)
             return result
           })
         )
       }
     },
-    effectPipeline: action$ =>
+    effectPipeline: (action$) =>
       action$.pipe(
-        tap(action => {
+        tap((action) => {
           if (action.type === '$reset-cache') {
             provider.clear()
           }
         }),
-        filter(action => action.type !== '$reset-cache')
+        filter((action) => action.type !== '$reset-cache')
       ),
   })
 }
