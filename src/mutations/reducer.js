@@ -1,4 +1,4 @@
-import { SUCCESS, INIT } from '../actionTypes'
+import { SUCCESS, INIT, RUN, FAILURE } from '../actionTypes'
 import { MUTATION_PREFIX } from './actionTypes'
 import combineReducers from '../combineReducers'
 
@@ -29,10 +29,25 @@ export function enhanceReducer(mutations, reducer, actionCreators) {
     }
 
     const type = `${MUTATION_PREFIX}/${name}/${SUCCESS}`
-    return {
+    const nextHanlders = {
       ...all,
       [type]: update,
     }
+
+    // Optmistic updater!
+    if (typeof mutation.optimisticResult === 'function') {
+      const type = `${MUTATION_PREFIX}/${name}/${RUN}`
+      nextHanlders[type] = (state, action) => {
+        const optimisticData = mutation.optimisticResult(
+          ...action.payload.params
+        )
+        return update(state, {
+          payload: { data: optimisticData },
+        })
+      }
+    }
+
+    return nextHanlders
   }, {})
 
   return (prevState, action) => {
@@ -49,7 +64,7 @@ function makeMutationReducer(mutation, name) {
     if (action.type === INIT) {
       return mutation.reducer(state, action)
     }
-    const pieces = (action.type || '').split('/')
+    const pieces = action.type.split('/')
     if (pieces.length !== 3) {
       return state
     }
@@ -80,4 +95,201 @@ export function makeMutationsReducer(mutations) {
   }
 
   return combineReducers(mutationsReducers)
+}
+
+const DefaultOptState = {
+  snapshot: null,
+  actions: [],
+}
+export function optimisticMutationsReducer(state = DefaultOptState, action) {
+  if (state.snapshot) {
+    return {
+      ...state,
+      actions: state.actions.concat({ committed: true, action }),
+    }
+  }
+  return state
+}
+
+function handleOptRun(reducer, state, action) {
+  const {
+    optimisticMutations: { actions, snapshot },
+  } = state
+  const nextActions = actions.concat({
+    committed: false,
+    action,
+  })
+  const nextSnapshot = snapshot ?? state.root
+  const nextState = reducer(state, action)
+  return {
+    ...nextState,
+    optimisticMutations: {
+      snapshot: nextSnapshot,
+      actions: nextActions,
+    },
+  }
+}
+
+function applyActionsOnSnapshot(snapshot, actions, reducer) {
+  const state = { root: snapshot }
+  return actions.reduce((snap, action) => reducer(snap, action), state).root
+}
+
+function getFirstNonCommittedIndex(actions) {
+  for (let i = 0; i < actions.length; i++) {
+    if (!actions[i].committed) {
+      return i
+    }
+  }
+  return null
+}
+
+function handleOptSuccess(reducer, state, action) {
+  const {
+    optimisticMutations: { actions, snapshot },
+  } = state
+
+  // Commit action
+  // SWAP THE RUN \W SUCCESS KEEP ORDER BUT USE SERVER RESPONSE
+  const mutationTypeRun = action.type
+    .split('/')
+    .slice(0, 2)
+    .concat(RUN)
+    .join('/')
+  let nextActions = actions.map(a => {
+    if (
+      a.action.type === mutationTypeRun &&
+      a.action?.meta?.mutationID === action.meta.mutationID
+    ) {
+      return {
+        committed: true,
+        action,
+      }
+    } else {
+      return a
+    }
+  })
+
+  // Commited root state \w SUCCESS from SERVER
+  const commitedRootState = applyActionsOnSnapshot(
+    snapshot,
+    nextActions.map(a => a.action),
+    reducer
+  )
+
+  const firstNonCommitIndex = getFirstNonCommittedIndex(nextActions)
+
+  let nextSnapshot
+  if (firstNonCommitIndex === null) {
+    // All commited!
+    nextSnapshot = null
+    nextActions = []
+  } else {
+    // Save a new snapshot appling actions unitl first non committed
+    nextSnapshot = applyActionsOnSnapshot(
+      snapshot,
+      nextActions.slice(0, firstNonCommitIndex).map(a => a.action),
+      reducer
+    )
+    // Take only action from first non committed
+    nextActions = nextActions.slice(firstNonCommitIndex)
+  }
+
+  const nextState = reducer(state, action)
+  return {
+    ...nextState,
+    root: commitedRootState,
+    optimisticMutations: {
+      snapshot: nextSnapshot,
+      actions: nextActions,
+    },
+  }
+}
+
+function handleOptFailure(reducer, state, action) {
+  const {
+    optimisticMutations: { actions, snapshot },
+  } = state
+
+  // Remove failied RUN
+  const mutationTypeRun = action.type
+    .split('/')
+    .slice(0, 2)
+    .concat(RUN)
+    .join('/')
+  let nextActions = actions.filter(
+    a =>
+      a.action.type !== mutationTypeRun ||
+      a.action?.meta?.mutationID !== action.meta.mutationID
+  )
+
+  // 0 - 1 - 1 - 0 - 1
+  // FILTER:
+  // 1 - 1 - 0 - 1
+  // or
+  // 0 - 1 - 1 - 1
+
+  // Rollback to state without opt failed actions
+  const roolBackRootState = applyActionsOnSnapshot(
+    snapshot,
+    nextActions.map(a => a.action),
+    reducer
+  )
+
+  const firstNonCommitIndex = getFirstNonCommittedIndex(nextActions)
+
+  let nextSnapshot
+  if (firstNonCommitIndex === null) {
+    // All committed!
+    nextSnapshot = null
+    nextActions = []
+  } else {
+    // 0 - 1 - 1 - 1
+    // Squash the action that will be removed into a new snap
+    nextSnapshot = applyActionsOnSnapshot(
+      snapshot,
+      nextActions.slice(0, firstNonCommitIndex).map(a => a.action),
+      reducer
+    )
+    // 0 - 1
+    // or
+    // 0 - 1 - 1 - 1
+    // from
+    nextActions = nextActions.slice(firstNonCommitIndex)
+  }
+
+  const nextState = reducer(state, action)
+  return {
+    ...nextState,
+    root: roolBackRootState,
+    optimisticMutations: {
+      snapshot: nextSnapshot,
+      actions: nextActions,
+    },
+  }
+}
+
+export function optimisticMutationsHor(reducer) {
+  return (state, action) => {
+    if (Number.isInteger(action?.meta?.mutationID)) {
+      // OPT ACTIONS
+
+      // Split into mutations pieces
+      const pieces = action.type.split('/')
+      if (pieces.length === 3 && pieces[0] === MUTATION_PREFIX) {
+        const decoupleType = pieces[2]
+        if (decoupleType === RUN) {
+          return handleOptRun(reducer, state, action)
+        }
+        if (decoupleType === FAILURE) {
+          return handleOptFailure(reducer, state, action)
+        }
+        if (decoupleType === SUCCESS) {
+          return handleOptSuccess(reducer, state, action)
+        }
+      }
+    }
+
+    return reducer(state, action)
+  }
 }

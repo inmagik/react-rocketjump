@@ -124,19 +124,19 @@ describe('RJ mutations computed', () => {
   })
 
   it('should get angry when misconfigured mutation computed', async () => {
-    const MaRjState = rj({
-      mutations: {
-        socio: {
-          effect: () => Promise.resolve(23),
-          updater: s => s,
-        },
-      },
-      effect: () => Promise.resolve('U.u'),
-      computed: {
-        skinny: '@mutation.skinny.fulminatoDiMercurio',
-      },
-    })
     expect(() => {
+      const MaRjState = rj({
+        mutations: {
+          socio: {
+            effect: () => Promise.resolve(23),
+            updater: s => s,
+          },
+        },
+        effect: () => Promise.resolve('U.u'),
+        computed: {
+          skinny: '@mutation.skinny.fulminatoDiMercurio',
+        },
+      })
       const { result } = renderHook(() => useRj(MaRjState))
       // eslint-disable-next-line no-unused-vars
       const { skinny } = result.current[0]
