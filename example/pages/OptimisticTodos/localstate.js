@@ -5,7 +5,7 @@ import request from 'superagent'
 export const API_URL = 'http://localhost:9001'
 
 function isMyLuckyDay(chance) {
-  return 1 + Math.floor(Math.random() * chance) === 1 ? '' : '~404~'
+  return 1 + Math.floor(Math.random() * 100) <= chance ? '' : '~404~'
 }
 
 export const TodosListState = rj(rjPlainList(), {

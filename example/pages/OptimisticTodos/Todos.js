@@ -14,7 +14,7 @@ export default function Todos() {
 
   const [errors, setErrors] = useState([])
 
-  const [chance, setChance] = useState(1)
+  const [chance, setChance] = useState(100)
 
   const handleToggleTodo = useCallback(
     (todo) => {
@@ -86,12 +86,13 @@ export default function Todos() {
           </div>
         </div>
         <div className="optmistic-hack-lucky">
-          Success chance 1 /{' '}
+          Success chance{' '}
           <input
             type="number"
             value={chance}
             onChange={(e) => setChance(e.target.value)}
           />
+          {'%'}
         </div>
       </div>
       <h3>
