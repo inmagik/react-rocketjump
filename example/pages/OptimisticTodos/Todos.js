@@ -64,7 +64,7 @@ export default function Todos() {
   )
 
   return (
-    <div className="todos">
+    <div className="todos optimistic-todos">
       <ErrorToast errors={errors} setErrors={setErrors} />
       <h1>
         Ma REST{' '}
@@ -76,7 +76,7 @@ export default function Todos() {
         </span>{' '}
         Todos
       </h1>
-      <div className="optimistic-todos">
+      <div className="optimistic-todos-header">
         <div>
           <div className="action-button-rj">
             <button onClick={() => clean()}>CLEAN</button>

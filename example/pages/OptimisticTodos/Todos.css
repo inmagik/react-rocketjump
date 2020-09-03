@@ -54,7 +54,7 @@
   font-size: 25px;
 }
 
-.optimistic-todos {
+.optimistic-todos-header {
   display: flex;
 }
 .optmistic-hack-lucky {
@@ -74,19 +74,19 @@
   margin: 0;
 }
 
-.todo .todo-increment {
+ .optimistic-todos .todo .todo-increment {
   color: crimson;
   margin-right: 20px;
 }
-.todo .todo-delete {
+ .optimistic-todos .todo .todo-delete {
   border-radius: 40%;
   color: salmon;
 }
-.todo.todo-done .todo-circle {
+.optimistic-todos .todo.todo-done .todo-circle {
   color: green;
   border: 1px solid green;
 }
-.todo.todo-done .todo-title {
+.optimistic-todos .todo.todo-done .todo-title {
   text-decoration: line-through;
 }
 

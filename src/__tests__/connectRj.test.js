@@ -3,7 +3,6 @@ import { act } from 'react-dom/test-utils'
 import Enzyme, { mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import connectRj from '../connectRj'
-// import memoize from 'memoize-one'
 import rj from '../rj'
 
 Enzyme.configure({ adapter: new Adapter() })
