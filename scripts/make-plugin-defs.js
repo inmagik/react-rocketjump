@@ -16,7 +16,7 @@ plugins.forEach(plugin => {
         name: 'react-rocketjump/plugins/' + plugin,
         private: true,
         main: '../../lib/plugins/' + plugin + '/index.cjs.js',
-        module: '../../lib/plugins/' + plugin + '/index.esm.js',
+        module: '../../lib/plugins/' + plugin + '/index.es.js',
       },
       null,
       2

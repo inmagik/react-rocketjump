@@ -2,5 +2,5 @@
   "name": "react-rocketjump/plugins/map",
   "private": true,
   "main": "../../lib/plugins/map/index.cjs.js",
-  "module": "../../lib/plugins/map/index.esm.js"
+  "module": "../../lib/plugins/map/index.es.js"
 }

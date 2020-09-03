@@ -2,5 +2,5 @@
   "name": "react-rocketjump/plugins/listDelete",
   "private": true,
   "main": "../../lib/plugins/listDelete/index.cjs.js",
-  "module": "../../lib/plugins/listDelete/index.esm.js"
+  "module": "../../lib/plugins/listDelete/index.es.js"
 }
