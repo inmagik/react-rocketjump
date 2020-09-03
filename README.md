@@ -15,8 +15,6 @@ Benefits of using React RocketJump
 - the library detects when components are mounted or unmounted, so that no asynchronous code is run on unmounted components
 - extensible (but already powerful) and composable ecosystem of plugins to manage the most common and challenging tasks
 
-## HEADS UP! RJ v2 is out :fire: read the full [CHANGELOG](/CHANGELOG.md#200)
-
 ## Quick start
 
 ### Install
@@ -171,13 +169,13 @@ const TodoList = ({ username }) => {
   // useRunRj is implement with useRj and useEffect to call the run action with your deps
   const [
     { data: todos, pending, error },
-    { run }  
+    { run }
   ] = useRj(TodosState, [username])
 
   useEffect(() => {
     if (username) {
       run(username)
-    }  
+    }
   }, [username])
 
   function onTodosReload() {
@@ -232,7 +230,7 @@ const TodoList = ({ username }) => {
     {
       run,
       addTodo, // <-- Match the mutation name
-    }  
+    }
   ] = useRj(TodosState, [username])
 
   // Mutations actions works as run, cancel and clean
@@ -251,6 +249,69 @@ const TodoList = ({ username }) => {
   // ...
 }
 ```
+
+### Optimistic Mutations
+
+To make a mutation optimistic add `optimisticResult` to your `mutation` config:
+
+```js
+rj({
+  effect: fetchTodosApi,
+  mutations: {
+    updateTodo: {
+      optimisticResult: (todo) => todo,
+      updater: (state, updatedTodo) => ({
+        ...state,
+        data: state.data.map((todo) =>
+          todo.id === updatedTodo.id ? updatedTodo : todo
+        ),
+      }),
+      effect: updateTodoApi,
+    },
+    toggleTodo: {
+      optimisticResult: (todo) => ({
+        ...todo,
+        done: !todo.done,
+      }),
+      updater: (state, updatedTodo) => ({
+        ...state,
+        data: state.data.map((todo) =>
+          todo.id === updatedTodo.id ? updatedTodo : todo
+        ),
+      }),
+      effect: (todo) =>
+        updateTodoApi({
+          ...todo,
+          done: !todo.done,
+        }),
+    },
+    incrementTodo: {
+      optimisticResult: (todo) => todo.id,
+      updater: (state, todoIdToIncrement) => ({
+        ...state,
+        data: state.data.map((todo) =>
+          todo.id === todoIdToIncrement
+            ? {
+                ...todo,
+                score: todo.score + 1,
+              }
+            : todo
+        ),
+      }),
+      effect: (todo) => incrementTodoApi(todo.id).then(() => todo.id),
+    },
+  },
+})
+```
+
+The `optimisticResult` function will be called with your *params* (as your `effect`)
+and the return value will be passed to the `updater` to update your state.
+
+If your mutation **SUCCESS** *rocketjump* will commit your state and re-running
+your `updater` ussing the effect result as a normal mutation.
+
+Otherwise if your mutation **FAILURE** *rocketjump* roll back your state and
+unapply the `optimisticResult`.
 
 ## Deep dive
 
