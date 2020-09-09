@@ -20,7 +20,8 @@ export function enhanceReducer(mutations, reducer, actionCreators) {
       update = (state, action) =>
         reducer(state, actionCreator(action.payload.data))
     } else if (typeof mutation.updater === 'function') {
-      update = (state, action) => mutation.updater(state, action.payload.data)
+      update = (state, action, isOptimisticUpdate = false) =>
+        mutation.updater(state, action.payload.data, isOptimisticUpdate)
     } else {
       throw new Error(
         '[react-rocketjump] @mutations you should provide at least ' +
@@ -41,9 +42,13 @@ export function enhanceReducer(mutations, reducer, actionCreators) {
         const optimisticData = mutation.optimisticResult(
           ...action.payload.params
         )
-        return update(state, {
-          payload: { data: optimisticData },
-        })
+        return update(
+          state,
+          {
+            payload: { data: optimisticData },
+          },
+          true
+        )
       }
     }
 

@@ -6,7 +6,7 @@ import { renderHook, act } from '@testing-library/react-hooks'
 const MUTATION_PREFIX = '@MUTATION'
 
 describe('RJ mutations updater', () => {
-  it('should be called on mutation SUCCESS with current rj state and the effect result', async () => {
+  it('should be called on mutation SUCCESS with current rj state, the effect result and optimistic flag false', async () => {
     const mockUpdater = jest.fn()
 
     const MaRjState = rj({
@@ -32,12 +32,58 @@ describe('RJ mutations updater', () => {
         error: null,
         pending: false,
       },
-      23
+      23,
+      false
     )
     await act(async () => {
       result.current[1].muta(false)
     })
     expect(mockUpdater).toBeCalledTimes(1)
+  })
+  it('should be called on mutation RUN and SUCCESS on optimisti update with current rj state, the effect result and optimistic flag', async () => {
+    const mockUpdater = jest.fn()
+    const resolves = []
+
+    const MaRjState = rj({
+      mutations: {
+        muta: {
+          optimisticResult: () => 'Rinne',
+          effect: () =>
+            new Promise((resolve) => {
+              resolves.push(resolve)
+            }),
+          updater: mockUpdater,
+        },
+      },
+      effect: () => {},
+    })
+
+    const { result } = renderHook(() => useRj(MaRjState))
+    expect(mockUpdater).not.toHaveBeenCalled()
+    await act(async () => {
+      result.current[1].muta()
+    })
+    expect(mockUpdater).toHaveBeenLastCalledWith(
+      {
+        data: null,
+        error: null,
+        pending: false,
+      },
+      'Rinne',
+      true
+    )
+    await act(async () => {
+      resolves[0]('Giova')
+    })
+    expect(mockUpdater).toHaveBeenLastCalledWith(
+      {
+        data: null,
+        error: null,
+        pending: false,
+      },
+      'Giova',
+      false
+    )
   })
   it('should be used as updater for main state', () => {
     const MaRjState = rj({
