@@ -156,31 +156,41 @@ function handleOptSuccess(reducer, state, action) {
 
   // Commit action
   // SWAP THE RUN \W SUCCESS KEEP ORDER BUT USE SERVER RESPONSE
+  // OR WHEN AUTO COMMIT ACTIVE COMMIT THE GOOD RUN!
   const mutationTypeRun = action.type
     .split('/')
     .slice(0, 2)
     .concat(RUN)
     .join('/')
-  let nextActions = actions.map((a) => {
+  let nextActions = actions.map((actionWrapper) => {
     if (
-      a.action.type === mutationTypeRun &&
-      a.action?.meta?.mutationID === action.meta.mutationID
+      actionWrapper.action.type === mutationTypeRun &&
+      actionWrapper.action?.meta?.mutationID === action.meta.mutationID
     ) {
       return {
         committed: true,
-        action,
+        action:
+          action.meta.mutationAutoCommit === true
+            ? actionWrapper.action
+            : action,
       }
     } else {
-      return a
+      return actionWrapper
     }
   })
 
-  // Commited root state \w SUCCESS from SERVER
-  const commitedRootState = applyActionsOnSnapshot(
-    snapshot,
-    nextActions.map((a) => a.action),
-    reducer
-  )
+  let commitedRootState
+  if (action.meta.mutationAutoCommit === true) {
+    // Use current root state and commit them!
+    commitedRootState = state.root
+  } else {
+    // Commited root state \w SUCCESS from SERVER
+    commitedRootState = applyActionsOnSnapshot(
+      snapshot,
+      nextActions.map((a) => a.action),
+      reducer
+    )
+  }
 
   const firstNonCommitIndex = getFirstNonCommittedIndex(nextActions)
 

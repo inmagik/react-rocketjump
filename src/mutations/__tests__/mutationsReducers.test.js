@@ -1598,6 +1598,247 @@ describe('RJ mutations reducers', () => {
     })
   })
 
+  it('should be optimistic and auto commit when requested', () => {
+    const MaRjState = rj({
+      mutations: {
+        create: {
+          optimisticResult: (name) => name,
+          effect: () => {},
+          updater: (state, name) => ({
+            ...state,
+            data: state.data.concat(name),
+          }),
+        },
+      },
+      effect: () => {},
+    })
+
+    const { reducer } = MaRjState
+    let state = reducer(undefined, { type: INIT })
+    state = reducer(state, {
+      type: SUCCESS,
+      payload: { data: ['Babu'] },
+    })
+
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: ['Babu'],
+      },
+      optimisticMutations: {
+        actions: [],
+        snapshot: null,
+      },
+    })
+
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/create/${RUN}`,
+      payload: { params: ['Lina'] },
+      meta: {
+        mutationID: 1,
+      },
+    })
+
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: ['Babu', 'Lina'],
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['Lina'] },
+              meta: {
+                mutationID: 1,
+              },
+            },
+            committed: false,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: ['Babu'],
+        },
+      },
+    })
+
+    let prevState = state
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/create/${SUCCESS}`,
+      payload: { data: 'Lina' },
+      meta: {
+        mutationID: 1,
+        mutationAutoCommit: true,
+      },
+    })
+
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: ['Babu', 'Lina'],
+      },
+      optimisticMutations: {
+        actions: [],
+        snapshot: null,
+      },
+    })
+    expect(prevState.root).toBe(state.root)
+
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/create/${RUN}`,
+      payload: { params: ['Lino'] },
+      meta: {
+        mutationID: 2,
+      },
+    })
+
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: ['Babu', 'Lina', 'Lino'],
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['Lino'] },
+              meta: {
+                mutationID: 2,
+              },
+            },
+            committed: false,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: ['Babu', 'Lina'],
+        },
+      },
+    })
+
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/create/${RUN}`,
+      payload: { params: ['GiuGiu'] },
+      meta: {
+        mutationID: 3,
+      },
+    })
+
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: ['Babu', 'Lina', 'Lino', 'GiuGiu'],
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['Lino'] },
+              meta: {
+                mutationID: 2,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['GiuGiu'] },
+              meta: {
+                mutationID: 3,
+              },
+            },
+            committed: false,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: ['Babu', 'Lina'],
+        },
+      },
+    })
+
+    prevState = state
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/create/${SUCCESS}`,
+      payload: { data: 'GiuGiu' },
+      meta: {
+        mutationID: 3,
+        mutationAutoCommit: true,
+      },
+    })
+    expect(prevState.root).toBe(state.root)
+
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: ['Babu', 'Lina', 'Lino', 'GiuGiu'],
+      },
+      optimisticMutations: {
+        actions: [
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['Lino'] },
+              meta: {
+                mutationID: 2,
+              },
+            },
+            committed: false,
+          },
+          {
+            action: {
+              type: `${MUTATION_PREFIX}/create/${RUN}`,
+              payload: { params: ['GiuGiu'] },
+              meta: {
+                mutationID: 3,
+              },
+            },
+            committed: true,
+          },
+        ],
+        snapshot: {
+          pending: false,
+          error: null,
+          data: ['Babu', 'Lina'],
+        },
+      },
+    })
+
+    state = reducer(state, {
+      type: `${MUTATION_PREFIX}/create/${FAILURE}`,
+      payload: 'Fuck',
+      meta: {
+        mutationID: 2,
+      },
+    })
+
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: ['Babu', 'Lina', 'GiuGiu'],
+      },
+      optimisticMutations: {
+        actions: [],
+        snapshot: null,
+      },
+    })
+  })
+
   it('should be optimistic and revert failure and commit success an keep state consistent', () => {
     const MaRjState = rj({
       mutations: {
