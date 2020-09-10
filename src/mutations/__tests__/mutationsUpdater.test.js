@@ -6,7 +6,7 @@ import { renderHook, act } from '@testing-library/react-hooks'
 const MUTATION_PREFIX = '@MUTATION'
 
 describe('RJ mutations updater', () => {
-  it('should be called on mutation SUCCESS with current rj state, the effect result and optimistic flag false', async () => {
+  it('should be called on mutation SUCCESS with current rj state and the effect result', async () => {
     const mockUpdater = jest.fn()
 
     const MaRjState = rj({
@@ -32,16 +32,17 @@ describe('RJ mutations updater', () => {
         error: null,
         pending: false,
       },
-      23,
-      false
+      23
     )
     await act(async () => {
       result.current[1].muta(false)
     })
     expect(mockUpdater).toBeCalledTimes(1)
   })
-  it('should be called on mutation RUN and SUCCESS on optimisti update with current rj state, the effect result and optimistic flag', async () => {
+
+  it('should used optimisticUpdater when provided for optimistic update and updater for commit update', async () => {
     const mockUpdater = jest.fn()
+    const mockOptUpdater = jest.fn()
     const resolves = []
 
     const MaRjState = rj({
@@ -53,6 +54,7 @@ describe('RJ mutations updater', () => {
               resolves.push(resolve)
             }),
           updater: mockUpdater,
+          optimisticUpdater: mockOptUpdater,
         },
       },
       effect: () => {},
@@ -60,29 +62,31 @@ describe('RJ mutations updater', () => {
 
     const { result } = renderHook(() => useRj(MaRjState))
     expect(mockUpdater).not.toHaveBeenCalled()
+    expect(mockOptUpdater).not.toHaveBeenCalled()
     await act(async () => {
       result.current[1].muta()
     })
-    expect(mockUpdater).toHaveBeenLastCalledWith(
+    expect(mockUpdater).not.toHaveBeenCalled()
+    expect(mockOptUpdater).toHaveBeenLastCalledWith(
       {
         data: null,
         error: null,
         pending: false,
       },
-      'Rinne',
-      true
+      'Rinne'
     )
+    mockOptUpdater.mockClear()
     await act(async () => {
       resolves[0]('Giova')
     })
+    expect(mockOptUpdater).not.toHaveBeenCalled()
     expect(mockUpdater).toHaveBeenLastCalledWith(
       {
         data: null,
         error: null,
         pending: false,
       },
-      'Giova',
-      false
+      'Giova'
     )
   })
   it('should be used as updater for main state', () => {
@@ -180,6 +184,82 @@ describe('RJ mutations updater', () => {
       pending: false,
       error: null,
       data: 'The King Was GioVa',
+    })
+  })
+  it('should can be a string with the name of action creator used as optimisticUpdater for main state', () => {
+    const mockAction = jest.fn((name) => ({
+      type: 'FIX_MA',
+      payload: name,
+    }))
+    const MaRjState = rj(
+      rj({
+        actions: () => ({
+          fixMaState: mockAction,
+        }),
+        composeReducer: (state, action) => {
+          if (action.type === 'FIX_MA') {
+            return { ...state, data: 'The King Was ' + action.payload }
+          }
+          return state
+        },
+      }),
+      {
+        mutations: {
+          muta: {
+            effect: () => {},
+            optimisticResult: (a) => a,
+            optimisticUpdater: 'fixMaState',
+          },
+        },
+        effect: () => {},
+      }
+    )
+    let state = MaRjState.reducer(undefined, { INIT })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: null,
+      },
+      optimisticMutations: {
+        snapshot: null,
+        actions: [],
+      },
+    })
+    // Not realted mutation ...
+    state = MaRjState.reducer(state, {
+      type: `${MUTATION_PREFIX}/socio/RUN`,
+      meta: {},
+      payload: { params: ['GioVa'] },
+    })
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: null,
+      },
+      optimisticMutations: {
+        snapshot: null,
+        actions: [],
+      },
+    })
+    expect(mockAction).not.toHaveBeenCalled()
+    state = MaRjState.reducer(state, {
+      type: `${MUTATION_PREFIX}/muta/RUN`,
+      meta: {},
+      payload: { params: ['GioVa'] },
+    })
+    expect(mockAction).toHaveBeenLastCalledWith('GioVa')
+    expect(state).toEqual({
+      root: {
+        pending: false,
+        error: null,
+        data: 'The King Was GioVa',
+      },
+      optimisticMutations: {
+        snapshot: null,
+        actions: [],
+      },
     })
   })
   it('should can be a string with the name of action creator used as updater for main state also for optimistic update', () => {

@@ -253,6 +253,63 @@ describe('RJ mutations action creators', () => {
     })
   })
 
+  it('should be generated from mutations and generate auto commit action when only optimistiUpdater is configured', () => {
+    let rj
+    jest.isolateModules(() => {
+      rj = require('../../rj').default
+    })
+    const mockDispatch = jest.fn()
+    const maRjState = rj({
+      mutations: {
+        killHumans: {
+          optimisticResult: () => null,
+          effect: () => Promise.resolve(23),
+          updater: () => {},
+          optimisticUpdater: () => {},
+        },
+        cookSpaghetti: {
+          optimisticResult: () => null,
+          effect: () => Promise.resolve(23),
+          optimisticUpdater: () => {},
+        },
+      },
+      effect: () => Promise.resolve(1312),
+    })
+    const boundActions = bindActionCreators(
+      maRjState.actionCreators,
+      mockDispatch
+    )
+    boundActions.killHumans('x')
+
+    expect(mockDispatch).nthCalledWith(1, {
+      type: `${MUTATION_PREFIX}/killHumans/${RUN}`,
+      payload: { params: ['x'] },
+      meta: {
+        mutationID: 1,
+        params: ['x'],
+      },
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+
+    boundActions.cookSpaghetti('Yeah', 23)
+    expect(mockDispatch).nthCalledWith(2, {
+      type: `${MUTATION_PREFIX}/cookSpaghetti/${RUN}`,
+      payload: { params: ['Yeah', 23] },
+      meta: {
+        mutationID: 2,
+        params: ['Yeah', 23],
+        mutationAutoCommit: true,
+      },
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+  })
+
   it('should be warn when a mutation override existing action creator', async () => {
     let rj
     jest.isolateModules(() => {

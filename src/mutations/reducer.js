@@ -4,56 +4,107 @@ import combineReducers from '../combineReducers'
 
 // enhance the basic reducer \w updater of mutations to rj root reducer
 export function enhanceReducer(mutations, reducer, actionCreators) {
-  const handleMutationsReducers = Object.keys(mutations).reduce((all, name) => {
-    const mutation = mutations[name]
+  const handleMutationsReducers = Object.keys(mutations).reduce(
+    (handlers, name) => {
+      const mutation = mutations[name]
 
-    let update
+      let update, optimisticUpdate
 
-    if (typeof mutation.updater === 'string') {
-      const actionCreator = actionCreators[mutation.updater]
-      if (typeof actionCreator !== 'function') {
-        throw new Error(
-          `[react-rocketjump] @mutations you provide a non existing ` +
-            `action creator [${mutation.updater}] as updater for mutation [${name}].`
-        )
+      if (
+        typeof mutation.optimisticUpdater === 'function' ||
+        typeof mutation.optimisticUpdater === 'string'
+      ) {
+        // Got optimisticUpdater
+        // Check optimisticResult to be define when got optimisticUpdater
+        if (typeof mutation.optimisticResult !== 'function') {
+          if (process.env.NODE_ENV === 'production') {
+            throw new Error('[react-rocketjump] @mutations error.')
+          } else {
+            throw new Error(
+              '[react-rocketjump] @mutations you should define optimisticUpdater ' +
+                `along with optimisticResult check your mutation config [${name}].`
+            )
+          }
+        }
+        // Check for good optimisticUpdater action creator
+        if (typeof mutation.optimisticUpdater === 'string') {
+          const actionCreator = actionCreators[mutation.optimisticUpdater]
+          if (typeof actionCreator !== 'function') {
+            if (process.env.NODE_ENV === 'production') {
+              throw new Error('[react-rocketjump] @mutations error.')
+            } else {
+              throw new Error(
+                `[react-rocketjump] @mutations you provide a non existing ` +
+                  `action creator [${mutation.updater}] as optimisticUpdater for mutation [${name}].`
+              )
+            }
+          }
+          // Use action creator as optmistic update handler
+          optimisticUpdate = (state, action) =>
+            reducer(state, actionCreator(action.payload.data))
+        } else {
+          optimisticUpdate = (state, action) =>
+            mutation.optimisticUpdater(state, action.payload.data)
+        }
       }
-      update = (state, action) =>
-        reducer(state, actionCreator(action.payload.data))
-    } else if (typeof mutation.updater === 'function') {
-      update = (state, action, isOptimisticUpdate = false) =>
-        mutation.updater(state, action.payload.data, isOptimisticUpdate)
-    } else {
-      throw new Error(
-        '[react-rocketjump] @mutations you should provide at least ' +
-          `an effect and an updater to mutation config [${name}].`
-      )
-    }
 
-    const type = `${MUTATION_PREFIX}/${name}/${SUCCESS}`
-    const nextHanlders = {
-      ...all,
-      [type]: update,
-    }
+      // No optimisticUpdater
+      // Check for good updater
+      if (typeof mutation.updater === 'string') {
+        const actionCreator = actionCreators[mutation.updater]
+        if (typeof actionCreator !== 'function') {
+          if (process.env.NODE_ENV === 'production') {
+            throw new Error('[react-rocketjump] @mutations error.')
+          } else {
+            throw new Error(
+              `[react-rocketjump] @mutations you provide a non existing ` +
+                `action creator [${mutation.updater}] as updater for mutation [${name}].`
+            )
+          }
+        }
+        update = (state, action) =>
+          reducer(state, actionCreator(action.payload.data))
+      } else if (typeof mutation.updater === 'function') {
+        update = (state, action) => mutation.updater(state, action.payload.data)
+      } else if (!optimisticUpdate) {
+        // Get angry only when we have no a valid optimisticUpdate
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('[react-rocketjump] @mutations error.')
+        } else {
+          throw new Error(
+            '[react-rocketjump] @mutations you should provide at least ' +
+              `an effect and an updater to mutation config [${name}].`
+          )
+        }
+      }
 
-    // Optmistic updater!
-    if (typeof mutation.optimisticResult === 'function') {
-      const type = `${MUTATION_PREFIX}/${name}/${RUN}`
-      nextHanlders[type] = (state, action) => {
-        const optimisticData = mutation.optimisticResult(
-          ...action.payload.params
-        )
-        return update(
-          state,
-          {
+      // Register updater as SUCCESS handler
+      if (update) {
+        const type = `${MUTATION_PREFIX}/${name}/${SUCCESS}`
+        handlers[type] = update
+      }
+
+      // Optmistic updater!
+      if (typeof mutation.optimisticResult === 'function') {
+        // Use standard updater ans optimistiUpdater when is not defined
+        if (!optimisticUpdate) {
+          optimisticUpdate = update
+        }
+        const type = `${MUTATION_PREFIX}/${name}/${RUN}`
+        handlers[type] = (state, action) => {
+          const optimisticData = mutation.optimisticResult(
+            ...action.payload.params
+          )
+          return optimisticUpdate(state, {
             payload: { data: optimisticData },
-          },
-          true
-        )
+          })
+        }
       }
-    }
 
-    return nextHanlders
-  }, {})
+      return handlers
+    },
+    {}
+  )
 
   return (prevState, action) => {
     if (handleMutationsReducers[action.type]) {

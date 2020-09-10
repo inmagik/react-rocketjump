@@ -1604,7 +1604,7 @@ describe('RJ mutations reducers', () => {
         create: {
           optimisticResult: (name) => name,
           effect: () => {},
-          updater: (state, name) => ({
+          optimisticUpdater: (state, name) => ({
             ...state,
             data: state.data.concat(name),
           }),
