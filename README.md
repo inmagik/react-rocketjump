@@ -287,7 +287,7 @@ rj({
     },
     incrementTodo: {
       optimisticResult: (todo) => todo.id,
-      updater: (state, todoIdToIncrement) => ({
+      optmisticUpdater: (state, todoIdToIncrement) => ({
         ...state,
         data: state.data.map((todo) =>
           todo.id === todoIdToIncrement
@@ -312,6 +312,19 @@ your `updater` ussing the effect result as a normal mutation.
 
 Otherwise if your mutation **FAILURE** *rocketjump* roll back your state and
 unapply the `optimisticResult`.
+
+Sometimes you need to distinguish between an optmisitc update and an update
+from `SUCCESS` if you provide the `optimisticUpdater` key in your mutation
+config the `optimisticUpdater` is used to perform the optmistic update an
+the `updater` to perform the update when commit success.
+
+If your provided **ONLY** `optimisticUpdater` the success commit is skipped
+and used current root state, this is useful for response as `204 No Content`
+style where you can ignore the success and skip an-extra React update to your
+state.
+
+If you provide only `updater` this is used for **BOTH** optmistic and non-optimistic
+updates.
 
 ## Deep dive
 
