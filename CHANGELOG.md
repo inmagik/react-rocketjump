@@ -1,3 +1,29 @@
+## 2.6.0
+##### *Semptmber 16th, 2020*
+
+Added `.curry(...args)` method to action builder.
+Sometimes expecially in custom hooks you need to curry arguments, success,
+failures callbacks or metas.
+
+Es:.
+```js
+function useProduct(id) {
+  const [data, actions] = useRunRj(ProductState, [id])
+  const patchCurrentProduct = useMemo(
+    () => actions.patchProduct.onSuccess(() => alert('Patched!')).curry(id),
+    [actions, id]
+  )
+  // ... ID will be curried and also onSuccess handler
+  patchCurrentProduct({ price: 33 })
+}
+```
+
+##### NOTE
+
+`.curry` is immutable an create a new builder instance every time is invoked
+so is prefer to be used wrapped in a `React.useMemo`.
+
+
 ## 2.5.0
 ##### *Semptmber 10th, 2020*
 
