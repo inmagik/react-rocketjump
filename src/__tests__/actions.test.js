@@ -788,4 +788,42 @@ describe('React-RocketJump actions', () => {
     })
     expect(actionLog).toEqual([])
   })
+
+  it('should curry builder as well', async () => {
+    const actionLog = []
+
+    const rjState = reactRj({
+      effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
+      reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
+    })
+
+    const wrapper = makeRjComponent(rjState)
+    const run = wrapper.prop('run')
+    const curriedRun = run
+      .withMeta({ x: 'xd' })
+      .withMeta({ babu: 23 })
+      .curry(1)
+      .withMeta({ giova: 33 })
+      .curry(2, 23)
+
+    await act(async () => {
+      curriedRun(88, 99)
+    })
+
+    expect(actionLog[0]).toEqual({
+      type: RUN,
+      payload: {
+        params: [1, 2, 23, 88, 99],
+      },
+      meta: {
+        giova: 33,
+        babu: 23,
+        x: 'xd',
+      },
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+  })
 })
