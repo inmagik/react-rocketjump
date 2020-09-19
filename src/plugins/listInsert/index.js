@@ -11,9 +11,9 @@ const rjListInsert = (config = {}) => {
 
   return rj({
     actions: () => ({
-      insertItem: item => ({ type: TYPE, item }),
+      insertItem: (item) => ({ type: TYPE, item }),
     }),
-    reducer: oldReducer => (state, action) => {
+    reducer: (oldReducer) => (state, action) => {
       if (action.type === TYPE) {
         const paginationPath = path
           .split('.')

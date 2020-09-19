@@ -2,8 +2,8 @@ import { omit } from '../../helpers'
 import { rj } from '../../index'
 import { PENDING, SUCCESS, FAILURE, CLEAN } from '../../actionTypes'
 
-const defaultKeyMaker = action => (action.meta ? action.meta.id : null)
-const defaultDataTransform = arg => arg
+const defaultKeyMaker = (action) => (action.meta ? action.meta.id : null)
+const defaultDataTransform = (arg) => arg
 
 const handlePendingItem = (prevState, action) => ({
   ...prevState,
@@ -77,7 +77,7 @@ const makeMapReducer = (
 }
 
 const makeMapSelectors = () => {
-  const getMapPendings = state =>
+  const getMapPendings = (state) =>
     Object.keys(state).reduce(
       (r, key) => (state[key].pending ? { ...r, [key]: true } : r),
       {}
@@ -85,13 +85,13 @@ const makeMapSelectors = () => {
 
   const getMapLoadings = getMapPendings
 
-  const getMapFailures = state =>
+  const getMapFailures = (state) =>
     Object.keys(state).reduce((r, key) => {
       const error = state[key].error
       return error !== null ? { ...r, [key]: error } : r
     }, {})
 
-  const getMapData = state =>
+  const getMapData = (state) =>
     Object.keys(state).reduce((r, key) => {
       const data = state[key].data
       return data !== null ? { ...r, [key]: data } : r
@@ -109,9 +109,9 @@ const rjMap = (mapConfig = {}) =>
   rj({
     actions: ({ run, clean }) => ({
       runKey: (id, ...params) => run(id, ...params).withMeta({ id }),
-      cleanKey: id => clean(id).withMeta({ id }),
+      cleanKey: (id) => clean(id).withMeta({ id }),
     }),
-    reducer: oldReducer =>
+    reducer: (oldReducer) =>
       makeMapReducer(
         mapConfig.key,
         mapConfig.dataTransform,

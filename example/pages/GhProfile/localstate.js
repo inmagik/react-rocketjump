@@ -26,7 +26,7 @@ export const GhUserStarsState = rj(
   }),
   {
     name: 'GitHub User Stars',
-    effect: username => ajax.getJSON(`${API_URL}/users/${username}/starred`),
+    effect: (username) => ajax.getJSON(`${API_URL}/users/${username}/starred`),
   }
 )
 
@@ -37,6 +37,7 @@ export const GhUserFollowersState = rj(
   }),
   {
     name: 'GitHub User Followers',
-    effect: username => ajax.getJSON(`${API_URL}/users/${username}/followers`),
+    effect: (username) =>
+      ajax.getJSON(`${API_URL}/users/${username}/followers`),
   }
 )

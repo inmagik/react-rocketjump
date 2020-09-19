@@ -5,7 +5,7 @@ const COMPUTED_MUTATION_PREFIX = '@mutation'
 function createWithMutationsComputeState(computed, mutations) {
   const computedKeys = Object.keys(computed)
   const mutationsSelectors = computedKeys
-    .filter(k => k.indexOf(COMPUTED_MUTATION_PREFIX) === 0)
+    .filter((k) => k.indexOf(COMPUTED_MUTATION_PREFIX) === 0)
     .reduce((selectors, key) => {
       const path = key.substr(
         key.indexOf(COMPUTED_MUTATION_PREFIX) +
@@ -30,7 +30,7 @@ function createWithMutationsComputeState(computed, mutations) {
 
       return {
         ...selectors,
-        [key]: state => get(state, path),
+        [key]: (state) => get(state, path),
       }
     }, {})
 
@@ -69,7 +69,7 @@ export function enancheComputeState(
     return computeState
   }
   if (!computeState) {
-    return state => state.root
+    return (state) => state.root
   }
   const withMutationsComputeState = createWithMutationsComputeState(
     computed,

@@ -9,9 +9,9 @@ describe('RJ mutations side effect model', () => {
   it('should be use take effect every by default', async () => {
     const mockCallback = jest.fn()
     const resolvesA = []
-    const mockEffectA = jest.fn(() => new Promise(r => resolvesA.push(r)))
+    const mockEffectA = jest.fn(() => new Promise((r) => resolvesA.push(r)))
     const resolvesB = []
-    const mockEffectB = jest.fn(() => new Promise(r => resolvesB.push(r)))
+    const mockEffectB = jest.fn(() => new Promise((r) => resolvesB.push(r)))
 
     const RjObject = rj({
       mutations: {
@@ -116,9 +116,9 @@ describe('RJ mutations side effect model', () => {
   it('should be use a custom take effect when specified', async () => {
     const mockCallback = jest.fn()
     const resolvesA = []
-    const mockEffectA = jest.fn(() => new Promise(r => resolvesA.push(r)))
+    const mockEffectA = jest.fn(() => new Promise((r) => resolvesA.push(r)))
     const resolvesB = []
-    const mockEffectB = jest.fn(() => new Promise(r => resolvesB.push(r)))
+    const mockEffectB = jest.fn(() => new Promise((r) => resolvesB.push(r)))
 
     const RjObject = rj({
       mutations: {
@@ -202,12 +202,12 @@ describe('RJ mutations side effect model', () => {
     })
   })
 
-  it('should apply the mutation effect caller', done => {
+  it('should apply the mutation effect caller', (done) => {
     const mockApi = jest.fn().mockResolvedValue(['GioVa'])
     const mockCallback = jest.fn()
 
     const callerA = jest.fn((fn, ...args) => {
-      return fn(...args).then(a => a.concat('Skaffo'))
+      return fn(...args).then((a) => a.concat('Skaffo'))
     })
 
     const RjObject = rj({
@@ -275,7 +275,7 @@ describe('RJ mutations side effect model', () => {
           updater: () => {},
         },
       },
-      effectPipeline: action$ => {
+      effectPipeline: (action$) => {
         return action$.pipe(tap(mockTap))
       },
       effect: mockEffect,

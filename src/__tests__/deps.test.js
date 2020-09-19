@@ -10,7 +10,7 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -62,7 +62,7 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -115,7 +115,7 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -167,7 +167,7 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -220,7 +220,7 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -272,7 +272,7 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -280,7 +280,7 @@ describe('deps', () => {
 
     const MyRjState = rj({
       effect: mockApi,
-      effectPipeline: a => a.pipe(tap(actionLog)),
+      effectPipeline: (a) => a.pipe(tap(actionLog)),
     })
 
     const { rerender } = renderHook(
@@ -329,7 +329,7 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -337,7 +337,7 @@ describe('deps', () => {
 
     const MyRjState = rj({
       effect: mockApi,
-      effectPipeline: a => a.pipe(tap(actionLog)),
+      effectPipeline: (a) => a.pipe(tap(actionLog)),
     })
 
     const { rerender } = renderHook(
@@ -411,7 +411,7 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -419,7 +419,7 @@ describe('deps', () => {
 
     const MyRjState = rj({
       effect: mockApi,
-      effectPipeline: a => a.pipe(tap(actionLog)),
+      effectPipeline: (a) => a.pipe(tap(actionLog)),
     })
 
     const { rerender } = renderHook(
@@ -479,7 +479,7 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -487,7 +487,7 @@ describe('deps', () => {
 
     const MyRjState = rj({
       effect: mockApi,
-      effectPipeline: a => a.pipe(tap(actionLog)),
+      effectPipeline: (a) => a.pipe(tap(actionLog)),
     })
 
     const { rerender } = renderHook(
@@ -560,7 +560,7 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
@@ -568,7 +568,7 @@ describe('deps', () => {
 
     const MyRjState = rj({
       effect: mockApi,
-      effectPipeline: a => a.pipe(tap(actionLog)),
+      effectPipeline: (a) => a.pipe(tap(actionLog)),
     })
 
     const { rerender } = renderHook(
@@ -648,13 +648,13 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
     const MyRjState = rj({
       effect: mockApi,
-      effectPipeline: a => a.pipe(tap(actionLog)),
+      effectPipeline: (a) => a.pipe(tap(actionLog)),
     })
 
     const { rerender, result } = renderHook(
@@ -730,13 +730,13 @@ describe('deps', () => {
     let _resolves = []
     const mockApi = jest.fn(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve) => {
           _resolves.push(resolve)
         })
     )
     const MyRjState = rj({
       effect: mockApi,
-      effectPipeline: a => a.pipe(tap(actionLog)),
+      effectPipeline: (a) => a.pipe(tap(actionLog)),
     })
 
     const { rerender, result } = renderHook(

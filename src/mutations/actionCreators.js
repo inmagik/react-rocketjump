@@ -2,12 +2,30 @@ import { makeLibraryAction } from 'rocketjump-core'
 import { RUN } from '../actionTypes'
 import { MUTATION_PREFIX } from './actionTypes'
 
+let mutationIDCounter = 0
+
 // Make the action creater that trigger a mutation side effects
 function makeActionCreator(name, mutation) {
-  const actionCreator = (...params) =>
-    makeLibraryAction(`${MUTATION_PREFIX}/${name}/${RUN}`, ...params).withMeta({
+  const isOptimistic = typeof mutation.optimisticResult === 'function'
+  // Has auto commit when only optimisticUpdater is provided
+  const hasAutoCommit =
+    isOptimistic && mutation.optimisticUpdater && !mutation.updater
+
+  const actionCreator = (...params) => {
+    const meta = {
       params,
-    })
+    }
+    if (isOptimistic) {
+      meta.mutationID = ++mutationIDCounter
+      if (hasAutoCommit) {
+        meta.mutationAutoCommit = true
+      }
+    }
+    return makeLibraryAction(
+      `${MUTATION_PREFIX}/${name}/${RUN}`,
+      ...params
+    ).withMeta(meta)
+  }
   return actionCreator
 }
 

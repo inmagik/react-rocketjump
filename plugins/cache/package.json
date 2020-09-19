@@ -2,5 +2,5 @@
   "name": "react-rocketjump/plugins/cache",
   "private": true,
   "main": "../../lib/plugins/cache/index.cjs.js",
-  "module": "../../lib/plugins/cache/index.esm.js"
+  "module": "../../lib/plugins/cache/index.es.js"
 }

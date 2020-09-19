@@ -311,7 +311,7 @@ describe('List Plugin', () => {
 
   it('should allow custom list reducer', () => {
     const customReducer = jest.fn((oldList, action) => {
-      return action.payload.data.filter(item => item.name.startsWith('A'))
+      return action.payload.data.filter((item) => item.name.startsWith('A'))
     })
 
     const { reducer } = rj(

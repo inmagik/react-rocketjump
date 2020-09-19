@@ -2,5 +2,5 @@
   "name": "react-rocketjump/plugins/listInsert",
   "private": true,
   "main": "../../lib/plugins/listInsert/index.cjs.js",
-  "module": "../../lib/plugins/listInsert/index.esm.js"
+  "module": "../../lib/plugins/listInsert/index.es.js"
 }

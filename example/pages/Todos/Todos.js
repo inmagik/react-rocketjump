@@ -8,12 +8,20 @@ import './Todos.css'
 export default function Todos() {
   const [
     { todos, loading, adding, deleting, updating },
-    { addStupidTodo, removeTodo, toggleTodo },
+    { addStupidTodo, removeTodo, toggleTodo, clean, run },
   ] = useRunRj(TodosListState)
 
   return (
     <div className="todos">
       <h1>Ma REST Todos</h1>
+      <div>
+        <div className="action-button-rj">
+          <button onClick={() => clean()}>CLEAN</button>
+        </div>
+        <div className="action-button-rj">
+          <button onClick={() => run()}>RUN</button>
+        </div>
+      </div>
       <h3>
         <a href={`${API_URL}/todos`}>
           {API_URL}
@@ -27,9 +35,9 @@ export default function Todos() {
       )}
       {todos && (
         <NewTodo
-          onSubmit={todo => {
+          onSubmit={(todo) => {
             addStupidTodo
-              .onSuccess(todo => {
+              .onSuccess((todo) => {
                 console.log('Todo Added!', todo)
               })
               .run(todo)
@@ -39,7 +47,7 @@ export default function Todos() {
       )}
       <div className="todo-list">
         {todos &&
-          todos.map(todo => (
+          todos.map((todo) => (
             <Todo
               saving={updating[todo.id] || deleting[todo.id]}
               onToggle={toggleTodo}

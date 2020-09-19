@@ -8,20 +8,20 @@ export const TodosListState = rj(rjPlainList(), {
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
   mutations: {
     addStupidTodo: rj.mutation.single({
-      effect: todo =>
+      effect: (todo) =>
         request
           .post(`${API_URL}/todos`)
           .send(todo)
           .then(({ body }) => body),
       updater: 'insertItem',
     }),
-    removeTodo: rj.mutation.multi(todo => todo.id, {
-      effect: todo =>
+    removeTodo: rj.mutation.multi((todo) => todo.id, {
+      effect: (todo) =>
         request.delete(`${API_URL}/todos/${todo.id}`).then(() => todo),
       updater: 'deleteItem',
     }),
-    toggleTodo: rj.mutation.multi(todo => todo.id, {
-      effect: todo =>
+    toggleTodo: rj.mutation.multi((todo) => todo.id, {
+      effect: (todo) =>
         request
           .put(`${API_URL}/todos/${todo.id}`)
           .send({

@@ -5,6 +5,14 @@
   margin-top: 50px;
 }
 
+.action-button-rj {
+  margin-top: 3px;
+}
+.action-button-rj button {
+  width: 100px;
+  font-weight: bold;
+}
+
 .todo-list {
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;

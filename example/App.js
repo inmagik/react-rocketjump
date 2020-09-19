@@ -6,7 +6,7 @@ const examples = preval`
   const fs = require('fs');
   module.exports = fs.readdirSync(__dirname + '/pages').filter(item => item[0] !== '.');
 `
-const lazyExamples = examples.map(example =>
+const lazyExamples = examples.map((example) =>
   React.lazy(() => import(`./pages/${example}`))
 )
 
@@ -18,11 +18,24 @@ const BackButton = () => (
 
 function ListExamples() {
   return (
-    <div>
-      <h1>RJ examples</h1>~
+    <div style={{ fontFamily: 'monospace' }}>
+      <h1>RJ Examples</h1>
+      <div style={{ fontSize: 16 }}>
+        From HERE TO Th3 M00N{' '}
+        <span style={{ fontFamily: 'verdana' }}>{'~'}</span>{' '}
+        <span role="img" aria-label="rocket">
+          🚀
+        </span>
+        <span role="img" aria-label="rocket">
+          🚀
+        </span>
+        <span role="img" aria-label="rocket">
+          🚀
+        </span>
+      </div>
       <ul>
         {examples.map((example, i) => (
-          <li key={i}>
+          <li key={i} style={{ fontSize: 15 }}>
             <Link to={`/examples/${example}`}>{example}</Link>
           </li>
         ))}

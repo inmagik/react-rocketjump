@@ -24,8 +24,8 @@ export const makeSideEffectDescriptor = () => ({
 
 export const exportEffectCaller = makeExportValue({
   defaultValue: undefined,
-  isLazy: v => v === RJ_CONFIG_PLACEHOLDER,
-  shouldCompose: v => !!v,
+  isLazy: (v) => v === RJ_CONFIG_PLACEHOLDER,
+  shouldCompose: (v) => !!v,
   compose: (prevCaller, caller) => {
     if (prevCaller) {
       return composeEffectCallers(prevCaller, caller)

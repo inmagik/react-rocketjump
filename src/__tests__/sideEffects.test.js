@@ -13,8 +13,11 @@ import {
 jest.useFakeTimers()
 
 describe('RJ side effect model', () => {
-  it('should run an async api and dispatch PENDING and SUCCESS actions when resolved', done => {
-    const mockApiResult = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
+  it('should run an async api and dispatch PENDING and SUCCESS actions when resolved', (done) => {
+    const mockApiResult = [
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' },
+    ]
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
     const mockCallback = jest.fn()
 
@@ -59,7 +62,7 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('should be cancelable', done => {
+  it('should be cancelable', (done) => {
     const mockApi = jest.fn().mockResolvedValueOnce(1312)
     const mockCallback = jest.fn()
 
@@ -105,7 +108,7 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('should run an async api and dispatch LOADING and FAILURE actions when rejected', done => {
+  it('should run an async api and dispatch LOADING and FAILURE actions when rejected', (done) => {
     const mockBadApi = jest.fn(() => Promise.reject('Something bad happened'))
     const mockCallback = jest.fn()
 
@@ -147,7 +150,7 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('should pass params to api function', done => {
+  it('should pass params to api function', (done) => {
     const mockApi = jest.fn().mockResolvedValueOnce(1)
     const mockCallback = jest.fn()
 
@@ -171,8 +174,11 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('should dispatch meta along with actions', done => {
-    const mockApiResult = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
+  it('should dispatch meta along with actions', (done) => {
+    const mockApiResult = [
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' },
+    ]
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
     const mockCallback = jest.fn()
 
@@ -217,7 +223,7 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('should dispatch meta along with actions also when reject', done => {
+  it('should dispatch meta along with actions also when reject', (done) => {
     const mockBadApi = jest.fn(() => Promise.reject('Something bad happened'))
     const mockCallback = jest.fn()
 
@@ -259,7 +265,7 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('can unload a side effect', done => {
+  it('can unload a side effect', (done) => {
     const mockApi = jest.fn().mockResolvedValueOnce(1)
     const mockCallback = jest.fn()
 
@@ -309,7 +315,7 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('can unload a every side effect', done => {
+  it('can unload a every side effect', (done) => {
     const mockApi = jest
       .fn()
       .mockResolvedValueOnce(1)
@@ -415,11 +421,8 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('can unload a exhaust side effect', done => {
-    const mockApi = jest
-      .fn()
-      .mockResolvedValueOnce(1)
-      .mockResolvedValueOnce(23)
+  it('can unload a exhaust side effect', (done) => {
+    const mockApi = jest.fn().mockResolvedValueOnce(1).mockResolvedValueOnce(23)
     const mockCallback = jest.fn()
 
     const RjObject = rj({
@@ -549,11 +552,8 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('can unload a queue side effect', done => {
-    const mockApi = jest
-      .fn()
-      .mockResolvedValueOnce(1)
-      .mockResolvedValueOnce(23)
+  it('can unload a queue side effect', (done) => {
+    const mockApi = jest.fn().mockResolvedValueOnce(1).mockResolvedValueOnce(23)
     const mockCallback = jest.fn()
 
     const RjObject = rj({
@@ -635,7 +635,7 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('takes only the last side effect as default', done => {
+  it('takes only the last side effect as default', (done) => {
     const mockApi = jest
       .fn()
       .mockResolvedValueOnce('Alice')
@@ -704,7 +704,7 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('takes every side effect when specified', done => {
+  it('takes every side effect when specified', (done) => {
     const mockApi = jest
       .fn()
       .mockResolvedValueOnce('Alice')
@@ -785,7 +785,7 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('can pipeling effect with rx', done => {
+  it('can pipeling effect with rx', (done) => {
     const mockApi = jest
       .fn()
       .mockResolvedValueOnce('Alice')
@@ -794,11 +794,8 @@ describe('RJ side effect model', () => {
     const mockCallback = jest.fn()
 
     const rjWithDebouce = rj({
-      effectPipeline: action$ =>
-        action$.pipe(
-          debounceTime(200),
-          distinctUntilChanged()
-        ),
+      effectPipeline: (action$) =>
+        action$.pipe(debounceTime(200), distinctUntilChanged()),
     })
     const RjObject = rj(rjWithDebouce, {
       effect: mockApi,
@@ -854,19 +851,19 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('takes every side effect and dispatch succees in order of completation', done => {
+  it('takes every side effect and dispatch succees in order of completation', (done) => {
     const resolves = []
     const mockApi = jest
       .fn()
       .mockImplementationOnce(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolves.push(() => resolve('Gio Va'))
           })
       )
       .mockImplementationOnce(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolves.push(() => resolve('Ma Ik'))
           })
       )
@@ -1035,19 +1032,19 @@ describe('RJ side effect model', () => {
   //   })
   // })
 
-  it('takes exhaust side effect when specified', done => {
+  it('takes exhaust side effect when specified', (done) => {
     const resolves = []
     const mockApi = jest
       .fn()
       .mockImplementationOnce(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolves.push(() => resolve('Gio Va'))
           })
       )
       .mockImplementationOnce(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolves.push(() => resolve('Ma Ik'))
           })
       )
@@ -1143,12 +1140,12 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('take latest side effect group by when specified', done => {
+  it('take latest side effect group by when specified', (done) => {
     const counterByName = {}
 
     const mockApi = jest.fn(
-      name =>
-        new Promise(resolve => {
+      (name) =>
+        new Promise((resolve) => {
           counterByName[name] = (counterByName[name] || 0) + 1
           resolve(`${name} is cool ${counterByName[name]}`)
         })
@@ -1158,7 +1155,7 @@ describe('RJ side effect model', () => {
 
     const RjObject = rj({
       effect: mockApi,
-      takeEffect: [TAKE_EFFECT_GROUP_BY, action => action.meta.name],
+      takeEffect: [TAKE_EFFECT_GROUP_BY, (action) => action.meta.name],
     })
 
     const subject = createTestRJSubscription(RjObject, mockCallback)
@@ -1273,12 +1270,12 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('take exahust side effect group by when specified', done => {
+  it('take exahust side effect group by when specified', (done) => {
     const counterByName = {}
 
     const mockApi = jest.fn(
-      name =>
-        new Promise(resolve => {
+      (name) =>
+        new Promise((resolve) => {
           counterByName[name] = (counterByName[name] || 0) + 1
           resolve(`${name} is cool ${counterByName[name]}`)
         })
@@ -1288,7 +1285,7 @@ describe('RJ side effect model', () => {
 
     const RjObject = rj({
       effect: mockApi,
-      takeEffect: [TAKE_EFFECT_GROUP_BY_EXHAUST, action => action.meta.name],
+      takeEffect: [TAKE_EFFECT_GROUP_BY_EXHAUST, (action) => action.meta.name],
     })
 
     const subject = createTestRJSubscription(RjObject, mockCallback)
@@ -1395,8 +1392,8 @@ describe('RJ side effect model', () => {
     const counterByName = {}
 
     const mockApi = jest.fn(
-      name =>
-        new Promise(resolve => {
+      (name) =>
+        new Promise((resolve) => {
           counterByName[name] = (counterByName[name] || 0) + 1
           resolve(`${name} is cool ${counterByName[name]}`)
         })
@@ -1414,8 +1411,8 @@ describe('RJ side effect model', () => {
     const counterByName = {}
 
     const mockApi = jest.fn(
-      name =>
-        new Promise(resolve => {
+      (name) =>
+        new Promise((resolve) => {
           counterByName[name] = (counterByName[name] || 0) + 1
           resolve(`${name} is cool ${counterByName[name]}`)
         })
@@ -1433,8 +1430,8 @@ describe('RJ side effect model', () => {
     const counterByName = {}
 
     const mockApi = jest.fn(
-      name =>
-        new Promise(resolve => {
+      (name) =>
+        new Promise((resolve) => {
           counterByName[name] = (counterByName[name] || 0) + 1
           resolve(`${name} is cool ${counterByName[name]}`)
         })
@@ -1475,7 +1472,10 @@ describe('RJ side effect model', () => {
 
   it('emit successCallback along action when SUCCESS is produced', async () => {
     const mockCallback = jest.fn()
-    const mockApiResult = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }]
+    const mockApiResult = [
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' },
+    ]
     const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
 
     const RjObject = rj({
@@ -1538,15 +1538,15 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('should apply effect caller recursive', done => {
+  it('should apply effect caller recursive', (done) => {
     const mockApi = jest.fn().mockResolvedValueOnce(['GioVa'])
     const mockCallback = jest.fn()
 
     const callerA = jest.fn((fn, ...args) => {
-      return fn(...args).then(a => a.concat('Skaffo'))
+      return fn(...args).then((a) => a.concat('Skaffo'))
     })
     function callerB(fn, ...args) {
-      return fn(...args).then(a => a.concat('Vegas'))
+      return fn(...args).then((a) => a.concat('Vegas'))
     }
 
     const RjObject = rj(
@@ -1594,18 +1594,18 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('should inject effect caller in given placeholder position', done => {
+  it('should inject effect caller in given placeholder position', (done) => {
     const mockApi = jest.fn().mockResolvedValueOnce(['GioVa'])
     const mockCallback = jest.fn()
 
     const callerA = jest.fn((fn, ...args) => {
-      return fn(...args).then(a => a.concat('Skaffo'))
+      return fn(...args).then((a) => a.concat('Skaffo'))
     })
     function callerB(fn, ...args) {
-      return fn(...args).then(a => a.concat('Albi'))
+      return fn(...args).then((a) => a.concat('Albi'))
     }
     function callerC(fn, ...args) {
-      return fn(...args).then(a => a.concat('Vegas'))
+      return fn(...args).then((a) => a.concat('Vegas'))
     }
 
     const RjObject = rj(
@@ -1662,14 +1662,14 @@ describe('RJ side effect model', () => {
 
   it('should throw proper errors', async () => {
     const badApi = () =>
-      new Promise(resolve => {
+      new Promise((resolve) => {
         const a = {}
         resolve(a.b.c)
       })
 
-    const error = await new Promise(resolve => {
+    const error = await new Promise((resolve) => {
       const mockCallback = jest.fn()
-      const mockError = jest.fn(err => {
+      const mockError = jest.fn((err) => {
         resolve(err)
       })
 

@@ -5,7 +5,7 @@ export default function NewTodo({ adding, onSubmit }) {
 
   const submitTodo = (e) => {
     e.preventDefault()
-    onSubmit({ title: title, done: false })
+    onSubmit({ title: title, done: false, count: 0 })
     setTitle('')
   }
 

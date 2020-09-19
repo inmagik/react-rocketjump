@@ -40,7 +40,7 @@ function GhProfile() {
     <div className="Gh-Profile">
       <form
         className="Gh-SearchBox"
-        onSubmit={e => {
+        onSubmit={(e) => {
           e.preventDefault()
           if (inputUsername !== '') {
             setUsername(inputUsername)
@@ -51,7 +51,7 @@ function GhProfile() {
           placeholder="Hit enter to search"
           type="text"
           value={inputUsername}
-          onChange={e => setInputUsername(e.target.value)}
+          onChange={(e) => setInputUsername(e.target.value)}
         />
       </form>
 
@@ -72,7 +72,7 @@ function GhProfile() {
           {followers && (
             <div className="Gh-Followers">
               <h2>Followers</h2>
-              {followers.map(follower => (
+              {followers.map((follower) => (
                 <div key={follower.id}>{follower.login}</div>
               ))}
             </div>
@@ -80,7 +80,7 @@ function GhProfile() {
           {stars && (
             <div className="Gh-Stars">
               <h2>Stars</h2>
-              {stars.map(star => (
+              {stars.map((star) => (
                 <div key={star.id}>{star.full_name}</div>
               ))}
             </div>

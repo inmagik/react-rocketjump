@@ -15,7 +15,7 @@ function cancel(...params) {
   return makeLibraryAction(CANCEL, ...params)
 }
 
-const updateData = data => ({
+const updateData = (data) => ({
   type: UPDATE_DATA,
   payload: data,
 })
