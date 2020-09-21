@@ -115,9 +115,6 @@ export default function useMiniRedux(
     stateSubject.next(state)
   }, [state, state$, stateSubject])
 
-  // Extra shit from <ConfigureRj />
-  const extraConfig = useContext(ConfigureRjContext)
-
   const [
     actionSubject,
     action$,
@@ -154,7 +151,8 @@ export default function useMiniRedux(
     const [dispatchObservable, updateExtraSideEffectConfig] = makeObservable(
       rjPipedActionObservable,
       state$,
-      extraConfig ? extraConfig.effectCaller : undefined
+      null
+      // extraConfig ? extraConfig.effectCaller : undefined
     )
 
     return [
@@ -166,20 +164,20 @@ export default function useMiniRedux(
   })
 
   // Update extra side effect config
-  const notUpdateOnFirstMount = useRef(true)
-  useEffect(() => {
-    // Not update on first useEffect call because in alredy updated ...
-    if (notUpdateOnFirstMount.current) {
-      notUpdateOnFirstMount.current = false
-      return
-    }
-    // Update the effect caller at run time <3
-    // Now <ConfigureRj effectCaller={() => {}} />
-    // can be an anonymous without breaking anything
-    updateExtraSideEffectConfig({
-      effectCaller: extraConfig.effectCaller,
-    })
-  }, [extraConfig, updateExtraSideEffectConfig])
+  // const notUpdateOnFirstMount = useRef(true)
+  // useEffect(() => {
+  //   // Not update on first useEffect call because in alredy updated ...
+  //   if (notUpdateOnFirstMount.current) {
+  //     notUpdateOnFirstMount.current = false
+  //     return
+  //   }
+  //   // Update the effect caller at run time <3
+  //   // Now <ConfigureRj effectCaller={() => {}} />
+  //   // can be an anonymous without breaking anything
+  //   updateExtraSideEffectConfig({
+  //     effectCaller: extraConfig.effectCaller,
+  //   })
+  // }, [extraConfig, updateExtraSideEffectConfig])
 
   // Subscription 2 dispatch$
   useEffect(() => {
@@ -237,11 +235,42 @@ export default function useMiniRedux(
     }
   }, [action$, dispatch$, debugEmitter, debugInfo])
 
+  // Extra shit from <ConfigureRj />
+  const extraConfig = useContext(ConfigureRjContext)
+
+  // NOTE: Why not a simple useRef?
+  // cause in rx we want to grab CURREN config:
+  // ... so if we passed ref.current the extraConfig will
+  // IMMUTABLE change instance and inside rx we will
+  // get old instance on the other and if we passed
+  // the React return of useRef() reading ref.current
+  // on unmounted componet can be null
+  // this is not a real problem if the rx handler
+  // live and dead with the Component
+  // but since in the upconmig cache this can be
+  // true ... reading the .current of another object avoid
+  // the risk of reading null cause
+  const effectArgs = useConstant(() => ({
+    current: extraConfig,
+  }))
+
+  useEffect(() => {
+    effectArgs.current = extraConfig
+  }, [extraConfig, effectArgs])
+
   // Dispatch to reducer or start an effect
   const dispatchWithEffect = useConstant(() => (action) => {
     if (isEffectAction(action)) {
       // Emit action to given observable theese perform side
       // effect and emit action dispatched above by subscription
+      // ... Inject the a ref to current action extraConfig
+      // NOTE:
+      // this maintein the OLD RJ Contract
+      // the configured effect caller is evalutated when the effect
+      // is runner Vs when the action is dispatched
+      Object.defineProperty(action, '@@RJ/EFFECT_ARGS', {
+        value: effectArgs,
+      })
       actionSubject.next(action)
     } else {
       // Update the state \w given reducer

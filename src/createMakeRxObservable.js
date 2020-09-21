@@ -16,34 +16,18 @@ import RxEffects from './rxEffects'
 
 const defaultEffectCaller = (call, ...args) => call(...args)
 
-const makeRunTimeConfig = (effectCaller, extraConfig) => {
-  const placeholderEffectCaller = extraConfig.effectCaller
-  let callEffect
-  callEffect = squashExportValue(
+const makeRunTimeEffectCaller = (effectCaller, injectEffectCaller) => {
+  const finalEffectCaller = squashExportValue(
     effectCaller,
-    [placeholderEffectCaller].filter(Boolean)
+    [injectEffectCaller].filter(Boolean)
   )
   // Use default effect caller
-  if (!callEffect) {
-    callEffect = defaultEffectCaller
+  if (!finalEffectCaller) {
+    return defaultEffectCaller
   }
 
-  const runTimeExtraConfig = {
-    callEffect,
-  }
-  return runTimeExtraConfig
-}
-
-// OOP is Just a Dream
-class ExtraSideEffectSubject extends BehaviorSubject {
-  constructor(value, effectCaller) {
-    super(makeRunTimeConfig(effectCaller, value))
-    this.effectCaller = effectCaller
-  }
-
-  next(extraConfig) {
-    return super.next(makeRunTimeConfig(this.effectCaller, extraConfig))
-  }
+  // Use squashed effect caller
+  return finalEffectCaller
 }
 
 const EffectActions = [CLEAN, RUN, CANCEL]
@@ -59,31 +43,38 @@ export default function createMakeRxObservable(
   prefix = ''
 ) {
   return function makeRxObservable(
-    action$,
-    state$,
+    actionObservable,
+    stateObservable,
     placeholderEffectCaller,
     prevObservable$ // <---- The observable to merge along
   ) {
     // Extra side effect configuration subject
     // used to emit changes on extra conf from outside world
-    const extraSideEffectSubject = new ExtraSideEffectSubject(
-      {
-        effectCaller: placeholderEffectCaller,
-      },
-      effectCaller
-    )
-    const extraSideEffectObs$ = extraSideEffectSubject.asObservable()
+    // const extraSideEffectSubject = new ExtraSideEffectSubject(
+    //   {
+    //     effectCaller: placeholderEffectCaller,
+    //   },
+    //   effectCaller
+    // )
+    // const extraSideEffectObs$ = extraSideEffectSubject.asObservable()
 
     // Generate a result Observable from a given action
     // a RUN action but this is not checked is up to you
     // pass the corret action
     // in plus emit the PENDING action before invoke the effect
     // action => Observable(<PENDING>, <SUCCESS>|<FAILURE>)
-    function mapActionToObserable(action, { callEffect }) {
+    function mapActionToObserable(action, __extra) {
       const { payload, meta, callbacks } = action
       const params = payload.params
 
-      const effectResult = callEffect(effectCall, ...params)
+      const effectArgs = action?.['@@RJ/EFFECT_ARGS']?.current
+      const finalEffectCaller = makeRunTimeEffectCaller(
+        effectCaller, // Defined in rocketjump config
+        effectArgs?.effectCaller // Run time effect caller
+      )
+      // console.log('Extra unused shit', __extra)
+
+      const effectResult = finalEffectCaller(effectCall, ...params)
 
       if (!(isPromise(effectResult) || isObservable(effectResult))) {
         return throwError(
@@ -127,8 +118,12 @@ export default function createMakeRxObservable(
 
     const [effectType, ...effectTypeArgs] = arrayze(takeEffect)
 
-    // The prev observable to merge if no used the action$
-    const mergeObservable$ = prevObservable$ ? prevObservable$ : action$
+    // The prev observable to merge if no used the actionObservable
+    const mergeObservable$ = prevObservable$
+      ? prevObservable$
+      : actionObservable
+
+    const extraSideEffectObs = of({})
 
     let dispatchObservable
     // Custom take effect
@@ -137,10 +132,11 @@ export default function createMakeRxObservable(
       // custom take effect and print some warning to help
       // developers to better debugging better rj configuration
       dispatchObservable = effectType(
-        action$,
+        actionObservable,
         mergeObservable$,
-        state$,
-        extraSideEffectObs$,
+        stateObservable,
+        extraSideEffectObs,
+        // extraSideEffectObs$,
         mapActionToObserable,
         prefix
       )
@@ -158,9 +154,9 @@ export default function createMakeRxObservable(
       // if an action different from theese is emitted simply emit/dispatch them
       dispatchObservable = merge(
         createEffect(
-          action$.pipe(filter((a) => filterEffectActions(a, prefix))),
-          state$,
-          extraSideEffectObs$,
+          actionObservable.pipe(filter((a) => filterEffectActions(a, prefix))),
+          stateObservable,
+          extraSideEffectObs,
           mapActionToObserable,
           effectTypeArgs,
           prefix
@@ -168,13 +164,18 @@ export default function createMakeRxObservable(
         mergeObservable$.pipe(filter((a) => filterNonEffectActions(a, prefix)))
       )
     }
-    return [dispatchObservable, (config) => extraSideEffectSubject.next(config)]
+    return [
+      dispatchObservable,
+      (config) => {
+        // extraSideEffectSubject.next(config)
+      },
+    ]
   }
 }
 
 // GioVa nel posto fa freddo brrrrrrrrrrrrr
 export function mergeCreateMakeRxObservable(...creators) {
-  return (action$, state$, effectCaller) => {
+  return (actionObservable, stateObservable, effectCaller) => {
     // TODO: Enable and test the following lines
     // when expose mergeCreateMakeRxObservable as library function
     // if (creators.length === 0) {
@@ -182,16 +183,16 @@ export function mergeCreateMakeRxObservable(...creators) {
     // }
     const [firstCreator, ...otherCreators] = creators
     const [firstDispatch$, updateConfig] = firstCreator(
-      action$,
-      state$,
+      actionObservable,
+      stateObservable,
       effectCaller
     )
 
     const [dispatch$, configUpdaters] = otherCreators.reduce(
       ([dispatch$, updaters], rxCreator) => {
         const [nextDispatch$, updateConfig] = rxCreator(
-          action$,
-          state$,
+          actionObservable,
+          stateObservable,
           effectCaller,
           dispatch$
         )

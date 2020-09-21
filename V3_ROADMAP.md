@@ -15,4 +15,4 @@
   // Should grab data
   Obj.makeSelectors().getData(state)
  ```
- - optimistic mutations
+ - refactor side effects

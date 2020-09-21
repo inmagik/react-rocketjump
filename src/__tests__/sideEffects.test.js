@@ -1617,20 +1617,22 @@ describe('RJ side effect model', () => {
       }
     )
 
-    const subject = createTestRJSubscription(
-      RjObject,
-      mockCallback,
-      undefined,
-      null,
-      callerB
-    )
+    const subject = createTestRJSubscription(RjObject, mockCallback)
 
-    subject.next({
+    const action = {
       type: RUN,
       payload: { params: [] },
       meta: {},
       callbacks: {},
+    }
+    Object.defineProperty(action, '@@RJ/EFFECT_ARGS', {
+      value: {
+        current: {
+          effectCaller: callerB,
+        },
+      },
     })
+    subject.next(action)
 
     callerA.mock.results[0].value.then(() => {
       expect(mockCallback).toBeCalledTimes(3)
