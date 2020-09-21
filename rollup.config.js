@@ -1,4 +1,4 @@
-import babel from 'rollup-plugin-babel'
+import babel from '@rollup/plugin-babel'
 import fs from 'fs'
 import pkg from './package.json'
 
@@ -40,7 +40,7 @@ export default ['esm', 'cjs'].map((format) => ({
   external: makeExternalPredicate(vendors),
   plugins: [
     babel({
-      runtimeHelpers: true,
+      babelHelpers: 'runtime',
       exclude: 'node_modules/**',
       plugins: [
         [
