@@ -1,12 +1,4 @@
-import {
-  of,
-  from,
-  concat,
-  throwError,
-  merge,
-  BehaviorSubject,
-  isObservable,
-} from 'rxjs'
+import { of, from, concat, throwError, merge, isObservable } from 'rxjs'
 import { map, catchError, filter } from 'rxjs/operators'
 import { squashExportValue } from 'rocketjump-core'
 import { SUCCESS, FAILURE, PENDING, RUN, CLEAN, CANCEL } from './actionTypes'
@@ -164,47 +156,33 @@ export default function createMakeRxObservable(
         mergeObservable$.pipe(filter((a) => filterNonEffectActions(a, prefix)))
       )
     }
-    return [
-      dispatchObservable,
-      (config) => {
-        // extraSideEffectSubject.next(config)
-      },
-    ]
+
+    return dispatchObservable
   }
 }
 
 // GioVa nel posto fa freddo brrrrrrrrrrrrr
-export function mergeCreateMakeRxObservable(...creators) {
+export function mergeCreateMakeRxObservable(baseCreator, ...creators) {
   return (actionObservable, stateObservable, effectCaller) => {
-    // TODO: Enable and test the following lines
-    // when expose mergeCreateMakeRxObservable as library function
-    // if (creators.length === 0) {
-    //   throw new Error('You should provide at least one creator to merge.')
-    // }
-    const [firstCreator, ...otherCreators] = creators
-    const [firstDispatch$, updateConfig] = firstCreator(
+    const baseDispatchObservable = baseCreator(
       actionObservable,
       stateObservable,
       effectCaller
     )
 
-    const [dispatch$, configUpdaters] = otherCreators.reduce(
-      ([dispatch$, updaters], rxCreator) => {
-        const [nextDispatch$, updateConfig] = rxCreator(
+    const mergedDispatchObservable = creators.reduce(
+      (dispatchObservable, rxCreator) => {
+        const nextDispatchObservable = rxCreator(
           actionObservable,
           stateObservable,
           effectCaller,
-          dispatch$
+          dispatchObservable
         )
-        return [nextDispatch$, updaters.concat(updateConfig)]
+        return nextDispatchObservable
       },
-      [firstDispatch$, [updateConfig]]
+      baseDispatchObservable
     )
 
-    return [
-      dispatch$,
-      (config) =>
-        configUpdaters.forEach((updateConfig) => updateConfig(config)),
-    ]
+    return mergedDispatchObservable
   }
 }

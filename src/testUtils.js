@@ -17,7 +17,7 @@ export function createTestRJSubscription(
     publish()
   )
 
-  const [observable] = makeRxObservable(fakeActionObservable, ...args)
+  const observable = makeRxObservable(fakeActionObservable, ...args)
 
   observable.subscribe(subscribeCallback, errorCallback)
 

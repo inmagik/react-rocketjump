@@ -21,9 +21,9 @@ export default function useMiniRedux(
   // Debug rj() \w classy (not in PROD)
   const debugEmitter = useConstant(() => createRjDebugEmitter(debugInfo))
 
-  // STATE$
+  // $stateObservable
   // emits state updates (used to build the $dispatch Observable)
-  const [stateSubject, state$] = useConstant(() => {
+  const [stateSubject, stateObservable] = useConstant(() => {
     const subject = new ReplaySubject()
     return [subject, subject.asObservable()]
   })
@@ -57,7 +57,7 @@ export default function useMiniRedux(
       //
       // kepp a reference of current "dispatch index"
       // and the same value in reducer state
-      state$.__dispatchIndex = 0
+      stateObservable.__dispatchIndex = 0
       return { idx: 0, state: initialState }
     }
   }
@@ -80,11 +80,11 @@ export default function useMiniRedux(
       // The reducer always update the state and remain a pure function
       const idx = prevState.idx + 1
       // if the new dispatch index is greater is a new action
-      if (idx > state$.__dispatchIndex) {
+      if (idx > stateObservable.__dispatchIndex) {
         // Emit the debug hook
         debugEmitter.onActionDispatched(action, prevState.state, nextState)
         // keep the index at the last version
-        state$.__dispatchIndex = idx
+        stateObservable.__dispatchIndex = idx
       }
       // Always update the state in the same way a pure function lol
       return { idx, state: nextState }
@@ -108,80 +108,57 @@ export default function useMiniRedux(
     state = stateAndIdx.state
   }
 
-  // Emit a state update to state$ Observable
+  // Emit a state update to stateObservable Observable
   // ... keep a reference of current state
   useEffect(() => {
-    state$.value = state
+    stateObservable.value = state
     stateSubject.next(state)
-  }, [state, state$, stateSubject])
+  }, [state, stateObservable, stateSubject])
 
-  const [
-    actionSubject,
-    action$,
-    dispatch$,
-    updateExtraSideEffectConfig,
-  ] = useConstant(() => {
-    // Why ReplaySubject?
-    // in the old useMiniRedux implementation
-    // subscription happened in the render phase
-    // but as says ma men @bvaughn for the correct work
-    // of upcoming async mode side effects are allowed 2 run
-    // in the commit phase ...
-    // Check this: https://github.com/facebook/react/tree/master/packages/use-subscription
-    // thanks 2 ReplaySubject the action dispatched between the render and commit phase
-    // are "re-played" and correct dispatched to our rx side effects or react reducer state
-    const subject = new ReplaySubject()
-    const actionObserable = subject.asObservable()
+  const [actionSubject, actionObservable, dispatchObservable] = useConstant(
+    () => {
+      // Why ReplaySubject?
+      // in the old useMiniRedux implementation
+      // subscription happened in the render phase
+      // but as says ma men @bvaughn for the correct work
+      // of upcoming async mode side effects are allowed 2 run
+      // in the commit phase ...
+      // Check this: https://github.com/facebook/react/tree/master/packages/use-subscription
+      // thanks 2 ReplaySubject the action dispatched between the render and commit phase
+      // are "re-played" and correct dispatched to our rx side effects or react reducer state
+      const subject = new ReplaySubject()
+      const actionObserable = subject.asObservable()
 
-    // Apply the effect pipeline
-    // useful to change the "normal" action stream
-    // ES:. here you can debounce, filter or other
-    // stuff before the action trigger Y effect
-    const rjPipedActionObservable = pipeActionStream(actionObserable, state$)
-      // this ensure that the side effects inside effectPipeline
-      // Es: tap(() => { sideEffect() })
-      // are excuted only once
-      // in the older implementation this mechanism was in
-      // createMakeRxObservable but this leads to a lot of bug and
-      // mysterious behaviours now pubblish are excuted only once
-      // in front of the original action observable
-      .pipe(publish())
+      // Apply the effect pipeline
+      // useful to change the "normal" action stream
+      // ES:. here you can debounce, filter or other
+      // stuff before the action trigger Y effect
+      const rjPipedActionObservable = pipeActionStream(
+        actionObserable,
+        stateObservable
+      )
+        // this ensure that the side effects inside effectPipeline
+        // Es: tap(() => { sideEffect() })
+        // are excuted only once
+        // in the older implementation this mechanism was in
+        // createMakeRxObservable but this leads to a lot of bug and
+        // mysterious behaviours now pubblish are excuted only once
+        // in front of the original action observable
+        .pipe(publish())
 
-    // Create the dispatch observable
-    const [dispatchObservable, updateExtraSideEffectConfig] = makeObservable(
-      rjPipedActionObservable,
-      state$,
-      null
-      // extraConfig ? extraConfig.effectCaller : undefined
-    )
+      // Create the dispatch observable
+      const dispatchObservable = makeObservable(
+        rjPipedActionObservable,
+        stateObservable
+      )
 
-    return [
-      subject,
-      rjPipedActionObservable,
-      dispatchObservable,
-      updateExtraSideEffectConfig,
-    ]
-  })
+      return [subject, rjPipedActionObservable, dispatchObservable]
+    }
+  )
 
-  // Update extra side effect config
-  // const notUpdateOnFirstMount = useRef(true)
-  // useEffect(() => {
-  //   // Not update on first useEffect call because in alredy updated ...
-  //   if (notUpdateOnFirstMount.current) {
-  //     notUpdateOnFirstMount.current = false
-  //     return
-  //   }
-  //   // Update the effect caller at run time <3
-  //   // Now <ConfigureRj effectCaller={() => {}} />
-  //   // can be an anonymous without breaking anything
-  //   updateExtraSideEffectConfig({
-  //     effectCaller: extraConfig.effectCaller,
-  //   })
-  // }, [extraConfig, updateExtraSideEffectConfig])
-
-  // Subscription 2 dispatch$
+  // Subscription 2 dispatchObservable
   useEffect(() => {
-    const subscription = dispatch$.subscribe(
+    const subscription = dispatchObservable.subscribe(
       (action) => {
         // Erase callbacks before dispatch on reducer
         let successCallback
@@ -221,8 +198,8 @@ export default function useMiniRedux(
         throw error
       }
     )
-    // Ok now we are ready to handle shit from dispatch$ observable!
-    action$.connect()
+    // Ok now we are ready to handle shit from dispatchObservable observable!
+    actionObservable.connect()
 
     return () => {
       subscription.unsubscribe()
@@ -233,7 +210,7 @@ export default function useMiniRedux(
         }
       }
     }
-  }, [action$, dispatch$, debugEmitter, debugInfo])
+  }, [actionObservable, dispatchObservable, debugEmitter, debugInfo])
 
   // Extra shit from <ConfigureRj />
   const extraConfig = useContext(ConfigureRjContext)
