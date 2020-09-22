@@ -1,5 +1,11 @@
-import { rj } from '..'
-import { mergeMap, debounceTime, distinctUntilChanged } from 'rxjs/operators'
+import { makeAction, rj } from '..'
+import {
+  mergeMap,
+  debounceTime,
+  distinctUntilChanged,
+  tap,
+  filter,
+} from 'rxjs/operators'
 import { PENDING, SUCCESS, FAILURE, CLEAN, RUN, CANCEL } from '../actionTypes'
 import { createTestRJSubscription } from '../testUtils'
 import {
@@ -9,6 +15,7 @@ import {
   TAKE_EFFECT_GROUP_BY_EXHAUST,
   TAKE_EFFECT_EXHAUST,
 } from '../rxEffects'
+import { bindActionCreators } from 'rocketjump-core'
 
 jest.useFakeTimers()
 
@@ -848,6 +855,53 @@ describe('RJ side effect model', () => {
       })
 
       done()
+    })
+  })
+
+  it('can pipeling custom effect action with rx', () => {
+    const mockApi = jest.fn()
+
+    const mockTapper = jest.fn()
+
+    const rjWithDebouce = rj({
+      effectPipeline: (actions) => actions.pipe(tap(mockTapper)),
+    })
+    const RjObject = rj(rjWithDebouce, {
+      actions: () => ({
+        zz: (...params) => makeAction('ZZ_TOP', ...params),
+        zzGang: (...params) => makeAction('ZZ_TOP_GANG', ...params),
+      }),
+      effect: mockApi,
+    })
+    const { actionCreators } = RjObject
+    const subject = createTestRJSubscription(RjObject, () => {})
+    const dispatch = (action) => subject.next(action)
+    const actions = bindActionCreators(actionCreators, dispatch, subject)
+
+    actions.zz(23)
+    actions.zzGang(3)
+
+    expect(mockTapper).nthCalledWith(1, {
+      type: 'ZZ_TOP',
+      payload: {
+        params: [23],
+      },
+      meta: {},
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+    expect(mockTapper).nthCalledWith(2, {
+      type: 'ZZ_TOP_GANG',
+      payload: {
+        params: [3],
+      },
+      meta: {},
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
     })
   })
 
@@ -1693,5 +1747,82 @@ describe('RJ side effect model', () => {
     })
 
     expect(error).toBeInstanceOf(Error)
+  })
+
+  it('should ignore non standard actions', () => {
+    const mockApi = jest.fn()
+
+    const mockCallback = jest.fn()
+
+    const RjObject = rj({
+      actions: () => ({
+        zz: (...params) => makeAction('ZZ_TOP', ...params),
+        zzGang: (...params) => makeAction('ZZ_TOP_GANG', ...params),
+      }),
+      effect: mockApi,
+    })
+
+    const { actionCreators } = RjObject
+    const subject = createTestRJSubscription(RjObject, mockCallback)
+    const dispatch = (action) => subject.next(action)
+    const actions = bindActionCreators(actionCreators, dispatch, subject)
+
+    actions.zz()
+    actions.zzGang()
+
+    expect(mockCallback).toBeCalledTimes(0)
+  })
+
+  it('should hanlde custom side effects', () => {
+    const mockApi = jest.fn()
+
+    const mockCallback = jest.fn()
+
+    const RjObject = rj(
+      rj({
+        addSideEffect: (actions) =>
+          actions.pipe(filter((a) => a.type === 'ZZ_TOP_GANG')),
+      }),
+      {
+        addSideEffect: (actions) =>
+          actions.pipe(filter((a) => a.type === 'ZZ_TOP')),
+        actions: () => ({
+          zz: (...params) => makeAction('ZZ_TOP', ...params),
+          zzGang: (...params) => makeAction('ZZ_TOP_GANG', ...params),
+        }),
+        effect: mockApi,
+      }
+    )
+
+    const { actionCreators } = RjObject
+    const subject = createTestRJSubscription(RjObject, mockCallback)
+    const dispatch = (action) => subject.next(action)
+    const actions = bindActionCreators(actionCreators, dispatch, subject)
+
+    actions.zz(23)
+    actions.zzGang(3)
+
+    expect(mockCallback).nthCalledWith(1, {
+      type: 'ZZ_TOP',
+      payload: {
+        params: [23],
+      },
+      meta: {},
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+    expect(mockCallback).nthCalledWith(2, {
+      type: 'ZZ_TOP_GANG',
+      payload: {
+        params: [3],
+      },
+      meta: {},
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
   })
 })

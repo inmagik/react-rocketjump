@@ -501,4 +501,6 @@ describe('useRj', () => {
   })
 
   test.todo('Test actions')
+
+  test.todo('Test pipe into custom effect action')
 })

@@ -4,6 +4,7 @@ import { makeAction } from '../../../index'
 import rjDebounce from '../index'
 import { createTestRJSubscription } from '../../../testUtils'
 import { PENDING, SUCCESS, CLEAN, RUN } from '../../../actionTypes'
+import { filter } from 'rxjs/operators'
 
 jest.useFakeTimers()
 
@@ -171,6 +172,8 @@ describe('rjDebounce', () => {
       actions: () => ({
         drago: () => makeAction('DRAGO'),
       }),
+      addSideEffect: (actions) =>
+        actions.pipe(filter((action) => action.type === 'DRAGO')),
       takeEffect: 'every',
     })
 

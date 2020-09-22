@@ -5,7 +5,9 @@ import {
   createComputeState,
 } from 'rocketjump-core'
 import makeExport from './export'
-import createMakeRxObservable from './createMakeRxObservable'
+import createMakeRxObservable, {
+  mergeCreateMakeRxObservable,
+} from './createMakeRxObservable'
 import {
   enhanceFinalExportWithMutations,
   checkMutationsConfig,
@@ -128,7 +130,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
   // ~~ END OF RECURSION CHAIN  ~~
   const { sideEffect, computed, ...rjExport } = mergegAlongExport
 
-  const { effectPipeline, ...sideEffectConfig } = sideEffect
+  const { effectPipeline, addSideEffect, ...sideEffectConfig } = sideEffect
 
   // Create the make rx observable function using merged side effect descriptor!
   const makeRxObservable = createMakeRxObservable(sideEffectConfig)
@@ -159,7 +161,24 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
       pipeActionStream: fn,
     }
   */
-  return enhanceFinalExportWithMutations(finalExport, mergegAlongExport)
+  // FIXME: Temp workaround ....
+  let {
+    tempExtraSideEffects: mutationsExtraSideEffects,
+    ...tempExport
+  } = enhanceFinalExportWithMutations(finalExport, mergegAlongExport)
+
+  const extraSideEffects = [].concat(
+    mutationsExtraSideEffects ?? [],
+    addSideEffect ?? []
+  )
+
+  if (extraSideEffects.length) {
+    tempExport.makeRxObservable = mergeCreateMakeRxObservable(
+      makeRxObservable,
+      ...extraSideEffects
+    )
+  }
+  return tempExport
 }
 
 export default forgeRocketJump({

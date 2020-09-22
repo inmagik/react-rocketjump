@@ -23,22 +23,15 @@ const makeRunTimeEffectCaller = (effectCaller, injectEffectCaller) => {
 }
 
 const EffectActions = [CLEAN, RUN, CANCEL]
-function filterEffectActions(action, prefix) {
+function filterStandarEffectActions(action, prefix) {
   return EffectActions.map((a) => prefix + a).indexOf(action.type) !== -1
-}
-function filterNonEffectActions(action, prefix) {
-  return EffectActions.map((a) => prefix + a).indexOf(action.type) === -1
 }
 
 export default function createMakeRxObservable(
   { effect: effectCall, effectCaller, takeEffect },
   prefix = ''
 ) {
-  return function makeRxObservable(
-    actionObservable,
-    stateObservable,
-    prevObservable // <---- The observable to merge along
-  ) {
+  return function makeRxObservable(actionObservable, stateObservable) {
     // Generate a result Observable from a given action
     // a RUN action but this is not checked is up to you
     // pass the corret action
@@ -98,18 +91,10 @@ export default function createMakeRxObservable(
 
     const [effectType, ...effectTypeArgs] = arrayze(takeEffect)
 
-    // The prev observable to merge if no used the actionObservable
-    const mergeObservable$ = prevObservable ? prevObservable : actionObservable
-
-    let dispatchObservable
     // Custom take effect
     if (typeof effectType === 'function') {
-      // TODO: Maybe in future check the return value of
-      // custom take effect and print some warning to help
-      // developers to better debugging better rj configuration
-      dispatchObservable = effectType(
+      return effectType(
         actionObservable,
-        mergeObservable$,
         stateObservable,
         mapActionToObserable,
         prefix
@@ -125,20 +110,16 @@ export default function createMakeRxObservable(
       const createEffect = RxEffects[effectType]
 
       // Apply the effect only to RUN, CLEAN and CANCEL + prefx
-      // if an action different from theese is emitted simply emit/dispatch them
-      dispatchObservable = merge(
-        createEffect(
-          actionObservable.pipe(filter((a) => filterEffectActions(a, prefix))),
-          stateObservable,
-          mapActionToObserable,
-          effectTypeArgs,
-          prefix
+      return createEffect(
+        actionObservable.pipe(
+          filter((a) => filterStandarEffectActions(a, prefix))
         ),
-        mergeObservable$.pipe(filter((a) => filterNonEffectActions(a, prefix)))
+        stateObservable,
+        mapActionToObserable,
+        effectTypeArgs,
+        prefix
       )
     }
-
-    return dispatchObservable
   }
 }
 
@@ -150,18 +131,18 @@ export function mergeCreateMakeRxObservable(baseCreator, ...creators) {
       stateObservable
     )
 
-    const mergedDispatchObservable = creators.reduce(
-      (dispatchObservable, rxCreator) => {
+    const dispatchObservables2Merge = creators.reduce(
+      (dispatchObservables, rxCreator) => {
         const nextDispatchObservable = rxCreator(
           actionObservable,
-          stateObservable,
-          dispatchObservable
+          stateObservable
         )
-        return nextDispatchObservable
+        dispatchObservables.push(nextDispatchObservable)
+        return dispatchObservables
       },
-      baseDispatchObservable
+      [baseDispatchObservable]
     )
 
-    return mergedDispatchObservable
+    return merge(...dispatchObservables2Merge)
   }
 }

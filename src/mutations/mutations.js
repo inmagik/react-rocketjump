@@ -7,7 +7,7 @@ import {
   optimisticMutationsHor,
 } from './reducer'
 import { enancheComputeState } from './computed'
-import { enhanceMakeObservable } from './sideEffects'
+import { extraSideEffects } from './sideEffects'
 import { enhanceActionCreators } from './actionCreators'
 import { enhanceMakeSelectors } from './selectors'
 
@@ -66,7 +66,6 @@ export function enhanceFinalExportWithMutations(
   }
 
   const {
-    makeRxObservable,
     actionCreators,
     reducer,
     computeState,
@@ -117,10 +116,12 @@ export function enhanceFinalExportWithMutations(
     reducer: withMutationsReducer,
     makeSelectors: enhanceMakeSelectors(mutations, makeSelectors),
     actionCreators: enhanceActionCreators(mutations, actionCreators),
-    makeRxObservable: enhanceMakeObservable(
-      mutations,
-      makeRxObservable,
-      sideEffect.effectCaller
-    ),
+    // TODO: Temp workaround ....
+    tempExtraSideEffects: extraSideEffects(mutations, sideEffect.effectCaller),
+    // makeRxObservable: enhanceMakeObservable(
+    //   mutations,
+    //   makeRxObservable,
+    //   sideEffect.effectCaller
+    // ),
   }
 }
