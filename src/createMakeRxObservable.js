@@ -124,7 +124,7 @@ export default function createMakeRxObservable(
 }
 
 // GioVa nel posto fa freddo brrrrrrrrrrrrr
-export function mergeCreateMakeRxObservable(baseCreator, ...creators) {
+export function mergeMakeRxObservables(baseCreator, ...creators) {
   return (actionObservable, stateObservable) => {
     const baseDispatchObservable = baseCreator(
       actionObservable,

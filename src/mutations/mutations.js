@@ -6,10 +6,10 @@ import {
   optimisticMutationsReducer,
   optimisticMutationsHor,
 } from './reducer'
-import { enancheComputeState } from './computed'
+import { enhanceComputeState } from './computed'
 import { extraSideEffects } from './sideEffects'
 import { enhanceActionCreators } from './actionCreators'
-import { enhanceMakeSelectors } from './selectors'
+import { makeMutationsSelectors } from './selectors'
 
 export function checkMutationsConfig(rjConfig) {
   if (
@@ -56,28 +56,17 @@ export function enhanceMakeExportWithMutations(rjConfig, extendExport) {
   return extendExport
 }
 
-export function enhanceFinalExportWithMutations(
-  rjObject,
-  { computed, sideEffect }
-) {
-  const { mutations, ...rjEnhancedObject } = rjObject
+export function createMutationsFinalExportEnhancer(mutations) {
   if (!mutations) {
-    return rjEnhancedObject
+    return {}
   }
 
-  const {
-    actionCreators,
-    reducer,
-    computeState,
-    makeSelectors,
-  } = rjEnhancedObject
-
-  const enhancedReducer = enhanceReducer(mutations, reducer, actionCreators)
-
   const reducersToCombine = {}
+  let hasMutationsState = false
   const mutationsReducer = makeMutationsReducer(mutations)
   if (mutationsReducer) {
     reducersToCombine.mutations = mutationsReducer
+    hasMutationsState = true
   }
 
   const hasSomeOptimisticMutations = Object.keys(mutations).some(
@@ -88,40 +77,22 @@ export function enhanceFinalExportWithMutations(
     reducersToCombine.optimisticMutations = optimisticMutationsReducer
   }
 
-  let hasMutationsState
-  let withMutationsReducer
-  if (Object.keys(reducersToCombine).length === 0) {
-    hasMutationsState = false
-    withMutationsReducer = enhancedReducer
-  } else {
-    hasMutationsState = true
-    withMutationsReducer = combineReducers({
-      root: enhancedReducer,
-      ...reducersToCombine,
-    })
-  }
-
+  let enhanceCombinedReducer
   if (hasSomeOptimisticMutations) {
-    withMutationsReducer = optimisticMutationsHor(withMutationsReducer)
+    enhanceCombinedReducer = optimisticMutationsHor
   }
 
   return {
-    ...rjEnhancedObject,
-    computeState: enancheComputeState(
-      mutations,
-      hasMutationsState,
-      computeState,
-      computed
-    ),
-    reducer: withMutationsReducer,
-    makeSelectors: enhanceMakeSelectors(mutations, makeSelectors),
-    actionCreators: enhanceActionCreators(mutations, actionCreators),
-    // TODO: Temp workaround ....
-    tempExtraSideEffects: extraSideEffects(mutations, sideEffect.effectCaller),
-    // makeRxObservable: enhanceMakeObservable(
-    //   mutations,
-    //   makeRxObservable,
-    //   sideEffect.effectCaller
-    // ),
+    enhanceActionCreators: (actionCreators) =>
+      enhanceActionCreators(mutations, actionCreators),
+    enhanceRootReducer: (reducer, ...args) =>
+      enhanceReducer(mutations, reducer, ...args),
+    enhanceCombinedReducer,
+    reducersToCombine,
+    enhanceComputeState: (computeState, computed) =>
+      enhanceComputeState(mutations, hasMutationsState, computeState, computed),
+    extraSideEffects: (sideEffect) =>
+      extraSideEffects(mutations, sideEffect.effectCaller),
+    extraSelectors: makeMutationsSelectors(),
   }
 }

@@ -53,13 +53,13 @@ function createWithMutationsComputeState(computed, mutations) {
       }
       return {
         ...computedState,
-        [keyName]: selector(state.root),
+        [keyName]: selector(state),
       }
     }, {})
   }
 }
 
-export function enancheComputeState(
+export function enhanceComputeState(
   mutations,
   hasMutationsState,
   computeState,
@@ -69,11 +69,7 @@ export function enancheComputeState(
     return computeState
   }
   if (!computeState) {
-    return (state) => state.root
+    return null
   }
-  const withMutationsComputeState = createWithMutationsComputeState(
-    computed,
-    mutations
-  )
-  return (state, selectors) => withMutationsComputeState(state, selectors)
+  return createWithMutationsComputeState(computed, mutations)
 }
