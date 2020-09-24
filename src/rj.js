@@ -201,7 +201,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
 
   const extraSideEffects = [].concat(
     mutationsEnhancer.extraSideEffects?.(sideEffectConfig) ?? [],
-    addSideEffect ?? []
+    addSideEffect
   )
   if (extraSideEffects.length) {
     makeRxObservable = mergeMakeRxObservables(

@@ -4,7 +4,7 @@ import { SUCCESS, FAILURE, PENDING } from '../../actionTypes'
 import { renderHook, act } from '@testing-library/react-hooks'
 
 describe('RJ mutations computed', () => {
-  it('should work as expected without break ... for now', async () => {
+  it('should introduce mutations state when a reducer on mutation is defined', async () => {
     const MaRjState = rj({
       mutations: {
         killHumans: {
@@ -13,8 +13,8 @@ describe('RJ mutations computed', () => {
           reducer: () => ({ giova: 23 }),
         },
       },
-      selectors: () => ({
-        getMagik: (s) => s.magik,
+      selectors: ({ getRoot }) => ({
+        getMagik: (s) => getRoot(s).magik,
       }),
       composeReducer: (state, action) => ({
         magik: 1312,
@@ -65,8 +65,8 @@ describe('RJ mutations computed', () => {
           },
         },
       },
-      selectors: () => ({
-        getMagik: (s) => s.magik,
+      selectors: ({ getRoot }) => ({
+        getMagik: (s) => getRoot(s).magik,
       }),
       composeReducer: (state, action) => ({
         magik: 1312,

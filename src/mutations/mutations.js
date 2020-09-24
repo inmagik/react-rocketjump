@@ -1,5 +1,4 @@
 import { exportEffectCaller } from '../sideEffectDescriptor'
-import combineReducers from '../combineReducers'
 import {
   enhanceReducer,
   makeMutationsReducer,
@@ -91,8 +90,8 @@ export function createMutationsFinalExportEnhancer(mutations) {
     reducersToCombine,
     enhanceComputeState: (computeState, computed) =>
       enhanceComputeState(mutations, hasMutationsState, computeState, computed),
+    extraSelectors: makeMutationsSelectors(),
     extraSideEffects: (sideEffect) =>
       extraSideEffects(mutations, sideEffect.effectCaller),
-    extraSelectors: makeMutationsSelectors(),
   }
 }
