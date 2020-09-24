@@ -6,7 +6,7 @@ import {
   optimisticMutationsHor,
 } from './reducer'
 import { enhanceComputeState } from './computed'
-import { extraSideEffects } from './sideEffects'
+import { makeExtraRxObservables } from './sideEffects'
 import { enhanceActionCreators } from './actionCreators'
 import { makeMutationsSelectors } from './selectors'
 
@@ -91,7 +91,7 @@ export function createMutationsFinalExportEnhancer(mutations) {
     enhanceComputeState: (computeState, computed) =>
       enhanceComputeState(mutations, hasMutationsState, computeState, computed),
     extraSelectors: makeMutationsSelectors(),
-    extraSideEffects: (sideEffect) =>
-      extraSideEffects(mutations, sideEffect.effectCaller),
+    makeExtraRxObservables: (sideEffect) =>
+      makeExtraRxObservables(mutations, sideEffect.effectCaller),
   }
 }

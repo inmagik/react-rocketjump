@@ -1,7 +1,7 @@
 import createMakeRxObservable from '../createMakeRxObservable'
 import { MUTATION_PREFIX } from './actionTypes'
 
-export function extraSideEffects(mutations, parentEffectCaller) {
+export function makeExtraRxObservables(mutations, parentEffectCaller) {
   const makeMutationsObsList = Object.keys(mutations).map((name) => {
     const { effect, takeEffect, effectCaller } = mutations[name]
     const prefix = `${MUTATION_PREFIX}/${name}/`

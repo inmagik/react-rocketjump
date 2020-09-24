@@ -199,14 +199,15 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
   const pipeActionStream = (actions, state) =>
     effectPipeline.reduce((actions, piper) => piper(actions, state), actions)
 
-  const extraSideEffects = [].concat(
-    mutationsEnhancer.extraSideEffects?.(sideEffectConfig) ?? [],
+  const extraRxObservables = [].concat(
+    mutationsEnhancer.makeExtraRxObservables?.(sideEffectConfig) ?? [],
+    // TODO: Should Inject effect caller ecc?
     addSideEffect
   )
-  if (extraSideEffects.length) {
+  if (extraRxObservables.length) {
     makeRxObservable = mergeMakeRxObservables(
       makeRxObservable,
-      ...extraSideEffects
+      ...extraRxObservables
     )
   }
 
