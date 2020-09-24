@@ -34,6 +34,9 @@ export { makeLibraryAction as makeAction } from 'rocketjump-core'
 // All action types
 export * from './actionTypes'
 
+// Mutations action types
+export * from './mutations/actionTypes'
+
 // All types checks
 export * from './types'
 

@@ -1,5 +1,5 @@
 import { SUCCESS, INIT, RUN, FAILURE } from '../actionTypes'
-import { MUTATION_PREFIX } from './actionTypes'
+import { makeMutationType, matchMutationType } from './actionTypes'
 import combineReducers from '../combineReducers'
 
 // enhance the basic reducer \w updater of mutations to rj root reducer
@@ -80,7 +80,7 @@ export function enhanceReducer(mutations, reducer, actionCreators) {
 
       // Register updater as SUCCESS handler
       if (update) {
-        const type = `${MUTATION_PREFIX}/${name}/${SUCCESS}`
+        const type = makeMutationType(name, SUCCESS)
         handlers[type] = update
       }
 
@@ -90,7 +90,7 @@ export function enhanceReducer(mutations, reducer, actionCreators) {
         if (!optimisticUpdate) {
           optimisticUpdate = update
         }
-        const type = `${MUTATION_PREFIX}/${name}/${RUN}`
+        const type = makeMutationType(name, RUN)
         handlers[type] = (state, action) => {
           const optimisticData = mutation.optimisticResult(
             ...action.payload.params
@@ -120,12 +120,10 @@ function makeMutationReducer(mutation, name) {
     if (action.type === INIT) {
       return mutation.reducer(state, action)
     }
-    const pieces = action.type.split('/')
-    if (pieces.length !== 3) {
-      return state
-    }
-    if (pieces[0] === MUTATION_PREFIX && pieces[1] === name) {
-      const decoupleType = pieces[2]
+
+    const matchesMutationType = matchMutationType(action.type, name)
+    if (matchesMutationType) {
+      const [, decoupleType] = matchesMutationType
       return mutation.reducer(state, { ...action, type: decoupleType })
     }
     return state
@@ -339,11 +337,9 @@ export function optimisticMutationsHor(reducer) {
   return (state, action) => {
     if (Number.isInteger(action?.meta?.mutationID)) {
       // OPT ACTIONS
-
-      // Split into mutations pieces
-      const pieces = action.type.split('/')
-      if (pieces.length === 3 && pieces[0] === MUTATION_PREFIX) {
-        const decoupleType = pieces[2]
+      const matchesMutationType = matchMutationType(action.type)
+      if (matchesMutationType) {
+        const [, decoupleType] = matchesMutationType
         if (decoupleType === RUN) {
           return handleOptRun(reducer, state, action)
         }

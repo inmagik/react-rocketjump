@@ -1,6 +1,6 @@
 import { makeLibraryAction } from 'rocketjump-core'
 import { RUN } from '../actionTypes'
-import { MUTATION_PREFIX } from './actionTypes'
+import { makeMutationType } from './actionTypes'
 
 let mutationIDCounter = 0
 
@@ -21,10 +21,9 @@ function makeActionCreator(name, mutation) {
         meta.mutationAutoCommit = true
       }
     }
-    return makeLibraryAction(
-      `${MUTATION_PREFIX}/${name}/${RUN}`,
-      ...params
-    ).withMeta(meta)
+    return makeLibraryAction(makeMutationType(name, RUN), ...params).withMeta(
+      meta
+    )
   }
   return actionCreator
 }
