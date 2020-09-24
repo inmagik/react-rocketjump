@@ -37,7 +37,7 @@ export default function createMakeRxObservable(
     // pass the corret action
     // in plus emit the PENDING action before invoke the effect
     // action => Observable(<PENDING>, <SUCCESS>|<FAILURE>)
-    function mapActionToObserable(action) {
+    function mapActionToObservable(action) {
       const { payload, meta, callbacks } = action
       const params = payload.params
 
@@ -96,7 +96,7 @@ export default function createMakeRxObservable(
       return effectType(
         actionObservable,
         stateObservable,
-        mapActionToObserable,
+        mapActionToObservable,
         prefix
       )
     } else {
@@ -115,7 +115,7 @@ export default function createMakeRxObservable(
           filter((a) => filterStandarEffectActions(a, prefix))
         ),
         stateObservable,
-        mapActionToObserable,
+        mapActionToObservable,
         effectTypeArgs,
         prefix
       )

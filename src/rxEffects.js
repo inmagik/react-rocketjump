@@ -23,13 +23,13 @@ function takeUntilCancelAction(actionObservable, prefix) {
 
 export const TAKE_EFFECT_LATEST = 'latest'
 
-function mapToLatest(actionObservable, mapActionToObserable, prefix) {
+function mapToLatest(actionObservable, mapActionToObservable, prefix) {
   return switchMap((action) => {
     // Switch Map take always the last task so cancel ecc are auto emitted
     if (action.type === prefix + CANCEL || action.type === prefix + CLEAN) {
       return of(action)
     }
-    return concat(of(action), mapActionToObserable(action)).pipe(
+    return concat(of(action), mapActionToObservable(action)).pipe(
       takeUntilCancelAction(actionObservable, prefix)
     )
   })
@@ -38,12 +38,12 @@ function mapToLatest(actionObservable, mapActionToObserable, prefix) {
 function takeEffectLatest(
   actionObservable,
   stateObservable,
-  mapActionToObserable,
+  mapActionToObservable,
   effectTypeArgs,
   prefix
 ) {
   return actionObservable.pipe(
-    mapToLatest(actionObservable, mapActionToObserable, prefix)
+    mapToLatest(actionObservable, mapActionToObservable, prefix)
   )
 }
 
@@ -52,7 +52,7 @@ export const TAKE_EFFECT_EVERY = 'every'
 function takeEffectEvery(
   actionObservable,
   stateObservable,
-  mapActionToObserable,
+  mapActionToObservable,
   effectTypeArgs,
   prefix
 ) {
@@ -64,7 +64,7 @@ function takeEffectEvery(
       }
       return concat(
         of(action),
-        mapActionToObserable(action).pipe(
+        mapActionToObservable(action).pipe(
           takeUntilCancelAction(actionObservable, prefix)
         )
       )
@@ -76,7 +76,7 @@ function takeEffectEvery(
 
 function actionToExhaustObservableEffect(
   actionObservable,
-  mapActionToObserable,
+  mapActionToObservable,
   prefix
 ) {
   return merge(
@@ -94,7 +94,7 @@ function actionToExhaustObservableEffect(
         if (action.type === prefix + CANCEL || action.type === prefix + CLEAN) {
           return empty()
         }
-        return concat(of(action), mapActionToObserable(action)).pipe(
+        return concat(of(action), mapActionToObservable(action)).pipe(
           takeUntilCancelAction(actionObservable, prefix)
         )
       })
@@ -107,13 +107,13 @@ export const TAKE_EFFECT_EXHAUST = 'exhaust'
 function takeEffectExhaust(
   actionObservable,
   stateObservable,
-  mapActionToObserable,
+  mapActionToObservable,
   effectTypeArgs,
   prefix
 ) {
   return actionToExhaustObservableEffect(
     actionObservable,
-    mapActionToObserable,
+    mapActionToObservable,
     prefix
   )
 }
@@ -123,7 +123,7 @@ export const TAKE_EFFECT_GROUP_BY = 'groupBy'
 function takeEffectGroupBy(
   actionObservable,
   stateObservable,
-  mapActionToObserable,
+  mapActionToObservable,
   effectTypeArgs,
   prefix
 ) {
@@ -138,7 +138,7 @@ function takeEffectGroupBy(
     groupBy(groupByFn),
     mergeMap((groupedObservable) =>
       groupedObservable.pipe(
-        mapToLatest(groupedObservable, mapActionToObserable, prefix)
+        mapToLatest(groupedObservable, mapActionToObservable, prefix)
       )
     )
   )
@@ -149,7 +149,7 @@ export const TAKE_EFFECT_GROUP_BY_EXHAUST = 'groupByExhaust'
 function takeEffectGroupByExhaust(
   actionObservable,
   stateObservable,
-  mapActionToObserable,
+  mapActionToObservable,
   effectTypeArgs,
   prefix
 ) {
@@ -165,7 +165,7 @@ function takeEffectGroupByExhaust(
     mergeMap((groupedObservable) =>
       actionToExhaustObservableEffect(
         groupedObservable,
-        mapActionToObserable,
+        mapActionToObservable,
         prefix
       )
     )
