@@ -1,6 +1,6 @@
 {
   "name": "react-rocketjump",
-  "version": "2.6.0",
+  "version": "3.0.0-rc6",
   "description": "Rocketjump your react! Manage state and side effects like a breeze",
   "main": "lib/index.cjs.js",
   "module": "lib/index.es.js",
@@ -9,6 +9,11 @@
     "Giovanni Fumagalli <giovanni.fumagalli@inmagik.com>",
     "Mauro Bianchi <mauro.bianchi@inmagik.com>",
     "Alberto Osio <osioalberto@gmail.com>"
+  ],
+  "files": [
+    "lib",
+    "logger",
+    "plugins"
   ],
   "scripts": {
     "run-example": "npm-run-all -p dev-example fake-server",
