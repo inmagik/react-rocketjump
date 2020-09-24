@@ -32,6 +32,15 @@ export default function createMakeRxObservable(
   prefix = ''
 ) {
   return function makeRxObservable(actionObservable, stateObservable) {
+    // Make run time caller from effect action
+    function getEffectCaller(action) {
+      const effectArgs = action?.['@@RJ/EFFECT_ARGS']?.current
+      return makeRunTimeEffectCaller(
+        effectCaller, // Defined in rocketjump config
+        effectArgs?.effectCaller // Run time effect caller
+      )
+    }
+
     // Generate a result Observable from a given action
     // a RUN action but this is not checked is up to you
     // pass the corret action
@@ -41,13 +50,8 @@ export default function createMakeRxObservable(
       const { payload, meta, callbacks } = action
       const params = payload.params
 
-      const effectArgs = action?.['@@RJ/EFFECT_ARGS']?.current
-      const finalEffectCaller = makeRunTimeEffectCaller(
-        effectCaller, // Defined in rocketjump config
-        effectArgs?.effectCaller // Run time effect caller
-      )
-
-      const effectResult = finalEffectCaller(effectCall, ...params)
+      const effectCaller = getEffectCaller(action)
+      const effectResult = effectCaller(effectCall, ...params)
 
       if (!(isPromise(effectResult) || isObservable(effectResult))) {
         return throwError(
@@ -93,12 +97,10 @@ export default function createMakeRxObservable(
 
     // Custom take effect
     if (typeof effectType === 'function') {
-      return effectType(
-        actionObservable,
-        stateObservable,
-        mapActionToObservable,
-        prefix
-      )
+      return effectType(actionObservable, stateObservable, {
+        runSideEffectAction: mapActionToObservable,
+        getEffectCaller,
+      })
     } else {
       // Invalid effect type
       if (RxEffects[effectType] === undefined) {
