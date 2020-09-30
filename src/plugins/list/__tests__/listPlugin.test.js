@@ -20,9 +20,11 @@ describe('List Plugin', () => {
     )
 
     const prevState = {
-      data: null,
-      pending: false,
-      error: null,
+      root: {
+        data: null,
+        pending: false,
+        error: null,
+      },
     }
 
     let action = {
@@ -53,7 +55,7 @@ describe('List Plugin', () => {
 
     let nextState = reducer(prevState, action)
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: {
@@ -108,7 +110,7 @@ describe('List Plugin', () => {
 
     nextState = reducer(prevState, action)
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: {
@@ -163,7 +165,7 @@ describe('List Plugin', () => {
 
     nextState = reducer(prevState, action)
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: {
@@ -218,7 +220,7 @@ describe('List Plugin', () => {
 
     nextState = reducer(prevState, action)
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: {
@@ -258,16 +260,18 @@ describe('List Plugin', () => {
     )
 
     const prevState = {
-      data: {
-        list: [
-          {
-            id: 99,
-            name: 'Mallory',
-          },
-        ],
+      root: {
+        data: {
+          list: [
+            {
+              id: 99,
+              name: 'Mallory',
+            },
+          ],
+        },
+        pending: false,
+        error: null,
       },
-      pending: false,
-      error: null,
     }
 
     const action = {
@@ -297,7 +301,7 @@ describe('List Plugin', () => {
       },
     }
     const nextState = reducer(prevState, action)
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: {
@@ -341,16 +345,18 @@ describe('List Plugin', () => {
     )
 
     const prevState = {
-      data: {
-        list: [
-          {
-            id: 99,
-            name: 'Mallory',
-          },
-        ],
+      root: {
+        data: {
+          list: [
+            {
+              id: 99,
+              name: 'Mallory',
+            },
+          ],
+        },
+        pending: false,
+        error: null,
       },
-      pending: false,
-      error: null,
     }
 
     const action = {
@@ -380,7 +386,7 @@ describe('List Plugin', () => {
       },
     }
     const nextState = reducer(prevState, action)
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: {
@@ -435,40 +441,42 @@ describe('List Plugin', () => {
     } = makeSelectors()
 
     const state = {
-      loading: false,
-      error: null,
-      data: {
-        pagination: {
-          count: 99,
-          current: { page: 1 },
-          next: { page: 2 },
-          previous: null,
+      root: {
+        loading: false,
+        error: null,
+        data: {
+          pagination: {
+            count: 99,
+            current: { page: 1 },
+            next: { page: 2 },
+            previous: null,
+          },
+          list: [
+            {
+              id: 23,
+              name: 'Alice',
+            },
+            {
+              id: 23,
+              name: 'Bob',
+            },
+            {
+              id: 7,
+              name: 'Eve',
+            },
+          ],
         },
-        list: [
-          {
-            id: 23,
-            name: 'Alice',
-          },
-          {
-            id: 23,
-            name: 'Bob',
-          },
-          {
-            id: 7,
-            name: 'Eve',
-          },
-        ],
       },
     }
-    expect(getList(state)).toBe(state.data.list)
+    expect(getList(state)).toBe(state.root.data.list)
     expect(getCount(state)).toBe(99)
     expect(getNumPages(state)).toBe(10)
     expect(getNumPages(state, 50)).toBe(2)
     expect(hasNext(state)).toBe(true)
     expect(hasPrev(state)).toBe(false)
-    expect(getNext(state)).toBe(state.data.pagination.next)
+    expect(getNext(state)).toBe(state.root.data.pagination.next)
     expect(getPrev(state)).toBe(null)
-    expect(getCurrent(state)).toBe(state.data.pagination.current)
+    expect(getCurrent(state)).toBe(state.root.data.pagination.current)
   })
 
   it('should use fallback reducer', () => {
@@ -490,7 +498,7 @@ describe('List Plugin', () => {
       }
     )
 
-    const prevState = null
+    const prevState = { root: {} }
 
     const action = {
       type: 'CUSTOM',
@@ -502,7 +510,7 @@ describe('List Plugin', () => {
 
     reducer(prevState, action)
 
-    expect(fallbackReducer).toBeCalledWith(null, action)
+    expect(fallbackReducer).toBeCalledWith({}, action)
   })
 
   it('should get angry if no pagesize is provided and not passed to getNumPages', () => {
@@ -518,9 +526,11 @@ describe('List Plugin', () => {
     const { getNumPages } = makeSelectors()
 
     const state = {
-      loading: false,
-      error: null,
-      data: null,
+      root: {
+        loading: false,
+        error: null,
+        data: null,
+      },
     }
 
     const action = {
@@ -577,9 +587,11 @@ describe('List Plugin', () => {
     } = makeSelectors()
 
     const state = {
-      loading: false,
-      error: null,
-      data: null,
+      root: {
+        loading: false,
+        error: null,
+        data: null,
+      },
     }
     expect(getList(state)).toBe(null)
     expect(getCount(state)).toBe(null)
@@ -611,12 +623,14 @@ describe('List Plugin', () => {
     )
 
     const prevState = {
-      data: {
-        list: [],
-        pagination: null,
+      root: {
+        data: {
+          list: [],
+          pagination: null,
+        },
+        pending: false,
+        error: null,
       },
-      pending: false,
-      error: null,
     }
 
     const action = {
@@ -647,9 +661,9 @@ describe('List Plugin', () => {
 
     const nextState = reducer(prevState, action)
 
-    expect(customReducer).toBeCalledWith(prevState.data.list, action)
+    expect(customReducer).toBeCalledWith(prevState.root.data.list, action)
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: {
@@ -690,12 +704,14 @@ describe('List Plugin', () => {
     )
 
     const prevState = {
-      data: {
-        list: [],
-        pagination: null,
+      root: {
+        data: {
+          list: [],
+          pagination: null,
+        },
+        pending: false,
+        error: null,
       },
-      pending: false,
-      error: null,
     }
 
     const action = {
@@ -726,9 +742,9 @@ describe('List Plugin', () => {
 
     const nextState = reducer(prevState, action)
 
-    expect(customReducer).toBeCalledWith(prevState.data.pagination, action)
+    expect(customReducer).toBeCalledWith(prevState.root.data.pagination, action)
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: {
@@ -778,41 +794,43 @@ describe('List Plugin', () => {
     } = makeSelectors()
 
     const state = {
-      loading: false,
-      error: null,
-      data: {
-        pagination: {
-          count: 99,
-          previous: { offset: 10, limit: 10 },
-          current: { offset: 20, limit: 10 },
-          next: { offset: 30, limit: 10 },
+      root: {
+        loading: false,
+        error: null,
+        data: {
+          pagination: {
+            count: 99,
+            previous: { offset: 10, limit: 10 },
+            current: { offset: 20, limit: 10 },
+            next: { offset: 30, limit: 10 },
+          },
+          list: [
+            {
+              id: 23,
+              name: 'Alice',
+            },
+            {
+              id: 23,
+              name: 'Bob',
+            },
+            {
+              id: 7,
+              name: 'Eve',
+            },
+          ],
         },
-        list: [
-          {
-            id: 23,
-            name: 'Alice',
-          },
-          {
-            id: 23,
-            name: 'Bob',
-          },
-          {
-            id: 7,
-            name: 'Eve',
-          },
-        ],
       },
     }
 
-    expect(getList(state)).toBe(state.data.list)
+    expect(getList(state)).toBe(state.root.data.list)
     expect(getCount(state)).toBe(99)
     expect(getNumPages(state)).toBe(10)
     expect(getNumPages(state, 50)).toBe(2)
     expect(hasNext(state)).toBe(true)
     expect(hasPrev(state)).toBe(true)
-    expect(getNext(state)).toBe(state.data.pagination.next)
-    expect(getPrev(state)).toBe(state.data.pagination.previous)
-    expect(getCurrent(state)).toBe(state.data.pagination.current)
+    expect(getNext(state)).toBe(state.root.data.pagination.next)
+    expect(getPrev(state)).toBe(state.root.data.pagination.previous)
+    expect(getCurrent(state)).toBe(state.root.data.pagination.current)
 
     let action = {
       type: SUCCESS,
@@ -956,41 +974,43 @@ describe('List Plugin', () => {
     } = makeSelectors()
 
     const state = {
-      loading: false,
-      error: null,
-      data: {
-        pagination: {
-          count: 99,
-          previous: null,
-          current: { page: 1 },
-          next: { page: 2 },
+      root: {
+        loading: false,
+        error: null,
+        data: {
+          pagination: {
+            count: 99,
+            previous: null,
+            current: { page: 1 },
+            next: { page: 2 },
+          },
+          list: [
+            {
+              id: 23,
+              name: 'Alice',
+            },
+            {
+              id: 23,
+              name: 'Bob',
+            },
+            {
+              id: 7,
+              name: 'Eve',
+            },
+          ],
         },
-        list: [
-          {
-            id: 23,
-            name: 'Alice',
-          },
-          {
-            id: 23,
-            name: 'Bob',
-          },
-          {
-            id: 7,
-            name: 'Eve',
-          },
-        ],
       },
     }
 
-    expect(getList(state)).toBe(state.data.list)
+    expect(getList(state)).toBe(state.root.data.list)
     expect(getCount(state)).toBe(99)
     expect(getNumPages(state)).toBe(10)
     expect(getNumPages(state, 50)).toBe(2)
     expect(hasNext(state)).toBe(true)
     expect(hasPrev(state)).toBe(false)
-    expect(getNext(state)).toBe(state.data.pagination.next)
-    expect(getPrev(state)).toBe(state.data.pagination.previous)
-    expect(getCurrent(state)).toBe(state.data.pagination.current)
+    expect(getNext(state)).toBe(state.root.data.pagination.next)
+    expect(getPrev(state)).toBe(state.root.data.pagination.previous)
+    expect(getCurrent(state)).toBe(state.root.data.pagination.current)
 
     const action = {
       type: SUCCESS,
@@ -1046,9 +1066,11 @@ describe('List Plugin', () => {
     } = makeSelectors()
 
     const state = {
-      loading: false,
-      error: null,
-      data: null,
+      root: {
+        loading: false,
+        error: null,
+        data: null,
+      },
     }
 
     const action = {
@@ -1105,9 +1127,11 @@ describe('List Plugin', () => {
     } = makeSelectors()
 
     const state = {
-      loading: false,
-      error: null,
-      data: null,
+      root: {
+        loading: false,
+        error: null,
+        data: null,
+      },
     }
 
     const action = {
@@ -1161,9 +1185,11 @@ describe('List Plugin', () => {
     const { getCurrent } = makeSelectors()
 
     const state = {
-      loading: false,
-      error: null,
-      data: null,
+      root: {
+        loading: false,
+        error: null,
+        data: null,
+      },
     }
 
     const action = {

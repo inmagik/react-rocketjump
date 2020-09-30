@@ -15,7 +15,7 @@ describe('Rocketjump reducer', () => {
       effect: () => Promise.resolve(1),
     })
 
-    expect(reducer(undefined, { type: '@' })).toEqual({
+    expect(reducer(undefined, { type: '@' }).root).toEqual({
       pending: false,
       data: null,
       error: null,
@@ -24,16 +24,18 @@ describe('Rocketjump reducer', () => {
 
   it('should handle PENDING actions', () => {
     const prevState = {
-      pending: false,
-      data: 'custom_data',
-      error: null,
+      root: {
+        pending: false,
+        data: 'custom_data',
+        error: null,
+      },
     }
 
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
     })
 
-    expect(reducer(prevState, { type: PENDING })).toEqual({
+    expect(reducer(prevState, { type: PENDING }).root).toEqual({
       pending: true,
       data: 'custom_data',
       error: null,
@@ -42,9 +44,11 @@ describe('Rocketjump reducer', () => {
 
   it('should handle FAILURE actions', () => {
     const prevState = {
-      pending: true,
-      data: null,
-      error: null,
+      root: {
+        pending: true,
+        data: null,
+        error: null,
+      },
     }
 
     const { reducer } = rj({
@@ -56,7 +60,7 @@ describe('Rocketjump reducer', () => {
         type: FAILURE,
         error: true,
         payload: 'Something very bad happened...',
-      })
+      }).root
     ).toEqual({
       pending: false,
       data: null,
@@ -66,9 +70,11 @@ describe('Rocketjump reducer', () => {
 
   it('should handle SUCCESS actions', () => {
     const prevState = {
-      pending: true,
-      data: null,
-      error: null,
+      root: {
+        pending: true,
+        data: null,
+        error: null,
+      },
     }
 
     const { reducer } = rj({
@@ -76,7 +82,7 @@ describe('Rocketjump reducer', () => {
     })
 
     expect(
-      reducer(prevState, { type: SUCCESS, payload: { data: 'Yeah' } })
+      reducer(prevState, { type: SUCCESS, payload: { data: 'Yeah' } }).root
     ).toEqual({
       pending: false,
       data: 'Yeah',
@@ -86,9 +92,11 @@ describe('Rocketjump reducer', () => {
 
   it('should handle UPDATE_DATA actions', () => {
     const prevState = {
-      pending: false,
-      data: { name: 'Albi' },
-      error: null,
+      root: {
+        pending: false,
+        data: { name: 'Albi' },
+        error: null,
+      },
     }
 
     const { reducer } = rj({
@@ -96,7 +104,7 @@ describe('Rocketjump reducer', () => {
     })
 
     expect(
-      reducer(prevState, { type: UPDATE_DATA, payload: { name: 'GioVa' } })
+      reducer(prevState, { type: UPDATE_DATA, payload: { name: 'GioVa' } }).root
     ).toEqual({
       pending: false,
       data: { name: 'GioVa' },
@@ -106,17 +114,19 @@ describe('Rocketjump reducer', () => {
 
   it('should handle CLEAN actions', () => {
     const prevState = {
-      pending: true,
-      data: 'Where is my mind?',
-      error: 'Too many errors... Always...',
-      customKey: 23,
+      root: {
+        pending: true,
+        data: 'Where is my mind?',
+        error: 'Too many errors... Always...',
+        customKey: 23,
+      },
     }
 
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
     })
 
-    expect(reducer(prevState, { type: CLEAN })).toEqual({
+    expect(reducer(prevState, { type: CLEAN }).root).toEqual({
       pending: false,
       data: null,
       error: null,
@@ -126,17 +136,19 @@ describe('Rocketjump reducer', () => {
 
   it('should handle CANCEL actions', () => {
     const prevState = {
-      pending: true,
-      data: 'Where is my mind?',
-      error: 'Too many errors... Always...',
-      customKey: 23,
+      root: {
+        pending: true,
+        data: 'Where is my mind?',
+        error: 'Too many errors... Always...',
+        customKey: 23,
+      },
     }
 
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
     })
 
-    expect(reducer(prevState, { type: CANCEL })).toEqual({
+    expect(reducer(prevState, { type: CANCEL }).root).toEqual({
       pending: false,
       data: 'Where is my mind?',
       error: 'Too many errors... Always...',
@@ -159,13 +171,15 @@ describe('Rocketjump reducer', () => {
     })
 
     const prevState = {
-      pending: true,
-      data: null,
-      error: null,
+      root: {
+        pending: true,
+        data: null,
+        error: null,
+      },
     }
 
     expect(
-      reducer(prevState, { type: SUCCESS, payload: { data: 'Maik' } })
+      reducer(prevState, { type: SUCCESS, payload: { data: 'Maik' } }).root
     ).toEqual({
       pending: false,
       data: 'Maik',
@@ -210,15 +224,17 @@ describe('Rocketjump reducer', () => {
     let state = reducer(undefined, {})
 
     expect(state).toEqual({
-      pending: false,
-      error: null,
-      data: null,
-      hisCustomKey: 1,
-      myCustomKey: 12,
+      root: {
+        pending: false,
+        error: null,
+        data: null,
+        hisCustomKey: 1,
+        myCustomKey: 12,
+      },
     })
 
     state = reducer(state, { type: 'COMPUTE_BRAIN_AGE' })
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: null,

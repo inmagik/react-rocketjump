@@ -164,36 +164,31 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
     mutationsEnhancer.enhanceRootReducer?.(baseReducer, actionCreators) ??
     baseReducer
 
-  const extraSelectors = mutationsEnhancer.extraSelectors ?? {}
-
-  // ... Compose reducer with mutations + future reducers
+  // ... Compose reducer with mutations + config reducers
   const extraReducers = {
     ...combineReducersMap,
     // TODO: IN DEV WARK ABOUT MUTATIONS KEYS ....
     ...mutationsEnhancer.reducersToCombine,
   }
-  let reducer
-  let makeSelectors
-  if (Object.keys(extraReducers).length) {
-    const getRoot = (state) => state.root
-    makeSelectors = () => baseMakeSelectors({ getRoot, ...extraSelectors })
 
-    reducer = combineReducers({
-      // TODO: IN DEV WARK ABOUT ROOT KEY ....
-      ...extraReducers,
-      root: rootReducer,
-    })
+  let reducer = combineReducers({
+    // TODO: IN DEV WARK ABOUT ROOT KEY ....
+    ...extraReducers,
+    root: rootReducer,
+  })
 
-    if (!computeState) {
-      computeState = getRoot
-    }
-  } else {
-    reducer = rootReducer
-    const getRoot = (state) => state
-    makeSelectors = () => baseMakeSelectors({ getRoot, ...extraSelectors })
-  }
-
+  // Combined reducer ++
   reducer = mutationsEnhancer.enhanceCombinedReducer?.(reducer) ?? reducer
+
+  const extraSelectors = mutationsEnhancer.extraSelectors ?? {}
+
+  const getRoot = (state) => state.root
+  const makeSelectors = () => baseMakeSelectors({ getRoot, ...extraSelectors })
+
+  // Rj default compute the root state!
+  if (!computeState) {
+    computeState = getRoot
+  }
 
   const { effectPipeline, addSideEffect, ...sideEffectConfig } = sideEffect
 

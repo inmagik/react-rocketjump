@@ -2,18 +2,20 @@ import { rj } from '..'
 
 describe('Rocketjump selectors', () => {
   const mockState = {
-    pending: false,
-    error: '401 Unauthorized',
-    data: [
-      {
-        name: 'Alice',
-        age: 24,
-      },
-      {
-        name: 'Bob',
-        age: 29,
-      },
-    ],
+    root: {
+      pending: false,
+      error: '401 Unauthorized',
+      data: [
+        {
+          name: 'Alice',
+          age: 24,
+        },
+        {
+          name: 'Bob',
+          age: 29,
+        },
+      ],
+    },
   }
 
   const rjSelectors = (...config) => {
@@ -25,10 +27,10 @@ describe('Rocketjump selectors', () => {
       effect: () => Promise.resolve(1),
     })
 
-    expect(selectors.isLoading(mockState)).toBe(mockState.pending)
-    expect(selectors.isPending(mockState)).toBe(mockState.pending)
-    expect(selectors.getError(mockState)).toBe(mockState.error)
-    expect(selectors.getData(mockState)).toBe(mockState.data)
+    expect(selectors.isLoading(mockState)).toBe(false)
+    expect(selectors.isPending(mockState)).toBe(false)
+    expect(selectors.getError(mockState)).toBe(mockState.root.error)
+    expect(selectors.getData(mockState)).toBe(mockState.root.data)
   })
 
   it('should be proxable and extendible', () => {
