@@ -6,6 +6,7 @@ import {
   CLEAN,
   CANCEL,
   UPDATE_DATA,
+  INIT,
 } from '../actionTypes'
 
 describe('Rocketjump reducer', () => {
@@ -223,6 +224,112 @@ describe('Rocketjump reducer', () => {
       data: null,
       hisCustomKey: 1,
       myCustomKey: 'Your brain age is: 24',
+    })
+  })
+
+  it('should be combinable', () => {
+    function dragoReducer(state = 'drago', action) {
+      if (action.type === 'D') {
+        return state + '_' + state
+      }
+      return state
+    }
+    const { reducer } = rj({
+      effect: () => {},
+      combineReducers: {
+        drago: dragoReducer,
+      },
+    })
+
+    let state = reducer(undefined, { type: INIT })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago',
+    })
+    state = reducer(state, { type: 'D' })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago_drago',
+    })
+
+    state = reducer(state, { type: 'D' })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago_drago_drago_drago',
+    })
+
+    const snapState = state
+    state = reducer(state, { type: 'MISS' })
+    expect(state).toBe(snapState)
+
+    state = reducer(state, { type: 'MISS 2X' })
+    expect(state).toBe(snapState)
+  })
+
+  it('should be combinable and respect the rj law', () => {
+    function dragoReducer(state = 'drago', action) {
+      if (action.type === 'D') {
+        return state + '_' + state
+      }
+      return state
+    }
+    const { reducer } = rj(
+      rj({
+        combineReducers: {
+          babu: () => 'babu',
+          drago: () => 999,
+        },
+      }),
+      {
+        effect: () => {},
+        combineReducers: {
+          drago: dragoReducer,
+        },
+      }
+    )
+
+    let state = reducer(undefined, { type: INIT })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago',
+      babu: 'babu',
+    })
+    state = reducer(state, { type: 'D' })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago_drago',
+      babu: 'babu',
+    })
+
+    state = reducer(state, { type: 'D' })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago_drago_drago_drago',
+      babu: 'babu',
     })
   })
 })

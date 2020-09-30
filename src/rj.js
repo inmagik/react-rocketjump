@@ -133,6 +133,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
     reducer: baseReducer,
     makeSelectors: baseMakeSelectors,
     actionCreators: baseActionCreators,
+    combineReducers: combineReducersMap,
     computed,
     sideEffect,
     // EXTRA SHIT
@@ -167,6 +168,8 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
 
   // ... Compose reducer with mutations + future reducers
   const extraReducers = {
+    ...combineReducersMap,
+    // TODO: IN DEV WARK ABOUT MUTATIONS KEYS ....
     ...mutationsEnhancer.reducersToCombine,
   }
   let reducer
@@ -176,8 +179,9 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
     makeSelectors = () => baseMakeSelectors({ getRoot, ...extraSelectors })
 
     reducer = combineReducers({
-      root: rootReducer,
+      // TODO: IN DEV WARK ABOUT ROOT KEY ....
       ...extraReducers,
+      root: rootReducer,
     })
 
     if (!computeState) {

@@ -1,8 +1,25 @@
-import { rj } from 'react-rocketjump'
+import {
+  rj,
+  matchMutationType,
+  PENDING,
+  SUCCESS,
+  FAILURE,
+} from 'react-rocketjump'
 import rjPlainList from 'react-rocketjump/plugins/plainList'
 import request from 'superagent'
 
 export const API_URL = 'http://localhost:9001'
+
+const trackTypes = ['removeTodo', 'toggleTodo']
+function mutationsBusyReducer(state = 0, action) {
+  if (matchMutationType(action.type, trackTypes, PENDING)) {
+    return state + 1
+  }
+  if (matchMutationType(action.type, trackTypes, [SUCCESS, FAILURE])) {
+    return state - 1
+  }
+  return state
+}
 
 export const TodosListState = rj(rjPlainList(), {
   effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
@@ -32,7 +49,14 @@ export const TodosListState = rj(rjPlainList(), {
       updater: 'updateItem',
     }),
   },
+  selectors: () => ({
+    isBusy: (state) => state.busy > 0,
+  }),
+  combineReducers: {
+    busy: mutationsBusyReducer,
+  },
   computed: {
+    busy: 'isBusy',
     adding: '@mutation.addStupidTodo.pending',
     deleting: '@mutation.removeTodo.pendings',
     updating: '@mutation.toggleTodo.pendings',

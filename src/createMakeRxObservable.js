@@ -113,6 +113,8 @@ export default function createMakeRxObservable(
 
       // Apply the effect only to RUN, CLEAN and CANCEL + prefx
       return createEffect(
+        // TODO: MAKE PREFIX MORE PREDICABLE MAKE CUSTOM SIDE SHIT
+        // MORE INTEGRABLE .........
         actionObservable.pipe(
           filter((a) => filterStandarEffectActions(a, prefix))
         ),

@@ -7,13 +7,13 @@ import './Todos.css'
 
 export default function Todos() {
   const [
-    { todos, loading, adding, deleting, updating },
+    { todos, loading, adding, deleting, updating, busy },
     { addStupidTodo, removeTodo, toggleTodo, clean, run },
   ] = useRunRj(TodosListState)
 
   return (
     <div className="todos">
-      <h1>Ma REST Todos</h1>
+      <h1>Ma REST Todos {busy && <small>Saving...</small>}</h1>
       <div>
         <div className="action-button-rj">
           <button onClick={() => clean()}>CLEAN</button>

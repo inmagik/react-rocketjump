@@ -49,6 +49,16 @@ export default (_, rjConfig, extendExport = {}) => {
     }
   }
 
+  // Reducers to combine
+  let combineReducers
+  if (!extendExport.combineReducers) {
+    // Start \w empty map of combine reducers
+    combineReducers = {}
+  } else {
+    combineReducers = extendExport.combineReducers
+  }
+  combineReducers = { ...combineReducers, ...rjConfig.combineReducers }
+
   // Make action creators
   let actionCreators
   if (!extendExport.actionCreators) {
@@ -95,6 +105,7 @@ export default (_, rjConfig, extendExport = {}) => {
     ...extendExport,
     sideEffect,
     reducer,
+    combineReducers,
     actionCreators,
     makeSelectors,
     computed,
