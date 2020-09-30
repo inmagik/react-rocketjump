@@ -4,7 +4,7 @@ import hoistStatics from 'hoist-non-react-statics'
 import { useConstant } from './hooks'
 import useMiniRedux from './useMiniRedux'
 
-const defaultMapActionsToProps = a => a
+const defaultMapActionsToProps = (a) => a
 
 export default function connectRj(
   // The returned value of rj(..., EFFECT)

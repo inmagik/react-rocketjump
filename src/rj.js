@@ -5,10 +5,13 @@ import {
   createComputeState,
 } from 'rocketjump-core'
 import makeExport from './export'
-import createMakeRxObservable from './createMakeRxObservable'
+import createMakeRxObservable, {
+  mergeMakeRxObservables,
+} from './createMakeRxObservable'
+import combineReducers from './combineReducers'
 import {
-  enhanceFinalExportWithMutations,
   checkMutationsConfig,
+  createMutationsFinalExportEnhancer,
 } from './mutations/index'
 
 function shouldRocketJump(partialRjsOrConfigs) {
@@ -99,7 +102,7 @@ function makeRecursionRjs(
 ) {
   let hasEffectConfigured = false
 
-  const recursionRjs = partialRjsOrConfigs.map(partialRjOrConfig => {
+  const recursionRjs = partialRjsOrConfigs.map((partialRjOrConfig) => {
     if (typeof partialRjOrConfig === 'function') {
       // A Partial RJ
       if (isPartialRj(partialRjOrConfig)) {
@@ -126,45 +129,97 @@ function makeRecursionRjs(
 
 function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
   // ~~ END OF RECURSION CHAIN  ~~
-  const { sideEffect, computed, ...rjExport } = mergegAlongExport
+  const {
+    reducer: baseReducer,
+    makeSelectors: baseMakeSelectors,
+    actionCreators: baseActionCreators,
+    combineReducers: combineReducersMap,
+    computed,
+    sideEffect,
+    // EXTRA SHIT
+    mutations,
+    cache,
+  } = mergegAlongExport
 
-  const { effectPipeline, ...sideEffectConfig } = sideEffect
+  // NOTE: In future Enhancer can be an interface for next extensions
+  const mutationsEnhancer = createMutationsFinalExportEnhancer(mutations)
 
-  // Create the make rx observable function using merged side effect descriptor!
-  const makeRxObservable = createMakeRxObservable(sideEffectConfig)
-
-  const pipeActionStream = (action$, state$) =>
-    effectPipeline.reduce((action$, piper) => piper(action$, state$), action$)
+  // ++ Actions Creators
+  const actionCreators =
+    mutationsEnhancer.enhanceActionCreators?.(baseActionCreators) ??
+    baseActionCreators
 
   // Create the compute state function by computed config,
   // when no computed config is given return null is responsibility
   // of useRj, connectRj, .. to check for null
-  const computeState = createComputeState(computed)
+  let computeState = createComputeState(computed)
 
-  const finalExport = {
-    ...rjExport,
+  // ++ Compute state
+  computeState =
+    mutationsEnhancer.enhanceComputeState?.(computeState, computed) ??
+    computeState
+
+  // ++ Base reducer
+  const rootReducer =
+    mutationsEnhancer.enhanceRootReducer?.(baseReducer, actionCreators) ??
+    baseReducer
+
+  // ... Compose reducer with mutations + config reducers
+  const extraReducers = {
+    ...combineReducersMap,
+    // TODO: IN DEV WARK ABOUT MUTATIONS KEYS ....
+    ...mutationsEnhancer.reducersToCombine,
+  }
+
+  let reducer = combineReducers({
+    // TODO: IN DEV WARK ABOUT ROOT KEY ....
+    ...extraReducers,
+    root: rootReducer,
+  })
+
+  // Combined reducer ++
+  reducer = mutationsEnhancer.enhanceCombinedReducer?.(reducer) ?? reducer
+
+  const extraSelectors = mutationsEnhancer.extraSelectors ?? {}
+
+  const getRoot = (state) => state.root
+  const makeSelectors = () => baseMakeSelectors({ getRoot, ...extraSelectors })
+
+  // Rj default compute the root state!
+  if (!computeState) {
+    computeState = getRoot
+  }
+
+  const { effectPipeline, addSideEffect, ...sideEffectConfig } = sideEffect
+
+  // Create the make rx observable function using merged side effect descriptor!
+  let makeRxObservable = createMakeRxObservable(sideEffectConfig)
+
+  const pipeActionStream = (actions, state) =>
+    effectPipeline.reduce((actions, piper) => piper(actions, state), actions)
+
+  const extraRxObservables = [].concat(
+    mutationsEnhancer.makeExtraRxObservables?.(sideEffectConfig) ?? [],
+    addSideEffect.map((takeEffect) =>
+      createMakeRxObservable({ ...sideEffectConfig, takeEffect })
+    )
+  )
+  if (extraRxObservables.length) {
+    makeRxObservable = mergeMakeRxObservables(
+      makeRxObservable,
+      ...extraRxObservables
+    )
+  }
+
+  return {
+    reducer,
     computeState,
+    actionCreators,
+    makeSelectors,
     makeRxObservable,
     pipeActionStream,
+    cache,
   }
-
-  // ... Add an per RJ Shared Cache
-  if (rjExport.cache) {
-    finalExport.cache = rjExport.cache(finalExport)
-  }
-
-  // Finally the rocketjump runnable state is created!
-  /*
-    {
-      reducer: fn,
-      computeState: fn|null
-      actionCreators: {},
-      makeSelectors: fn,
-      makeRxObservable: fn,
-      pipeActionStream: fn,
-    }
-  */
-  return enhanceFinalExportWithMutations(finalExport, mergegAlongExport)
 }
 
 export default forgeRocketJump({

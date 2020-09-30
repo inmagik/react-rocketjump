@@ -11,6 +11,7 @@ module.exports = {
     contentBase: './example',
     historyApiFallback: true,
     port: 9000,
+    hot: true,
   },
   devtool: 'inline-source-map',
   module: {

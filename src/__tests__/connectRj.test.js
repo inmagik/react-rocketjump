@@ -3,14 +3,13 @@ import { act } from 'react-dom/test-utils'
 import Enzyme, { mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import connectRj from '../connectRj'
-// import memoize from 'memoize-one'
 import rj from '../rj'
 
 Enzyme.configure({ adapter: new Adapter() })
 
 describe('connectRj', () => {
   const makeRjComponent = (...args) => {
-    const Component = props => null
+    const Component = (props) => null
     const RjComponent = connectRj(...args)(Component)
 
     return mount(<RjComponent />)
@@ -42,7 +41,7 @@ describe('connectRj', () => {
       }),
       {
         effect: () => Promise.resolve(1312),
-        selectors: s => ({
+        selectors: (s) => ({
           getBudda: () => s.getBudda() * 2,
         }),
         computed: {
@@ -77,7 +76,7 @@ describe('connectRj', () => {
       }),
       {
         effect: () => Promise.resolve(1312),
-        selectors: s => ({
+        selectors: (s) => ({
           getBudda: () => s.getBudda() * 2,
         }),
         computed: {
@@ -122,7 +121,7 @@ describe('connectRj', () => {
   })
 
   it('should get angry with a non rj object is passed as argument', () => {
-    const Component = props => null
+    const Component = (props) => null
     expect(() => {
       connectRj(rj())(Component)
     }).toThrowError(
@@ -145,7 +144,7 @@ describe('connectRj', () => {
     )
   })
 
-  it('should run rj sideEffects and react to succees', async done => {
+  it('should run rj sideEffects and react to succees', async (done) => {
     const mockFn = jest.fn().mockResolvedValue(23)
     const rjState = rj(mockFn)
 
@@ -156,10 +155,7 @@ describe('connectRj', () => {
     expect(wrapper.find('Component').props().friends).toBe(null)
 
     await act(async () => {
-      wrapper
-        .find('Component')
-        .props()
-        .run()
+      wrapper.find('Component').props().run()
       expect(mockFn).toHaveBeenCalledTimes(1)
     })
 

@@ -97,7 +97,7 @@ describe('useRj', () => {
     )
 
     const { result } = renderHook(() =>
-      useRj(maRjState, state => ({
+      useRj(maRjState, (state) => ({
         ...state,
         maik: 1312,
       }))
@@ -222,7 +222,7 @@ describe('useRj', () => {
   it('should create a per-instance version of selectors to enable good memoization', () => {
     const mySelector = jest
       .fn()
-      .mockImplementation(n => (n === 0 ? 0 : n + 1300))
+      .mockImplementation((n) => (n === 0 ? 0 : n + 1300))
 
     const maRjState = rj(
       rj({
@@ -242,12 +242,12 @@ describe('useRj', () => {
           return prevState
         },
         actions: () => ({
-          gang: n => ({ type: 'GANG', payload: n }),
+          gang: (n) => ({ type: 'GANG', payload: n }),
           charlie: () => ({ type: 'CHARLIE' }),
         }),
         selectors: ({ getData }) => {
           const memoSelector = memoize(mySelector)
-          return { getMaik: state => memoSelector(getData(state)) }
+          return { getMaik: (state) => memoSelector(getData(state)) }
         },
       }),
       () => Promise.resolve(1312)
@@ -398,19 +398,19 @@ describe('useRj', () => {
       .fn()
       .mockImplementationOnce(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolves[0] = resolve
           })
       )
       .mockImplementationOnce(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolves[1] = resolve
           })
       )
       .mockImplementationOnce(
         () =>
-          new Promise(resolve => {
+          new Promise((resolve) => {
             resolves[2] = resolve
           })
       )
@@ -481,7 +481,71 @@ describe('useRj', () => {
     expect(out).toBe(result.current)
   })
 
-  test.todo('Test onSuccess onFailure')
+  it('should call onSucces when a RUN success', async () => {
+    const mockEffect = jest
+      .fn()
+      .mockResolvedValueOnce('GANG')
+      .mockResolvedValueOnce('13')
+    const MaRjState = rj({
+      effect: mockEffect,
+    })
+    const mockOnSuccess = jest.fn()
+
+    const { result } = renderHook(() => useRj(MaRjState))
+
+    await act(async () => {
+      result.current[1].run.onSuccess(mockOnSuccess).run()
+    })
+
+    expect(mockEffect).toBeCalledTimes(1)
+    await mockEffect.mock.results[0].value
+
+    expect(mockOnSuccess).nthCalledWith(1, 'GANG')
+
+    await act(async () => {
+      result.current[1].run.onSuccess(mockOnSuccess).run()
+    })
+
+    expect(mockEffect).toBeCalledTimes(2)
+    await mockEffect.mock.results[1].value
+    expect(mockOnSuccess).nthCalledWith(2, '13')
+  })
+
+  it('should call onFailure when a RUN failure', async () => {
+    const mockEffect = jest
+      .fn()
+      .mockRejectedValueOnce('GANG')
+      .mockRejectedValueOnce('13')
+    const MaRjState = rj({
+      effect: mockEffect,
+    })
+    const mockOnFailure = jest.fn()
+
+    const { result } = renderHook(() => useRj(MaRjState))
+
+    await act(async () => {
+      result.current[1].run.onFailure(mockOnFailure).run()
+    })
+
+    expect(mockEffect).toBeCalledTimes(1)
+    try {
+      await mockEffect.mock.results[0].value
+    } catch (e) {}
+
+    expect(mockOnFailure).nthCalledWith(1, 'GANG')
+
+    await act(async () => {
+      result.current[1].run.onFailure(mockOnFailure).run()
+    })
+
+    expect(mockEffect).toBeCalledTimes(2)
+    try {
+      await mockEffect.mock.results[1].value
+    } catch (e) {}
+    expect(mockOnFailure).nthCalledWith(2, '13')
+  })
 
   test.todo('Test actions')
+
+  test.todo('Test pipe into custom effect action')
 })

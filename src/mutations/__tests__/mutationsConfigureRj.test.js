@@ -144,7 +144,7 @@ describe('ConfigureRj', () => {
       const caller = () => Promise.resolve(i)
       useEffect(() => {
         if (i < 1) {
-          setI(i => i + 1)
+          setI((i) => i + 1)
         }
       }, [i])
       // i take values 0 then 1 then stop

@@ -20,12 +20,13 @@ const composeEffectCallers = (...callers) => (effectCall, ...args) => {
 export const makeSideEffectDescriptor = () => ({
   takeEffect: [TAKE_EFFECT_LATEST],
   effectPipeline: [],
+  addSideEffect: [],
 })
 
 export const exportEffectCaller = makeExportValue({
   defaultValue: undefined,
-  isLazy: v => v === RJ_CONFIG_PLACEHOLDER,
-  shouldCompose: v => !!v,
+  isLazy: (v) => v === RJ_CONFIG_PLACEHOLDER,
+  shouldCompose: (v) => !!v,
   compose: (prevCaller, caller) => {
     if (prevCaller) {
       return composeEffectCallers(prevCaller, caller)
@@ -56,6 +57,11 @@ export const addConfigToSideEffectDescritor = (
   if (typeof config.effectPipeline === 'function') {
     newSideEffectDescriptor.effectPipeline = newSideEffectDescriptor.effectPipeline.concat(
       config.effectPipeline
+    )
+  }
+  if (typeof config.addSideEffect === 'function') {
+    newSideEffectDescriptor.addSideEffect = newSideEffectDescriptor.addSideEffect.concat(
+      config.addSideEffect
     )
   }
 

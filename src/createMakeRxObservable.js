@@ -1,12 +1,4 @@
-import {
-  of,
-  from,
-  concat,
-  throwError,
-  merge,
-  BehaviorSubject,
-  isObservable,
-} from 'rxjs'
+import { of, from, concat, throwError, merge, isObservable } from 'rxjs'
 import { map, catchError, filter } from 'rxjs/operators'
 import { squashExportValue } from 'rocketjump-core'
 import { SUCCESS, FAILURE, PENDING, RUN, CLEAN, CANCEL } from './actionTypes'
@@ -16,42 +8,23 @@ import RxEffects from './rxEffects'
 
 const defaultEffectCaller = (call, ...args) => call(...args)
 
-const makeRunTimeConfig = (effectCaller, extraConfig) => {
-  const placeholderEffectCaller = extraConfig.effectCaller
-  let callEffect
-  callEffect = squashExportValue(
+const makeRunTimeEffectCaller = (effectCaller, injectEffectCaller) => {
+  const finalEffectCaller = squashExportValue(
     effectCaller,
-    [placeholderEffectCaller].filter(Boolean)
+    [injectEffectCaller].filter(Boolean)
   )
   // Use default effect caller
-  if (!callEffect) {
-    callEffect = defaultEffectCaller
+  if (!finalEffectCaller) {
+    return defaultEffectCaller
   }
 
-  const runTimeExtraConfig = {
-    callEffect,
-  }
-  return runTimeExtraConfig
-}
-
-// OOP is Just a Dream
-class ExtraSideEffectSubject extends BehaviorSubject {
-  constructor(value, effectCaller) {
-    super(makeRunTimeConfig(effectCaller, value))
-    this.effectCaller = effectCaller
-  }
-
-  next(extraConfig) {
-    return super.next(makeRunTimeConfig(this.effectCaller, extraConfig))
-  }
+  // Use squashed effect caller
+  return finalEffectCaller
 }
 
 const EffectActions = [CLEAN, RUN, CANCEL]
-function filterEffectActions(action, prefix) {
-  return EffectActions.map(a => prefix + a).indexOf(action.type) !== -1
-}
-function filterNonEffectActions(action, prefix) {
-  return EffectActions.map(a => prefix + a).indexOf(action.type) === -1
+function filterStandarEffectActions(action, prefix) {
+  return EffectActions.map((a) => prefix + a).indexOf(action.type) !== -1
 }
 
 export default function createMakeRxObservable(
@@ -59,43 +32,31 @@ export default function createMakeRxObservable(
   prefix = ''
 ) {
   return function makeRxObservable(
-    action$,
-    state$,
-    placeholderEffectCaller,
-    overrideTakeEffect,
-    prevObservable$ // <---- The observable to merge along,
+    actionObservable,
+    stateObservable,
+    overrideTakeEffect
   ) {
-    const takeEffect = overrideTakeEffect || baseTakeEffect
-    // Extra side effect configuration subject
-    // used to emit changes on extra conf from outside world
-    const extraSideEffectSubject = new ExtraSideEffectSubject(
-      {
-        effectCaller: placeholderEffectCaller,
-      },
-      effectCaller
-    )
-    const extraSideEffectObs$ = extraSideEffectSubject.asObservable()
+    const takeEffect = overrideTakeEffect ?? baseTakeEffect
+    // Make run time caller from effect action
+    function getEffectCaller(action) {
+      const effectArgs = action?.['@@RJ/EFFECT_ARGS']?.current
+      return makeRunTimeEffectCaller(
+        effectCaller, // Defined in rocketjump config
+        effectArgs?.effectCaller // Run time effect caller
+      )
+    }
 
     // Generate a result Observable from a given action
     // a RUN action but this is not checked is up to you
     // pass the corret action
     // in plus emit the PENDING action before invoke the effect
     // action => Observable(<PENDING>, <SUCCESS>|<FAILURE>)
-    function mapActionToObserable(action, { callEffect }) {
+    function mapActionToObservable(action) {
       const { payload, meta, callbacks } = action
       const params = payload.params
 
-      let finalCallEffect = callEffect
-      // TODO: This just sucks ... Please in @rj unify them
-      // and memo this operation ...
-      if (action.effectCaller) {
-        const runTimeCallerConf = makeRunTimeConfig(effectCaller, {
-          effectCaller: action.effectCaller,
-        })
-        finalCallEffect = runTimeCallerConf.callEffect
-        delete action.effectCaller
-      }
-      const effectResult = finalCallEffect(effectCall, ...params)
+      const effectCaller = getEffectCaller(action)
+      const effectResult = effectCaller(effectCall, ...params)
 
       if (!(isPromise(effectResult) || isObservable(effectResult))) {
         return throwError(
@@ -108,14 +69,14 @@ export default function createMakeRxObservable(
       return concat(
         of({ type: prefix + PENDING, meta }),
         from(effectResult).pipe(
-          map(data => ({
+          map((data) => ({
             type: prefix + SUCCESS,
             payload: { data, params },
             meta,
             // Callback runned from the subscribtion in the react hook
             successCallback: callbacks ? callbacks.onSuccess : undefined,
           })),
-          catchError(error => {
+          catchError((error) => {
             // Avoid headache
             if (
               error instanceof TypeError ||
@@ -139,23 +100,12 @@ export default function createMakeRxObservable(
 
     const [effectType, ...effectTypeArgs] = arrayze(takeEffect)
 
-    // The prev observable to merge if no used the action$
-    const mergeObservable$ = prevObservable$ ? prevObservable$ : action$
-
-    let dispatchObservable
     // Custom take effect
     if (typeof effectType === 'function') {
-      // TODO: Maybe in future check the return value of
-      // custom take effect and print some warning to help
-      // developers to better debugging better rj configuration
-      dispatchObservable = effectType(
-        action$,
-        mergeObservable$,
-        state$,
-        extraSideEffectObs$,
-        mapActionToObserable,
-        prefix
-      )
+      return effectType(actionObservable, stateObservable, {
+        runSideEffectAction: mapActionToObservable,
+        getEffectCaller,
+      })
     } else {
       // Invalid effect type
       if (RxEffects[effectType] === undefined) {
@@ -167,63 +117,41 @@ export default function createMakeRxObservable(
       const createEffect = RxEffects[effectType]
 
       // Apply the effect only to RUN, CLEAN and CANCEL + prefx
-      // if an action different from theese is emitted simply emit/dispatch them
-      dispatchObservable = merge(
-        createEffect(
-          action$.pipe(filter(a => filterEffectActions(a, prefix))),
-          state$,
-          extraSideEffectObs$,
-          mapActionToObserable,
-          effectTypeArgs,
-          prefix
+      return createEffect(
+        // TODO: MAKE PREFIX MORE PREDICABLE MAKE CUSTOM SIDE SHIT
+        // MORE INTEGRABLE .........
+        actionObservable.pipe(
+          filter((a) => filterStandarEffectActions(a, prefix))
         ),
-        mergeObservable$.pipe(
-          filter(a => {
-            if (a.meta && a.meta.ignoreDispatch) {
-              return false
-            }
-            return filterNonEffectActions(a, prefix)
-          })
-        )
+        stateObservable,
+        mapActionToObservable,
+        effectTypeArgs,
+        prefix
       )
     }
-    return [dispatchObservable, config => extraSideEffectSubject.next(config)]
   }
 }
 
 // GioVa nel posto fa freddo brrrrrrrrrrrrr
-export function mergeCreateMakeRxObservable(...creators) {
-  return (action$, state$, effectCaller, takeEffect) => {
-    // TODO: Enable and test the following lines
-    // when expose mergeCreateMakeRxObservable as library function
-    // if (creators.length === 0) {
-    //   throw new Error('You should provide at least one creator to merge.')
-    // }
-    const [firstCreator, ...otherCreators] = creators
-    const [firstDispatch$, updateConfig] = firstCreator(
-      action$,
-      state$,
-      effectCaller,
-      takeEffect
+export function mergeMakeRxObservables(baseCreator, ...creators) {
+  return (actionObservable, stateObservable) => {
+    const baseDispatchObservable = baseCreator(
+      actionObservable,
+      stateObservable
     )
 
-    const [dispatch$, configUpdaters] = otherCreators.reduce(
-      ([dispatch$, updaters], rxCreator) => {
-        const [nextDispatch$, updateConfig] = rxCreator(
-          action$,
-          state$,
-          effectCaller,
-          takeEffect,
-          dispatch$
+    const dispatchObservables2Merge = creators.reduce(
+      (dispatchObservables, rxCreator) => {
+        const nextDispatchObservable = rxCreator(
+          actionObservable,
+          stateObservable
         )
-        return [nextDispatch$, updaters.concat(updateConfig)]
+        dispatchObservables.push(nextDispatchObservable)
+        return dispatchObservables
       },
-      [firstDispatch$, [updateConfig]]
+      [baseDispatchObservable]
     )
 
-    return [
-      dispatch$,
-      config => configUpdaters.forEach(updateConfig => updateConfig(config)),
-    ]
+    return merge(...dispatchObservables2Merge)
   }
 }

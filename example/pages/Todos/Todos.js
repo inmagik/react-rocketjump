@@ -22,7 +22,7 @@ export default function TodosApp() {
   return (
     <div>
       <div style={{ marginTop: 30 }}>
-        <button onClick={() => setToggle(a => !a)}>
+        <button onClick={() => setToggle((a) => !a)}>
           {toggle ? 'ON' : 'OFF'}
         </button>
       </div>
@@ -63,7 +63,7 @@ function Gang() {
       )}
       <div className="todo-list">
         {todos &&
-          todos.map(todo => (
+          todos.map((todo) => (
             <Todo
               saving={updating[todo.id] || deleting[todo.id]}
               onToggle={toggleTodo}
@@ -115,7 +115,7 @@ function Todos({ id }) {
       <input
         type="text"
         value={search}
-        onChange={e => setSearch(e.target.value)}
+        onChange={(e) => setSearch(e.target.value)}
       />
       <h3>
         <a href={`${API_URL}/todos`}>
@@ -130,7 +130,7 @@ function Todos({ id }) {
       )}
       {todos && (
         <NewTodo
-          onSubmit={todo => {
+          onSubmit={(todo) => {
             addStupidTodo
               .onSuccess((todo, cacheStore) => {
                 console.log('Todo Added!', todo)
@@ -143,7 +143,7 @@ function Todos({ id }) {
       )}
       <div className="todo-list">
         {todos &&
-          todos.map(todo => (
+          todos.map((todo) => (
             <Todo
               saving={updating[todo.id] || deleting[todo.id]}
               onToggle={toggleTodo}

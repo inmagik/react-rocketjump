@@ -7,6 +7,7 @@ import {
   CANCEL,
   UPDATE_DATA,
   HYDRATE,
+  INIT,
 } from '../actionTypes'
 
 describe('Rocketjump reducer', () => {
@@ -15,7 +16,7 @@ describe('Rocketjump reducer', () => {
       effect: () => Promise.resolve(1),
     })
 
-    expect(reducer(undefined, { type: '@' })).toEqual({
+    expect(reducer(undefined, { type: '@' }).root).toEqual({
       pending: false,
       data: null,
       error: null,
@@ -24,16 +25,18 @@ describe('Rocketjump reducer', () => {
 
   it('should handle PENDING actions', () => {
     const prevState = {
-      pending: false,
-      data: 'custom_data',
-      error: null,
+      root: {
+        pending: false,
+        data: 'custom_data',
+        error: null,
+      },
     }
 
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
     })
 
-    expect(reducer(prevState, { type: PENDING })).toEqual({
+    expect(reducer(prevState, { type: PENDING }).root).toEqual({
       pending: true,
       data: 'custom_data',
       error: null,
@@ -42,9 +45,11 @@ describe('Rocketjump reducer', () => {
 
   it('should handle FAILURE actions', () => {
     const prevState = {
-      pending: true,
-      data: null,
-      error: null,
+      root: {
+        pending: true,
+        data: null,
+        error: null,
+      },
     }
 
     const { reducer } = rj({
@@ -56,7 +61,7 @@ describe('Rocketjump reducer', () => {
         type: FAILURE,
         error: true,
         payload: 'Something very bad happened...',
-      })
+      }).root
     ).toEqual({
       pending: false,
       data: null,
@@ -66,9 +71,11 @@ describe('Rocketjump reducer', () => {
 
   it('should handle SUCCESS actions', () => {
     const prevState = {
-      pending: true,
-      data: null,
-      error: null,
+      root: {
+        pending: true,
+        data: null,
+        error: null,
+      },
     }
 
     const { reducer } = rj({
@@ -76,7 +83,7 @@ describe('Rocketjump reducer', () => {
     })
 
     expect(
-      reducer(prevState, { type: SUCCESS, payload: { data: 'Yeah' } })
+      reducer(prevState, { type: SUCCESS, payload: { data: 'Yeah' } }).root
     ).toEqual({
       pending: false,
       data: 'Yeah',
@@ -86,9 +93,11 @@ describe('Rocketjump reducer', () => {
 
   it('should handle UPDATE_DATA actions', () => {
     const prevState = {
-      pending: false,
-      data: { name: 'Albi' },
-      error: null,
+      root: {
+        pending: false,
+        data: { name: 'Albi' },
+        error: null,
+      },
     }
 
     const { reducer } = rj({
@@ -96,7 +105,7 @@ describe('Rocketjump reducer', () => {
     })
 
     expect(
-      reducer(prevState, { type: UPDATE_DATA, payload: { name: 'GioVa' } })
+      reducer(prevState, { type: UPDATE_DATA, payload: { name: 'GioVa' } }).root
     ).toEqual({
       pending: false,
       data: { name: 'GioVa' },
@@ -126,17 +135,19 @@ describe('Rocketjump reducer', () => {
 
   it('should handle CLEAN actions', () => {
     const prevState = {
-      pending: true,
-      data: 'Where is my mind?',
-      error: 'Too many errors... Always...',
-      customKey: 23,
+      root: {
+        pending: true,
+        data: 'Where is my mind?',
+        error: 'Too many errors... Always...',
+        customKey: 23,
+      },
     }
 
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
     })
 
-    expect(reducer(prevState, { type: CLEAN })).toEqual({
+    expect(reducer(prevState, { type: CLEAN }).root).toEqual({
       pending: false,
       data: null,
       error: null,
@@ -146,17 +157,19 @@ describe('Rocketjump reducer', () => {
 
   it('should handle CANCEL actions', () => {
     const prevState = {
-      pending: true,
-      data: 'Where is my mind?',
-      error: 'Too many errors... Always...',
-      customKey: 23,
+      root: {
+        pending: true,
+        data: 'Where is my mind?',
+        error: 'Too many errors... Always...',
+        customKey: 23,
+      },
     }
 
     const { reducer } = rj({
       effect: () => Promise.resolve(1),
     })
 
-    expect(reducer(prevState, { type: CANCEL })).toEqual({
+    expect(reducer(prevState, { type: CANCEL }).root).toEqual({
       pending: false,
       data: 'Where is my mind?',
       error: 'Too many errors... Always...',
@@ -167,7 +180,7 @@ describe('Rocketjump reducer', () => {
   it('should be proxable', () => {
     const { reducer } = rj({
       effect: () => Promise.resolve(),
-      reducer: givenReducer => {
+      reducer: (givenReducer) => {
         return (prevState, action) => {
           const nextState = givenReducer(prevState, action)
           if (action.type === SUCCESS) {
@@ -179,13 +192,15 @@ describe('Rocketjump reducer', () => {
     })
 
     const prevState = {
-      pending: true,
-      data: null,
-      error: null,
+      root: {
+        pending: true,
+        data: null,
+        error: null,
+      },
     }
 
     expect(
-      reducer(prevState, { type: SUCCESS, payload: { data: 'Maik' } })
+      reducer(prevState, { type: SUCCESS, payload: { data: 'Maik' } }).root
     ).toEqual({
       pending: false,
       data: 'Maik',
@@ -230,20 +245,128 @@ describe('Rocketjump reducer', () => {
     let state = reducer(undefined, {})
 
     expect(state).toEqual({
-      pending: false,
-      error: null,
-      data: null,
-      hisCustomKey: 1,
-      myCustomKey: 12,
+      root: {
+        pending: false,
+        error: null,
+        data: null,
+        hisCustomKey: 1,
+        myCustomKey: 12,
+      },
     })
 
     state = reducer(state, { type: 'COMPUTE_BRAIN_AGE' })
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: null,
       hisCustomKey: 1,
       myCustomKey: 'Your brain age is: 24',
+    })
+  })
+
+  it('should be combinable', () => {
+    function dragoReducer(state = 'drago', action) {
+      if (action.type === 'D') {
+        return state + '_' + state
+      }
+      return state
+    }
+    const { reducer } = rj({
+      effect: () => {},
+      combineReducers: {
+        drago: dragoReducer,
+      },
+    })
+
+    let state = reducer(undefined, { type: INIT })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago',
+    })
+    state = reducer(state, { type: 'D' })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago_drago',
+    })
+
+    state = reducer(state, { type: 'D' })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago_drago_drago_drago',
+    })
+
+    const snapState = state
+    state = reducer(state, { type: 'MISS' })
+    expect(state).toBe(snapState)
+
+    state = reducer(state, { type: 'MISS 2X' })
+    expect(state).toBe(snapState)
+  })
+
+  it('should be combinable and respect the rj law', () => {
+    function dragoReducer(state = 'drago', action) {
+      if (action.type === 'D') {
+        return state + '_' + state
+      }
+      return state
+    }
+    const { reducer } = rj(
+      rj({
+        combineReducers: {
+          babu: () => 'babu',
+          drago: () => 999,
+        },
+      }),
+      {
+        effect: () => {},
+        combineReducers: {
+          drago: dragoReducer,
+        },
+      }
+    )
+
+    let state = reducer(undefined, { type: INIT })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago',
+      babu: 'babu',
+    })
+    state = reducer(state, { type: 'D' })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago_drago',
+      babu: 'babu',
+    })
+
+    state = reducer(state, { type: 'D' })
+    expect(state).toEqual({
+      root: {
+        error: null,
+        pending: false,
+        data: null,
+      },
+      drago: 'drago_drago_drago_drago',
+      babu: 'babu',
     })
   })
 })

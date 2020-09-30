@@ -28,7 +28,7 @@ describe('List Update plugin', () => {
     )
 
     const spy = rj({
-      reducer: oldReducer => (state, action) =>
+      reducer: (oldReducer) => (state, action) =>
         jestReducer(state, action, oldReducer),
     })
 

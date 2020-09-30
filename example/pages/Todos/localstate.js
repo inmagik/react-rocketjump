@@ -2,6 +2,7 @@ import { rj } from 'react-rocketjump'
 import { ajax } from 'rxjs/ajax'
 import { rjCache } from 'react-rocketjump/plugins/cache/new'
 import rjPlainList from 'react-rocketjump/plugins/plainList'
+import rjMutationsPending from 'react-rocketjump/plugins/mutationsPending'
 import request from 'superagent'
 
 export const API_URL = 'http://localhost:9001'
@@ -18,21 +19,21 @@ export const TodosListState = rj(
     effect: (q = '') => ajax.getJSON(`${API_URL}/todos?q=${q}`),
     mutations: {
       addStupidTodo: rj.mutation.single({
-        effect: todo =>
+        effect: (todo) =>
           request
             .post(`${API_URL}/todos`)
             .send(todo)
             .then(({ body }) => body),
-        updater: s => s, //'insertItem',
+        updater: (s) => s, //'insertItem',
         // updater: 'insertItem',
       }),
-      removeTodo: rj.mutation.multi(todo => todo.id, {
-        effect: todo =>
+      removeTodo: rj.mutation.multi((todo) => todo.id, {
+        effect: (todo) =>
           request.delete(`${API_URL}/todos/${todo.id}`).then(() => todo),
         updater: 'deleteItem',
       }),
-      toggleTodo: rj.mutation.multi(todo => todo.id, {
-        effect: todo =>
+      toggleTodo: rj.mutation.multi((todo) => todo.id, {
+        effect: (todo) =>
           request
             .put(`${API_URL}/todos/${todo.id}`)
             .send({

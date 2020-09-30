@@ -17,7 +17,7 @@ function whereMyRjIsIvoked(wrappedComponentName) {
   }
   Error.stackTraceLimit = originalStackLimit
 
-  const parseStackLine = line => {
+  const parseStackLine = (line) => {
     const cleanLine = line.trim()
     if (cleanLine.indexOf('at') === 0) {
       const pieces = cleanLine.split(' ')
@@ -72,13 +72,13 @@ function getRandomColor() {
 
 const colors = Array.apply(null, { length: 100 }).map(getRandomColor)
 
-const pad = n => Array.apply(null, { length: n }).join(' ')
+const pad = (n) => Array.apply(null, { length: n }).join(' ')
 
 export default function rjLogger() {
   let rjLives = []
   let whereUsed = {}
 
-  RjDebugEvents.subscribe(event => {
+  RjDebugEvents.subscribe((event) => {
     if (event.type === RJ_INIT_EVENT) {
       whereUsed[event.meta.trackId] = whereMyRjIsIvoked(
         event.meta.info.wrappedComponentName
@@ -96,7 +96,7 @@ export default function rjLogger() {
       const rjName = info.name || `${index + 1}°`
       const { component, rjFn, hooks } = location
       const componentLocation = `%c${component}%c${hooks
-        .map(h => `  ${h}()`)
+        .map((h) => `  ${h}()`)
         .reverse()
         .join('')}  ${rjFn}(${rjName})`
 
@@ -130,7 +130,7 @@ export default function rjLogger() {
       const rjName = info.name || `${index + 1}°`
       const { component, rjFn, hooks } = location
       const componentLocation = `${component}${hooks.map(
-        h => `  ${h}()`
+        (h) => `  ${h}()`
       )}  ${rjFn}(${rjName})`
 
       const error = event.payload

@@ -1,3 +1,116 @@
+## 2.6.0
+##### *Semptmber 16th, 2020*
+
+Added `.curry(...args)` method to action builder.
+Sometimes expecially in custom hooks you need to curry arguments, success,
+failures callbacks or metas.
+
+Es:.
+```js
+function useProduct(id) {
+  const [data, actions] = useRunRj(ProductState, [id])
+  const patchCurrentProduct = useMemo(
+    () => actions.patchProduct.onSuccess(() => alert('Patched!')).curry(id),
+    [actions, id]
+  )
+  // ... ID will be curried and also onSuccess handler
+  patchCurrentProduct({ price: 33 })
+}
+```
+
+##### NOTE
+
+`.curry` is immutable an create a new builder instance every time is invoked
+so is prefer to be used wrapped in a `React.useMemo`.
+
+
+## 2.5.0
+##### *Semptmber 10th, 2020*
+
+Added `optimisticUpdater` and enable auto commit for optimistic mutations.
+
+Sometimes you need to distinguish between an optmisitc update and an update
+from `SUCCESS` if you provide the `optimisticUpdater` key in your mutation
+config the `optimisticUpdater` is used to perform the optmistic update an
+the `updater` to perform the update when commit success.
+
+If your provided **ONLY** `optimisticUpdater` the success commit is skipped
+and used current root state, this is useful for response as `204 No Content`
+style where you can ignore the success and skip an-extra React update to your
+state.
+
+If you provide only `updater` this is used for **BOTH** optmistic and non-optimistic
+updates as before.
+
+## 2.4.0
+##### *Semptmber 3th, 2020*
+
+Added optmistic mutations.
+
+To make a mutation optimistic add `optimisticResult` to your `mutation` config:
+
+```js
+rj({
+  effect: fetchTodosApi,
+  mutations: {
+    updateTodo: {
+      optimisticResult: (todo) => todo,
+      updater: (state, updatedTodo) => ({
+        ...state,
+        data: state.data.map((todo) =>
+          todo.id === updatedTodo.id ? updatedTodo : todo
+        ),
+      }),
+      effect: updateTodoApi,
+    },
+    toggleTodo: {
+      optimisticResult: (todo) => ({
+        ...todo,
+        done: !todo.done,
+      }),
+      updater: (state, updatedTodo) => ({
+        ...state,
+        data: state.data.map((todo) =>
+          todo.id === updatedTodo.id ? updatedTodo : todo
+        ),
+      }),
+      effect: (todo) =>
+        updateTodoApi({
+          ...todo,
+          done: !todo.done,
+        }),
+    },
+    incrementTodo: {
+      optimisticResult: (todo) => todo.id,
+      updater: (state, todoIdToIncrement) => ({
+        ...state,
+        data: state.data.map((todo) =>
+          todo.id === todoIdToIncrement
+            ? {
+                ...todo,
+                score: todo.score + 1,
+              }
+            : todo
+        ),
+      }),
+      effect: (todo) => incrementTodoApi(todo.id).then(() => todo.id),
+    },
+  },
+})
+```
+
+The `optimisticResult` function will be called with your *params* (as your `effect`)
+and the return value will be passed to the `updater` to update your state.
+
+If your mutation **SUCCESS** *rocketjump* will commit your state and re-running
+your `updater` ussing the effect result as a normal mutation.
+
+Otherwise if your mutation **FAILURE** *rocketjump* roll back your state and
+unapply the `optimisticResult`.
+
+*rocketjump* take care of orders of your effects results and the thirdy parts
+actions dispatched in the meanwhile.
+
 ## 2.3.0
 ##### *April 7th, 2020*
 

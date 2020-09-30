@@ -9,22 +9,22 @@ Enzyme.configure({ adapter: new Adapter() })
 
 describe('compose', () => {
   it('should compose rjs', () => {
-    const MaComponent = props => null
+    const MaComponent = (props) => null
     const rjState = rj(() => Promise.resolve(1312))
     const RjComponent = compose(
       connectRj(
         rjState,
-        state => ({ un: state.data }),
+        (state) => ({ un: state.data }),
         ({ run }) => ({ loadUn: run })
       ),
       connectRj(
         rjState,
-        state => ({ dos: state.data }),
+        (state) => ({ dos: state.data }),
         ({ run }) => ({ loadDos: run })
       ),
       connectRj(
         rjState,
-        state => ({ tres: state.data }),
+        (state) => ({ tres: state.data }),
         ({ run }) => ({ loadTres: run })
       )
     )(MaComponent)

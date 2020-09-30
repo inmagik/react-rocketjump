@@ -50,7 +50,7 @@ class MapProxyStore {
   }
 }
 
-const rjCache = config => {
+const rjCache = (config) => {
   if (!config.ns) {
     throw new Error('RjCache requires the ns property to be set')
   }
@@ -69,7 +69,7 @@ const rjCache = config => {
 
   const key = config.key || defaultKey
   return rj({
-    cache: rjObject => ({
+    cache: (rjObject) => ({
       ns,
       key,
       provider,
@@ -89,7 +89,7 @@ const rjCache = config => {
         return of(provider.get(k))
       } else {
         return from(effectFn(...args)).pipe(
-          map(result => {
+          map((result) => {
             const k = key(...args)
             provider.set(k, result)
             return result
@@ -97,14 +97,14 @@ const rjCache = config => {
         )
       }
     },
-    effectPipeline: action$ =>
+    effectPipeline: (action$) =>
       action$.pipe(
-        tap(action => {
+        tap((action) => {
           if (action.type === '$reset-cache') {
             provider.clear()
           }
         }),
-        filter(action => {
+        filter((action) => {
           if (action.type === '$reset-cache') {
             return false
           }
@@ -113,7 +113,7 @@ const rjCache = config => {
           }
           return true
         }),
-        map(action => {
+        map((action) => {
           if (action.type === RUN) {
             // Cache enabled unless cacheEnabled meta is defined
             const cacheEnabled = action.meta.cache ?? true
@@ -173,11 +173,11 @@ function createCacheSideEffect(rjObject) {
   const [dispatchObservable] = makeRxObservable(
     actionObserable,
     of({}),
-    undefined,
+    // undefined,
     'every'
   )
 
-  dispatchObservable.subscribe(action => {
+  dispatchObservable.subscribe((action) => {
     let successCallback
     if (action.successCallback) {
       successCallback = action.successCallback
@@ -222,12 +222,12 @@ export function prefetchRj(rjObject, params = []) {
         params: [{ cacheEnabled: true }].concat(params),
       },
       callbacks: {
-        onFailure: error => {
+        onFailure: (error) => {
           cache.promisesPoll.delete(key)
           cache.errorsPool.set(key, error)
           reject(error)
         },
-        onSuccess: data => {
+        onSuccess: (data) => {
           cache.promisesPoll.delete(key)
           resolve(data)
         },
@@ -246,7 +246,7 @@ export function usePrefetchRj(rjObject) {
   const extraConfig = useContext(ConfigureRjContext)
   const effectCaller = extraConfig === null ? null : extraConfig.effectCaller
   const prefetch = useCallback(
-    params => {
+    (params) => {
       const key = cache.key(...params)
 
       if (cache.promisesPoll.has(key)) {
@@ -263,12 +263,12 @@ export function usePrefetchRj(rjObject) {
             params: [{ cacheEnabled: true }].concat(params),
           },
           callbacks: {
-            onFailure: error => {
+            onFailure: (error) => {
               cache.promisesPoll.delete(key)
               cache.errorsPool.set(key, error)
               reject(error)
             },
-            onSuccess: data => {
+            onSuccess: (data) => {
               cache.promisesPoll.delete(key)
               resolve(data)
             },
@@ -309,7 +309,7 @@ function useRjCacheData(rjObject, params = [], config = {}) {
   const effectCaller = extraConfig === null ? null : extraConfig.effectCaller
 
   const actions = useMemo(() => {
-    const dispatch = action => {
+    const dispatch = (action) => {
       const nextAction = { ...action }
       nextAction.payload = {
         ...action.payload,
@@ -329,7 +329,7 @@ function useRjCacheData(rjObject, params = [], config = {}) {
   ])
 
   const prefetch = useCallback(
-    params => {
+    (params) => {
       const prefetchKey = cache.key(...params)
       if (cache.promisesPoll.has(prefetchKey)) {
         return cache.promisesPoll.get(prefetchKey)
@@ -341,7 +341,7 @@ function useRjCacheData(rjObject, params = [], config = {}) {
         .onSuccess(() => {
           cache.promisesPoll.delete(prefetchKey)
         })
-        .onFailure(error => {
+        .onFailure((error) => {
           cache.promisesPoll.delete(prefetchKey)
           cache.errorsPool.set(prefetchKey, error)
         })
@@ -379,7 +379,7 @@ function useRjCacheData(rjObject, params = [], config = {}) {
       .onSuccess(() => {
         cache.promisesPoll.delete(key)
       })
-      .onFailure(error => {
+      .onFailure((error) => {
         cache.promisesPoll.delete(key)
         cache.errorsPool.set(key, error)
       })
@@ -408,10 +408,10 @@ export function useRjCacheState(rjObject, params = [], config = {}) {
 
   const [trigger, setTrigger] = useState([0, 0])
   const forceUpdate = useCallback(() => {
-    setTrigger(a => [a[0], a[1] + 1])
+    setTrigger((a) => [a[0], a[1] + 1])
   }, [])
   const refetch = useCallback(() => {
-    setTrigger(a => [a[0] + 1, a[1]])
+    setTrigger((a) => [a[0] + 1, a[1]])
   }, [])
   const [fetchTrigger] = trigger
 

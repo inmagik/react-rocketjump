@@ -1,16 +1,13 @@
 import React, { useState } from 'react'
-import { useRunRj } from 'react-rocketjump'
-import { API_URL, TodosListState, Socio } from './localstate'
 
 export default function NewTodo({ adding, onSubmit }) {
   const [title, setTitle] = useState('')
 
-  const submitTodo = e => {
+  const submitTodo = (e) => {
     e.preventDefault()
     onSubmit({ title: title, done: false })
     setTitle('')
   }
-  // useRunRj(Socio)
 
   return (
     <form className="new-todo" onSubmit={submitTodo}>
@@ -20,7 +17,7 @@ export default function NewTodo({ adding, onSubmit }) {
         placeholder="What to do ma friend?"
         value={title}
         type="text"
-        onChange={e => setTitle(e.target.value)}
+        onChange={(e) => setTitle(e.target.value)}
       />
     </form>
   )

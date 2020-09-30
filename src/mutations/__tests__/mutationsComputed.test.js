@@ -4,7 +4,7 @@ import { SUCCESS, FAILURE, PENDING } from '../../actionTypes'
 import { renderHook, act } from '@testing-library/react-hooks'
 
 describe('RJ mutations computed', () => {
-  it('should work as expected without break ... for now', async () => {
+  it('should introduce mutations state when a reducer on mutation is defined', async () => {
     const MaRjState = rj({
       mutations: {
         killHumans: {
@@ -13,8 +13,8 @@ describe('RJ mutations computed', () => {
           reducer: () => ({ giova: 23 }),
         },
       },
-      selectors: () => ({
-        getMagik: s => s.magik,
+      selectors: ({ getRoot }) => ({
+        getMagik: (s) => getRoot(s).magik,
       }),
       composeReducer: (state, action) => ({
         magik: 1312,
@@ -36,14 +36,14 @@ describe('RJ mutations computed', () => {
 
   it('should support @mutation computed', async () => {
     const resolvesA = []
-    const effectKill = jest.fn(() => new Promise(r => resolvesA.push(r)))
+    const effectKill = jest.fn(() => new Promise((r) => resolvesA.push(r)))
     const effectAlbi = jest.fn().mockResolvedValue(1312)
 
     const MaRjState = rj({
       mutations: {
         killHumans: {
           effect: effectKill,
-          updater: s => s,
+          updater: (s) => s,
           reducer: (state = { pending: false }, { type }) => {
             if (type === PENDING) {
               return { ...state, pending: true }
@@ -56,7 +56,7 @@ describe('RJ mutations computed', () => {
         },
         fuckBitches: {
           effect: effectAlbi,
-          updater: s => s,
+          updater: (s) => s,
           reducer: (state = { albi: null }, action) => {
             if (action.type === SUCCESS) {
               return { albi: action.payload.data }
@@ -65,8 +65,8 @@ describe('RJ mutations computed', () => {
           },
         },
       },
-      selectors: () => ({
-        getMagik: s => s.magik,
+      selectors: ({ getRoot }) => ({
+        getMagik: (s) => getRoot(s).magik,
       }),
       composeReducer: (state, action) => ({
         magik: 1312,
@@ -124,19 +124,19 @@ describe('RJ mutations computed', () => {
   })
 
   it('should get angry when misconfigured mutation computed', async () => {
-    const MaRjState = rj({
-      mutations: {
-        socio: {
-          effect: () => Promise.resolve(23),
-          updater: s => s,
-        },
-      },
-      effect: () => Promise.resolve('U.u'),
-      computed: {
-        skinny: '@mutation.skinny.fulminatoDiMercurio',
-      },
-    })
     expect(() => {
+      const MaRjState = rj({
+        mutations: {
+          socio: {
+            effect: () => Promise.resolve(23),
+            updater: (s) => s,
+          },
+        },
+        effect: () => Promise.resolve('U.u'),
+        computed: {
+          skinny: '@mutation.skinny.fulminatoDiMercurio',
+        },
+      })
       const { result } = renderHook(() => useRj(MaRjState))
       // eslint-disable-next-line no-unused-vars
       const { skinny } = result.current[0]
@@ -150,7 +150,7 @@ describe('RJ mutations computed', () => {
           socio: {
             effect: () => Promise.resolve(23),
             reducer: (s = {}) => s,
-            updater: s => s,
+            updater: (s) => s,
           },
         },
         effect: () => Promise.resolve('U.u'),
@@ -168,11 +168,11 @@ describe('RJ mutations computed', () => {
           socio23: {
             effect: () => Promise.resolve(23),
             reducer: () => null,
-            updater: s => s,
+            updater: (s) => s,
           },
           socio: {
             effect: () => Promise.resolve(23),
-            updater: s => s,
+            updater: (s) => s,
           },
         },
         effect: () => Promise.resolve('U.u'),
@@ -189,11 +189,11 @@ describe('RJ mutations computed', () => {
         socio23: {
           effect: () => Promise.resolve(23),
           reducer: () => null,
-          updater: s => s,
+          updater: (s) => s,
         },
         socio: {
           effect: () => Promise.resolve(23),
-          updater: s => s,
+          updater: (s) => s,
         },
       },
       effect: () => Promise.resolve('U.u'),

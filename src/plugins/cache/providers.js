@@ -35,7 +35,7 @@ export class LRUCache {
     const realKey = this._effectiveKey(key)
     const meta = this._meta()
     if (!!meta.dict[realKey]) {
-      meta.lru = [...meta.lru.filter(key => key !== realKey), realKey]
+      meta.lru = [...meta.lru.filter((key) => key !== realKey), realKey]
       this._setMeta(meta)
       return this.store.getItem(realKey)
     } else {
@@ -63,7 +63,7 @@ export class LRUCache {
 
   clear() {
     const meta = this._meta()
-    Object.keys(meta.dict).forEach(key => {
+    Object.keys(meta.dict).forEach((key) => {
       this.store.removeItem(key)
     })
     this._resetMeta()
@@ -142,7 +142,7 @@ export class FIFOCache {
 
   clear() {
     const meta = this._meta()
-    Object.keys(meta.dict).forEach(key => {
+    Object.keys(meta.dict).forEach((key) => {
       this.store.removeItem(key)
     })
     this._resetMeta()

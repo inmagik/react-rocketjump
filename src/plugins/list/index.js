@@ -51,12 +51,12 @@ const makeListDataReducer = (
 
 // Selectors for a list
 const makeListSelectors = (getData, pageSize) => {
-  const getList = state => {
+  const getList = (state) => {
     const data = getData(state)
     return data === null ? null : data.list
   }
 
-  const getCount = state => {
+  const getCount = (state) => {
     const data = getData(state)
     return data === null ? null : data.pagination.count
   }
@@ -72,27 +72,27 @@ const makeListSelectors = (getData, pageSize) => {
     return count === null ? null : Math.ceil(count / overridePageSize)
   }
 
-  const hasNext = state => {
+  const hasNext = (state) => {
     const data = getData(state)
     return data === null ? false : data.pagination.next !== null
   }
 
-  const hasPrev = state => {
+  const hasPrev = (state) => {
     const data = getData(state)
     return data === null ? false : data.pagination.previous !== null
   }
 
-  const getNext = state => {
+  const getNext = (state) => {
     const data = getData(state)
     return data === null ? null : data.pagination.next
   }
 
-  const getPrev = state => {
+  const getPrev = (state) => {
     const data = getData(state)
     return data === null ? null : data.pagination.previous
   }
 
-  const getCurrent = state => {
+  const getCurrent = (state) => {
     const data = getData(state)
     return data === null ? null : data.pagination.current
   }
@@ -146,7 +146,7 @@ const rjList = (config = {}) => {
     rjListDelete({ path: 'data.list' }),
     {
       selectors: ({ getData }) => makeListSelectors(getData, config.pageSize),
-      reducer: oldReducer => (state, action) => {
+      reducer: (oldReducer) => (state, action) => {
         switch (action.type) {
           case HYDRATE:
             return {

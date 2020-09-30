@@ -1,5 +1,5 @@
 import { SUCCESS, FAILURE, PENDING } from '../../actionTypes'
-import immutable from 'object-path-immutable'
+import { del } from 'object-path-immutable'
 
 function makeMultiMutationReducer(makeKey) {
   return (state = { pendings: {}, errors: {} }, action) => {
@@ -7,7 +7,7 @@ function makeMultiMutationReducer(makeKey) {
       case PENDING: {
         const key = makeKey(...action.meta.params)
         return {
-          errors: immutable.del(state.errors, key),
+          errors: del(state.errors, key),
           pendings: {
             ...state.pendings,
             [key]: true,
@@ -21,14 +21,14 @@ function makeMultiMutationReducer(makeKey) {
             ...state.errors,
             [key]: action.payload,
           },
-          pendings: immutable.del(state.pendings, key),
+          pendings: del(state.pendings, key),
         }
       }
       case SUCCESS: {
         const key = makeKey(...action.meta.params)
         return {
           ...state,
-          pendings: immutable.del(state.pendings, key),
+          pendings: del(state.pendings, key),
         }
       }
       default:
@@ -40,7 +40,7 @@ function makeMultiMutationReducer(makeKey) {
 export default function multi(makeKey, mutationConfig) {
   return {
     reducer: makeMultiMutationReducer(makeKey),
-    takeEffect: ['groupByExhaust', action => makeKey(...action.meta.params)],
+    takeEffect: ['groupByExhaust', (action) => makeKey(...action.meta.params)],
     ...mutationConfig,
   }
 }

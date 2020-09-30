@@ -49,6 +49,16 @@ export default (_, rjConfig, extendExport = {}) => {
     }
   }
 
+  // Reducers to combine
+  let combineReducers
+  if (!extendExport.combineReducers) {
+    // Start \w empty map of combine reducers
+    combineReducers = {}
+  } else {
+    combineReducers = extendExport.combineReducers
+  }
+  combineReducers = { ...combineReducers, ...rjConfig.combineReducers }
+
   // Make action creators
   let actionCreators
   if (!extendExport.actionCreators) {
@@ -75,7 +85,7 @@ export default (_, rjConfig, extendExport = {}) => {
     makeSelectors = extendExport.makeSelectors
   }
   if (makeSelectors) {
-    makeSelectors = kompose(makeSelectors, selectors =>
+    makeSelectors = kompose(makeSelectors, (selectors) =>
       proxyObject(selectors, rjConfig.selectors)
     )
   }
@@ -91,20 +101,21 @@ export default (_, rjConfig, extendExport = {}) => {
     computed = { ...computed, ...invertKeys(rjConfig.computed) }
   }
 
+  // Set given config cache
+  let cache = extendExport.cache ?? null
+  if (rjConfig.cache) {
+    cache = rjConfig.cache
+  }
+
   const newExport = {
     ...extendExport,
     sideEffect,
     reducer,
+    combineReducers,
     actionCreators,
     makeSelectors,
     computed,
-  }
-
-  // TODO: This sucks a lot in future make cache core
-  // or give a decent contract to plugins ....
-  // Set given config cache
-  if (rjConfig.cache) {
-    newExport.cache = rjConfig.cache
+    cache,
   }
 
   return enhanceMakeExportWithMutations(rjConfig, newExport)
