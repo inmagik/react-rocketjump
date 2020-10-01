@@ -1,5 +1,5 @@
 export function makeDispatchWithCallbacks(dispatch, cacheStore) {
-  return action => {
+  return (action) => {
     const { successCallback, failureCallback, ...actionToDispatch } = action
 
     dispatch(actionToDispatch)
@@ -12,7 +12,7 @@ export function makeDispatchWithCallbacks(dispatch, cacheStore) {
     }
   }
 }
-
+// [String, Object, Number, Boolean, Array]
 // TODO: IMPROVE THIS FUCKING SHIT MAYBE ASK 2 1312
 export function createBucketMatchPredicate(rjObject, matchParams) {
   const { makeKey } = rjObject.cache
@@ -22,7 +22,7 @@ export function createBucketMatchPredicate(rjObject, matchParams) {
   } else if (matchParams !== undefined && matchParams !== null) {
     matchKey = makeKey([matchParams])
   }
-  return bucket => {
+  return (bucket) => {
     const { params, rjObject: rjObjectIterBucket } = bucket
     if (rjObjectIterBucket.cache.ns === rjObject.cache.ns) {
       // All shit
