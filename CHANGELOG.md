@@ -13,6 +13,7 @@ Always state has **root** ...
 *TODO*
 - Configured effect caller from `action`
 - SideEffects handle only standard effect actions, new rj option addSideEffect to add an Observable to hanlde custom effect actions
+- New signature for custom `takeEffect`
 
 ### :zap: New features
 
