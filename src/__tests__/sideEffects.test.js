@@ -1,10 +1,11 @@
 import { makeAction, rj } from '..'
+import { forkJoin, from, Observable } from 'rxjs'
 import {
-  mergeMap,
   debounceTime,
   distinctUntilChanged,
   tap,
   filter,
+  map,
 } from 'rxjs/operators'
 import { PENDING, SUCCESS, FAILURE, CLEAN, RUN, CANCEL } from '../actionTypes'
 import { createTestRJSubscription } from '../testUtils'
@@ -1499,20 +1500,34 @@ describe('RJ side effect model', () => {
     expect(() => createTestRJSubscription(RjObject)).toThrow()
   })
 
-  it('call provided takeEffect when function is given', () => {
+  it('call provided takeEffect when function is given', async () => {
     const mockApi = jest.fn().mockResolvedValue(1312)
     const customMockTakeEffect = jest
       .fn()
-      // NOTE: the only scope of writing this implementation
-      // is to avoid makeRxObservable to throw shit
-      .mockImplementation(($o, mapTo$) => $o.pipe(mergeMap(mapTo$)))
+      .mockImplementation(
+        (
+          actionObservable,
+          stateObservable,
+          { effect, runSideEffectAction, getEffectCaller }
+        ) =>
+          forkJoin({
+            drago: from(effect()),
+            drago2x: from(effect()),
+          }).pipe(
+            map((result) => ({
+              type: '2X',
+              payload: result,
+            }))
+          )
+      )
 
     const RjObject = rj({
       effect: mockApi,
       takeEffect: customMockTakeEffect,
     })
 
-    const subject = createTestRJSubscription(RjObject)
+    const mockSub = jest.fn()
+    const subject = createTestRJSubscription(RjObject, mockSub)
 
     subject.next({
       type: RUN,
@@ -1520,8 +1535,29 @@ describe('RJ side effect model', () => {
       meta: {},
       callbacks: {},
     })
-    // FIXME this is a poor test think somenthing better haha
     expect(customMockTakeEffect).toHaveBeenCalledTimes(1)
+    expect(customMockTakeEffect).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Observable),
+      expect.any(Observable),
+      {
+        effect: mockApi,
+        runSideEffectAction: expect.any(Function),
+        getEffectCaller: expect.any(Function),
+      }
+    )
+
+    expect(mockApi).toHaveBeenCalledTimes(2)
+    await mockApi.mock.results[0].value
+    await mockApi.mock.results[1].value
+
+    expect(mockSub).toHaveBeenNthCalledWith(1, {
+      type: '2X',
+      payload: {
+        drago: 1312,
+        drago2x: 1312,
+      },
+    })
   })
 
   it('emit successCallback along action when SUCCESS is produced', async () => {
@@ -1778,10 +1814,15 @@ describe('RJ side effect model', () => {
 
     const mockCallback = jest.fn()
 
+    const mockAddSideEffect = jest
+      .fn()
+      .mockImplementation((actions) =>
+        actions.pipe(filter((a) => a.type === 'ZZ_TOP_GANG'))
+      )
+
     const RjObject = rj(
       rj({
-        addSideEffect: (actions) =>
-          actions.pipe(filter((a) => a.type === 'ZZ_TOP_GANG')),
+        addSideEffect: mockAddSideEffect,
       }),
       {
         addSideEffect: (actions) =>
@@ -1801,6 +1842,17 @@ describe('RJ side effect model', () => {
 
     actions.zz(23)
     actions.zzGang(3)
+
+    expect(mockAddSideEffect).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Observable),
+      expect.any(Observable),
+      {
+        effect: mockApi,
+        runSideEffectAction: expect.any(Function),
+        getEffectCaller: expect.any(Function),
+      }
+    )
 
     expect(mockCallback).nthCalledWith(1, {
       type: 'ZZ_TOP',

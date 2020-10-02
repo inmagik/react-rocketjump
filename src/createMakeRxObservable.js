@@ -98,6 +98,7 @@ export default function createMakeRxObservable(
     // Custom take effect
     if (typeof effectType === 'function') {
       return effectType(actionObservable, stateObservable, {
+        effect: effectCall,
         runSideEffectAction: mapActionToObservable,
         getEffectCaller,
       })
