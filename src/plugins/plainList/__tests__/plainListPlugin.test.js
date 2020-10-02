@@ -9,9 +9,11 @@ describe('List Plugin', () => {
     })
 
     const prevState = {
-      data: null,
-      pending: false,
-      error: null,
+      root: {
+        data: null,
+        pending: false,
+        error: null,
+      },
     }
 
     const action = {
@@ -37,7 +39,7 @@ describe('List Plugin', () => {
 
     const nextState = reducer(prevState, action)
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: [
@@ -63,14 +65,16 @@ describe('List Plugin', () => {
     })
 
     let state = {
-      data: [
-        {
-          id: 99,
-          name: 'Mallory',
-        },
-      ],
-      pending: false,
-      error: null,
+      root: {
+        data: [
+          {
+            id: 99,
+            name: 'Mallory',
+          },
+        ],
+        pending: false,
+        error: null,
+      },
     }
 
     const action = {
@@ -96,7 +100,7 @@ describe('List Plugin', () => {
 
     state = reducer(state, action)
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: [
@@ -120,14 +124,16 @@ describe('List Plugin', () => {
     })
 
     state = {
-      data: null,
-      pending: false,
-      error: null,
+      root: {
+        data: null,
+        pending: false,
+        error: null,
+      },
     }
 
     state = reducer(state, action)
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: [
@@ -153,14 +159,16 @@ describe('List Plugin', () => {
     })
 
     let state = {
-      data: [
-        {
-          id: 99,
-          name: 'Mallory',
-        },
-      ],
-      pending: false,
-      error: null,
+      root: {
+        data: [
+          {
+            id: 99,
+            name: 'Mallory',
+          },
+        ],
+        pending: false,
+        error: null,
+      },
     }
 
     const action = {
@@ -186,7 +194,7 @@ describe('List Plugin', () => {
 
     state = reducer(state, action)
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: [
@@ -210,14 +218,16 @@ describe('List Plugin', () => {
     })
 
     state = {
-      data: null,
-      pending: false,
-      error: null,
+      root: {
+        data: null,
+        pending: false,
+        error: null,
+      },
     }
 
     state = reducer(state, action)
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: [
@@ -245,24 +255,26 @@ describe('List Plugin', () => {
     const { getList, getCount } = makeSelectors()
 
     const state = {
-      loading: false,
-      error: null,
-      data: [
-        {
-          id: 23,
-          name: 'Alice',
-        },
-        {
-          id: 23,
-          name: 'Bob',
-        },
-        {
-          id: 7,
-          name: 'Eve',
-        },
-      ],
+      root: {
+        loading: false,
+        error: null,
+        data: [
+          {
+            id: 23,
+            name: 'Alice',
+          },
+          {
+            id: 23,
+            name: 'Bob',
+          },
+          {
+            id: 7,
+            name: 'Eve',
+          },
+        ],
+      },
     }
-    expect(getList(state)).toBe(state.data)
+    expect(getList(state)).toBe(state.root.data)
     expect(getCount(state)).toBe(3)
   })
 
@@ -278,7 +290,7 @@ describe('List Plugin', () => {
       effect: () => Promise.resolve(1),
     })
 
-    const prevState = null
+    const prevState = { root: null }
 
     const action = {
       type: 'CUSTOM',
@@ -301,9 +313,11 @@ describe('List Plugin', () => {
     const { getList, getCount } = makeSelectors()
 
     const state = {
-      loading: false,
-      error: null,
-      data: null,
+      root: {
+        loading: false,
+        error: null,
+        data: null,
+      },
     }
     expect(getList(state)).toBe(null)
     expect(getCount(state)).toBe(null)
@@ -311,7 +325,7 @@ describe('List Plugin', () => {
 
   it('should allow custom list reducer', () => {
     const customReducer = jest.fn((oldList, action) => {
-      return action.payload.data.filter((item) => item.name.startsWith('A'))
+      return action.payload.data.filter(item => item.name.startsWith('A'))
     })
 
     const { reducer } = rj(
@@ -324,12 +338,14 @@ describe('List Plugin', () => {
     )
 
     const prevState = {
-      data: {
-        list: [],
-        pagination: null,
+      root: {
+        data: {
+          list: [],
+          pagination: null,
+        },
+        pending: false,
+        error: null,
       },
-      pending: false,
-      error: null,
     }
 
     const action = {
@@ -355,9 +371,9 @@ describe('List Plugin', () => {
 
     const nextState = reducer(prevState, action)
 
-    expect(customReducer).toBeCalledWith(prevState.data, action)
+    expect(customReducer).toBeCalledWith(prevState.root.data, action)
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: [
