@@ -104,7 +104,7 @@ describe('RJ mutations updater', () => {
     })
 
     let state = MaRjState.reducer(undefined, { INIT })
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: null,
@@ -115,7 +115,7 @@ describe('RJ mutations updater', () => {
       meta: {},
       payload: { data: 'GioVa' },
     })
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: null,
@@ -125,7 +125,7 @@ describe('RJ mutations updater', () => {
       meta: {},
       payload: { data: 'GioVa' },
     })
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: 'My name WAS ~ GioVa',
@@ -159,7 +159,7 @@ describe('RJ mutations updater', () => {
     )
 
     let state = MaRjState.reducer(undefined, { INIT })
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: null,
@@ -170,7 +170,7 @@ describe('RJ mutations updater', () => {
       meta: {},
       payload: { data: 'GioVa' },
     })
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: null,
@@ -180,7 +180,7 @@ describe('RJ mutations updater', () => {
       meta: {},
       payload: { data: 'GioVa' },
     })
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       pending: false,
       error: null,
       data: 'The King Was GioVa',

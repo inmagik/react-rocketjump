@@ -21,9 +21,11 @@ describe('RJ mutations reducers', () => {
 
     let state = MaRjState.reducer(undefined, { INIT })
     expect(state).toEqual({
-      pending: false,
-      error: null,
-      data: null,
+      root: {
+        pending: false,
+        error: null,
+        data: null,
+      },
     })
   })
   it('should be match the mutation key and be decoupled to related mutation', async () => {
