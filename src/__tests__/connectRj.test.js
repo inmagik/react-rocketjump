@@ -9,7 +9,7 @@ Enzyme.configure({ adapter: new Adapter() })
 
 describe('connectRj', () => {
   const makeRjComponent = (...args) => {
-    const Component = (props) => null
+    const Component = props => null
     const RjComponent = connectRj(...args)(Component)
 
     return mount(<RjComponent />)
@@ -41,7 +41,7 @@ describe('connectRj', () => {
       }),
       {
         effect: () => Promise.resolve(1312),
-        selectors: (s) => ({
+        selectors: s => ({
           getBudda: () => s.getBudda() * 2,
         }),
         computed: {
@@ -76,7 +76,7 @@ describe('connectRj', () => {
       }),
       {
         effect: () => Promise.resolve(1312),
-        selectors: (s) => ({
+        selectors: s => ({
           getBudda: () => s.getBudda() * 2,
         }),
         computed: {
@@ -91,9 +91,11 @@ describe('connectRj', () => {
       (state, selectors, props, computedState) => {
         // Expect default state
         expect(state).toEqual({
-          data: null,
-          pending: false,
-          error: null,
+          root: {
+            data: null,
+            pending: false,
+            error: null,
+          },
         })
         // Expect computed to be applied
         expect(computedState).toEqual({
@@ -121,7 +123,7 @@ describe('connectRj', () => {
   })
 
   it('should get angry with a non rj object is passed as argument', () => {
-    const Component = (props) => null
+    const Component = props => null
     expect(() => {
       connectRj(rj())(Component)
     }).toThrowError(
@@ -144,7 +146,7 @@ describe('connectRj', () => {
     )
   })
 
-  it('should run rj sideEffects and react to succees', async (done) => {
+  it('should run rj sideEffects and react to succees', async done => {
     const mockFn = jest.fn().mockResolvedValue(23)
     const rjState = rj(mockFn)
 
@@ -155,7 +157,10 @@ describe('connectRj', () => {
     expect(wrapper.find('Component').props().friends).toBe(null)
 
     await act(async () => {
-      wrapper.find('Component').props().run()
+      wrapper
+        .find('Component')
+        .props()
+        .run()
       expect(mockFn).toHaveBeenCalledTimes(1)
     })
 
