@@ -22,11 +22,12 @@ describe('Rocketjump selectors', () => {
     return rj(...config).makeSelectors()
   }
 
-  it('should be getData, isLoading, getError, getBaseState', () => {
+  it('should be getData, isLoading, getError, getRoot', () => {
     const selectors = rjSelectors({
       effect: () => Promise.resolve(1),
     })
 
+    expect(selectors.getRoot(mockState)).toBe(mockState.root)
     expect(selectors.isLoading(mockState)).toBe(false)
     expect(selectors.isPending(mockState)).toBe(false)
     expect(selectors.getError(mockState)).toBe(mockState.root.error)
@@ -37,13 +38,13 @@ describe('Rocketjump selectors', () => {
     const selectors = rjSelectors({
       effect: () => Promise.resolve(1),
       selectors: ({ getData }) => ({
-        getData: (state) =>
-          getData(state).map((s) => ({
+        getData: state =>
+          getData(state).map(s => ({
             ...s,
             name: s.name.toUpperCase(),
             fresh: true,
           })),
-        getOldest: (state) => {
+        getOldest: state => {
           let people = [...getData(state)]
           people.sort((a, b) => b.age - a.age)
           return people[0]
@@ -73,21 +74,21 @@ describe('Rocketjump selectors', () => {
   it('should be composable', () => {
     const rjIsAlive = rj({
       selectors: ({ getData }) => ({
-        getData: (state) =>
-          getData(state).map((s) => ({
+        getData: state =>
+          getData(state).map(s => ({
             ...s,
             isAlive: s.age < 27,
           })),
       }),
     })
 
-    const capitalize = (s) =>
+    const capitalize = s =>
       s.slice(0, 1).toUpperCase() + s.slice(1).toLowerCase()
 
     const rjRangerName = rj({
       selectors: ({ getData }) => ({
-        getData: (state) =>
-          getData(state).map((s) => ({
+        getData: state =>
+          getData(state).map(s => ({
             ...s,
             rangerName: [s.name.slice(0, -2), s.name.slice(-2)]
               .map(capitalize)
@@ -98,8 +99,8 @@ describe('Rocketjump selectors', () => {
 
     const rjPoliteRanger = rj(rjIsAlive, rjRangerName, {
       selectors: ({ getData }) => ({
-        getData: (state) =>
-          getData(state).map((s) => ({
+        getData: state =>
+          getData(state).map(s => ({
             ...s,
             hello: `My name is ${s.rangerName} an i am ${s.age}`,
           })),
@@ -109,8 +110,8 @@ describe('Rocketjump selectors', () => {
     const selectors = rjSelectors(rjPoliteRanger, {
       effect: () => Promise.resolve(1),
       selectors: ({ getData }) => ({
-        getData: (state) =>
-          getData(state).map((s) => ({
+        getData: state =>
+          getData(state).map(s => ({
             ...s,
             hello: s.isAlive
               ? `${s.hello} and i am alive`

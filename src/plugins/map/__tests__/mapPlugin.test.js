@@ -18,7 +18,7 @@ describe('Map Plugin', () => {
       }
     )
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       23: {
         pending: true,
         error: null,
@@ -31,7 +31,7 @@ describe('Map Plugin', () => {
       meta: { id: 99 },
     })
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       23: {
         pending: true,
         error: null,
@@ -50,7 +50,7 @@ describe('Map Plugin', () => {
       meta: { id: 23 },
     })
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       23: {
         pending: false,
         error: null,
@@ -72,7 +72,7 @@ describe('Map Plugin', () => {
       meta: { id: 99 },
     })
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       23: {
         pending: false,
         error: null,
@@ -93,7 +93,7 @@ describe('Map Plugin', () => {
       meta: { id: 99 },
     })
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       23: {
         pending: false,
         error: null,
@@ -109,7 +109,7 @@ describe('Map Plugin', () => {
       meta: { id: 23 },
     })
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       23: {
         pending: true,
         error: null,
@@ -126,7 +126,7 @@ describe('Map Plugin', () => {
       meta: { id: 23 },
     })
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       23: {
         pending: false,
         error: null,
@@ -142,7 +142,7 @@ describe('Map Plugin', () => {
       meta: {},
     })
 
-    expect(state).toEqual({})
+    expect(state.root).toEqual({})
   })
 
   it('should bubble up unknown actions', () => {
@@ -155,7 +155,7 @@ describe('Map Plugin', () => {
 
     const spyRj = () =>
       rj({
-        reducer: (oldReducer) => (state, action) =>
+        reducer: oldReducer => (state, action) =>
           spy(state, action, oldReducer),
       })
 
@@ -282,7 +282,7 @@ describe('Map Plugin', () => {
     })
   })
 
-  it('should use a proper take effect', (done) => {
+  it('should use a proper take effect', done => {
     const mockApi = jest
       .fn()
       .mockResolvedValueOnce('Alice')
@@ -371,7 +371,7 @@ describe('Map Plugin', () => {
       }
     )
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       1: {
         pending: true,
         error: null,
@@ -385,7 +385,7 @@ describe('Map Plugin', () => {
       meta: { id: 1 },
     })
 
-    expect(state).toEqual({})
+    expect(state.root).toEqual({})
 
     state = reducer(
       {},
@@ -396,7 +396,7 @@ describe('Map Plugin', () => {
       }
     )
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       2: {
         pending: true,
         error: null,
@@ -410,7 +410,7 @@ describe('Map Plugin', () => {
       meta: { id: 2 },
     })
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       2: {
         pending: false,
         error: 'Error',
@@ -422,7 +422,7 @@ describe('Map Plugin', () => {
   it('should use a custom keymaker function', () => {
     const { reducer } = rj(
       rjMap({
-        key: (action) => action.meta.name,
+        key: action => action.meta.name,
       }),
       {
         effect: () => Promise.resolve(1),
@@ -437,7 +437,7 @@ describe('Map Plugin', () => {
       }
     )
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       Alice: {
         pending: true,
         data: null,
@@ -451,7 +451,7 @@ describe('Map Plugin', () => {
       meta: { name: 'Alice' },
     })
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       Alice: {
         pending: false,
         data: { secret: 'secret' },
@@ -465,12 +465,15 @@ describe('Map Plugin', () => {
       effect: () => Promise.resolve(1),
     })
 
-    let state = reducer(null, {
-      type: PENDING,
-      meta: { id: 1 },
-    })
+    let state = reducer(
+      { root: null },
+      {
+        type: PENDING,
+        meta: { id: 1 },
+      }
+    )
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       1: {
         pending: true,
         data: null,
@@ -486,7 +489,7 @@ describe('Map Plugin', () => {
       }
     )
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       1: {
         pending: true,
         data: null,
@@ -498,17 +501,20 @@ describe('Map Plugin', () => {
   it('should be able to take a custom data transform function', () => {
     const { reducer } = rj(
       rjMap({
-        dataTransform: (data) => ({ ...data, name: data.name.toUpperCase() }),
+        dataTransform: data => ({ ...data, name: data.name.toUpperCase() }),
       }),
       {
         effect: () => Promise.resolve(1),
       }
     )
 
-    let state = reducer(null, {
-      type: PENDING,
-      meta: { id: 1 },
-    })
+    let state = reducer(
+      { root: null },
+      {
+        type: PENDING,
+        meta: { id: 1 },
+      }
+    )
 
     state = reducer(state, {
       type: SUCCESS,
@@ -519,7 +525,7 @@ describe('Map Plugin', () => {
       meta: { id: 1 },
     })
 
-    expect(state).toEqual({
+    expect(state.root).toEqual({
       1: {
         pending: false,
         error: null,
