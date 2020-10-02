@@ -1,0 +1,6 @@
+{
+  "name": "react-rocketjump/plugins/mutationsPending",
+  "private": true,
+  "main": "../../lib/plugins/mutationsPending/index.cjs.js",
+  "module": "../../lib/plugins/mutationsPending/index.es.js"
+}
