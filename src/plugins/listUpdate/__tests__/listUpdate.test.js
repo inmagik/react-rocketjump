@@ -28,7 +28,7 @@ describe('List Update plugin', () => {
     )
 
     const spy = rj({
-      reducer: (oldReducer) => (state, action) =>
+      reducer: oldReducer => (state, action) =>
         jestReducer(state, action, oldReducer),
     })
 
@@ -37,9 +37,11 @@ describe('List Update plugin', () => {
     })
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: null,
+      root: {
+        pending: false,
+        error: null,
+        data: null,
+      },
     }
 
     reducer(prevState, { type: 'RJ_LIST_UPDATE' })
@@ -57,22 +59,24 @@ describe('List Update plugin', () => {
     })
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: [
-        {
-          id: 1,
-          name: 'Alice',
-        },
-        {
-          id: 2,
-          name: 'Bob',
-        },
-        {
-          id: 3,
-          name: 'Eve',
-        },
-      ],
+      root: {
+        pending: false,
+        error: null,
+        data: [
+          {
+            id: 1,
+            name: 'Alice',
+          },
+          {
+            id: 2,
+            name: 'Bob',
+          },
+          {
+            id: 3,
+            name: 'Eve',
+          },
+        ],
+      },
     }
 
     let nextState = reducer(prevState, {
@@ -80,7 +84,7 @@ describe('List Update plugin', () => {
       item: { id: 1, name: 'Mallory' },
     })
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: [
@@ -106,26 +110,28 @@ describe('List Update plugin', () => {
     })
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: {
-        custom: {
-          path: {
-            to: {
-              list: [
-                {
-                  id: 1,
-                  name: 'Alice',
-                },
-                {
-                  id: 2,
-                  name: 'Bob',
-                },
-                {
-                  id: 3,
-                  name: 'Eve',
-                },
-              ],
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          custom: {
+            path: {
+              to: {
+                list: [
+                  {
+                    id: 1,
+                    name: 'Alice',
+                  },
+                  {
+                    id: 2,
+                    name: 'Bob',
+                  },
+                  {
+                    id: 3,
+                    name: 'Eve',
+                  },
+                ],
+              },
             },
           },
         },
@@ -137,7 +143,7 @@ describe('List Update plugin', () => {
       item: { id: 1, name: 'Mallory' },
     })
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: {
@@ -177,13 +183,15 @@ describe('List Update plugin', () => {
     )
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: [
-        { id: 1, someKey: 'a', name: 'Alice' },
-        { id: 2, someKey: 'b', name: 'Bob' },
-        { id: 3, someKey: 'c', name: 'Claus' },
-      ],
+      root: {
+        pending: false,
+        error: null,
+        data: [
+          { id: 1, someKey: 'a', name: 'Alice' },
+          { id: 2, someKey: 'b', name: 'Bob' },
+          { id: 3, someKey: 'c', name: 'Claus' },
+        ],
+      },
     }
 
     let nextState = reducer(prevState, {
@@ -191,7 +199,7 @@ describe('List Update plugin', () => {
       item: { someKey: 'b', name: 'Mallory', id: 6 },
     })
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: [
