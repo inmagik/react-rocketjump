@@ -29,6 +29,9 @@ Always state has **root** ...
 #### New plugin `plugins/mutationsPending`
 *TODO*
 
+#### New helper `mapRunActionToObservable`
+*TODO*
+
 ## 2.6.0
 ##### *Semptmber 16th, 2020*
 
