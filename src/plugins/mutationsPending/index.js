@@ -19,7 +19,7 @@ const rjMutationsPending = (config = {}) =>
       mutationsPending: makeMutationsPendingReducer(config.track ?? '*'),
     },
     selectors: () => ({
-      anyMutationsPending: (state) => state.mutationsPending > 0,
+      anyMutationPending: state => state.mutationsPending > 0,
     }),
   })
 
