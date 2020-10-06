@@ -12,7 +12,7 @@ function stableReplacer(key, value) {
   return value
 }
 
-const defaultKeyMaker = ns => params =>
+const defaultKeyMaker = (ns) => (params) =>
   `${ns}/` + JSON.stringify(params, stableReplacer)
 
 const defaultCacheConfig = {
@@ -20,7 +20,7 @@ const defaultCacheConfig = {
   staleTime: 0,
 }
 
-const rjCache = config => {
+const rjCache = (config) => {
   if (!config.ns) {
     throw new Error('RjCache requires the ns property to be set')
   }
@@ -31,7 +31,7 @@ const rjCache = config => {
 
   return rj({
     takeEffect: 'exhaust',
-    cache: rjObject => ({
+    cache: (rjObject) => ({
       ns,
       cacheTime,
       staleTime,

@@ -31,7 +31,7 @@ export default function useFreshRj(rjObject, params = [], config = {}) {
     isStaleDataRef.current =
       bucket.instances.size === 0 || lastConfig.runOnMount
     // eheheh the malus the extra render to be consistent baby!
-    const unsub = bucket.subscribe(state => {
+    const unsub = bucket.subscribe((state) => {
       const prevState = prevStateRef.current
       const { getData, getRoot } = bucket.selectors
       // TODO: FIX THI SHIT !!!!

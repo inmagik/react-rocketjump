@@ -46,18 +46,16 @@ export class LRUCache {
   set(key, value) {
     const realKey = this._effectiveKey(key)
     const meta = this._meta()
-    if (!meta.dict[realKey]) {
-      if (meta.count === this.size) {
-        const keyToDelete = meta.lru.shift()
-        this.store.removeItem(keyToDelete)
-        delete meta.dict[keyToDelete]
-        meta.count--
-      }
-      meta.dict[realKey] = 1
-      meta.count++
-      meta.lru = [...meta.lru, realKey]
-      this._setMeta(meta)
+    if (meta.count === this.size) {
+      const keyToDelete = meta.lru.shift()
+      this.store.removeItem(keyToDelete)
+      delete meta.dict[keyToDelete]
+      meta.count--
     }
+    meta.dict[realKey] = 1
+    meta.count++
+    meta.lru = [...meta.lru, realKey]
+    this._setMeta(meta)
     this.store.setItem(realKey, value)
   }
 
@@ -116,28 +114,17 @@ export class FIFOCache {
   set(key, value) {
     const realKey = this._effectiveKey(key)
     const meta = this._meta()
-    if (!meta.dict[realKey]) {
-      if (meta.count === this.size) {
-        const keyToDelete = meta.queue.shift()
-        this.store.removeItem(keyToDelete)
-        delete meta.dict[keyToDelete]
-        meta.count--
-      }
-      meta.dict[realKey] = 1
-      meta.count++
-      meta.queue = [...meta.queue, realKey]
-      this._setMeta(meta)
+    if (meta.count === this.size) {
+      const keyToDelete = meta.queue.shift()
+      this.store.removeItem(keyToDelete)
+      delete meta.dict[keyToDelete]
+      meta.count--
     }
-    this.store.setItem(realKey, value)
-  }
-
-  delete(key) {
-    const keyToDelete = this._effectiveKey(key)
-    const meta = this._meta()
-    this.store.removeItem(keyToDelete)
-    delete meta.dict[keyToDelete]
-    meta.count--
+    meta.dict[realKey] = 1
+    meta.count++
+    meta.queue = [...meta.queue, realKey]
     this._setMeta(meta)
+    this.store.setItem(realKey, value)
   }
 
   clear() {

@@ -60,7 +60,7 @@ export default function createBucket(cacheStore, rjObject, params, key) {
   // Calculate the new state via rj object reducer
   // set the new state on current bucket emit new state
   // on rj bucket observable
-  bucket.dispatchToState = action => {
+  bucket.dispatchToState = (action) => {
     const nextState = reducer(bucket.state, action)
     bucket.state = nextState
     bucket.memoizedState =
@@ -81,7 +81,7 @@ export default function createBucket(cacheStore, rjObject, params, key) {
   const dispatchWithCallbacks = makeDispatchWithCallbacks(
     bucket.dispatchToState
   )
-  const effectSubscription = effectObservable.subscribe(action => {
+  const effectSubscription = effectObservable.subscribe((action) => {
     dispatchWithCallbacks(action)
     if (action.type === SUCCESS && action.meta.cacheRunId) {
       bucket.lastSucccessAt = new Date().getTime()
@@ -95,14 +95,14 @@ export default function createBucket(cacheStore, rjObject, params, key) {
   // for LAST gc scheduled
   const gcSubject = new Subject()
   const gcObservable = gcSubject.asObservable().pipe(
-    switchMap(action => {
+    switchMap((action) => {
       if (action.type === 'gc') {
         return of(action).pipe(delay(cacheOptions.cacheTime))
       }
       return empty()
     })
   )
-  const gcSubscription = gcObservable.subscribe(action => {
+  const gcSubscription = gcObservable.subscribe((action) => {
     // Delete actual bucket from parent buckets map only
     // When no instances attached 2 bucket
     if (bucket.instances.size === 0) {
@@ -111,7 +111,7 @@ export default function createBucket(cacheStore, rjObject, params, key) {
   })
 
   bucket.clear = () => {
-    bucket.instances.forEach(instance => {
+    bucket.instances.forEach((instance) => {
       instance.clear()
     })
     cacheStore.buckets.delete(key)
@@ -124,7 +124,7 @@ export default function createBucket(cacheStore, rjObject, params, key) {
   }
 
   // Dispatch on state or trigger a side effect on rj object rx side effects
-  bucket.dispatch = action => {
+  bucket.dispatch = (action) => {
     if (isEffectAction(action)) {
       if (action.type === RUN) {
         bucket.lastRun = action.meta.cacheRunId ?? null

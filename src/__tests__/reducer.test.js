@@ -115,9 +115,11 @@ describe('Rocketjump reducer', () => {
 
   it('should handle HYDRATE actions', () => {
     const prevState = {
-      pending: false,
-      data: { name: 'Albi' },
-      error: null,
+      root: {
+        pending: false,
+        data: { name: 'Albi' },
+        error: null,
+      },
     }
 
     const { reducer } = rj({
@@ -125,7 +127,7 @@ describe('Rocketjump reducer', () => {
     })
 
     expect(
-      reducer(prevState, { type: HYDRATE, payload: { data: 'GioVa' } })
+      reducer(prevState, { type: HYDRATE, payload: { data: 'GioVa' } }).root
     ).toEqual({
       pending: false,
       data: 'GioVa',

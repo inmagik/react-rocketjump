@@ -16,7 +16,7 @@ export default function createCacheStore() {
     if (isObjectRj(rjObject)) {
       matchPredicate = createBucketMatchPredicate(rjObject, params)
     }
-    cacheStore.buckets.forEach(bucket => {
+    cacheStore.buckets.forEach((bucket) => {
       if (matchPredicate && matchPredicate(bucket)) {
         cb(bucket)
       }
@@ -25,7 +25,7 @@ export default function createCacheStore() {
 
   cacheStore.getBuckets = (rjObject, params) => {
     const bucketsList = []
-    cacheStore.onEachBucket(bucket => bucketsList.push(bucket))
+    cacheStore.onEachBucket((bucket) => bucketsList.push(bucket))
     return bucketsList
   }
 
@@ -50,7 +50,7 @@ export default function createCacheStore() {
   }
 
   cacheStore.invalidate = (rjObject, matchParams) => {
-    cacheStore.onEachBucket(rjObject, matchParams, bucket => {
+    cacheStore.onEachBucket(rjObject, matchParams, (bucket) => {
       if (bucket.instances.size === 0) {
         // TODO: Write better... add config options and so on ...
         cacheStore.buckets.delete(bucket.key)

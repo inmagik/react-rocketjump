@@ -8,7 +8,7 @@ function dispatchToBucketsState(cacheStore, rjObject, action) {
   if (!dispatchMatchParams) {
     return
   }
-  cacheStore.onEachBucket(rjObject, dispatchMatchParams, bucket =>
+  cacheStore.onEachBucket(rjObject, dispatchMatchParams, (bucket) =>
     bucket.dispatchToState(action)
   )
 }
@@ -32,7 +32,7 @@ function makeActionsSubject(cacheStore, rjObject) {
   )
   effectObservable.subscribe(
     makeDispatchWithCallbacks(
-      action => dispatchToBucketsState(cacheStore, rjObject, action),
+      (action) => dispatchToBucketsState(cacheStore, rjObject, action),
       cacheStore
     )
   )
