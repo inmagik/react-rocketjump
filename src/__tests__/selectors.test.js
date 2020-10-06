@@ -22,11 +22,12 @@ describe('Rocketjump selectors', () => {
     return rj(...config).makeSelectors()
   }
 
-  it('should be getData, isLoading, getError, getBaseState', () => {
+  it('should be getData, isLoading, getError, getRoot', () => {
     const selectors = rjSelectors({
       effect: () => Promise.resolve(1),
     })
 
+    expect(selectors.getRoot(mockState)).toBe(mockState.root)
     expect(selectors.isLoading(mockState)).toBe(false)
     expect(selectors.isPending(mockState)).toBe(false)
     expect(selectors.getError(mockState)).toBe(mockState.root.error)

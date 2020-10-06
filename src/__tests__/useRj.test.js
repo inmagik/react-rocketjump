@@ -97,8 +97,8 @@ describe('useRj', () => {
     )
 
     const { result } = renderHook(() =>
-      useRj(maRjState, (state) => ({
-        ...state,
+      useRj(maRjState, (state, { getRoot }) => ({
+        ...getRoot(state),
         maik: 1312,
       }))
     )
@@ -254,15 +254,15 @@ describe('useRj', () => {
     )
 
     const { result: resultA } = renderHook(() =>
-      useRj(maRjState, (state, { getMaik }) => ({
+      useRj(maRjState, (state, { getMaik, getRoot }) => ({
         friends: getMaik(state),
-        beat: state.beat,
+        beat: getRoot(state).beat,
       }))
     )
     const { result: resultB } = renderHook(() =>
-      useRj(maRjState, (state, { getMaik }) => ({
+      useRj(maRjState, (state, { getMaik, getRoot }) => ({
         friends: getMaik(state),
-        beat: state.beat,
+        beat: getRoot(state).beat,
       }))
     )
 
@@ -442,18 +442,22 @@ describe('useRj', () => {
     })
     expect(mockFn).toHaveBeenCalledTimes(1)
     expect(testMaState).nthCalledWith(1, {
-      pending: false,
-      data: null,
-      error: null,
+      root: {
+        pending: false,
+        data: null,
+        error: null,
+      },
     })
     await act(async () => {
       result.current[1].run()
     })
     expect(mockFn).toHaveBeenCalledTimes(2)
     expect(testMaState).nthCalledWith(2, {
-      pending: true,
-      data: null,
-      error: null,
+      root: {
+        pending: true,
+        data: null,
+        error: null,
+      },
     })
     await act(async () => {
       resolves[0]('LuX')
@@ -463,9 +467,11 @@ describe('useRj', () => {
       result.current[1].run()
     })
     expect(testMaState).nthCalledWith(3, {
-      pending: false,
-      data: 'Albi1312',
-      error: null,
+      root: {
+        pending: false,
+        data: 'Albi1312',
+        error: null,
+      },
     })
   })
 

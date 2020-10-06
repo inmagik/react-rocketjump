@@ -1,14 +1,15 @@
 import { makeAction, rj } from '..'
+import { forkJoin, from, Observable } from 'rxjs'
 import {
-  mergeMap,
   debounceTime,
   distinctUntilChanged,
   tap,
   filter,
+  map,
 } from 'rxjs/operators'
 import { PENDING, SUCCESS, FAILURE, CLEAN, RUN, CANCEL } from '../actionTypes'
 import { createTestRJSubscription } from '../testUtils'
-import {
+import RxEffects, {
   TAKE_EFFECT_EVERY,
   TAKE_EFFECT_GROUP_BY,
   // TAKE_EFFECT_QUEUE,
@@ -30,6 +31,56 @@ describe('RJ side effect model', () => {
 
     const RjObject = rj({
       effect: mockApi,
+    })
+
+    const subject = createTestRJSubscription(RjObject, mockCallback)
+
+    subject.next({
+      type: RUN,
+      payload: { params: [] },
+      meta: {},
+      callbacks: {},
+    })
+
+    mockApi.mock.results[0].value.then(() => {
+      expect(mockCallback).toBeCalledTimes(3)
+
+      expect(mockCallback).nthCalledWith(1, {
+        type: RUN,
+        payload: { params: [] },
+        meta: {},
+        callbacks: {},
+      })
+
+      expect(mockCallback).nthCalledWith(2, {
+        type: PENDING,
+        meta: {},
+      })
+
+      expect(mockCallback).nthCalledWith(3, {
+        type: SUCCESS,
+        meta: {},
+        payload: {
+          params: [],
+          data: mockApiResult,
+        },
+      })
+
+      done()
+    })
+  })
+
+  it('should support using rxEffects as function as valid take effects', (done) => {
+    const mockApiResult = [
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' },
+    ]
+    const mockApi = jest.fn().mockResolvedValueOnce(mockApiResult)
+    const mockCallback = jest.fn()
+
+    const RjObject = rj({
+      effect: mockApi,
+      takeEffect: RxEffects.latest,
     })
 
     const subject = createTestRJSubscription(RjObject, mockCallback)
@@ -1499,20 +1550,29 @@ describe('RJ side effect model', () => {
     expect(() => createTestRJSubscription(RjObject)).toThrow()
   })
 
-  it('call provided takeEffect when function is given', () => {
+  it('call provided takeEffect when function is given', async () => {
     const mockApi = jest.fn().mockResolvedValue(1312)
     const customMockTakeEffect = jest
       .fn()
-      // NOTE: the only scope of writing this implementation
-      // is to avoid makeRxObservable to throw shit
-      .mockImplementation(($o, mapTo$) => $o.pipe(mergeMap(mapTo$)))
+      .mockImplementation((actionObservable, stateObservable, { effect }) =>
+        forkJoin({
+          drago: from(effect()),
+          drago2x: from(effect()),
+        }).pipe(
+          map((result) => ({
+            type: '2X',
+            payload: result,
+          }))
+        )
+      )
 
     const RjObject = rj({
       effect: mockApi,
       takeEffect: customMockTakeEffect,
     })
 
-    const subject = createTestRJSubscription(RjObject)
+    const mockSub = jest.fn()
+    const subject = createTestRJSubscription(RjObject, mockSub)
 
     subject.next({
       type: RUN,
@@ -1520,8 +1580,29 @@ describe('RJ side effect model', () => {
       meta: {},
       callbacks: {},
     })
-    // FIXME this is a poor test think somenthing better haha
     expect(customMockTakeEffect).toHaveBeenCalledTimes(1)
+    expect(customMockTakeEffect).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Observable),
+      expect.any(Observable),
+      {
+        effect: mockApi,
+        getEffectCaller: expect.any(Function),
+        prefix: '',
+      }
+    )
+
+    expect(mockApi).toHaveBeenCalledTimes(2)
+    await mockApi.mock.results[0].value
+    await mockApi.mock.results[1].value
+
+    expect(mockSub).toHaveBeenNthCalledWith(1, {
+      type: '2X',
+      payload: {
+        drago: 1312,
+        drago2x: 1312,
+      },
+    })
   })
 
   it('emit successCallback along action when SUCCESS is produced', async () => {
@@ -1778,10 +1859,15 @@ describe('RJ side effect model', () => {
 
     const mockCallback = jest.fn()
 
+    const mockAddSideEffect = jest
+      .fn()
+      .mockImplementation((actions) =>
+        actions.pipe(filter((a) => a.type === 'ZZ_TOP_GANG'))
+      )
+
     const RjObject = rj(
       rj({
-        addSideEffect: (actions) =>
-          actions.pipe(filter((a) => a.type === 'ZZ_TOP_GANG')),
+        addSideEffect: mockAddSideEffect,
       }),
       {
         addSideEffect: (actions) =>
@@ -1801,6 +1887,17 @@ describe('RJ side effect model', () => {
 
     actions.zz(23)
     actions.zzGang(3)
+
+    expect(mockAddSideEffect).toHaveBeenNthCalledWith(
+      1,
+      expect.any(Observable),
+      expect.any(Observable),
+      {
+        effect: mockApi,
+        getEffectCaller: expect.any(Function),
+        prefix: '',
+      }
+    )
 
     expect(mockCallback).nthCalledWith(1, {
       type: 'ZZ_TOP',
@@ -1823,6 +1920,57 @@ describe('RJ side effect model', () => {
         onSuccess: undefined,
         onFailure: undefined,
       },
+    })
+  })
+
+  it('should hanlde custom side effects ... using core rj take effects', async () => {
+    const mockApi = jest.fn().mockResolvedValue('GioVa')
+
+    const mockCallback = jest.fn()
+
+    const RjObject = rj({
+      addSideEffect: (actions, state, config) =>
+        RxEffects.latest(actions, state, {
+          ...config,
+          prefix: 'GANG/',
+        }),
+      actions: () => ({
+        gang: (...params) => makeAction(`GANG/${RUN}`, ...params),
+      }),
+      effect: mockApi,
+    })
+
+    const { actionCreators } = RjObject
+    const subject = createTestRJSubscription(RjObject, mockCallback)
+    const dispatch = (action) => subject.next(action)
+    const actions = bindActionCreators(actionCreators, dispatch, subject)
+
+    actions.gang(23)
+
+    await mockApi.mock.results[0].value
+
+    expect(mockCallback).nthCalledWith(1, {
+      type: 'GANG/RUN',
+      payload: {
+        params: [23],
+      },
+      meta: {},
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+    expect(mockCallback).nthCalledWith(2, {
+      type: 'GANG/PENDING',
+      meta: {},
+    })
+    expect(mockCallback).nthCalledWith(3, {
+      type: 'GANG/SUCCESS',
+      payload: {
+        params: [23],
+        data: 'GioVa',
+      },
+      meta: {},
     })
   })
 })

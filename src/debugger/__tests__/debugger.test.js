@@ -54,7 +54,7 @@ describe('RJ Debugger', () => {
       },
       type: RJ_INIT_EVENT,
       payload: {
-        state: { pending: false, error: null, data: null },
+        state: { root: { pending: false, error: null, data: null } },
       },
     })
   })
@@ -84,7 +84,13 @@ describe('RJ Debugger', () => {
       },
       type: RJ_INIT_EVENT,
       payload: {
-        state: { pending: false, error: null, data: null },
+        state: {
+          root: {
+            pending: false,
+            error: null,
+            data: null,
+          },
+        },
       },
     })
   })
@@ -112,6 +118,9 @@ describe('RJ Debugger', () => {
       effect: effectD,
       name: 'RjD',
       reducer: (r) => () => ({ giova: 23 }),
+      combineReducers: {
+        drago: () => 999,
+      },
     }
     const RjD = rj(configD)
 
@@ -153,7 +162,7 @@ describe('RJ Debugger', () => {
       },
       type: RJ_INIT_EVENT,
       payload: {
-        state: { pending: false, error: null, data: null },
+        state: { root: { pending: false, error: null, data: null } },
       },
     })
     expect(mockCallback).nthCalledWith(2, {
@@ -163,7 +172,7 @@ describe('RJ Debugger', () => {
       },
       type: RJ_INIT_EVENT,
       payload: {
-        state: { pending: false, error: null, data: null },
+        state: { root: { pending: false, error: null, data: null } },
       },
     })
     expect(mockCallback).nthCalledWith(3, {
@@ -173,7 +182,7 @@ describe('RJ Debugger', () => {
       },
       type: RJ_INIT_EVENT,
       payload: {
-        state: { pending: false, error: null, data: null },
+        state: { root: { pending: false, error: null, data: null } },
       },
     })
     expect(mockCallback).nthCalledWith(4, {
@@ -183,7 +192,7 @@ describe('RJ Debugger', () => {
       },
       type: RJ_INIT_EVENT,
       payload: {
-        state: { pending: false, error: null, data: null },
+        state: { root: { pending: false, error: null, data: null } },
       },
     })
     expect(mockCallback).nthCalledWith(5, {
@@ -193,7 +202,7 @@ describe('RJ Debugger', () => {
       },
       type: RJ_INIT_EVENT,
       payload: {
-        state: { giova: 23 },
+        state: { root: { giova: 23 }, drago: 999 },
       },
     })
   })
@@ -220,7 +229,7 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: false, error: null, data: null },
+        prevState: { root: { pending: false, error: null, data: null } },
         action: {
           type: RUN,
           payload: {
@@ -232,7 +241,7 @@ describe('RJ Debugger', () => {
             onFailure: undefined,
           },
         },
-        nextState: { pending: false, error: null, data: null },
+        nextState: { root: { pending: false, error: null, data: null } },
       },
     })
     expect(mockCallback).nthCalledWith(3, {
@@ -242,12 +251,12 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: false, error: null, data: null },
+        prevState: { root: { pending: false, error: null, data: null } },
         action: {
           type: PENDING,
           meta: {},
         },
-        nextState: { pending: true, error: null, data: null },
+        nextState: { root: { pending: true, error: null, data: null } },
       },
     })
     expect(mockCallback).nthCalledWith(4, {
@@ -257,7 +266,7 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: true, error: null, data: null },
+        prevState: { root: { pending: true, error: null, data: null } },
         action: {
           type: SUCCESS,
           payload: {
@@ -266,7 +275,7 @@ describe('RJ Debugger', () => {
           },
           meta: {},
         },
-        nextState: { pending: false, error: null, data: 23 },
+        nextState: { root: { pending: false, error: null, data: 23 } },
       },
     })
   })
@@ -275,18 +284,35 @@ describe('RJ Debugger', () => {
     RjDebugEvents.subscribe(mockCallback)
 
     const effect = () => Promise.resolve(23)
+    const combineReducers = {
+      gang: (state = null, action) => {
+        if (action.type === 'FSK') {
+          return 'KARTA'
+        }
+        return state
+      },
+    }
+    const actions = () => ({
+      kiello: () => ({ type: 'FSK' }),
+    })
     const MaRjState = rj({
       effect,
+      combineReducers,
+      actions,
     })
 
     const MaTreeWithEvents = () => {
-      const { run } = useRj(MaRjState)[1]
+      const { run, kiello } = useRj(MaRjState)[1]
       return (
         <div>
           <button
             onClick={() => {
               run('This die')
-              run('Giova', 23)
+              run
+                .onSuccess(() => {
+                  kiello()
+                })
+                .run('Giova', 23)
             }}
           >
             Click Me
@@ -300,15 +326,18 @@ describe('RJ Debugger', () => {
       fireEvent.click(getByText('Click Me'))
     })
 
-    expect(mockCallback).toBeCalledTimes(6)
+    expect(mockCallback).toBeCalledTimes(7)
     expect(mockCallback).nthCalledWith(2, {
       meta: {
-        info: { effect },
+        info: { effect, combineReducers, actions },
         trackId: 0,
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: false, error: null, data: null },
+        prevState: {
+          root: { pending: false, error: null, data: null },
+          gang: null,
+        },
         action: {
           type: RUN,
           payload: {
@@ -320,32 +349,44 @@ describe('RJ Debugger', () => {
             onFailure: undefined,
           },
         },
-        nextState: { pending: false, error: null, data: null },
+        nextState: {
+          root: { pending: false, error: null, data: null },
+          gang: null,
+        },
       },
     })
     expect(mockCallback).nthCalledWith(3, {
       meta: {
-        info: { effect },
+        info: { effect, combineReducers, actions },
         trackId: 0,
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: false, error: null, data: null },
+        prevState: {
+          root: { pending: false, error: null, data: null },
+          gang: null,
+        },
         action: {
           type: PENDING,
           meta: {},
         },
-        nextState: { pending: true, error: null, data: null },
+        nextState: {
+          root: { pending: true, error: null, data: null },
+          gang: null,
+        },
       },
     })
     expect(mockCallback).nthCalledWith(4, {
       meta: {
-        info: { effect },
+        info: { effect, combineReducers, actions },
         trackId: 0,
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: true, error: null, data: null },
+        prevState: {
+          root: { pending: true, error: null, data: null },
+          gang: null,
+        },
         action: {
           type: RUN,
           payload: {
@@ -353,36 +394,48 @@ describe('RJ Debugger', () => {
           },
           meta: {},
           callbacks: {
-            onSuccess: undefined,
+            onSuccess: expect.any(Function),
             onFailure: undefined,
           },
         },
-        nextState: { pending: true, error: null, data: null },
+        nextState: {
+          root: { pending: true, error: null, data: null },
+          gang: null,
+        },
       },
     })
     expect(mockCallback).nthCalledWith(5, {
       meta: {
-        info: { effect },
+        info: { effect, combineReducers, actions },
         trackId: 0,
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: true, error: null, data: null },
+        prevState: {
+          root: { pending: true, error: null, data: null },
+          gang: null,
+        },
         action: {
           type: PENDING,
           meta: {},
         },
-        nextState: { pending: true, error: null, data: null },
+        nextState: {
+          root: { pending: true, error: null, data: null },
+          gang: null,
+        },
       },
     })
     expect(mockCallback).nthCalledWith(6, {
       meta: {
-        info: { effect },
+        info: { effect, combineReducers, actions },
         trackId: 0,
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: true, error: null, data: null },
+        prevState: {
+          root: { pending: true, error: null, data: null },
+          gang: null,
+        },
         action: {
           type: SUCCESS,
           payload: {
@@ -391,7 +444,30 @@ describe('RJ Debugger', () => {
           },
           meta: {},
         },
-        nextState: { pending: false, error: null, data: 23 },
+        nextState: {
+          root: { pending: false, error: null, data: 23 },
+          gang: null,
+        },
+      },
+    })
+    expect(mockCallback).nthCalledWith(7, {
+      meta: {
+        info: { effect, combineReducers, actions },
+        trackId: 0,
+      },
+      type: RJ_DISPATCH_EVENT,
+      payload: {
+        prevState: {
+          root: { pending: false, error: null, data: 23 },
+          gang: null,
+        },
+        action: {
+          type: 'FSK',
+        },
+        nextState: {
+          root: { pending: false, error: null, data: 23 },
+          gang: 'KARTA',
+        },
       },
     })
   })
@@ -449,7 +525,7 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: false, error: null, data: null },
+        prevState: { root: { pending: false, error: null, data: null } },
         action: {
           type: RUN,
           payload: {
@@ -461,7 +537,7 @@ describe('RJ Debugger', () => {
             onFailure: undefined,
           },
         },
-        nextState: { pending: false, error: null, data: null },
+        nextState: { root: { pending: false, error: null, data: null } },
       },
     })
     expect(mockCallback).nthCalledWith(5, {
@@ -471,7 +547,7 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: false, error: null, data: null },
+        prevState: { root: { pending: false, error: null, data: null } },
         action: {
           type: RUN,
           payload: {
@@ -483,7 +559,7 @@ describe('RJ Debugger', () => {
             onFailure: undefined,
           },
         },
-        nextState: { pending: false, error: null, data: null },
+        nextState: { root: { pending: false, error: null, data: null } },
       },
     })
     expect(mockCallback).nthCalledWith(6, {
@@ -493,12 +569,12 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: false, error: null, data: null },
+        prevState: { root: { pending: false, error: null, data: null } },
         action: {
           type: PENDING,
           meta: {},
         },
-        nextState: { pending: true, error: null, data: null },
+        nextState: { root: { pending: true, error: null, data: null } },
       },
     })
     expect(mockCallback).nthCalledWith(7, {
@@ -508,12 +584,12 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: false, error: null, data: null },
+        prevState: { root: { pending: false, error: null, data: null } },
         action: {
           type: PENDING,
           meta: {},
         },
-        nextState: { pending: true, error: null, data: null },
+        nextState: { root: { pending: true, error: null, data: null } },
       },
     })
     await actForDom(async () => resolvesC[0]('C'))
@@ -525,13 +601,13 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: true, error: null, data: null },
+        prevState: { root: { pending: true, error: null, data: null } },
         action: {
           type: SUCCESS,
           payload: { data: 'C', params: [] },
           meta: {},
         },
-        nextState: { pending: false, error: null, data: 'C' },
+        nextState: { root: { pending: false, error: null, data: 'C' } },
       },
     })
     await actForDom(async () => resolvesA[0]('A'))
@@ -543,13 +619,13 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: true, error: null, data: null },
+        prevState: { root: { pending: true, error: null, data: null } },
         action: {
           type: SUCCESS,
           payload: { data: 'A', params: [] },
           meta: {},
         },
-        nextState: { pending: false, error: null, data: 'A' },
+        nextState: { root: { pending: false, error: null, data: 'A' } },
       },
     })
     await actForDom(async () => fireEvent.click(getByText('Click Me')))
@@ -561,7 +637,7 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: false, error: null, data: null },
+        prevState: { root: { pending: false, error: null, data: null } },
         action: {
           type: RUN,
           payload: {
@@ -573,7 +649,7 @@ describe('RJ Debugger', () => {
             onFailure: undefined,
           },
         },
-        nextState: { pending: false, error: null, data: null },
+        nextState: { root: { pending: false, error: null, data: null } },
       },
     })
     expect(mockCallback).nthCalledWith(11, {
@@ -583,12 +659,12 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: false, error: null, data: null },
+        prevState: { root: { pending: false, error: null, data: null } },
         action: {
           type: PENDING,
           meta: {},
         },
-        nextState: { pending: true, error: null, data: null },
+        nextState: { root: { pending: true, error: null, data: null } },
       },
     })
     await actForDom(async () => resolvesB[0]('B'))
@@ -600,13 +676,13 @@ describe('RJ Debugger', () => {
       },
       type: RJ_DISPATCH_EVENT,
       payload: {
-        prevState: { pending: true, error: null, data: null },
+        prevState: { root: { pending: true, error: null, data: null } },
         action: {
           type: SUCCESS,
           payload: { data: 'B', params: [] },
           meta: {},
         },
-        nextState: { pending: false, error: null, data: 'B' },
+        nextState: { root: { pending: false, error: null, data: 'B' } },
       },
     })
   })

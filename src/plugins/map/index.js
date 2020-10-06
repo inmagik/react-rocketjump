@@ -76,26 +76,32 @@ const makeMapReducer = (
   }
 }
 
-const makeMapSelectors = () => {
-  const getMapPendings = (state) =>
-    Object.keys(state).reduce(
-      (r, key) => (state[key].pending ? { ...r, [key]: true } : r),
+const makeMapSelectors = ({ getRoot }) => {
+  const getMapPendings = (state) => {
+    const rootState = getRoot(state)
+    return Object.keys(rootState).reduce(
+      (r, key) => (rootState[key].pending ? { ...r, [key]: true } : r),
       {}
     )
+  }
 
   const getMapLoadings = getMapPendings
 
-  const getMapFailures = (state) =>
-    Object.keys(state).reduce((r, key) => {
-      const error = state[key].error
+  const getMapFailures = (state) => {
+    const rootState = getRoot(state)
+    return Object.keys(rootState).reduce((r, key) => {
+      const error = rootState[key].error
       return error !== null ? { ...r, [key]: error } : r
     }, {})
+  }
 
-  const getMapData = (state) =>
-    Object.keys(state).reduce((r, key) => {
-      const data = state[key].data
+  const getMapData = (state) => {
+    const rootState = getRoot(state)
+    return Object.keys(rootState).reduce((r, key) => {
+      const data = rootState[key].data
       return data !== null ? { ...r, [key]: data } : r
     }, {})
+  }
 
   return {
     getMapLoadings,
@@ -118,7 +124,7 @@ const rjMap = (mapConfig = {}) =>
         mapConfig.keepCompleted,
         oldReducer
       ),
-    selectors: () => makeMapSelectors(),
+    selectors: makeMapSelectors,
     takeEffect: [
       'groupBy',
       typeof mapConfig.key === 'function' ? mapConfig.key : defaultKeyMaker,

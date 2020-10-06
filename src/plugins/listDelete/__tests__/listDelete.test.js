@@ -36,9 +36,11 @@ describe('List DeletePlugin', () => {
     })
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: null,
+      root: {
+        pending: false,
+        error: null,
+        data: null,
+      },
     }
 
     reducer(prevState, { type: 'RJ_LIST_DELETE' })
@@ -56,22 +58,24 @@ describe('List DeletePlugin', () => {
     })
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: [
-        {
-          id: 1,
-          name: 'Alice',
-        },
-        {
-          id: 2,
-          name: 'Bob',
-        },
-        {
-          id: 3,
-          name: 'Eve',
-        },
-      ],
+      root: {
+        pending: false,
+        error: null,
+        data: [
+          {
+            id: 1,
+            name: 'Alice',
+          },
+          {
+            id: 2,
+            name: 'Bob',
+          },
+          {
+            id: 3,
+            name: 'Eve',
+          },
+        ],
+      },
     }
 
     let nextState = reducer(prevState, {
@@ -79,7 +83,7 @@ describe('List DeletePlugin', () => {
       item: { id: 1 },
     })
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: [
@@ -101,26 +105,28 @@ describe('List DeletePlugin', () => {
     })
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: {
-        custom: {
-          path: {
-            to: {
-              list: [
-                {
-                  id: 1,
-                  name: 'Alice',
-                },
-                {
-                  id: 2,
-                  name: 'Bob',
-                },
-                {
-                  id: 3,
-                  name: 'Eve',
-                },
-              ],
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          custom: {
+            path: {
+              to: {
+                list: [
+                  {
+                    id: 1,
+                    name: 'Alice',
+                  },
+                  {
+                    id: 2,
+                    name: 'Bob',
+                  },
+                  {
+                    id: 3,
+                    name: 'Eve',
+                  },
+                ],
+              },
             },
           },
         },
@@ -132,7 +138,7 @@ describe('List DeletePlugin', () => {
       item: { id: 1 },
     })
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: {
@@ -167,14 +173,16 @@ describe('List DeletePlugin', () => {
     )
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: [1, 2, 3],
+      root: {
+        pending: false,
+        error: null,
+        data: [1, 2, 3],
+      },
     }
 
     let nextState = reducer(prevState, { type: 'RJ_LIST_DELETE', item: 2 })
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: [1, 3],
@@ -197,11 +205,13 @@ describe('List DeletePlugin', () => {
     )
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: {
-        pagination: {},
-        list: [1, 2, 3],
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          pagination: {},
+          list: [1, 2, 3],
+        },
       },
     }
 

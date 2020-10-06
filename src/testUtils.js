@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs'
+import { Subject, of } from 'rxjs'
 import { publish } from 'rxjs/operators'
 
 // Create a useMiniRedux like subscription util 4 tesing
@@ -7,8 +7,7 @@ const noop = () => {}
 export function createTestRJSubscription(
   RjObject,
   subscribeCallback = noop,
-  errorCallback = noop,
-  ...args
+  errorCallback = noop
 ) {
   const subject = new Subject()
 
@@ -17,7 +16,10 @@ export function createTestRJSubscription(
     publish()
   )
 
-  const observable = makeRxObservable(fakeActionObservable, ...args)
+  const fakeStateObservable = of({
+    root: {},
+  })
+  const observable = makeRxObservable(fakeActionObservable, fakeStateObservable)
 
   observable.subscribe(subscribeCallback, errorCallback)
 

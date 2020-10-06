@@ -45,6 +45,7 @@ export const TodosListState = rj(
       }),
     },
     computed: {
+      // busy: 'anyMutationPending',
       adding: '@mutation.addStupidTodo.pending',
       deleting: '@mutation.removeTodo.pendings',
       updating: '@mutation.toggleTodo.pendings',

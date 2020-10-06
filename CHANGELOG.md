@@ -1,3 +1,37 @@
+## 3.0.0
+##### *???*
+
+### :bangbang: Breaking changes
+
+#### Default state shape
+
+*TODO*
+Always state has **root** ...
+
+#### Side effect
+
+*TODO*
+- Configured effect caller from `action`
+- SideEffects handle only standard effect actions, new rj option addSideEffect to add an Observable to hanlde custom effect actions
+- New signature for custom `takeEffect`
+
+### :zap: New features
+
+#### New config option `combineReducers`
+*TODO*
+
+#### New config option `addSideEffect`
+*TODO*
+
+#### Expose mutations types helpers `makeMutationType` `matchMutationType`
+*TODO*
+
+#### New plugin `plugins/mutationsPending`
+*TODO*
+
+#### New helper `mapRunActionToObservable`
+*TODO*
+
 ## 2.6.0
 ##### *Semptmber 16th, 2020*
 

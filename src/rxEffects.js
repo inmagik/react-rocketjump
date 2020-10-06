@@ -1,4 +1,4 @@
-import { CLEAN, CANCEL } from './actionTypes'
+import { CLEAN, CANCEL, RUN } from './actionTypes'
 import { of, concat, empty, merge } from 'rxjs'
 import {
   switchMap,
@@ -9,6 +9,13 @@ import {
   takeUntil,
   filter,
 } from 'rxjs/operators'
+import mapRunActionToObservable from './mapRunActionToObservable'
+
+const EffectActions = [CLEAN, RUN, CANCEL]
+function makeFilterStandarEffectActions(prefix) {
+  return (action) =>
+    EffectActions.map((a) => prefix + a).indexOf(action.type) !== -1
+}
 
 function takeUntilCancelAction(actionObservable, prefix) {
   return takeUntil(
@@ -23,39 +30,42 @@ function takeUntilCancelAction(actionObservable, prefix) {
 
 export const TAKE_EFFECT_LATEST = 'latest'
 
-function mapToLatest(actionObservable, mapActionToObservable, prefix) {
+function mapToLatest(actionObservable, effect, getEffectCaller, prefix) {
   return switchMap((action) => {
     // Switch Map take always the last task so cancel ecc are auto emitted
     if (action.type === prefix + CANCEL || action.type === prefix + CLEAN) {
       return of(action)
     }
-    return concat(of(action), mapActionToObservable(action)).pipe(
-      takeUntilCancelAction(actionObservable, prefix)
-    )
+    return concat(
+      of(action),
+      mapRunActionToObservable(action, effect, getEffectCaller, prefix)
+    ).pipe(takeUntilCancelAction(actionObservable, prefix))
   })
 }
 
 function takeEffectLatest(
-  actionObservable,
+  allActionObservable,
   stateObservable,
-  mapActionToObservable,
-  effectTypeArgs,
-  prefix
+  { effect, getEffectCaller, prefix }
 ) {
+  const actionObservable = allActionObservable.pipe(
+    filter(makeFilterStandarEffectActions(prefix))
+  )
   return actionObservable.pipe(
-    mapToLatest(actionObservable, mapActionToObservable, prefix)
+    mapToLatest(actionObservable, effect, getEffectCaller, prefix)
   )
 }
 
 export const TAKE_EFFECT_EVERY = 'every'
 
 function takeEffectEvery(
-  actionObservable,
+  allActionObservable,
   stateObservable,
-  mapActionToObservable,
-  effectTypeArgs,
-  prefix
+  { effect, getEffectCaller, prefix }
 ) {
+  const actionObservable = allActionObservable.pipe(
+    filter(makeFilterStandarEffectActions(prefix))
+  )
   return actionObservable.pipe(
     mergeMap((action) => {
       // Marge Map take every
@@ -64,7 +74,7 @@ function takeEffectEvery(
       }
       return concat(
         of(action),
-        mapActionToObservable(action).pipe(
+        mapRunActionToObservable(action, effect, getEffectCaller, prefix).pipe(
           takeUntilCancelAction(actionObservable, prefix)
         )
       )
@@ -76,7 +86,8 @@ function takeEffectEvery(
 
 function actionToExhaustObservableEffect(
   actionObservable,
-  mapActionToObservable,
+  effect,
+  getEffectCaller,
   prefix
 ) {
   return merge(
@@ -94,9 +105,10 @@ function actionToExhaustObservableEffect(
         if (action.type === prefix + CANCEL || action.type === prefix + CLEAN) {
           return empty()
         }
-        return concat(of(action), mapActionToObservable(action)).pipe(
-          takeUntilCancelAction(actionObservable, prefix)
-        )
+        return concat(
+          of(action),
+          mapRunActionToObservable(action, effect, getEffectCaller, prefix)
+        ).pipe(takeUntilCancelAction(actionObservable, prefix))
       })
     )
   )
@@ -105,15 +117,17 @@ function actionToExhaustObservableEffect(
 export const TAKE_EFFECT_EXHAUST = 'exhaust'
 
 function takeEffectExhaust(
-  actionObservable,
+  allActionObservable,
   stateObservable,
-  mapActionToObservable,
-  effectTypeArgs,
-  prefix
+  { effect, getEffectCaller, prefix }
 ) {
+  const actionObservable = allActionObservable.pipe(
+    filter(makeFilterStandarEffectActions(prefix))
+  )
   return actionToExhaustObservableEffect(
     actionObservable,
-    mapActionToObservable,
+    effect,
+    getEffectCaller,
     prefix
   )
 }
@@ -121,11 +135,10 @@ function takeEffectExhaust(
 export const TAKE_EFFECT_GROUP_BY = 'groupBy'
 
 function takeEffectGroupBy(
-  actionObservable,
+  allActionObservable,
   stateObservable,
-  mapActionToObservable,
-  effectTypeArgs,
-  prefix
+  { effect, getEffectCaller, prefix },
+  ...effectTypeArgs
 ) {
   const groupByFn = effectTypeArgs[0]
   if (typeof groupByFn !== 'function') {
@@ -134,11 +147,14 @@ function takeEffectGroupBy(
         'takeEffect you must provide a function to group by the effect.'
     )
   }
+  const actionObservable = allActionObservable.pipe(
+    filter(makeFilterStandarEffectActions(prefix))
+  )
   return actionObservable.pipe(
     groupBy(groupByFn),
     mergeMap((groupedObservable) =>
       groupedObservable.pipe(
-        mapToLatest(groupedObservable, mapActionToObservable, prefix)
+        mapToLatest(groupedObservable, effect, getEffectCaller, prefix)
       )
     )
   )
@@ -147,11 +163,10 @@ function takeEffectGroupBy(
 export const TAKE_EFFECT_GROUP_BY_EXHAUST = 'groupByExhaust'
 
 function takeEffectGroupByExhaust(
-  actionObservable,
+  allActionObservable,
   stateObservable,
-  mapActionToObservable,
-  effectTypeArgs,
-  prefix
+  { effect, getEffectCaller, prefix },
+  ...effectTypeArgs
 ) {
   const groupByFn = effectTypeArgs[0]
   if (typeof groupByFn !== 'function') {
@@ -160,12 +175,16 @@ function takeEffectGroupByExhaust(
         'takeEffect you must provide a function to group by the effect.'
     )
   }
+  const actionObservable = allActionObservable.pipe(
+    filter(makeFilterStandarEffectActions(prefix))
+  )
   return actionObservable.pipe(
     groupBy(groupByFn),
     mergeMap((groupedObservable) =>
       actionToExhaustObservableEffect(
         groupedObservable,
-        mapActionToObservable,
+        effect,
+        getEffectCaller,
         prefix
       )
     )

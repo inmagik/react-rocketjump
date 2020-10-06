@@ -91,9 +91,11 @@ describe('connectRj', () => {
       (state, selectors, props, computedState) => {
         // Expect default state
         expect(state).toEqual({
-          data: null,
-          pending: false,
-          error: null,
+          root: {
+            data: null,
+            pending: false,
+            error: null,
+          },
         })
         // Expect computed to be applied
         expect(computedState).toEqual({

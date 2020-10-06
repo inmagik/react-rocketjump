@@ -36,9 +36,11 @@ describe('List Insert plugin', () => {
     })
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: null,
+      root: {
+        pending: false,
+        error: null,
+        data: null,
+      },
     }
 
     reducer(prevState, { type: 'RJ_LIST_INSERT' })
@@ -56,22 +58,24 @@ describe('List Insert plugin', () => {
     })
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: [
-        {
-          id: 1,
-          name: 'Alice',
-        },
-        {
-          id: 2,
-          name: 'Bob',
-        },
-        {
-          id: 3,
-          name: 'Eve',
-        },
-      ],
+      root: {
+        pending: false,
+        error: null,
+        data: [
+          {
+            id: 1,
+            name: 'Alice',
+          },
+          {
+            id: 2,
+            name: 'Bob',
+          },
+          {
+            id: 3,
+            name: 'Eve',
+          },
+        ],
+      },
     }
 
     let nextState = reducer(prevState, {
@@ -79,7 +83,7 @@ describe('List Insert plugin', () => {
       item: { id: 4, name: 'Mallory' },
     })
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: [
@@ -109,26 +113,28 @@ describe('List Insert plugin', () => {
     })
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: {
-        custom: {
-          path: {
-            to: {
-              list: [
-                {
-                  id: 1,
-                  name: 'Alice',
-                },
-                {
-                  id: 2,
-                  name: 'Bob',
-                },
-                {
-                  id: 3,
-                  name: 'Eve',
-                },
-              ],
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          custom: {
+            path: {
+              to: {
+                list: [
+                  {
+                    id: 1,
+                    name: 'Alice',
+                  },
+                  {
+                    id: 2,
+                    name: 'Bob',
+                  },
+                  {
+                    id: 3,
+                    name: 'Eve',
+                  },
+                ],
+              },
             },
           },
         },
@@ -140,7 +146,7 @@ describe('List Insert plugin', () => {
       item: { id: 4, name: 'Mallory' },
     })
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: {
@@ -188,11 +194,13 @@ describe('List Insert plugin', () => {
     )
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: {
-        pagination: {},
-        list: [1, 2, 3],
+      root: {
+        pending: false,
+        error: null,
+        data: {
+          pagination: {},
+          list: [1, 2, 3],
+        },
       },
     }
 
@@ -216,18 +224,20 @@ describe('List Insert plugin', () => {
     )
 
     const prevState = {
-      pending: false,
-      error: null,
-      data: [
-        {
-          id: 1,
-          name: 'Alice',
-        },
-        {
-          id: 3,
-          name: 'Eve',
-        },
-      ],
+      root: {
+        pending: false,
+        error: null,
+        data: [
+          {
+            id: 1,
+            name: 'Alice',
+          },
+          {
+            id: 3,
+            name: 'Eve',
+          },
+        ],
+      },
     }
 
     let nextState = reducer(prevState, {
@@ -235,7 +245,7 @@ describe('List Insert plugin', () => {
       item: { id: 2, name: 'Bob' },
     })
 
-    expect(nextState).toEqual({
+    expect(nextState.root).toEqual({
       pending: false,
       error: null,
       data: [
