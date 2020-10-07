@@ -1,10 +1,9 @@
-import { BehaviorSubject, Subject, of, empty } from 'rxjs'
+import { BehaviorSubject, Subject, of, EMPTY } from 'rxjs'
 import { switchMap, delay, share } from 'rxjs/operators'
 import { isEffectAction, bindActionCreators } from 'rocketjump-core'
-import { INIT, RUN, SUCCESS } from '../../../actionTypes'
+import { INIT, RUN, SUCCESS } from '../actionTypes'
 import { makeDispatchWithCallbacks } from './utils'
 import createMountedInstance from './createMountedInstance'
-import { act } from '@testing-library/react'
 
 // Create an RJ Bukcet
 
@@ -34,7 +33,7 @@ export default function createBucket(cacheStore, rjObject, params, key) {
     key,
     // Memo-selectors of rj object
     selectors: makeSelectors(),
-    // Handle the last run id grubbed from action.metac.cacheRunId
+    // Handle the last run id grubbed from action.meta.cacheRunId
     lastRun: null,
     // Timestamp of last success
     lastSucccessAt: null,
@@ -77,7 +76,7 @@ export default function createBucket(cacheStore, rjObject, params, key) {
   const effectObservable = makeRxObservable(
     actionObserable,
     bucket.stateObservable
-  )[0].pipe(share())
+  ).pipe(share())
   const dispatchWithCallbacks = makeDispatchWithCallbacks(
     bucket.dispatchToState
   )
@@ -99,7 +98,7 @@ export default function createBucket(cacheStore, rjObject, params, key) {
       if (action.type === 'gc') {
         return of(action).pipe(delay(cacheOptions.cacheTime))
       }
-      return empty()
+      return EMPTY
     })
   )
   const gcSubscription = gcObservable.subscribe((action) => {

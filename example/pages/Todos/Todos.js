@@ -1,122 +1,27 @@
-import React, { useState, Suspense } from 'react'
+import React from 'react'
 import Todo from './Todo'
-// import { useRunRj } from 'react-rocketjump'
-import {
-  useRj,
-  useLastRj,
-  rjCache,
-  useFreshRj,
-  cacheStore,
-  useRjActions,
-} from 'react-rocketjump/plugins/cache/new'
+import { useRunRj } from 'react-rocketjump'
 import { API_URL, TodosListState } from './localstate'
 import NewTodo from './NewTodo'
 import './Todos.css'
 
-console.log('CACHE', cacheStore)
-
-const MemoTodos = React.memo(() => <Todos id="b" />)
-
-export default function TodosApp() {
-  const [toggle, setToggle] = useState(true)
-  return (
-    <div>
-      <div style={{ marginTop: 30 }}>
-        <button onClick={() => setToggle((a) => !a)}>
-          {toggle ? 'ON' : 'OFF'}
-        </button>
-      </div>
-      <Gang />
-      <Suspense fallback={<h1>LOADING ~TODOS~</h1>}>
-        {toggle ? <Todos id={'A'} /> : <Gang />}
-      </Suspense>
-      {/* <MemoTodos id={'B'} /> */}
-    </div>
-  )
-}
-
-// b1.scheduleGC()
-
-function Gang() {
+export default function Todos() {
   const [
-    // Resolved state ...
-    { todos, adding, deleting, updating, loading },
-    { addStupidTodo, removeTodo, toggleTodo },
-  ] = useRj(TodosListState, [''])
-
-  return (
-    <div>
-      <h1>GANG</h1>
-
-      <button
-        onClick={() => {
-          const b1 = cacheStore.buildBucket(TodosListState, ['23'])
-          b1.run()
-        }}
-      >
-        CLEAR
-      </button>
-      {loading && (
-        <div>
-          Loading <b>Y</b> todos...
-        </div>
-      )}
-      <div className="todo-list">
-        {todos &&
-          todos.map((todo) => (
-            <Todo
-              saving={updating[todo.id] || deleting[todo.id]}
-              onToggle={toggleTodo}
-              onRemove={removeTodo}
-              key={todo.id}
-              todo={todo}
-            />
-          ))}
-      </div>
-    </div>
-  )
-}
-
-function Todos({ id }) {
-  const [count, setCount] = useState(0)
-  const [search, setSearch] = useState('')
-  const [
-    { todos, adding, deleting, updating },
-    { loading },
-    // { addStupidTodo, removeTodo },
-  ] = useLastRj(TodosListState, [search], {
-    // runOnMount: true,
-    suspense: true,
-  })
-  console.log('TODOS RENDER', todos, loading, id)
-
-  const { toggleTodo, addStupidTodo, removeTodo } = useRjActions(
-    TodosListState
-    // '23'
-  )
-
-  // function
-  // const [{ updating }, { toggleTodo }] = useRjMutations(TodosListState)
-
-  // console.log('RENDER', todos)
-  // cons
-  // const s2 = useRj(TodosListState, [''])
-  // const s3 = useRj(TodosListState)
-  // console.log(s2)
-  // const
-  // useRj(TodosListState, [count])
-
-  // console.log('RENDER', todos, loading, search)
+    { todos, loading, adding, deleting, updating, busy },
+    { addStupidTodo, removeTodo, toggleTodo, clean, run },
+  ] = useRunRj(TodosListState)
 
   return (
     <div className="todos">
-      <h1>Ma REST Todos</h1>
-      {/* <button onClick={() => setCount(count + 1)}>{count}</button> */}
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <h1>Ma REST Todos {busy && <small>Saving...</small>}</h1>
+      <div>
+        <div className="action-button-rj">
+          <button onClick={() => clean()}>CLEAN</button>
+        </div>
+        <div className="action-button-rj">
+          <button onClick={() => run()}>RUN</button>
+        </div>
+      </div>
       <h3>
         <a href={`${API_URL}/todos`}>
           {API_URL}
@@ -132,9 +37,8 @@ function Todos({ id }) {
         <NewTodo
           onSubmit={(todo) => {
             addStupidTodo
-              .onSuccess((todo, cacheStore) => {
+              .onSuccess((todo) => {
                 console.log('Todo Added!', todo)
-                cacheStore.invalidate(TodosListState)
               })
               .run(todo)
           }}

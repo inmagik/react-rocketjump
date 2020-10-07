@@ -38,3 +38,18 @@ export function createBucketMatchPredicate(rjObject, matchParams) {
     return false
   }
 }
+
+function stableReplacer(key, value) {
+  if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+    return Object.keys(value)
+      .sort()
+      .reduce((acc, k) => {
+        acc[k] = value[k]
+        return acc
+      }, {})
+  }
+  return value
+}
+
+export const makeKey = (ns, params) =>
+  `${ns}/` + JSON.stringify(params, stableReplacer)

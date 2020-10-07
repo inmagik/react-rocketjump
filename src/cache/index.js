@@ -12,5 +12,4 @@
 
 export { default as cacheStore } from './store'
 export { default as createCacheStore } from './createCacheStore'
-export { default as rjCache } from './rjCache'
 export * from './react'

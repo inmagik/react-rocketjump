@@ -1,6 +1,6 @@
 import createBucket from './createBucket'
-import { createBucketMatchPredicate } from './utils'
-import { isObjectRj } from '../../../types'
+import { createBucketMatchPredicate, makeKey } from './utils'
+import { isObjectRj } from '../types'
 import createMultiActions from './createMultiActions'
 
 export default function createCacheStore() {
@@ -30,12 +30,12 @@ export default function createCacheStore() {
   }
 
   cacheStore.getBucket = (rjObject, params) => {
-    const key = rjObject.cache.makeKey(params)
+    const key = makeKey(params, rjObject.cache.ns)
     return cacheStore.buckets.get(key)
   }
 
   cacheStore.buildBucket = (rjObject, params) => {
-    const key = rjObject.cache.makeKey(params)
+    const key = makeKey(params, rjObject.cache.ns)
     if (cacheStore.buckets.has(key)) {
       return cacheStore.buckets.get(key)
     }

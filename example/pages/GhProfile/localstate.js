@@ -1,5 +1,5 @@
 import { rj } from 'react-rocketjump'
-import rjCache from 'react-rocketjump/plugins/cache'
+import rjCache from 'react-rocketjump/plugins/legacycache'
 import { ajax } from 'rxjs/ajax'
 
 const API_URL = 'https://api.github.com'

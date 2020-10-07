@@ -13,6 +13,7 @@ import {
   checkMutationsConfig,
   createMutationsFinalExportEnhancer,
 } from './mutations/index'
+import makeCacheConfig from './cache/config'
 
 function shouldRocketJump(partialRjsOrConfigs) {
   let hasEffectConfigured = false
@@ -138,7 +139,7 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
     sideEffect,
     // EXTRA SHIT
     mutations,
-    cache,
+    cache: cacheConfig,
   } = mergegAlongExport
 
   // NOTE: In future Enhancer can be an interface for next extensions
@@ -209,6 +210,15 @@ function finalizeExport(mergegAlongExport, runConfig, finalConfig) {
       makeRxObservable,
       ...extraRxObservables
     )
+  }
+
+  // use Rj name as default ns if not set
+  let cache = null
+  if (finalConfig.name || cacheConfig) {
+    cache = makeCacheConfig({
+      ...(cacheConfig ?? {}),
+      ns: cacheConfig?.ns ?? finalConfig.name,
+    })
   }
 
   return {
