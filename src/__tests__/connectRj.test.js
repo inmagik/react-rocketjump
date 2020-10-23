@@ -1,25 +1,18 @@
 import React from 'react'
-import { act } from 'react-dom/test-utils'
-import Enzyme, { mount } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
+import TestRenderer, { act } from 'react-test-renderer'
 import connectRj from '../connectRj'
 import rj from '../rj'
 
-Enzyme.configure({ adapter: new Adapter() })
-
 describe('connectRj', () => {
-  const makeRjComponent = (...args) => {
-    const Component = props => null
-    const RjComponent = connectRj(...args)(Component)
-
-    return mount(<RjComponent />)
-  }
-
   it('should have the default props defined by rj', () => {
     const rjState = rj(() => Promise.resolve(1312))
-    const wrapper = makeRjComponent(rjState)
 
-    const props = wrapper.find('Component').props()
+    const Component = (props) => null
+    const RjComponent = connectRj(rjState)(Component)
+    const testRenderer = TestRenderer.create(<RjComponent />)
+    const wrapper = testRenderer.root.findByType(Component)
+    const props = wrapper.props
+
     expect(props.data).toBe(null)
     expect(props.error).toBe(null)
     expect(props.pending).toBe(false)
@@ -41,7 +34,7 @@ describe('connectRj', () => {
       }),
       {
         effect: () => Promise.resolve(1312),
-        selectors: s => ({
+        selectors: (s) => ({
           getBudda: () => s.getBudda() * 2,
         }),
         computed: {
@@ -51,9 +44,12 @@ describe('connectRj', () => {
         },
       }
     )
-    const wrapper = makeRjComponent(rjState)
+    const Component = (props) => null
+    const RjComponent = connectRj(rjState)(Component)
+    const testRenderer = TestRenderer.create(<RjComponent />)
+    const wrapper = testRenderer.root.findByType(Component)
+    const props = wrapper.props
 
-    const props = wrapper.find('Component').props()
     expect(props.data).toBe(undefined)
     expect(props.error).toBe(undefined)
     expect(props.pending).toBe(undefined)
@@ -76,7 +72,7 @@ describe('connectRj', () => {
       }),
       {
         effect: () => Promise.resolve(1312),
-        selectors: s => ({
+        selectors: (s) => ({
           getBudda: () => s.getBudda() * 2,
         }),
         computed: {
@@ -86,7 +82,8 @@ describe('connectRj', () => {
         },
       }
     )
-    const wrapper = makeRjComponent(
+    const Component = (props) => null
+    const RjComponent = connectRj(
       rjState,
       (state, selectors, props, computedState) => {
         // Expect default state
@@ -109,9 +106,11 @@ describe('connectRj', () => {
           DRAGO: selectors.getBudda(state),
         }
       }
-    )
+    )(Component)
+    const testRenderer = TestRenderer.create(<RjComponent />)
+    const wrapper = testRenderer.root.findByType(Component)
+    const props = wrapper.props
 
-    const props = wrapper.find('Component').props()
     expect(props.DRAGO).toBe(46)
     expect(props.data).toBe(undefined)
     expect(props.error).toBe(undefined)
@@ -123,7 +122,7 @@ describe('connectRj', () => {
   })
 
   it('should get angry with a non rj object is passed as argument', () => {
-    const Component = props => null
+    const Component = (props) => null
     expect(() => {
       connectRj(rj())(Component)
     }).toThrowError(
@@ -146,28 +145,27 @@ describe('connectRj', () => {
     )
   })
 
-  it('should run rj sideEffects and react to succees', async done => {
+  it('should run rj sideEffects and react to succees', async () => {
     const mockFn = jest.fn().mockResolvedValue(23)
     const rjState = rj(mockFn)
 
-    const wrapper = makeRjComponent(rjState, (state, { getData }) => ({
+    const Component = (props) => null
+    const RjComponent = connectRj(rjState, (state, { getData }) => ({
       friends: getData(state),
-    }))
+    }))(Component)
+    const testRenderer = TestRenderer.create(<RjComponent />)
+    const wrapper = testRenderer.root.findByType(Component)
 
-    expect(wrapper.find('Component').props().friends).toBe(null)
+    expect(wrapper.props.friends).toBe(null)
 
     await act(async () => {
-      wrapper
-        .find('Component')
-        .props()
-        .run()
-      expect(mockFn).toHaveBeenCalledTimes(1)
+      wrapper.props.run()
     })
+    expect(mockFn).toHaveBeenCalledTimes(1)
 
-    mockFn.mock.results[0].value.then(() => {
-      wrapper.update()
-      expect(wrapper.find('Component').props().friends).toBe(23)
-      done()
+    await act(async () => {
+      await mockFn.mock.results[0].value
     })
+    expect(wrapper.props.friends).toBe(23)
   })
 })

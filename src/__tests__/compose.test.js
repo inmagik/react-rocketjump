@@ -1,11 +1,8 @@
 import React from 'react'
+import TestRenderer from 'react-test-renderer'
 import rj from '../rj'
 import compose from '../compose'
 import connectRj from '../connectRj'
-import Enzyme, { shallow } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
-
-Enzyme.configure({ adapter: new Adapter() })
 
 describe('compose', () => {
   it('should compose rjs', () => {
@@ -28,15 +25,13 @@ describe('compose', () => {
         ({ run }) => ({ loadTres: run })
       )
     )(MaComponent)
-    const wrapper = shallow(<RjComponent />)
-      .shallow()
-      .shallow()
-      .find(MaComponent)
-    expect(wrapper.props()).toHaveProperty('un')
-    expect(wrapper.props()).toHaveProperty('dos')
-    expect(wrapper.props()).toHaveProperty('tres')
-    expect(wrapper.props()).toHaveProperty('loadUn')
-    expect(wrapper.props()).toHaveProperty('loadDos')
-    expect(wrapper.props()).toHaveProperty('loadTres')
+    const testRenderer = TestRenderer.create(<RjComponent />)
+    const wrapper = testRenderer.root.findByType(MaComponent)
+    expect(wrapper.props).toHaveProperty('un')
+    expect(wrapper.props).toHaveProperty('dos')
+    expect(wrapper.props).toHaveProperty('tres')
+    expect(wrapper.props).toHaveProperty('loadUn')
+    expect(wrapper.props).toHaveProperty('loadDos')
+    expect(wrapper.props).toHaveProperty('loadTres')
   })
 })
