@@ -1,6 +1,6 @@
 import React from 'react'
+import TestRenderer, { act } from 'react-test-renderer'
 import { rj, connectRj } from '../../../index'
-import Enzyme, { mount } from 'enzyme'
 import rjCache, {
   LRUCache,
   FIFOCache,
@@ -8,11 +8,7 @@ import rjCache, {
   LocalStorageStore,
   InMemoryStore,
 } from '../index'
-import Adapter from 'enzyme-adapter-react-16'
-import { act } from 'react-dom/test-utils'
 import { clearInMemoryStore } from '../stores'
-
-Enzyme.configure({ adapter: new Adapter() })
 
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
@@ -20,15 +16,16 @@ async function asyncForEach(array, callback) {
   }
 }
 
+const makeRjComponent = (rjState) => {
+  const Component = (props) => null
+
+  const RjComponent = connectRj(rjState)(Component)
+
+  const testRenderer = TestRenderer.create(<RjComponent />)
+  return testRenderer.root.findByType(Component)
+}
+
 describe('Cache Plugin (Session - LRU)', () => {
-  const makeRjComponent = (rjState) => {
-    const Component = (props) => null
-
-    const RjComponent = connectRj(rjState)(Component)
-
-    return mount(<RjComponent />).find(Component)
-  }
-
   beforeEach(() => {
     sessionStorage.clear()
   })
@@ -52,7 +49,7 @@ describe('Cache Plugin (Session - LRU)', () => {
     const wrapper = makeRjComponent(state)
 
     await act(async () => {
-      wrapper.prop('run')(1)
+      wrapper.props.run(1)
     })
 
     expect(effect).toHaveBeenCalledTimes(1)
@@ -77,11 +74,11 @@ describe('Cache Plugin (Session - LRU)', () => {
     const wrapper = makeRjComponent(state)
 
     await act(async () => {
-      await wrapper.prop('run').asPromise(1)
+      await wrapper.props.run.asPromise(1)
     })
 
     await act(async () => {
-      await wrapper.prop('run').asPromise(1)
+      await wrapper.props.run.asPromise(1)
     })
 
     expect(effect).toHaveBeenCalledTimes(1)
@@ -105,11 +102,11 @@ describe('Cache Plugin (Session - LRU)', () => {
 
     const wrapper1 = makeRjComponent(state1)
 
-    const run1 = wrapper1.prop('run')
+    const run1 = wrapper1.props.run
 
     const wrapper2 = makeRjComponent(state1)
 
-    const run2 = wrapper2.prop('run')
+    const run2 = wrapper2.props.run
 
     await act(async () => {
       await run1.asPromise(1)
@@ -140,7 +137,7 @@ describe('Cache Plugin (Session - LRU)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
     await act(async () => {
       asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
@@ -274,7 +271,7 @@ describe('Cache Plugin (Session - LRU)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
     await act(async () => {
       asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
@@ -307,7 +304,7 @@ describe('Cache Plugin (Session - LRU)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
     await act(async () => {
       asyncForEach([1, 2, 3, 1, 3, 2, 1, 4, 1], async (k) => {
@@ -343,11 +340,11 @@ describe('Cache Plugin (Session - LRU)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
-    expect(wrapper.prop('resetCache')).not.toBeUndefined()
+    expect(wrapper.props.resetCache).not.toBeUndefined()
 
-    const reset = wrapper.prop('resetCache')
+    const reset = wrapper.props.resetCache
 
     await act(async () => {
       await run.asPromise(1)
@@ -363,14 +360,6 @@ describe('Cache Plugin (Session - LRU)', () => {
 })
 
 describe('Cache Plugin (Local - FIFO)', () => {
-  const makeRjComponent = (rjState) => {
-    const Component = (props) => null
-
-    const RjComponent = connectRj(rjState)(Component)
-
-    return mount(<RjComponent />).find(Component)
-  }
-
   beforeEach(() => {
     localStorage.clear()
   })
@@ -394,7 +383,7 @@ describe('Cache Plugin (Local - FIFO)', () => {
     const wrapper = makeRjComponent(state)
 
     await act(async () => {
-      wrapper.prop('run')(1)
+      wrapper.props.run(1)
     })
 
     expect(effect).toHaveBeenCalledTimes(1)
@@ -419,11 +408,11 @@ describe('Cache Plugin (Local - FIFO)', () => {
     const wrapper = makeRjComponent(state)
 
     await act(async () => {
-      await wrapper.prop('run').asPromise(1)
+      await wrapper.props.run.asPromise(1)
     })
 
     await act(async () => {
-      await wrapper.prop('run').asPromise(1)
+      await wrapper.props.run.asPromise(1)
     })
 
     expect(effect).toHaveBeenCalledTimes(1)
@@ -447,11 +436,11 @@ describe('Cache Plugin (Local - FIFO)', () => {
 
     const wrapper1 = makeRjComponent(state1)
 
-    const run1 = wrapper1.prop('run')
+    const run1 = wrapper1.props.run
 
     const wrapper2 = makeRjComponent(state1)
 
-    const run2 = wrapper2.prop('run')
+    const run2 = wrapper2.props.run
 
     await act(async () => {
       await run1.asPromise(1)
@@ -482,7 +471,7 @@ describe('Cache Plugin (Local - FIFO)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
     await act(async () => {
       asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
@@ -616,7 +605,7 @@ describe('Cache Plugin (Local - FIFO)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
     await act(async () => {
       asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
@@ -649,7 +638,7 @@ describe('Cache Plugin (Local - FIFO)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
     await act(async () => {
       asyncForEach([1, 2, 3, 1, 3, 2, 1, 4, 1], async (k) => {
@@ -685,11 +674,11 @@ describe('Cache Plugin (Local - FIFO)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
-    expect(wrapper.prop('resetCache')).not.toBeUndefined()
+    expect(wrapper.props.resetCache).not.toBeUndefined()
 
-    const reset = wrapper.prop('resetCache')
+    const reset = wrapper.props.resetCache
 
     await act(async () => {
       await run.asPromise(1)
@@ -705,14 +694,6 @@ describe('Cache Plugin (Local - FIFO)', () => {
 })
 
 describe('Cache Plugin (InMemory - LRU)', () => {
-  const makeRjComponent = (rjState) => {
-    const Component = (props) => null
-
-    const RjComponent = connectRj(rjState)(Component)
-
-    return mount(<RjComponent />).find(Component)
-  }
-
   beforeEach(() => {
     clearInMemoryStore()
   })
@@ -736,7 +717,7 @@ describe('Cache Plugin (InMemory - LRU)', () => {
     const wrapper = makeRjComponent(state)
 
     await act(async () => {
-      wrapper.prop('run')(1)
+      wrapper.props.run(1)
     })
 
     expect(effect).toHaveBeenCalledTimes(1)
@@ -761,11 +742,11 @@ describe('Cache Plugin (InMemory - LRU)', () => {
     const wrapper = makeRjComponent(state)
 
     await act(async () => {
-      await wrapper.prop('run').asPromise(1)
+      await wrapper.props.run.asPromise(1)
     })
 
     await act(async () => {
-      await wrapper.prop('run').asPromise(1)
+      await wrapper.props.run.asPromise(1)
     })
 
     expect(effect).toHaveBeenCalledTimes(1)
@@ -789,11 +770,11 @@ describe('Cache Plugin (InMemory - LRU)', () => {
 
     const wrapper1 = makeRjComponent(state1)
 
-    const run1 = wrapper1.prop('run')
+    const run1 = wrapper1.props.run
 
     const wrapper2 = makeRjComponent(state1)
 
-    const run2 = wrapper2.prop('run')
+    const run2 = wrapper2.props.run
 
     await act(async () => {
       await run1.asPromise(1)
@@ -824,7 +805,7 @@ describe('Cache Plugin (InMemory - LRU)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
     await act(async () => {
       asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
@@ -958,7 +939,7 @@ describe('Cache Plugin (InMemory - LRU)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
     await act(async () => {
       asyncForEach([1, 2, 3, 1, 1, 2, 1, 4, 2], async (k) => {
@@ -991,7 +972,7 @@ describe('Cache Plugin (InMemory - LRU)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
     await act(async () => {
       asyncForEach([1, 2, 3, 1, 3, 2, 1, 4, 1], async (k) => {
@@ -1027,11 +1008,11 @@ describe('Cache Plugin (InMemory - LRU)', () => {
 
     const wrapper = makeRjComponent(state)
 
-    const run = wrapper.prop('run')
+    const run = wrapper.props.run
 
-    expect(wrapper.prop('resetCache')).not.toBeUndefined()
+    expect(wrapper.props.resetCache).not.toBeUndefined()
 
-    const reset = wrapper.prop('resetCache')
+    const reset = wrapper.props.resetCache
 
     await act(async () => {
       await run.asPromise(1)

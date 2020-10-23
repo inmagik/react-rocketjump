@@ -1,22 +1,12 @@
 import React from 'react'
-import { act } from 'react-dom/test-utils'
+import TestRenderer from 'react-test-renderer'
 import { isEffectAction, deps } from 'rocketjump-core'
 import { rj as reactRj, connectRj } from '..'
-import Enzyme, { mount, shallow } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
 import { RUN, CLEAN, CANCEL, SUCCESS, UPDATE_DATA } from '../actionTypes'
-
-Enzyme.configure({ adapter: new Adapter() })
+import useRj from '../useRj'
+import { renderHook, act } from '@testing-library/react-hooks'
 
 describe('React-RocketJump actions', () => {
-  const makeRjComponent = (rjState) => {
-    const Component = (props) => null
-
-    const RjComponent = connectRj(rjState)(Component)
-
-    return mount(<RjComponent />).find(Component)
-  }
-
   const makeActionObserver = (oldReducer, arrayLog, types) => {
     return (state, action) => {
       if (types.indexOf(action.type) >= 0) {
@@ -29,12 +19,13 @@ describe('React-RocketJump actions', () => {
   it('should produce default actions', () => {
     const rjState = reactRj(() => Promise.resolve([{ id: 1, name: 'admin' }]))
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
-    expect(wrapper.props()).toHaveProperty('run')
-    expect(wrapper.props()).toHaveProperty('clean')
-    expect(wrapper.props()).toHaveProperty('cancel')
-    expect(wrapper.props()).toHaveProperty('updateData')
+    expect(actions).toHaveProperty('run')
+    expect(actions).toHaveProperty('clean')
+    expect(actions).toHaveProperty('cancel')
+    expect(actions).toHaveProperty('updateData')
   })
 
   it('should produce a good run action', async () => {
@@ -45,10 +36,16 @@ describe('React-RocketJump actions', () => {
       reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
+
+    expect(actions).toHaveProperty('run')
+    expect(actions).toHaveProperty('clean')
+    expect(actions).toHaveProperty('cancel')
+    expect(actions).toHaveProperty('updateData')
 
     await act(async () => {
-      wrapper.prop('run')(1, 'a', {}, undefined)
+      actions.run(1, 'a', {}, undefined)
     })
 
     expect(actionLog[0]).toEqual({
@@ -74,10 +71,11 @@ describe('React-RocketJump actions', () => {
         makeActionObserver(oldReducer, actionLog, [CLEAN]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     await act(async () => {
-      wrapper.prop('clean')(1, 'a', {}, undefined)
+      actions.clean(1, 'a', {}, undefined)
     })
 
     expect(actionLog[0]).toEqual({
@@ -103,10 +101,11 @@ describe('React-RocketJump actions', () => {
         makeActionObserver(oldReducer, actionLog, [CANCEL]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     await act(async () => {
-      wrapper.prop('cancel')(1, 'a', {}, undefined)
+      actions.cancel(1, 'a', {}, undefined)
     })
 
     expect(actionLog[0]).toEqual({
@@ -132,10 +131,11 @@ describe('React-RocketJump actions', () => {
         makeActionObserver(oldReducer, actionLog, [UPDATE_DATA]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     await act(async () => {
-      wrapper.prop('updateData')({ name: 'GioVa23' })
+      actions.updateData({ name: 'GioVa23' })
     })
 
     expect(actionLog[0]).toEqual({
@@ -150,23 +150,25 @@ describe('React-RocketJump actions', () => {
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
-    expect(wrapper.prop('run')).toHaveProperty('onSuccess')
-    expect(wrapper.prop('run')).toHaveProperty('onFailure')
-    expect(wrapper.prop('run')).toHaveProperty('withMeta')
-    expect(wrapper.prop('run')).toHaveProperty('run')
-    expect(wrapper.prop('run')).toHaveProperty('asPromise')
+    expect(actions.run).toHaveProperty('onSuccess')
+    expect(actions.run).toHaveProperty('onFailure')
+    expect(actions.run).toHaveProperty('withMeta')
+    expect(actions.run).toHaveProperty('run')
+    expect(actions.run).toHaveProperty('asPromise')
   })
 
-  it('should now allow direct run invocation', () => {
+  it('should now allow direct run invocation', async () => {
     const rjState = reactRj({
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
-    expect(() => wrapper.prop('run').run()).toThrow()
+    expect(() => actions.run.run()).toThrow()
   })
 
   it('should use onSuccess', async () => {
@@ -174,12 +176,13 @@ describe('React-RocketJump actions', () => {
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn()
 
     await act(async () => {
-      wrapper.prop('run').onSuccess(onSuccess).run()
+      actions.run.onSuccess(onSuccess).run()
     })
     expect(onSuccess).toHaveBeenCalledTimes(1)
   })
@@ -189,12 +192,13 @@ describe('React-RocketJump actions', () => {
       effect: () => Promise.reject(),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onFailure = jest.fn()
 
     await act(async () => {
-      wrapper.prop('run').onFailure(onFailure).run()
+      actions.run.onFailure(onFailure).run()
     })
     expect(onFailure).toHaveBeenCalledTimes(1)
   })
@@ -207,12 +211,13 @@ describe('React-RocketJump actions', () => {
       reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn(() => {})
 
     await act(async () => {
-      wrapper.prop('run').withMeta({ a: 1 }).onSuccess(onSuccess).run()
+      actions.run.withMeta({ a: 1 }).onSuccess(onSuccess).run()
     })
     expect(onSuccess).toHaveBeenCalled()
     expect(actionLog[0].meta).toEqual({ a: 1 })
@@ -226,13 +231,13 @@ describe('React-RocketJump actions', () => {
       reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn(() => {})
 
     await act(async () => {
-      wrapper
-        .prop('run')
+      actions.run
         .withMeta({ a: 1 })
         .withMeta({ b: 2 })
         .withMeta({ a: 2, c: 3 })
@@ -251,13 +256,13 @@ describe('React-RocketJump actions', () => {
       reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn(() => {})
 
     await act(async () => {
-      wrapper
-        .prop('run')
+      actions.run
         .withMeta({ a: 1 })
         .withMeta(() => ({}))
         .onSuccess(onSuccess)
@@ -275,13 +280,13 @@ describe('React-RocketJump actions', () => {
       reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn(() => {})
 
     await act(async () => {
-      wrapper
-        .prop('run')
+      actions.run
         .withMeta({ a: 1 })
         .withMeta((oldMeta) => ({ b: oldMeta.a, a: 2 }))
         .onSuccess(onSuccess)
@@ -303,12 +308,13 @@ describe('React-RocketJump actions', () => {
       cleanTodos: clean,
     }))(Component)
 
-    const wrapper = shallow(<RjComponent />).find(Component)
+    const testRenderer = TestRenderer.create(<RjComponent />)
+    const wrapper = testRenderer.root.findByType(Component)
 
-    expect(wrapper.props()).toHaveProperty('fetchTodos')
-    expect(wrapper.props()).toHaveProperty('cleanTodos')
-    expect(wrapper.props()).not.toHaveProperty('run')
-    expect(wrapper.props()).not.toHaveProperty('clean')
+    expect(wrapper.props).toHaveProperty('fetchTodos')
+    expect(wrapper.props).toHaveProperty('cleanTodos')
+    expect(wrapper.props).not.toHaveProperty('run')
+    expect(wrapper.props).not.toHaveProperty('clean')
   })
 
   it('should allow action proxying', async () => {
@@ -323,16 +329,13 @@ describe('React-RocketJump actions', () => {
         makeActionObserver(oldReducer, actionLog, [SUCCESS]),
     })
 
-    const Component = (props) => null
-
-    const RjComponent = connectRj(rjState)(Component)
-
-    const wrapper = mount(<RjComponent />).find(Component)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn(() => {})
 
     await act(async () => {
-      wrapper.prop('run').onSuccess(onSuccess).run(1)
+      actions.run.onSuccess(onSuccess).run(1)
     })
 
     expect(actionLog[0]).toEqual({
@@ -358,19 +361,16 @@ describe('React-RocketJump actions', () => {
         makeActionObserver(oldReducer, actionLog, [SUCCESS]),
     })
 
-    const Component = (props) => null
-
-    const RjComponent = connectRj(rjState)(Component)
-
-    const wrapper = mount(<RjComponent />).find(Component)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn(() => {})
 
-    expect(wrapper.props()).toHaveProperty('run')
-    expect(wrapper.props()).toHaveProperty('runDouble')
+    expect(actions).toHaveProperty('run')
+    expect(actions).toHaveProperty('runDouble')
 
     await act(async () => {
-      wrapper.prop('runDouble').onSuccess(onSuccess).run(1)
+      actions.runDouble.onSuccess(onSuccess).run(1)
     })
     expect(onSuccess).toHaveBeenCalled()
     expect(actionLog[0]).toEqual({
@@ -395,19 +395,13 @@ describe('React-RocketJump actions', () => {
         makeActionObserver(oldReducer, actionLog, [SUCCESS]),
     })
 
-    const Component = (props) => null
-
-    const RjComponent = connectRj(rjState)(Component)
-
-    const wrapper = mount(<RjComponent />).find(Component)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn(() => {})
 
     await act(async () => {
-      wrapper
-        .prop('runObject')
-        .onSuccess(onSuccess)
-        .run({ id: 1, name: 'admin' })
+      actions.runObject.onSuccess(onSuccess).run({ id: 1, name: 'admin' })
     })
     expect(onSuccess).toHaveBeenCalled()
     expect(actionLog[0]).toEqual({
@@ -432,19 +426,13 @@ describe('React-RocketJump actions', () => {
         makeActionObserver(oldReducer, actionLog, [SUCCESS]),
     })
 
-    const Component = (props) => null
-
-    const RjComponent = connectRj(rjState)(Component)
-
-    const wrapper = mount(<RjComponent />).find(Component)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn(() => {})
 
     await act(async () => {
-      wrapper
-        .prop('runObject')
-        .onSuccess(onSuccess)
-        .run({ id: 1, name: 'admin' })
+      actions.runObject.onSuccess(onSuccess).run({ id: 1, name: 'admin' })
     })
     expect(actionLog[0]).toEqual({
       type: 'SUCCESS',
@@ -471,19 +459,13 @@ describe('React-RocketJump actions', () => {
         makeActionObserver(oldReducer, actionLog, [SUCCESS]),
     })
 
-    const Component = (props) => null
-
-    const RjComponent = connectRj(rjState)(Component)
-
-    const wrapper = mount(<RjComponent />).find(Component)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn(() => {})
 
     await act(async () => {
-      wrapper
-        .prop('runObject')
-        .onSuccess(onSuccess)
-        .run({ id: 1, name: 'admin' })
+      actions.runObject.onSuccess(onSuccess).run({ id: 1, name: 'admin' })
     })
     expect(onSuccess).toHaveBeenCalled()
     expect(actionLog[0]).toEqual({
@@ -513,10 +495,11 @@ describe('React-RocketJump actions', () => {
       custom: () => ({ type: 'CUSTOM' }),
     }))(Component)
 
-    const wrapper = mount(<RjComponent />).find(Component)
+    const testRenderer = TestRenderer.create(<RjComponent />)
+    const wrapper = testRenderer.root.findByType(Component)
 
     await act(async () => {
-      wrapper.prop('custom')()
+      wrapper.props.custom()
     })
 
     expect(actionLog[0]).toEqual({ type: 'CUSTOM' })
@@ -539,12 +522,13 @@ describe('React-RocketJump actions', () => {
       custom: () => ({ type: 'CUSTOM' }),
     }))(Component)
 
-    const wrapper = mount(<RjComponent />).find(Component)
+    const testRenderer = TestRenderer.create(<RjComponent />)
+    const wrapper = testRenderer.root.findByType(Component)
 
     const onSuccess = jest.fn()
 
     await act(async () => {
-      wrapper.prop('custom').onSuccess(onSuccess).run()
+      wrapper.props.custom.onSuccess(onSuccess).run()
     })
 
     expect(actionLog[0]).toEqual({ type: 'CUSTOM' })
@@ -556,10 +540,11 @@ describe('React-RocketJump actions', () => {
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     await act(async () => {
-      const p = wrapper.prop('run').asPromise()
+      const p = actions.run.asPromise()
 
       expect(p).toBeInstanceOf(Promise)
     })
@@ -570,17 +555,14 @@ describe('React-RocketJump actions', () => {
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn()
     const onFailure = jest.fn()
 
     await act(async () => {
-      await wrapper
-        .prop('run')
-        .onSuccess(onSuccess)
-        .onFailure(onFailure)
-        .asPromise()
+      await actions.run.onSuccess(onSuccess).onFailure(onFailure).asPromise()
     })
     expect(onSuccess).toHaveBeenCalledTimes(1)
     expect(onFailure).toHaveBeenCalledTimes(0)
@@ -591,14 +573,14 @@ describe('React-RocketJump actions', () => {
       effect: () => Promise.reject(),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn()
     const onFailure = jest.fn()
 
     await act(async () => {
-      await wrapper
-        .prop('run')
+      await actions.run
         .onSuccess(onSuccess)
         .onFailure(onFailure)
         .asPromise()
@@ -613,12 +595,13 @@ describe('React-RocketJump actions', () => {
       effect: () => Promise.resolve([{ id: 1, name: 'admin' }]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn()
 
     await act(async () => {
-      await wrapper.prop('run').asPromise().then(onSuccess)
+      await actions.run.asPromise().then(onSuccess)
     })
     expect(onSuccess).toHaveBeenCalledTimes(1)
   })
@@ -628,13 +611,13 @@ describe('React-RocketJump actions', () => {
       effect: () => Promise.reject(),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onFailure = jest.fn()
 
     await act(async () => {
-      await wrapper
-        .prop('run')
+      await actions.run
         .asPromise()
         .catch(onFailure)
         .then(() => {})
@@ -651,13 +634,13 @@ describe('React-RocketJump actions', () => {
       reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     const onSuccess = jest.fn(() => {})
 
     await act(async () => {
-      wrapper
-        .prop('run')
+      actions.run
         .withMeta({ a: 1 })
         .withMeta(() => ({}))
         .onSuccess(onSuccess)
@@ -684,10 +667,11 @@ describe('React-RocketJump actions', () => {
       custom: () => ({ type: 'CUSTOM' }),
     }))(Component)
 
-    const wrapper = mount(<RjComponent />).find(Component)
+    const testRenderer = TestRenderer.create(<RjComponent />)
+    const wrapper = testRenderer.root.findByType(Component)
 
     await act(async () => {
-      const p = wrapper.prop('custom').asPromise()
+      const p = wrapper.props.custom.asPromise()
       expect(p).toBeInstanceOf(Promise)
     })
 
@@ -702,10 +686,11 @@ describe('React-RocketJump actions', () => {
       reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     await act(async () => {
-      wrapper.prop('run')(
+      actions.run(
         1,
         2,
         deps.maybe(23),
@@ -736,10 +721,11 @@ describe('React-RocketJump actions', () => {
       reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     await act(async () => {
-      wrapper.prop('run')(
+      actions.run(
         1,
         2,
         deps.maybe(23).withMeta({ giova: 33 }),
@@ -774,10 +760,11 @@ describe('React-RocketJump actions', () => {
       reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
-    const wrapper = makeRjComponent(rjState)
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
 
     await act(async () => {
-      wrapper.prop('run')(
+      actions.run(
         1,
         2,
         deps.maybe(0).withMeta({ giova: 33 }),
@@ -797,8 +784,9 @@ describe('React-RocketJump actions', () => {
       reducer: (oldReducer) => makeActionObserver(oldReducer, actionLog, [RUN]),
     })
 
-    const wrapper = makeRjComponent(rjState)
-    const run = wrapper.prop('run')
+    const { result } = renderHook(() => useRj(rjState))
+    const [, actions] = result.current
+    const run = actions.run
     const curriedRun = run
       .withMeta({ x: 'xd' })
       .withMeta({ babu: 23 })
