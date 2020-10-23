@@ -1,3 +1,8 @@
+## 2.6.1
+##### *October 23th, 2020*
+
+React 17, rewrite tests to support React 17 code is the same of `2.6.0`.
+
 ## 2.6.0
 ##### *Semptmber 16th, 2020*
 
