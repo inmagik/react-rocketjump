@@ -7871,10 +7871,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rocketjump-core@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/rocketjump-core/-/rocketjump-core-3.1.0.tgz#91488c563c4874daebd350c310da813b435f4335"
-  integrity sha512-WfZ6MIhKl0TCh1yFLaB8BQkNs5VH3bK0ot0xJI0e1Q1iIA/8lE7CCrMptqGDZniEl+5NE1mtRwEBD//L9nsImA==
+rocketjump-core@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/rocketjump-core/-/rocketjump-core-3.1.1.tgz#b95f016e3cae38e1f3beb028b658d0e3f460f1fc"
+  integrity sha512-5MxG7p1EMMM7gVe4iPXapa6AC4ipNT+wYJwgW1ef+d3OCOLrhRztqpg6dPNjFvNLNE7vHqtsChM7chzu6Q2eYw==
   dependencies:
     "@babel/runtime" "^7.11.2"
 
