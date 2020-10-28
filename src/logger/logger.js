@@ -95,9 +95,10 @@ export default function rjLogger() {
 
       const rjName = info.name || `${index + 1}°`
       const { component, rjFn, hooks } = location
-      const componentLocation = `%c${component}%c${hooks.map(
-        (h) => `  ${h}()`
-      )}  ${rjFn}(${rjName})`
+      const componentLocation = `%c${component}%c${hooks
+        .map((h) => `  ${h}()`)
+        .reverse()
+        .join('')}  ${rjFn}(${rjName})`
 
       const color = colors[trackId % colors.length]
       const { action, prevState, nextState } = event.payload
