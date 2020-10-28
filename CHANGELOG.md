@@ -1,3 +1,9 @@
+## 2.6.2
+##### *October 28th, 2020*
+
+Fix an [issue](https://github.com/inmagik/react-rocketjump/issues/70)
+with rj logger and react fast refresh.
+
 ## 2.6.1
 ##### *October 23th, 2020*
 
