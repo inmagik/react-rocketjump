@@ -39,5 +39,3 @@ export * from './types'
 
 // All rx effects
 export { default as RxEffects } from './rxEffects'
-
-export { default as rjLogger } from './logger/index'
