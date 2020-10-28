@@ -75,29 +75,41 @@ const colors = Array.apply(null, { length: 100 }).map(getRandomColor)
 const pad = (n) => Array.apply(null, { length: n }).join(' ')
 
 export default function rjLogger() {
-  let rjLives = []
-  let whereUsed = {}
+  const rjLives = []
+  const whereUsed = {}
 
-  RjDebugEvents.subscribe((event) => {
-    if (event.type === RJ_INIT_EVENT) {
+  function lazyInitRjInstance(event) {
+    if (whereUsed[event.meta.trackId] === undefined) {
       whereUsed[event.meta.trackId] = whereMyRjIsIvoked(
         event.meta.info.wrappedComponentName
       )
+    }
+    if (rjLives.indexOf(event.meta.info) === -1) {
       rjLives.push(event.meta.info)
+    }
+  }
+
+  RjDebugEvents.subscribe((event) => {
+    if (event.type === RJ_INIT_EVENT) {
+      lazyInitRjInstance(event)
     } else if (event.type === RJ_TEARDOWN_EVENT) {
       const index = rjLives.indexOf(event.meta.info)
-      rjLives.splice(index, 1)
+      if (index !== -1) {
+        rjLives.splice(index, 1)
+      }
       delete whereUsed[event.meta.trackId]
     } else if (event.type === RJ_DISPATCH_EVENT) {
+      lazyInitRjInstance(event)
       const { info, trackId } = event.meta
       const index = rjLives.indexOf(info)
       const location = whereUsed[trackId]
 
       const rjName = info.name || `${index + 1}°`
       const { component, rjFn, hooks } = location
-      const componentLocation = `%c${component}%c${hooks.map(
-        (h) => `  ${h}()`
-      )}  ${rjFn}(${rjName})`
+      const componentLocation = `%c${component}%c${hooks
+        .map((h) => `  ${h}()`)
+        .reverse()
+        .join('')}  ${rjFn}(${rjName})`
 
       const color = colors[trackId % colors.length]
       const { action, prevState, nextState } = event.payload
@@ -122,6 +134,7 @@ export default function rjLogger() {
       // })
       console.groupEnd()
     } else if (event.type === RJ_ERROR_EVENT) {
+      lazyInitRjInstance(event)
       const { info, trackId } = event.meta
       const index = rjLives.indexOf(info)
       const location = whereUsed[trackId]
