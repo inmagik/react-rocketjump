@@ -9,6 +9,7 @@ import {
   takeUntil,
   filter,
   tap,
+  expand,
 } from 'rxjs/operators'
 import mapRunActionToObservable from './mapRunActionToObservable'
 
@@ -111,24 +112,26 @@ function takeEffectAudit(
       pending = true
       return concat(
         of(action),
-        mapRunActionToObservable(action, effect, getEffectCaller, prefix),
-        defer(() => {
-          if (!queued) {
-            return EMPTY
-          }
-          const nextAction = queued
-          queued = undefined
-          const projected = concat(
-            of(nextAction),
-            mapRunActionToObservable(
-              nextAction,
-              effect,
-              getEffectCaller,
-              prefix
+        mapRunActionToObservable(action, effect, getEffectCaller, prefix).pipe(
+          expand(() => {
+            if (!queued) {
+              return EMPTY
+            }
+            // console.log('Ex', queued)
+            const nextAction = queued
+            queued = undefined
+            const projected = concat(
+              of(nextAction),
+              mapRunActionToObservable(
+                nextAction,
+                effect,
+                getEffectCaller,
+                prefix
+              )
             )
-          )
-          return projected
-        })
+            return projected
+          })
+        )
       ).pipe(
         takeUntilCancelAction(actionObservable, prefix),
         tap({
