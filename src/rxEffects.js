@@ -1,5 +1,5 @@
 import { CLEAN, CANCEL, RUN } from './actionTypes'
-import { of, concat, merge, EMPTY, defer } from 'rxjs'
+import { of, concat, merge, EMPTY } from 'rxjs'
 import {
   switchMap,
   mergeMap,
