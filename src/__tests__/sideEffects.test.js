@@ -13,6 +13,7 @@ import RxEffects, {
   TAKE_EFFECT_EVERY,
   TAKE_EFFECT_GROUP_BY,
   // TAKE_EFFECT_QUEUE,
+  TAKE_EFFECT_EXPERIMENTAL_AUDIT,
   TAKE_EFFECT_GROUP_BY_EXHAUST,
   TAKE_EFFECT_EXHAUST,
 } from '../rxEffects'
@@ -1243,6 +1244,268 @@ describe('RJ side effect model', () => {
         done()
       })
     })
+  })
+
+  it('takes audit side effect when specified', async () => {
+    const resolves = []
+    const mockApi = jest
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolves.push(() => resolve('Gio Va'))
+          })
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolves.push(() => resolve('Maddy'))
+          })
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolves.push(() => resolve('Ma Ik'))
+          })
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolves.push(() => resolve('Drako'))
+          })
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolves.push(() => resolve('Gang'))
+          })
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolves.push(() => resolve('Yess'))
+          })
+      )
+
+    const mockCallback = jest.fn()
+
+    const RjObject = rj({
+      effect: mockApi,
+      takeEffect: TAKE_EFFECT_EXPERIMENTAL_AUDIT,
+    })
+
+    const subject = createTestRJSubscription(RjObject, mockCallback)
+
+    subject.next({
+      type: RUN,
+      payload: { params: [1] },
+      meta: {},
+      callbacks: {},
+    })
+
+    // Ingnored ...
+    subject.next({
+      type: RUN,
+      payload: { params: [2] },
+      meta: {},
+      callbacks: {},
+    })
+
+    // enqueue
+    subject.next({
+      type: RUN,
+      payload: { params: [3] },
+      meta: {},
+      callbacks: {},
+    })
+
+    // At this point only the first side effect function should be caled
+    expect(mockApi).toBeCalledTimes(1)
+
+    expect(mockCallback).nthCalledWith(1, {
+      type: RUN,
+      payload: { params: [1] },
+      meta: {},
+      callbacks: {},
+    })
+
+    resolves[0]()
+
+    await mockApi.mock.results[0].value
+
+    expect(mockApi).toBeCalledTimes(2)
+
+    expect(mockCallback).nthCalledWith(2, {
+      type: PENDING,
+      meta: {},
+    })
+
+    expect(mockCallback).nthCalledWith(3, {
+      type: SUCCESS,
+      meta: {},
+      payload: {
+        params: [1],
+        data: 'Gio Va',
+      },
+    })
+
+    expect(mockCallback).nthCalledWith(4, {
+      type: RUN,
+      payload: { params: [3] },
+      meta: {},
+      callbacks: {},
+    })
+
+    expect(mockCallback).nthCalledWith(5, {
+      type: PENDING,
+      meta: {},
+    })
+
+    resolves[1]()
+    await mockApi.mock.results[1].value
+
+    expect(mockCallback).nthCalledWith(6, {
+      type: SUCCESS,
+      meta: {},
+      payload: {
+        params: [3],
+        data: 'Maddy',
+      },
+    })
+
+    expect(mockApi).toBeCalledTimes(2)
+    expect(mockCallback).toBeCalledTimes(6)
+
+    subject.next({
+      type: RUN,
+      payload: { params: [4] },
+      meta: {},
+      callbacks: {},
+    })
+
+    expect(mockCallback).nthCalledWith(7, {
+      type: RUN,
+      payload: { params: [4] },
+      meta: {},
+      callbacks: {},
+    })
+
+    expect(mockApi).toBeCalledTimes(3)
+
+    subject.next({
+      type: CANCEL,
+    })
+
+    expect(mockCallback).nthCalledWith(8, {
+      type: PENDING,
+      meta: {},
+    })
+
+    expect(mockCallback).nthCalledWith(9, {
+      type: CANCEL,
+    })
+
+    resolves[2]()
+    await mockApi.mock.results[2].value
+
+    expect(mockCallback).toBeCalledTimes(9)
+
+    subject.next({
+      type: RUN,
+      payload: { params: [5] },
+      meta: {},
+      callbacks: {},
+    })
+
+    expect(mockApi).toBeCalledTimes(4)
+
+    expect(mockCallback).nthCalledWith(10, {
+      type: RUN,
+      payload: { params: [5] },
+      meta: {},
+      callbacks: {},
+    })
+
+    expect(mockCallback).nthCalledWith(11, {
+      type: PENDING,
+      meta: {},
+    })
+
+    resolves[3]()
+    await mockApi.mock.results[3].value
+
+    expect(mockCallback).nthCalledWith(12, {
+      type: SUCCESS,
+      meta: {},
+      payload: {
+        params: [5],
+        data: 'Drako',
+      },
+    })
+
+    subject.next({
+      type: RUN,
+      payload: { params: [6] },
+      meta: {},
+      callbacks: {},
+    })
+    subject.next({
+      type: RUN,
+      payload: { params: [7] },
+      meta: {},
+      callbacks: {},
+    })
+    subject.next({
+      type: RUN,
+      payload: { params: [8] },
+      meta: {},
+      callbacks: {},
+    })
+
+    expect(mockApi).toBeCalledTimes(5)
+    expect(mockCallback).nthCalledWith(13, {
+      type: RUN,
+      payload: { params: [6] },
+      meta: {},
+      callbacks: {},
+    })
+
+    resolves[4]()
+    await mockApi.mock.results[4].value
+
+    expect(mockApi).toBeCalledTimes(6)
+
+    expect(mockCallback).nthCalledWith(14, {
+      type: PENDING,
+      meta: {},
+    })
+    expect(mockCallback).nthCalledWith(15, {
+      type: SUCCESS,
+      meta: {},
+      payload: {
+        params: [6],
+        data: 'Gang',
+      },
+    })
+    expect(mockCallback).toBeCalledTimes(17)
+    expect(mockCallback).nthCalledWith(16, {
+      type: RUN,
+      payload: { params: [8] },
+      meta: {},
+      callbacks: {},
+    })
+
+    expect(mockCallback).nthCalledWith(17, {
+      type: PENDING,
+      meta: {},
+    })
+    subject.next({
+      type: CLEAN,
+    })
+    expect(mockCallback).nthCalledWith(18, {
+      type: CLEAN,
+    })
+    expect(mockCallback).toBeCalledTimes(18)
   })
 
   it('take latest side effect group by when specified', (done) => {

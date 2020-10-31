@@ -1,5 +1,5 @@
 import { CLEAN, CANCEL, RUN } from './actionTypes'
-import { of, concat, empty, merge } from 'rxjs'
+import { of, concat, merge, EMPTY, defer } from 'rxjs'
 import {
   switchMap,
   mergeMap,
@@ -8,6 +8,7 @@ import {
   groupBy,
   takeUntil,
   filter,
+  tap,
 } from 'rxjs/operators'
 import mapRunActionToObservable from './mapRunActionToObservable'
 
@@ -84,6 +85,60 @@ function takeEffectEvery(
 
 // export const TAKE_EFFECT_QUEUE = 'queue'
 
+export const TAKE_EFFECT_EXPERIMENTAL_AUDIT = '__audit'
+
+function takeEffectAudit(
+  allActionObservable,
+  stateObservable,
+  { effect, getEffectCaller, prefix }
+) {
+  const actionObservable = allActionObservable.pipe(
+    filter(makeFilterStandarEffectActions(prefix))
+  )
+  let pending = false
+  let queued = undefined
+  return actionObservable.pipe(
+    mergeMap((action) => {
+      if (action.type === prefix + CANCEL || action.type === prefix + CLEAN) {
+        queued = undefined
+        pending = false
+        return of(action)
+      }
+      if (pending) {
+        queued = action
+        return EMPTY
+      }
+      pending = true
+      return concat(
+        of(action),
+        mapRunActionToObservable(action, effect, getEffectCaller, prefix),
+        defer(() => {
+          if (!queued) {
+            return EMPTY
+          }
+          const nextAction = queued
+          queued = undefined
+          const projected = concat(
+            of(nextAction),
+            mapRunActionToObservable(
+              nextAction,
+              effect,
+              getEffectCaller,
+              prefix
+            )
+          )
+          return projected
+        })
+      ).pipe(
+        takeUntilCancelAction(actionObservable, prefix),
+        tap({
+          complete: () => (pending = false),
+        })
+      )
+    })
+  )
+}
+
 function actionToExhaustObservableEffect(
   actionObservable,
   effect,
@@ -96,14 +151,14 @@ function actionToExhaustObservableEffect(
         if (action.type === prefix + CANCEL || action.type === prefix + CLEAN) {
           return of(action)
         } else {
-          return empty()
+          return EMPTY
         }
       })
     ),
     actionObservable.pipe(
       exhaustMap((action) => {
         if (action.type === prefix + CANCEL || action.type === prefix + CLEAN) {
-          return empty()
+          return EMPTY
         }
         return concat(
           of(action),
@@ -195,6 +250,7 @@ const RxEffects = {
   [TAKE_EFFECT_LATEST]: takeEffectLatest,
   [TAKE_EFFECT_EVERY]: takeEffectEvery,
   [TAKE_EFFECT_EXHAUST]: takeEffectExhaust,
+  [TAKE_EFFECT_EXPERIMENTAL_AUDIT]: takeEffectAudit,
   [TAKE_EFFECT_GROUP_BY]: takeEffectGroupBy,
   [TAKE_EFFECT_GROUP_BY_EXHAUST]: takeEffectGroupByExhaust,
 }
