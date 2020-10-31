@@ -13,7 +13,7 @@ import RxEffects, {
   TAKE_EFFECT_EVERY,
   TAKE_EFFECT_GROUP_BY,
   // TAKE_EFFECT_QUEUE,
-  TAKE_EFFECT_EXPERIMENTAL_AUDIT,
+  TAKE_EFFECT_EXPERIMENTAL_CONCAT_LATEST,
   TAKE_EFFECT_GROUP_BY_EXHAUST,
   TAKE_EFFECT_EXHAUST,
 } from '../rxEffects'
@@ -1246,7 +1246,7 @@ describe('RJ side effect model', () => {
     })
   })
 
-  it('takes audit side effect when specified', async () => {
+  it('takes concat latest side effect when specified', async () => {
     const resolves = []
     const mockApi = jest
       .fn()
@@ -1291,7 +1291,7 @@ describe('RJ side effect model', () => {
 
     const RjObject = rj({
       effect: mockApi,
-      takeEffect: TAKE_EFFECT_EXPERIMENTAL_AUDIT,
+      takeEffect: TAKE_EFFECT_EXPERIMENTAL_CONCAT_LATEST,
     })
 
     const subject = createTestRJSubscription(RjObject, mockCallback)
@@ -1507,7 +1507,8 @@ describe('RJ side effect model', () => {
     })
     expect(mockCallback).toBeCalledTimes(18)
   })
-  it('takes audit side effect when specified 2', async () => {
+
+  it('takes concat latest side effect when specified ... and never miss a run', async () => {
     const resolves = []
     const mockApi = jest
       .fn()
@@ -1552,7 +1553,7 @@ describe('RJ side effect model', () => {
 
     const RjObject = rj({
       effect: mockApi,
-      takeEffect: TAKE_EFFECT_EXPERIMENTAL_AUDIT,
+      takeEffect: TAKE_EFFECT_EXPERIMENTAL_CONCAT_LATEST,
     })
 
     const subject = createTestRJSubscription(RjObject, mockCallback)

@@ -86,9 +86,9 @@ function takeEffectEvery(
 
 // export const TAKE_EFFECT_QUEUE = 'queue'
 
-export const TAKE_EFFECT_EXPERIMENTAL_AUDIT = '__audit'
+export const TAKE_EFFECT_EXPERIMENTAL_CONCAT_LATEST = 'concatLatest'
 
-function takeEffectAudit(
+function takeEffectConcatLatest(
   allActionObservable,
   stateObservable,
   { effect, getEffectCaller, prefix }
@@ -117,7 +117,6 @@ function takeEffectAudit(
             if (!queued) {
               return EMPTY
             }
-            // console.log('Ex', queued)
             const nextAction = queued
             queued = undefined
             const projected = concat(
@@ -253,7 +252,7 @@ const RxEffects = {
   [TAKE_EFFECT_LATEST]: takeEffectLatest,
   [TAKE_EFFECT_EVERY]: takeEffectEvery,
   [TAKE_EFFECT_EXHAUST]: takeEffectExhaust,
-  [TAKE_EFFECT_EXPERIMENTAL_AUDIT]: takeEffectAudit,
+  [TAKE_EFFECT_EXPERIMENTAL_CONCAT_LATEST]: takeEffectConcatLatest,
   [TAKE_EFFECT_GROUP_BY]: takeEffectGroupBy,
   [TAKE_EFFECT_GROUP_BY_EXHAUST]: takeEffectGroupByExhaust,
 }
