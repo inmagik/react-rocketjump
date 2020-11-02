@@ -88,14 +88,12 @@ function takeEffectEvery(
 
 export const TAKE_EFFECT_EXPERIMENTAL_CONCAT_LATEST = 'concatLatest'
 
-function takeEffectConcatLatest(
-  allActionObservable,
-  stateObservable,
-  { effect, getEffectCaller, prefix }
+function actionToConcatLatestObservableEffect(
+  actionObservable,
+  effect,
+  getEffectCaller,
+  prefix
 ) {
-  const actionObservable = allActionObservable.pipe(
-    filter(makeFilterStandarEffectActions(prefix))
-  )
   let pending = false
   let queued = undefined
   return actionObservable.pipe(
@@ -138,6 +136,22 @@ function takeEffectConcatLatest(
         })
       )
     })
+  )
+}
+
+function takeEffectConcatLatest(
+  allActionObservable,
+  stateObservable,
+  { effect, getEffectCaller, prefix }
+) {
+  const actionObservable = allActionObservable.pipe(
+    filter(makeFilterStandarEffectActions(prefix))
+  )
+  return actionToConcatLatestObservableEffect(
+    actionObservable,
+    effect,
+    getEffectCaller,
+    prefix
   )
 }
 
@@ -248,6 +262,37 @@ function takeEffectGroupByExhaust(
   )
 }
 
+export const TAKE_EFFECT_GROUP_BY_CONCAT_LATEST = 'groupByConcatLatest'
+
+function takeEffectGroupByConcatLatest(
+  allActionObservable,
+  stateObservable,
+  { effect, getEffectCaller, prefix },
+  ...effectTypeArgs
+) {
+  const groupByFn = effectTypeArgs[0]
+  if (typeof groupByFn !== 'function') {
+    throw new Error(
+      '[react-rj] when you choose the groupByConcatLatest ' +
+        'takeEffect you must provide a function to group by the effect.'
+    )
+  }
+  const actionObservable = allActionObservable.pipe(
+    filter(makeFilterStandarEffectActions(prefix))
+  )
+  return actionObservable.pipe(
+    groupBy(groupByFn),
+    mergeMap((groupedObservable) =>
+      actionToConcatLatestObservableEffect(
+        groupedObservable,
+        effect,
+        getEffectCaller,
+        prefix
+      )
+    )
+  )
+}
+
 const RxEffects = {
   [TAKE_EFFECT_LATEST]: takeEffectLatest,
   [TAKE_EFFECT_EVERY]: takeEffectEvery,
@@ -255,6 +300,7 @@ const RxEffects = {
   [TAKE_EFFECT_EXPERIMENTAL_CONCAT_LATEST]: takeEffectConcatLatest,
   [TAKE_EFFECT_GROUP_BY]: takeEffectGroupBy,
   [TAKE_EFFECT_GROUP_BY_EXHAUST]: takeEffectGroupByExhaust,
+  [TAKE_EFFECT_GROUP_BY_CONCAT_LATEST]: takeEffectGroupByConcatLatest,
 }
 
 export default RxEffects
