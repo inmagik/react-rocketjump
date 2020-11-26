@@ -14,20 +14,20 @@ export const TodosListState = rj(
     effect: () => request.get(`${API_URL}/todos`).then(({ body }) => body),
     mutations: {
       addStupidTodo: rj.mutation.single({
-        effect: todo =>
+        effect: (todo) =>
           request
             .post(`${API_URL}/todos`)
             .send(todo)
             .then(({ body }) => body),
         updater: 'insertItem',
       }),
-      removeTodo: rj.mutation.multi(todo => todo.id, {
-        effect: todo =>
+      removeTodo: rj.mutation.multi((todo) => todo.id, {
+        effect: (todo) =>
           request.delete(`${API_URL}/todos/${todo.id}`).then(() => todo),
         updater: 'deleteItem',
       }),
-      toggleTodo: rj.mutation.multi(todo => todo.id, {
-        effect: todo =>
+      toggleTodo: rj.mutation.multi((todo) => todo.id, {
+        effect: (todo) =>
           request
             .put(`${API_URL}/todos/${todo.id}`)
             .send({
@@ -40,9 +40,9 @@ export const TodosListState = rj(
     },
     computed: {
       busy: 'anyMutationPending',
-      adding: '@mutation.addStupidTodo.pending',
-      deleting: '@mutation.removeTodo.pendings',
-      updating: '@mutation.toggleTodo.pendings',
+      adding: (s) => s.mutations.addStupidTodo.pending,
+      deleting: (s) => s.mutations.removeTodo.pendings,
+      updating: (s) => s.mutations.toggleTodo.pendings,
       todos: 'getData',
       loading: 'isPending',
     },

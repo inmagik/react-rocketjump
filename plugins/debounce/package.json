@@ -2,5 +2,6 @@
   "name": "react-rocketjump/plugins/debounce",
   "private": true,
   "main": "../../lib/plugins/debounce/index.cjs.js",
-  "module": "../../lib/plugins/debounce/index.es.js"
+  "module": "../../lib/plugins/debounce/index.es.js",
+  "types": "../../lib/plugins/debounce/index.d.ts"
 }

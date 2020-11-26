@@ -2,5 +2,6 @@
   "name": "react-rocketjump/plugins/listUpdate",
   "private": true,
   "main": "../../lib/plugins/listUpdate/index.cjs.js",
-  "module": "../../lib/plugins/listUpdate/index.es.js"
+  "module": "../../lib/plugins/listUpdate/index.es.js",
+  "types": "../../lib/plugins/listUpdate/index.d.ts"
 }

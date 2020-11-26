@@ -1,13 +1,13 @@
 const fs = require('fs')
 const rimraf = require('rimraf')
 
-const plugins = fs.readdirSync('src/plugins').filter(item => item[0] !== '.')
+const plugins = fs.readdirSync('src/plugins').filter((item) => item[0] !== '.')
 
 rimraf.sync('plugins')
 
 fs.mkdirSync('plugins')
 
-plugins.forEach(plugin => {
+plugins.forEach((plugin) => {
   fs.mkdirSync('plugins/' + plugin)
   fs.writeFileSync(
     'plugins/' + plugin + '/package.json',
@@ -17,6 +17,7 @@ plugins.forEach(plugin => {
         private: true,
         main: '../../lib/plugins/' + plugin + '/index.cjs.js',
         module: '../../lib/plugins/' + plugin + '/index.es.js',
+        types: '../../lib/plugins/' + plugin + '/index.d.ts',
       },
       null,
       2

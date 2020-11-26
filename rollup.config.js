@@ -1,7 +1,9 @@
 import babel from '@rollup/plugin-babel'
+import resolve from '@rollup/plugin-node-resolve'
 import fs from 'fs'
 import pkg from './package.json'
 
+const extensions = ['.ts', '.tsx', '.js', '.jsx']
 const plugins = fs.readdirSync('src/plugins').filter((item) => item[0] !== '.')
 
 const vendors = [
@@ -19,12 +21,12 @@ const makeExternalPredicate = (externalArr) => {
 
 export default ['esm', 'cjs'].map((format) => ({
   input: {
-    index: 'src/index.js',
-    logger: 'src/logger/index.js',
+    index: 'src/index.ts',
+    logger: 'src/logger/index.ts',
     ...plugins.reduce(
       (all, plugin) => ({
         ...all,
-        [`plugins/${plugin}/index`]: `src/plugins/${plugin}/index.js`,
+        [`plugins/${plugin}/index`]: `src/plugins/${plugin}/index.ts`,
       }),
       {}
     ),
@@ -39,9 +41,11 @@ export default ['esm', 'cjs'].map((format) => ({
   ],
   external: makeExternalPredicate(vendors),
   plugins: [
+    resolve({ extensions }),
     babel({
       babelHelpers: 'runtime',
       exclude: 'node_modules/**',
+      extensions,
       plugins: [
         [
           '@babel/plugin-transform-runtime',

@@ -3,7 +3,6 @@ module.exports = {
     [
       '@babel/preset-env',
       {
-        loose: true,
         ...(process.env.NODE_ENV === 'test' && {
           targets: {
             node: 'current',
@@ -12,5 +11,6 @@ module.exports = {
       },
     ],
     '@babel/preset-react',
-  ]
+    '@babel/preset-typescript',
+  ],
 }

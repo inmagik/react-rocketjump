@@ -7,7 +7,7 @@ import './Todos.css'
 
 export default function Todos() {
   const [
-    { todos, loading, adding, deleting, updating, busy },
+    { loading, todos, adding, busy, deleting, updating },
     { addStupidTodo, removeTodo, toggleTodo, clean, run },
   ] = useRunRj(TodosListState)
 

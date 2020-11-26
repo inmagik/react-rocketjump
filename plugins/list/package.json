@@ -2,5 +2,6 @@
   "name": "react-rocketjump/plugins/list",
   "private": true,
   "main": "../../lib/plugins/list/index.cjs.js",
-  "module": "../../lib/plugins/list/index.es.js"
+  "module": "../../lib/plugins/list/index.es.js",
+  "types": "../../lib/plugins/list/index.d.ts"
 }
