@@ -1,4 +1,4 @@
-import { INIT, PENDING, RUN, SUCCESS } from '../actions/actionTypes'
+import { CANCEL, INIT, PENDING, RUN, SUCCESS } from '../actions/actionTypes'
 import bindActionCreators from '../actions/bindActionCreators'
 import rj from '../rj'
 import rjPlugin from '../rjPlugin'
@@ -203,6 +203,43 @@ describe('Rj Builder', () => {
       state = obj.reducer(state, { type: 'Y' })
       expect(state.root).toEqual({
         x: 11,
+      })
+    })
+    it('Should build with combineReducers', () => {
+      const obj = rj()
+        .combineReducers({
+          un: (state = 'UN', action) => state,
+          dos: (state: string = 'dos', action) => state.toUpperCase(),
+        })
+        .combineReducers({
+          // NOTE: For now you must help ts with type hints....
+          tres: (state: string = 'x', action): string => {
+            if (action.type === CANCEL) {
+              return '*CLEANED*'
+            }
+            return 'TRES'
+          },
+        })
+        .reducer((r) => () => null)
+        .effect(() => Promise.resolve(88))
+
+      let state: { un: string; dos: string; tres: string; root: null }
+      state = obj.reducer(undefined, { type: INIT })
+
+      expect(state).toEqual({
+        root: null,
+        un: 'UN',
+        dos: 'DOS',
+        tres: 'TRES',
+      })
+
+      state = obj.reducer(state, obj.actionCreators.clean())
+
+      expect(state).toEqual({
+        root: null,
+        un: 'UN',
+        dos: 'DOS',
+        tres: 'TRES',
       })
     })
   })
