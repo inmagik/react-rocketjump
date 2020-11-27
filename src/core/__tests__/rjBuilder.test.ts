@@ -20,9 +20,7 @@ describe('Rj Builder', () => {
     it('Should build with effect', async () => {
       const mockEffect = jest.fn().mockResolvedValue(88)
 
-      const obj = rj().effect({
-        effect: mockEffect,
-      })
+      const obj = rj().effect(mockEffect)
 
       const mockCb = jest.fn()
 
@@ -121,9 +119,7 @@ describe('Rj Builder', () => {
       .selectors(se => ({
         withClassy: () => se.killHumnas() + ' with classy!'
       }))
-      .effect({
-        effect: () => Promise.resolve(9)
-      })
+      .effect(() => Promise.resolve(9))
 
       expect(obj.makeSelectors().withClassy()).toBe('KILL HUMANS with classy!')
     })

@@ -32,6 +32,7 @@ import {
   MergeMutationsActionCreators,
   ExtractMergeObjStateWithMutations,
   RjObjectWithComputed,
+  EffectFn,
 } from './types'
 
 export interface RjBuilderFinalConfig
@@ -45,7 +46,7 @@ export interface RjEffectBuilder<
   ConfigMutations extends Mutations = Mutations
 > {
   effect(
-    config: RjBuilderFinalConfig
+    configOrEffect: RjBuilderFinalConfig | EffectFn
   ): RjObjectWithComputed<
     CombineReducers<
       ExtractMergeObjReducersMap<RJ> & {
@@ -65,8 +66,14 @@ function rjEffectBuilder(
   mutations?: Mutations
 ): RjEffectBuilder {
   return {
-    effect: (config) => {
-      const { name, effect, ...sideEffectConfig } = config
+    effect: (configOrEffect) => {
+      if (typeof configOrEffect === 'function') {
+        return finalizeRjObject(
+          { effect: configOrEffect, computed, mutations },
+          mergeObj
+        )
+      }
+      const { name, effect, ...sideEffectConfig } = configOrEffect
       const mergeObjWithEffect = mergeRjObject(sideEffectConfig, mergeObj)
       return finalizeRjObject(
         { name, effect, computed, mutations },
