@@ -1,4 +1,4 @@
-import { PENDING, RUN, SUCCESS } from '../actions/actionTypes'
+import { INIT, PENDING, RUN, SUCCESS } from '../actions/actionTypes'
 import bindActionCreators from '../actions/bindActionCreators'
 import rj from '../rj'
 import rjPlugin from '../rjPlugin'
@@ -109,19 +109,52 @@ describe('Rj Builder', () => {
 
   describe('Selectors', () => {
     it('Should build with selector and given actual selectors', () => {
-      const obj = rj().plugins(
-        rjPlugin({
-          selectors: () => ({
-            killHumnas: () => 'KILL HUMANS',
-          }),
-        })
-      )
-      .selectors(se => ({
-        withClassy: () => se.killHumnas() + ' with classy!'
-      }))
-      .effect(() => Promise.resolve(9))
+      const obj = rj()
+        .plugins(
+          rjPlugin({
+            selectors: () => ({
+              killHumnas: () => 'KILL HUMANS',
+            }),
+          })
+        )
+        .selectors((se) => ({
+          withClassy: () => se.killHumnas() + ' with classy!',
+        }))
+        .effect(() => Promise.resolve(9))
 
       expect(obj.makeSelectors().withClassy()).toBe('KILL HUMANS with classy!')
+    })
+  })
+
+  describe('Computed', () => {
+    it('Should build with computed', () => {
+      const obj = rj()
+        .plugins(
+          rjPlugin({
+            reducer: (r) => (state) => ({ xd: 'Giova Says' }),
+            selectors: () => ({
+              killHumnas: () => 'KILL HUMANS',
+            }),
+          })
+        )
+        .selectors((se) => ({
+          sayGoodBey: (state) => state.root.xd + ' Good Bye',
+          withClassy: () => se.killHumnas() + ' with classy!',
+        }))
+        .computed({
+          hat3: (s) => s.root.xd + ' Fuck The World!',
+          drag0: 'sayGoodBey',
+          arg0: 'withClassy',
+        })
+        .effect(() => Promise.resolve(99))
+
+      const state = obj.reducer(undefined, { type: INIT })
+      const computedState = obj.computeState(state, obj.makeSelectors())
+      expect(computedState).toEqual({
+        hat3: 'Giova Says Fuck The World!',
+        drag0: 'Giova Says Good Bye',
+        arg0: 'KILL HUMANS with classy!',
+      })
     })
   })
 })
