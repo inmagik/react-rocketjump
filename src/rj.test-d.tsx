@@ -4,6 +4,7 @@ import { FunctionComponent } from 'react'
 import { rj, rjPlugin, connectRj, INIT } from '.'
 import { RjBaseActionCreators, Reducer, Action } from './core/types'
 import rjPlainList from './plugins/plainList'
+import rjList, { nextPreviousPaginationAdapter } from './plugins/list'
 import { BoundActionCreatorsWithBuilder } from './core/actions/bindActionCreators'
 import { map, withLatestFrom } from 'rxjs/operators'
 
@@ -248,4 +249,41 @@ function pluginPlainList() {
   type TEST_DATA_TYPE = any[] | null
   const testData: TEST_DATA_TYPE = state.root.data
   state.root.data?.concat(88)
+}
+
+function pluginListVanillaVsBuilder() {
+  const objVanilla = rj(
+    rjList({
+      pageSize: 10,
+      pagination: nextPreviousPaginationAdapter,
+    }),
+    {
+      selectors: (se) => ({
+        // NOTE: In vanilla mode TS can't infer
+        // "getPagination" i think the cause in always
+        // see: https://github.com/microsoft/TypeScript/issues/41396
+        gang: (s) => se.getData(s),
+      }),
+      effect: () => Promise.resolve(88),
+    }
+  )
+
+  const objBuilder = rj()
+    .plugins(
+      rjList({
+        pageSize: 10,
+        pagination: nextPreviousPaginationAdapter,
+      })
+    )
+    .selectors((se) => ({
+      // NOTE: My FUCKING GOOD BOY BUILDER CAN INFER THE WHOLE HELL
+      // After .plugins() call TS ha infered the new state and selectors
+      gang: (s) => (se.getPagination(s).count ?? 0) * 2,
+    }))
+    .effect({
+      effect: () => Promise.resolve(88),
+    })
+
+  const state = objBuilder.reducer(undefined, { type: INIT })
+  objBuilder.makeSelectors().gang(state).toFixed(2)
 }
