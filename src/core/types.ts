@@ -271,7 +271,7 @@ export type RjConfguredCaller = typeof RJ_CONFIGURED_EFFECT_CALLER
 
 export type EffectCallerFn = (
   effect: EffectFn,
-  ...params: unknown[]
+  ...params: any[]
 ) => Promise<any> | Observable<any> | EffectFn
 
 export type RjEffectCaller = EffectCallerFn | RjConfguredCaller
@@ -336,32 +336,10 @@ export type MakeRjObservable = (
   stateObservable: StateObservable
 ) => Observable<Action | RjSucessAction | RjFailureAction>
 
-// The base rj interface to extends rj capabilities
-// both rjPlugin() and how loved rj() can rely on this
-export interface RjBaseConfig<
-  InputReducer extends Reducer = Reducer,
-  OutputReducer extends Reducer | undefined = Reducer,
-  InputSelectors extends RjBaseSelectors = RjBaseSelectors,
-  OutputSelectors extends Selectors = Selectors,
-  ReducersMapCombine extends ReducersMap = ReducersMap,
-  ComposedReducer extends ComposableReducer = ComposableReducer,
-  InputActionCreators extends RjBaseActionCreators = RjBaseActionCreators,
-  OutputActionCreators extends ActionCreators = ActionCreators
-> {
-  /**
-   * RJ Config root reducer enhancer:
-   * oldReducer => nextReducerInRecursion
-   */
-  readonly reducer?: OutputReducer extends Reducer
-    ? ReducerEnhancer<InputReducer, OutputReducer>
-    : undefined
-  readonly selectors?: SelectorsEnhancer<InputSelectors, OutputSelectors>
-  readonly combineReducers?: ReducersMapCombine
-  readonly composeReducer?: ComposedReducer
-  readonly actions?: ActionCreatorsEnhancer<
-    InputActionCreators,
-    OutputActionCreators
-  >
+/**
+ * Rj Side Effect configurations
+ */
+export interface RjSideEffectConfig {
   /**
    * Rj config take effect a string that describe how to handle your side effect
    * some takeEffect need an extra groupBy params in theese case you have to pass:
@@ -383,6 +361,36 @@ export interface RjBaseConfig<
   readonly effectPipeline?: RjEffectPipeliner
 
   readonly addSideEffect?: TakeEffectHanlder
+}
+
+/**
+ * The base rj interface to extends rj capabilities
+ * both rjPlugin() and how loved rj() can rely on this
+ */
+export interface RjBaseConfig<
+  InputReducer extends Reducer = Reducer,
+  OutputReducer extends Reducer | undefined = Reducer,
+  InputSelectors extends RjBaseSelectors = RjBaseSelectors,
+  OutputSelectors extends Selectors = Selectors,
+  ReducersMapCombine extends ReducersMap = ReducersMap,
+  ComposedReducer extends ComposableReducer = ComposableReducer,
+  InputActionCreators extends RjBaseActionCreators = RjBaseActionCreators,
+  OutputActionCreators extends ActionCreators = ActionCreators
+> extends RjSideEffectConfig {
+  /**
+   * RJ Config root reducer enhancer:
+   * oldReducer => nextReducerInRecursion
+   */
+  readonly reducer?: OutputReducer extends Reducer
+    ? ReducerEnhancer<InputReducer, OutputReducer>
+    : undefined
+  readonly selectors?: SelectorsEnhancer<InputSelectors, OutputSelectors>
+  readonly combineReducers?: ReducersMapCombine
+  readonly composeReducer?: ComposedReducer
+  readonly actions?: ActionCreatorsEnhancer<
+    InputActionCreators,
+    OutputActionCreators
+  >
 }
 
 // The rj object merged around
@@ -493,7 +501,7 @@ export interface RjNameConfig {
   readonly name?: string
 }
 
-export interface RjEffectConfig {
+export interface RjRunnableEffectConfig {
   /**
    * Define your Rocketjump async Effect.
    * Expect a function that return a Promise or an Observable.
@@ -504,7 +512,7 @@ export interface RjEffectConfig {
 export interface RjFinalizeConfig<
   ConfigComputed extends Computed = Computed,
   ConfigMutations extends Mutations = Mutations
-> extends RjEffectConfig,
+> extends RjRunnableEffectConfig,
     RjNameConfig {
   computed?: ConfigComputed
   /**

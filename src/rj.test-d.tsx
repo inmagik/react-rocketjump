@@ -219,9 +219,15 @@ function connectRjMatchProps() {
   const jsxB = <RjComponentB x={3} yy={['Hello', 'Giova']} />
 }
 
-function effectPipeline() {
+function sideEffectConfigurations() {
   const obj = rj({
     effect: () => Promise.resolve(99),
+
+    takeEffect: 'every',
+
+    effectCaller: (fn, ...args) =>
+      (fn(...args) as Promise<any>).then(() => 'Hello!'),
+
     effectPipeline: (action, state) => {
       const v = state.value
       return action.pipe(
@@ -240,6 +246,6 @@ function pluginPlainList() {
   })
   const state = obj.reducer(undefined, { type: INIT })
   type TEST_DATA_TYPE = any[] | null
-  const testData : TEST_DATA_TYPE = state.root.data
+  const testData: TEST_DATA_TYPE = state.root.data
   state.root.data?.concat(88)
 }
