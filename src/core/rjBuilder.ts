@@ -42,8 +42,8 @@ export interface RjBuilderFinalConfig
 
 export interface RjEffectBuilder<
   RJ extends RjMergeableObject = RjMergeableObject,
-  ConfigComputed extends Computed = Computed,
-  ConfigMutations extends Mutations = Mutations
+  ConfigMutations extends Mutations = Mutations,
+  ConfigComputed extends Computed = Computed
 > {
   effect(
     configOrEffect: RjBuilderFinalConfig | EffectFn
@@ -86,7 +86,7 @@ function rjEffectBuilder(
 export interface RjComputedBuilder<
   RJ extends RjMergeableObject = RjMergeableObject,
   ConfigMutations extends Mutations = Mutations
-> extends RjEffectBuilder<RJ> {
+> extends RjEffectBuilder<RJ, ConfigMutations> {
   computed<
     ConfigComputed extends Computed<
       ExtractMergeObjSelectors<RJ>,
@@ -94,7 +94,7 @@ export interface RjComputedBuilder<
     >
   >(
     computed: ConfigComputed
-  ): RjEffectBuilder<RJ, ConfigComputed, ConfigMutations>
+  ): RjEffectBuilder<RJ, ConfigMutations, ConfigComputed>
 
   computed<ConfigComputed extends Computed<ExtractMergeObjSelectors<RJ>>>(
     computed: ConfigComputed
@@ -147,6 +147,7 @@ export function rjSelectorsBuilder(
 export interface RjMutationsBuilder<
   RJ extends RjMergeableObject = RjMergeableObject
 > extends RjSelectorsBuilder<RJ> {
+
   mutations<
     ConfigMutations extends Mutations<
       ExtractMergeObjRootState<RJ>,

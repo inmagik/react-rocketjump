@@ -108,7 +108,7 @@ describe('Rj Builder', () => {
   })
 
   describe('Selectors', () => {
-    it('Should build with selector and given actual selectors', () => {
+    it('Should build with selectors and given actual selectors', () => {
       const obj = rj()
         .plugins(
           rjPlugin({
@@ -123,6 +123,41 @@ describe('Rj Builder', () => {
         .effect(() => Promise.resolve(9))
 
       expect(obj.makeSelectors().withClassy()).toBe('KILL HUMANS with classy!')
+    })
+    it('Shuld build with selctors and have acess to ALL state event the mutations state', () => {
+      const obj = rj()
+        .plugins(
+          rjPlugin({
+            combineReducers: {
+              drago: () => ({ bros: ['Skaffo'] }),
+            },
+          }),
+          rjPlugin({
+            combineReducers: {
+              dragoVerde: () => ({ sis: ['Maddy'] }),
+            },
+          })
+        )
+        .mutations({
+          muta: {
+            effect: () => Promise.resolve(88),
+            updater: (s) => s,
+            reducer: () => [1, 2, 3, 4],
+          },
+        })
+        .selectors((se) => ({
+          notSoSimple2Infer: (state) =>
+            state.drago.bros.concat(state.dragoVerde.sis).join(',') +
+            ' ' +
+            state.mutations.muta.join(',') +
+            ' Chiama il contatto',
+        }))
+        .effect(() => Promise.resolve(88))
+
+      const state = obj.reducer(undefined, { type: INIT })
+      expect(obj.makeSelectors().notSoSimple2Infer(state)).toBe(
+        'Skaffo,Maddy 1,2,3,4 Chiama il contatto'
+      )
     })
   })
 

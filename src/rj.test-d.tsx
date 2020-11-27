@@ -287,3 +287,42 @@ function pluginListVanillaVsBuilder() {
   const state = objBuilder.reducer(undefined, { type: INIT })
   objBuilder.makeSelectors().gang(state).toFixed(2)
 }
+
+function mutationsState() {
+  const o1 = rj({
+    mutations: {
+      muta: {
+        updater: (s) => s,
+        reducer: () => ({
+          drago: 23,
+          kill: 'Humans',
+        }),
+        effect: () => Promise.resolve(1),
+      },
+    },
+    effect: () => Promise.resolve(88),
+  })
+  const state = o1.reducer(undefined, { type: INIT })
+
+  const o2 = rj()
+    .mutations({
+      muta: {
+        updater: (s) => s,
+        reducer: () => ({
+          drago: 23,
+          kill: 'Humans',
+        }),
+        effect: () => Promise.resolve(1),
+      },
+    })
+    .effect(() => Promise.resolve(88))
+  const state2 = o2.reducer(undefined, { type: INIT })
+
+  type TEST_MUTATION_SHAPE = {
+    drago: number
+    kill: string
+  }
+
+  let stateT: TEST_MUTATION_SHAPE = state.mutations.muta
+  stateT = state2.mutations.muta
+}
