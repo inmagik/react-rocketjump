@@ -138,6 +138,10 @@ describe('Rj Builder', () => {
             },
           })
         )
+        .composeReducer((state, action) => ({
+          ...state,
+          sure: { for: 'For Sure' },
+        }))
         .mutations({
           muta: {
             effect: () => Promise.resolve(88),
@@ -150,14 +154,79 @@ describe('Rj Builder', () => {
             state.drago.bros.concat(state.dragoVerde.sis).join(',') +
             ' ' +
             state.mutations.muta.join(',') +
-            ' Chiama il contatto',
+            ' Chiama il contatto ' +
+            state.root.sure.for.toLowerCase(),
         }))
         .effect(() => Promise.resolve(88))
 
       const state = obj.reducer(undefined, { type: INIT })
       expect(obj.makeSelectors().notSoSimple2Infer(state)).toBe(
-        'Skaffo,Maddy 1,2,3,4 Chiama il contatto'
+        'Skaffo,Maddy 1,2,3,4 Chiama il contatto for sure'
       )
+    })
+  })
+
+  describe('Reducer', () => {
+    it('Should build with reducer and composeReducer', () => {
+      const obj = rj()
+        .reducer((r) => (state: { x: number } = { x: 0 }, action) => {
+          if (action.type === 'X') {
+            return {
+              x: state.x + 1,
+            }
+          }
+          return {
+            x: state.x,
+          }
+        })
+        .composeReducer((state, action) => {
+          if (action.type === 'Y') {
+            return {
+              x: state.x + 10,
+            }
+          }
+          return state
+        })
+        .effect(() => Promise.resolve(88))
+
+      let state: { root: { x: number } }
+      state = obj.reducer(undefined, { type: INIT })
+
+      expect(state.root).toEqual({
+        x: 0,
+      })
+
+      state = obj.reducer(state, { type: 'X' })
+      expect(state.root).toEqual({
+        x: 1,
+      })
+      state = obj.reducer(state, { type: 'Y' })
+      expect(state.root).toEqual({
+        x: 11,
+      })
+    })
+  })
+
+  describe('Actions', () => {
+    it('Should build with actions', () => {
+      const obj = rj()
+        .actions(() => ({
+          drago: (s: string) => ({ type: 'DRAGO', say: s }),
+        }))
+        .actions((a) => ({
+          drgonNero: () => a.drago('Bella Drago'),
+        }))
+        .effect(() => Promise.resolve(88))
+
+      expect(obj.actionCreators.drago('Bu')).toEqual({
+        type: 'DRAGO',
+        say: 'Bu',
+      })
+
+      expect(obj.actionCreators.drgonNero()).toEqual({
+        type: 'DRAGO',
+        say: 'Bella Drago',
+      })
     })
   })
 
