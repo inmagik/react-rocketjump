@@ -341,20 +341,28 @@ export type MakeRjObservable = (
  */
 export interface RjSideEffectConfig {
   /**
-   * Rj config take effect a string that describe how to handle your side effect
+   * RocketJump config take effect a string that describe how to handle your side effect
    * some takeEffect need an extra groupBy params in theese case you have to pass:
    * `[takeEffect, (action: Action) => any]`
    * the second argument the groupBy function is used to group by your side effect.
    *
-   * - `'latest'` Your loved latest
-   * - `['groupBy', groupByFn]` Your loved latest groupped by
+   * - `'latest'` Take latest effect, cancel previous effect
+   * - `['groupBy', groupByFn]` Take latest effect but group by
+   * - `'every'` Take every effect
+   * - `'exhaust'` Take an effect, ignore effect until last effect complete.
+   * - `['groupByExhaust', groupByFn]` Take exhaust effect but group by
+   * - `concatLatest` Take an effect, if another effect arrive enqueue the latest
+   * - `['groupByConcatLatest', groupByFn]` Take concat latest effect but group by
    */
   readonly takeEffect?: TakeEffects
 
   /**
    * Add a way to call given effect
-   * You can use it to hook into generic effect
+   * You can use it to hook into generic effect.
+   *
+   * ```js
    * (effectFn, ...args) => effectFn(...args).then()
+   * ```
    */
   readonly effectCaller?: RjEffectCaller
 
@@ -378,15 +386,64 @@ export interface RjBaseConfig<
   OutputActionCreators extends ActionCreators = ActionCreators
 > extends RjSideEffectConfig {
   /**
-   * RJ Config root reducer enhancer:
-   * oldReducer => nextReducerInRecursion
+   * Enhance the RocketJump root reducer.
+   *
+   * Expect a function called with current root reducer that return a new root
+   * reducer, used as new root reducer.
+   *
+   * ```js
+   * currentReducer => nextReducer
+   * ```
    */
   readonly reducer?: OutputReducer extends Reducer
     ? ReducerEnhancer<InputReducer, OutputReducer>
     : undefined
-  readonly selectors?: SelectorsEnhancer<InputSelectors, OutputSelectors>
-  readonly combineReducers?: ReducersMapCombine
+  /**
+   * Compose to RocketJump root reducer.
+   *
+   * Compose given root reducer with current root reducer.
+   */
   readonly composeReducer?: ComposedReducer
+  /**
+   * Enhance the RocketJump selectors.
+   *
+   * Expect a function called with current selectors bag that return
+   * new selectors bag, the result selector bag will merge with current.
+   *
+   * ```js
+   * currentSelectors => ({
+   *   myNewSelectors: state => selectState(state),
+   * })
+   * ```
+   */
+  readonly selectors?: SelectorsEnhancer<InputSelectors, OutputSelectors>
+  /**
+   * Add custom reducers to RocketJump reducer.
+   *
+   * Expect a map of reducers used as input for combineReducers
+   * to create final RocketJump reducer.
+   *
+   * ```js
+   * {
+   *   customA: customReducerA,
+   *   customB: customReducerB,
+   * }
+   * ```
+   *
+   */
+  readonly combineReducers?: ReducersMapCombine
+  /**
+   * Enhance the RocketJump action creators.
+   *
+   * Expect a function called with current action creators that return
+   * new action creators, the result action creators will merge with current.
+   *
+   * ```js
+   * currentActionCreators => ({
+   *   myNewActionCreator: () => ({ type: 'CUSTOM_TYPE' })
+   * })
+   * ```
+   */
   readonly actions?: ActionCreatorsEnhancer<
     InputActionCreators,
     OutputActionCreators
@@ -504,7 +561,10 @@ export interface RjNameConfig {
 export interface RjRunnableEffectConfig {
   /**
    * Define your Rocketjump async Effect.
-   * Expect a function that return a Promise or an Observable.
+   *
+   * Expect a function that return a Promise, an Observable, or function
+   * that return a Promise, an Observable recursively... Cause the
+   * effectCaller option can change the order of effect.
    */
   readonly effect: EffectFn
 }
