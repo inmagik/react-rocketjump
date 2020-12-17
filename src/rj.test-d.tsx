@@ -7,7 +7,7 @@ import rjPlainList from './plugins/plainList'
 import rjList, { nextPreviousPaginationAdapter } from './plugins/list'
 import { BoundActionCreatorsWithBuilder } from './core/actions/bindActionCreators'
 import { map, withLatestFrom } from 'rxjs/operators'
-import { useRj } from './react'
+import { useRj, useRunRj } from './react'
 
 function stateShape() {
   const ObjA = rj({
@@ -352,6 +352,39 @@ function useRjBasicTypesWithSelectState() {
   })
 
   const [{ flag, pizzaDay }, { run }] = useRj(obj, (state) => {
+    return {
+      flag: state.root.pending,
+      pizzaDay: new Date()
+    }
+  })
+  const flagU: boolean = flag
+  const dayPizzaDayIs: Date = pizzaDay
+}
+
+function useRunRjBasicTypes() {
+  const obj = rj({
+    effect: () => Promise.resolve(3)
+  })
+
+  const [{ pending }, { run }] = useRunRj(obj, [], true)
+  const flag: boolean = pending
+}
+
+function useRunRjBasicTypesEdge() {
+  const obj = rj({
+    effect: () => Promise.resolve(3)
+  })
+
+  const [{ pending }, { run }] = useRunRj(obj, [23, 88], true, undefined)
+  const flag: boolean = pending
+}
+
+function useRunRjBasicTypesWithSelectState() {
+  const obj = rj({
+    effect: () => Promise.resolve(3)
+  })
+
+  const [{ flag, pizzaDay }, { run }] = useRunRj(obj, [], false, (state) => {
     return {
       flag: state.root.pending,
       pizzaDay: new Date()

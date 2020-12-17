@@ -20,11 +20,25 @@ interface WithNextMetaActionsBag {
   withNextMeta(meta: ActionMeta): void
 }
 
+function useRunRj<R extends RjObject>(
+  // The returned value of rj(..., EFFECT)
+  rjObject: R,
+  // Argument of run
+  runArgs?: any[],
+  // Run clean on new effect ma sir?
+  shouldCleanOnNewEffect?: boolean,
+): [
+  ExtractRjObjectComputedState<R>,
+  BoundActionCreatorsWithBuilder<ExtractRjObjectActions<R>> &
+    WithNextMetaActionsBag
+]
+
 function useRunRj<R extends RjObject, O>(
   // The returned value of rj(..., EFFECT)
   rjObject: R,
   // Argument of run
   runArgs?: any[],
+  // Run clean on new effect ma sir?
   shouldCleanOnNewEffect?: boolean,
   // A function to select state
   selectState?: StateSelector<
