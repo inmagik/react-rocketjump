@@ -7,6 +7,7 @@ import rjPlainList from './plugins/plainList'
 import rjList, { nextPreviousPaginationAdapter } from './plugins/list'
 import { BoundActionCreatorsWithBuilder } from './core/actions/bindActionCreators'
 import { map, withLatestFrom } from 'rxjs/operators'
+import { useRj } from './react'
 
 function stateShape() {
   const ObjA = rj({
@@ -325,4 +326,37 @@ function mutationsState() {
 
   let stateT: TEST_MUTATION_SHAPE = state.mutations.muta
   stateT = state2.mutations.muta
+}
+
+function useRjBasicTypes() {
+  const obj = rj({
+    effect: () => Promise.resolve(3)
+  })
+
+  const [{ pending }, { run }] = useRj(obj)
+  const flag: boolean = pending
+}
+
+function useRjBasicTypesEdge() {
+  const obj = rj({
+    effect: () => Promise.resolve(3)
+  })
+
+  const [{ pending }, { run }] = useRj(obj, undefined)
+  const flag: boolean = pending
+}
+
+function useRjBasicTypesWithSelectState() {
+  const obj = rj({
+    effect: () => Promise.resolve(3)
+  })
+
+  const [{ flag, pizzaDay }, { run }] = useRj(obj, (state) => {
+    return {
+      flag: state.root.pending,
+      pizzaDay: new Date()
+    }
+  })
+  const flagU: boolean = flag
+  const dayPizzaDayIs: Date = pizzaDay
 }

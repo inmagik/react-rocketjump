@@ -14,6 +14,14 @@ import {
 } from '../core/types'
 import { StateSelector } from './types'
 
+function useRj<R extends RjObject>(
+  // The returned value of rj(..., EFFECT)
+  rjObject: R
+): [
+  ExtractRjObjectComputedState<R>,
+  BoundActionCreatorsWithBuilder<ExtractRjObjectActions<R>>
+]
+
 function useRj<R extends RjObject, O>(
   // The returned value of rj(..., EFFECT)
   rjObject: R,
