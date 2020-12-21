@@ -4,7 +4,6 @@ import {
   Reducer,
   RjStateRootShape,
   RjStateShape,
-  Selectors,
 } from '../../core/types'
 import rjListInsert from '../listInsert/index'
 import rjListUpdate from '../listUpdate/index'

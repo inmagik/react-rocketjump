@@ -8,7 +8,6 @@ import {
   Reducer,
   CombineReducers,
   ReducersMap,
-  Selectors,
   RjPlugin,
   MakeRjPlugin,
 } from '../../core/types'
@@ -133,7 +132,7 @@ interface PaginationSelected {
   prev: any
 }
 
-export interface ListSelectors<LS extends ListStateShape> extends Selectors {
+export type ListSelectors<LS extends ListStateShape> = {
   getList(s: LS): (LS extends ListStateShape<infer S> ? S : any) | null
   getCount(s: LS): number | null
   getNumPages(s: LS, overridePageSize?: number): number | null

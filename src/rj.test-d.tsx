@@ -253,9 +253,8 @@ function pluginPlainList() {
 }
 
 function pluginPlainListComputedBuilder() {
-  let p1 = rjPlainList()
   const obj = rj()
-    .plugins(p1)
+    .plugins(rjPlainList())
     .computed({
       hello: 'getList',
     })
@@ -268,6 +267,28 @@ function pluginPlainListComputedBuilder() {
   type TEST_DATA_TYPE = any[] | null
   const testCState : TEST_DATA_TYPE = cstate.hello
   cstate.hello?.concat(23)
+}
+
+function pluginListComputedBuilder() {
+  const obj = rj()
+    .plugins(rjList({
+      pageSize: 99,
+      pagination: nextPreviousPaginationAdapter,
+    }))
+    .computed({
+      hello: 'getList',
+      pagination: 'getPagination',
+    })
+    .effect({
+      effect: () => Promise.resolve(88),
+    })
+
+  const state = obj.reducer(undefined, { type: INIT })
+  const cstate = obj.computeState(state, obj.makeSelectors())
+  type TEST_DATA_TYPE = any[] | null
+  const testCState : TEST_DATA_TYPE = cstate.hello
+  cstate.hello?.concat(23)
+  let ccc: number | null = cstate.pagination.count
 }
 
 function pluginListVanillaVsBuilder() {
