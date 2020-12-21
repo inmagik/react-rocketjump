@@ -77,7 +77,7 @@ type GrabListReducer<
 
 type ListStateShape = RjStateShape<RjStateRootShape<any[] | null>>
 
-export interface ListSelectors extends Selectors {
+export type ListSelectors = {
   getList(s: ListStateShape): any[] | null
   getCount(s: ListStateShape): number | null
 }

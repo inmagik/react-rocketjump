@@ -252,6 +252,24 @@ function pluginPlainList() {
   state.root.data?.concat(88)
 }
 
+function pluginPlainListComputedBuilder() {
+  let p1 = rjPlainList()
+  const obj = rj()
+    .plugins(p1)
+    .computed({
+      hello: 'getList',
+    })
+    .effect({
+      effect: () => Promise.resolve(88),
+    })
+
+  const state = obj.reducer(undefined, { type: INIT })
+  const cstate = obj.computeState(state, obj.makeSelectors())
+  type TEST_DATA_TYPE = any[] | null
+  const testCState : TEST_DATA_TYPE = cstate.hello
+  cstate.hello?.concat(23)
+}
+
 function pluginListVanillaVsBuilder() {
   const objVanilla = rj(
     rjList({
@@ -330,7 +348,7 @@ function mutationsState() {
 
 function useRjBasicTypes() {
   const obj = rj({
-    effect: () => Promise.resolve(3)
+    effect: () => Promise.resolve(3),
   })
 
   const [{ pending }, { run }] = useRj(obj)
@@ -339,7 +357,7 @@ function useRjBasicTypes() {
 
 function useRjBasicTypesEdge() {
   const obj = rj({
-    effect: () => Promise.resolve(3)
+    effect: () => Promise.resolve(3),
   })
 
   const [{ pending }, { run }] = useRj(obj, undefined)
@@ -348,13 +366,13 @@ function useRjBasicTypesEdge() {
 
 function useRjBasicTypesWithSelectState() {
   const obj = rj({
-    effect: () => Promise.resolve(3)
+    effect: () => Promise.resolve(3),
   })
 
   const [{ flag, pizzaDay }, { run }] = useRj(obj, (state) => {
     return {
       flag: state.root.pending,
-      pizzaDay: new Date()
+      pizzaDay: new Date(),
     }
   })
   const flagU: boolean = flag
@@ -363,7 +381,7 @@ function useRjBasicTypesWithSelectState() {
 
 function useRunRjBasicTypes() {
   const obj = rj({
-    effect: () => Promise.resolve(3)
+    effect: () => Promise.resolve(3),
   })
 
   const [{ pending }, { run }] = useRunRj(obj, [], true)
@@ -372,7 +390,7 @@ function useRunRjBasicTypes() {
 
 function useRunRjBasicTypesEdge() {
   const obj = rj({
-    effect: () => Promise.resolve(3)
+    effect: () => Promise.resolve(3),
   })
 
   const [{ pending }, { run }] = useRunRj(obj, [23, 88], true, undefined)
@@ -381,13 +399,13 @@ function useRunRjBasicTypesEdge() {
 
 function useRunRjBasicTypesWithSelectState() {
   const obj = rj({
-    effect: () => Promise.resolve(3)
+    effect: () => Promise.resolve(3),
   })
 
   const [{ flag, pizzaDay }, { run }] = useRunRj(obj, [], false, (state) => {
     return {
       flag: state.root.pending,
-      pizzaDay: new Date()
+      pizzaDay: new Date(),
     }
   })
   const flagU: boolean = flag
