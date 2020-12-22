@@ -3,5 +3,5 @@
   "private": true,
   "main": "../lib/logger.cjs.js",
   "module": "../lib/logger.es.js",
-  "types": "lib/logger/index.d.ts"
+  "types": "../lib/logger/index.d.ts"
 }
