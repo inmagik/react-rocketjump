@@ -140,6 +140,8 @@ type RjFn = typeof rj
 
 interface RjWithHelpers extends RjFn {
   /**
+   * @deprecated Use `'configured'` instead.
+   *
    * Set your effectCaller a configured caller from `<ConfigureRj />`.
    */
   configured(): RjConfguredCaller

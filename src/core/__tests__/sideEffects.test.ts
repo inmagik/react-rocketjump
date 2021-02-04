@@ -2167,7 +2167,7 @@ describe('RJ side effect model', () => {
 
       const RjObject = rj(
         rjPlugin({ effectCaller: callerA }),
-        rjPlugin({ effectCaller: rj.configured() }),
+        rjPlugin({ effectCaller: 'configured' }),
         rjPlugin({ effectCaller: callerC }),
         {
           effect: mockApi,

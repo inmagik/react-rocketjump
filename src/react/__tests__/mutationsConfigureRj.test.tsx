@@ -17,7 +17,7 @@ describe('ConfigureRj with mutations', () => {
         },
       },
       effect: () => Promise.resolve(23),
-      effectCaller: rj.configured(),
+      effectCaller: 'configured',
     })
 
     function Wrapper({ children }: { children: any }) {
@@ -58,7 +58,7 @@ describe('ConfigureRj with mutations', () => {
         },
       },
       effect: () => Promise.resolve(23),
-      effectCaller: rj.configured(),
+      effectCaller: 'configured',
     })
 
     function Wrapper({ children } : { children: any }) {
@@ -99,7 +99,7 @@ describe('ConfigureRj with mutations', () => {
         },
       },
       effect: () => Promise.resolve(23),
-      effectCaller: rj.configured(),
+      effectCaller: 'configured',
     })
 
     function Wrapper({ children } : { children: any }) {
@@ -136,7 +136,7 @@ describe('ConfigureRj with mutations', () => {
         },
       },
       effect: mockEffect,
-      effectCaller: rj.configured(),
+      effectCaller: 'configured',
     })
 
     function Wrapper({ children } : {children: any}) {

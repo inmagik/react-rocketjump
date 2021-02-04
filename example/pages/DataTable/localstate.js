@@ -12,7 +12,7 @@ export const UsersState = rj(
   }),
   {
     name: 'Evil System Users',
-    effectCaller: rj.configured(),
+    effectCaller: 'configured',
     effect: (name = '') => ajax.getJSON(`${API_URL}/users?name_like=${name}`),
   }
 )

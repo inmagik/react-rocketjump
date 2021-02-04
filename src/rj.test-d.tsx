@@ -265,16 +265,18 @@ function pluginPlainListComputedBuilder() {
   const state = obj.reducer(undefined, { type: INIT })
   const cstate = obj.computeState(state, obj.makeSelectors())
   type TEST_DATA_TYPE = any[] | null
-  const testCState : TEST_DATA_TYPE = cstate.hello
+  const testCState: TEST_DATA_TYPE = cstate.hello
   cstate.hello?.concat(23)
 }
 
 function pluginListComputedBuilder() {
   const obj = rj()
-    .plugins(rjList({
-      pageSize: 99,
-      pagination: nextPreviousPaginationAdapter,
-    }))
+    .plugins(
+      rjList({
+        pageSize: 99,
+        pagination: nextPreviousPaginationAdapter,
+      })
+    )
     .computed({
       hello: 'getList',
       pagination: 'getPagination',
@@ -286,7 +288,7 @@ function pluginListComputedBuilder() {
   const state = obj.reducer(undefined, { type: INIT })
   const cstate = obj.computeState(state, obj.makeSelectors())
   type TEST_DATA_TYPE = any[] | null
-  const testCState : TEST_DATA_TYPE = cstate.hello
+  const testCState: TEST_DATA_TYPE = cstate.hello
   cstate.hello?.concat(23)
   let ccc: number | null = cstate.pagination.count
 }
@@ -431,4 +433,18 @@ function useRunRjBasicTypesWithSelectState() {
   })
   const flagU: boolean = flag
   const dayPizzaDayIs: Date = pizzaDay
+}
+
+function effectCallerEasyString() {
+  const obj = rj({
+    effectCaller: 'configured',
+    effect: () => Promise.resolve(3),
+  })
+}
+
+function oldEffectCallerDeprecated() {
+  const obj = rj({
+    effectCaller: 'configured',
+    effect: () => Promise.resolve(3),
+  })
 }

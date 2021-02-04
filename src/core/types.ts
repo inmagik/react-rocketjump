@@ -267,6 +267,9 @@ export type EffectFn = (
   ...params: any[]
 ) => Promise<any> | Observable<any> | EffectFn
 
+/**
+ * Placeholder for configured effect caller
+ */
 export type RjConfguredCaller = typeof RJ_CONFIGURED_EFFECT_CALLER
 
 export type EffectCallerFn = (
@@ -357,11 +360,26 @@ export interface RjSideEffectConfig {
   readonly takeEffect?: TakeEffects
 
   /**
-   * Add a way to call given effect
-   * You can use it to hook into generic effect.
+   * Specify how to call current effect.
+   *
+   * **Function**
+   *
+   * You can use it to hook into a generic effect.
    *
    * ```js
-   * (effectFn, ...args) => effectFn(...args).then()
+   * (effect, ...args) => effect(...args).then()
+   * ```
+   *
+   * `'configured'`
+   *
+   * Use the effect caller function configured by the nearest `<ConfigureRj />`
+   * in the React tree.
+   * ```js
+   * <ConfigureRj
+   *   effectCaller={(fn, ...args) => fn(...args).then()}
+   * >
+   *   <App />
+   * </ConfigureRJ>
    * ```
    */
   readonly effectCaller?: RjEffectCaller

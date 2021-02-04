@@ -11,7 +11,7 @@ export const GhUserState = rj(
   }),
   {
     name: 'GitHub User',
-    effectCaller: rj.configured(),
+    effectCaller: 'configured',
     effect: (token, username) =>
       ajax.getJSON(`${API_URL}/users/${username}`, {
         Authorization: token ? `token ${token}` : undefined,

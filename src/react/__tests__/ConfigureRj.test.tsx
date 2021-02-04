@@ -14,7 +14,7 @@ describe('ConfigureRj', () => {
 
     const maRjState = rj({
       effect: mockEffect,
-      effectCaller: rj.configured(),
+      effectCaller: 'configured',
     })
 
     function Wrapper({ children }: { children: React.ReactNode }) {
@@ -46,7 +46,7 @@ describe('ConfigureRj', () => {
     })
   })
   it(
-    'should use the default effectCaller when no rj.configured() in rj config even ' +
+    "should use the default effectCaller when no 'configured' in rj config even " +
       'if the ConfigureRj effectCaller is present',
     async () => {
       const mockEffect = jest.fn().mockResolvedValue(23)
@@ -106,7 +106,7 @@ describe('ConfigureRj', () => {
       }),
       {
         effect: mockEffect,
-        effectCaller: rj.configured(),
+        effectCaller: 'configured',
       }
     )
 
@@ -137,7 +137,7 @@ describe('ConfigureRj', () => {
         effectCaller: callerA,
       }),
       rjPlugin({
-        effectCaller: rj.configured(),
+        effectCaller: 'configured',
       }),
       {
         effect: mockEffect,
@@ -168,7 +168,7 @@ describe('ConfigureRj', () => {
 
     const maRjState = rj({
       effect: mockEffect,
-      effectCaller: rj.configured(),
+      effectCaller: 'configured',
     })
 
     function Wrapper({ children }: { children: React.ReactNode }) {
@@ -211,7 +211,7 @@ describe('ConfigureRj', () => {
 
     const maRjState = rj({
       effect: mockEffect,
-      effectCaller: rj.configured(),
+      effectCaller: 'configured',
       // Delay RUN Until p is reloved use
       // _resolve() as a fake trigger to delay last action
       effectPipeline: (actionObservable) =>
