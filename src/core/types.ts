@@ -1032,7 +1032,7 @@ export type ExtractMergeObjSelectors<
   ? ConfigSelectors
   : never
 
-export type ExtracConfigActionsCreators<
+export type ExtractMegeObjActionsCreators<
   R extends RjMergeableObject
 > = R extends RjMergeableObject<any, any, any, infer ActionCreators>
   ? ActionCreators

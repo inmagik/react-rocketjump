@@ -21,7 +21,7 @@ import {
   ExtractMergeObjSelectors,
   ExtractMergeObjReducersMap,
   ExtractMergeObjReducer,
-  ExtracConfigActionsCreators,
+  ExtractMegeObjActionsCreators,
   ExtractMergeObjRootState,
   RjRunnableEffectConfig,
   RjNameConfig,
@@ -55,7 +55,7 @@ export interface RjEffectBuilder<
     >,
     ExtractMergeObjSelectors<RJ>,
     ConfigComputed,
-    ExtracConfigActionsCreators<RJ> &
+    ExtractMegeObjActionsCreators<RJ> &
       MergeMutationsActionCreators<ConfigMutations>
   >
 }
@@ -127,7 +127,7 @@ export interface RjSelectorsBuilder<
       ExtractMergeObjReducer<RJ>,
       ExtractMergeObjSelectors<RJ> & ConfigSelectors,
       ExtractMergeObjReducersMap<RJ>,
-      ExtracConfigActionsCreators<RJ>
+      ExtractMegeObjActionsCreators<RJ>
     >,
     ConfigMutations
   >
@@ -152,7 +152,7 @@ export interface RjMutationsBuilder<
     ConfigMutations extends Mutations<
       ExtractMergeObjRootState<RJ>,
       Reducer,
-      ExtracConfigActionsCreators<RJ>
+      ExtractMegeObjActionsCreators<RJ>
     >
   >(
     mutations: ConfigMutations
@@ -162,7 +162,7 @@ export interface RjMutationsBuilder<
     ConfigMutations extends Mutations<
       ExtractMergeObjRootState<RJ>,
       Reducer,
-      ExtracConfigActionsCreators<RJ>
+      ExtractMegeObjActionsCreators<RJ>
     >
   >(
     mutations: ConfigMutations
@@ -186,7 +186,7 @@ export interface RjConfBuilder<RJ extends RjMergeableObject = RjMergeableObject>
       ConfigReducer,
       ExtractMergeObjSelectors<RJ>,
       ExtractMergeObjReducersMap<RJ>,
-      ExtracConfigActionsCreators<RJ>
+      ExtractMegeObjActionsCreators<RJ>
     >
   >
 
@@ -200,7 +200,7 @@ export interface RjConfBuilder<RJ extends RjMergeableObject = RjMergeableObject>
       Reducer<ComposedState>,
       ExtractMergeObjSelectors<RJ>,
       ExtractMergeObjReducersMap<RJ>,
-      ExtracConfigActionsCreators<RJ>
+      ExtractMegeObjActionsCreators<RJ>
     >
   >
 
@@ -211,13 +211,13 @@ export interface RjConfBuilder<RJ extends RjMergeableObject = RjMergeableObject>
       ExtractMergeObjReducer<RJ>,
       ExtractMergeObjSelectors<RJ>,
       ExtractMergeObjReducersMap<RJ> & ReducersMapCombine,
-      ExtracConfigActionsCreators<RJ>
+      ExtractMegeObjActionsCreators<RJ>
     >
   >
 
   actions<ConfigActionCreators extends ActionCreators>(
     actions: ActionCreatorsEnhancer<
-      ExtracConfigActionsCreators<RJ>,
+      ExtractMegeObjActionsCreators<RJ>,
       ConfigActionCreators
     >
   ): RjConfBuilder<
@@ -225,7 +225,7 @@ export interface RjConfBuilder<RJ extends RjMergeableObject = RjMergeableObject>
       ExtractMergeObjReducer<RJ>,
       ExtractMergeObjSelectors<RJ>,
       ExtractMergeObjReducersMap<RJ>,
-      ExtracConfigActionsCreators<RJ> & ConfigActionCreators
+      ExtractMegeObjActionsCreators<RJ> & ConfigActionCreators
     >
   >
 }
