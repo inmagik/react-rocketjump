@@ -233,7 +233,7 @@ describe('List Plugin', () => {
       error: null,
       data: {
         pagination: {
-          count: 'invalidShit',
+          count: NaN,
           current: null,
           next: null,
           previous: null,
@@ -977,7 +977,7 @@ describe('List Plugin', () => {
     nextState = reducer(state, action)
 
     expect(getList(nextState)).toBe(action.payload.data.results)
-    expect(getCount(nextState)).toBe('invalidShit')
+    expect(getCount(nextState)).toBe(NaN)
     expect(hasNext(nextState)).toBe(false)
     expect(hasPrev(nextState)).toBe(false)
     expect(getNext(nextState)).toBe(null)
@@ -1260,19 +1260,20 @@ describe('List Plugin', () => {
           pagination: 'getPagination',
           list: 'getList',
           loading: 'isLoading',
-          error: 'getError'
+          error: 'getError',
         },
-        effect: () => Promise.resolve({
-          next: '/my-api?page=3',
-          previous: '/my-api?page=1',
-          count: 100,
-          results: [
-            {
-              id: '9',
-              name: 'Mallory',
-            },
-          ],
-        })
+        effect: () =>
+          Promise.resolve({
+            next: '/my-api?page=3',
+            previous: '/my-api?page=1',
+            count: 100,
+            results: [
+              {
+                id: '9',
+                name: 'Mallory',
+              },
+            ],
+          }),
       }
     )
 
@@ -1313,6 +1314,422 @@ describe('List Plugin', () => {
           name: 'Mallory',
         },
       ],
+      loading: false,
+      error: null,
+    })
+  })
+
+  it('should insert item without tears', async () => {
+    const maRjState = rj(
+      rjList({
+        pageSize: 10,
+        pagination: nextPreviousPaginationAdapter,
+      }),
+      {
+        mutations: {
+          addPeople: {
+            effect: () =>
+              Promise.resolve({
+                name: 'Gio Va',
+                id: '11',
+              }),
+            updater: 'insertItem',
+          },
+        },
+        computed: {
+          pagination: 'getPagination',
+          list: 'getList',
+          loading: 'isLoading',
+          error: 'getError',
+        },
+        effect: () =>
+          Promise.resolve({
+            next: '/my-api?page=3',
+            previous: '/my-api?page=1',
+            count: 100,
+            results: [
+              {
+                id: '9',
+                name: 'Mallory',
+              },
+            ],
+          }),
+      }
+    )
+
+    const { result } = renderHook(() => useRj(maRjState))
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: null,
+        hasNext: false,
+        hasPrev: false,
+        next: null,
+        prev: null,
+        numPages: null,
+        current: null,
+      },
+      list: null,
+      loading: false,
+      error: null,
+    })
+
+    await act(async () => {
+      result.current[1].run()
+    })
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: 100,
+        hasNext: true,
+        hasPrev: true,
+        next: { page: 3 },
+        prev: { page: 1 },
+        numPages: 10,
+        current: { page: 2 },
+      },
+      list: [
+        {
+          id: '9',
+          name: 'Mallory',
+        },
+      ],
+      loading: false,
+      error: null,
+    })
+
+    await act(async () => {
+      result.current[1].addPeople()
+    })
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: 101,
+        hasNext: true,
+        hasPrev: true,
+        next: { page: 3 },
+        prev: { page: 1 },
+        numPages: 11,
+        current: { page: 2 },
+      },
+      list: [
+        {
+          id: '9',
+          name: 'Mallory',
+        },
+        {
+          id: '11',
+          name: 'Gio Va',
+        },
+      ],
+      loading: false,
+      error: null,
+    })
+  })
+
+  it("should don't touch pagination in insert when specified", async () => {
+    const maRjState = rj(
+      rjList({
+        pageSize: 10,
+        pagination: nextPreviousPaginationAdapter,
+        insertItemTouchPagination: false,
+      }),
+      {
+        mutations: {
+          addPeople: {
+            effect: () =>
+              Promise.resolve({
+                name: 'Gio Va',
+                id: '11',
+              }),
+            updater: 'insertItem',
+          },
+        },
+        computed: {
+          pagination: 'getPagination',
+          list: 'getList',
+          loading: 'isLoading',
+          error: 'getError',
+        },
+        effect: () =>
+          Promise.resolve({
+            next: '/my-api?page=3',
+            previous: '/my-api?page=1',
+            count: 100,
+            results: [
+              {
+                id: '9',
+                name: 'Mallory',
+              },
+            ],
+          }),
+      }
+    )
+
+    const { result } = renderHook(() => useRj(maRjState))
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: null,
+        hasNext: false,
+        hasPrev: false,
+        next: null,
+        prev: null,
+        numPages: null,
+        current: null,
+      },
+      list: null,
+      loading: false,
+      error: null,
+    })
+
+    await act(async () => {
+      result.current[1].run()
+    })
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: 100,
+        hasNext: true,
+        hasPrev: true,
+        next: { page: 3 },
+        prev: { page: 1 },
+        numPages: 10,
+        current: { page: 2 },
+      },
+      list: [
+        {
+          id: '9',
+          name: 'Mallory',
+        },
+      ],
+      loading: false,
+      error: null,
+    })
+
+    await act(async () => {
+      result.current[1].addPeople()
+    })
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: 100,
+        hasNext: true,
+        hasPrev: true,
+        next: { page: 3 },
+        prev: { page: 1 },
+        numPages: 10,
+        current: { page: 2 },
+      },
+      list: [
+        {
+          id: '9',
+          name: 'Mallory',
+        },
+        {
+          id: '11',
+          name: 'Gio Va',
+        },
+      ],
+      loading: false,
+      error: null,
+    })
+  })
+
+  it('should remove item without tears', async () => {
+    const maRjState = rj(
+      rjList({
+        pageSize: 10,
+        pagination: nextPreviousPaginationAdapter,
+      }),
+      {
+        mutations: {
+          rmPeople: {
+            effect: () =>
+              Promise.resolve({
+                name: 'Gio Va',
+                id: '9',
+              }),
+            updater: 'deleteItem',
+          },
+        },
+        computed: {
+          pagination: 'getPagination',
+          list: 'getList',
+          loading: 'isLoading',
+          error: 'getError',
+        },
+        effect: () =>
+          Promise.resolve({
+            next: '/my-api?page=3',
+            previous: '/my-api?page=1',
+            count: 100,
+            results: [
+              {
+                id: '9',
+                name: 'Mallory',
+              },
+            ],
+          }),
+      }
+    )
+
+    const { result } = renderHook(() => useRj(maRjState))
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: null,
+        hasNext: false,
+        hasPrev: false,
+        next: null,
+        prev: null,
+        numPages: null,
+        current: null,
+      },
+      list: null,
+      loading: false,
+      error: null,
+    })
+
+    await act(async () => {
+      result.current[1].run()
+    })
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: 100,
+        hasNext: true,
+        hasPrev: true,
+        next: { page: 3 },
+        prev: { page: 1 },
+        numPages: 10,
+        current: { page: 2 },
+      },
+      list: [
+        {
+          id: '9',
+          name: 'Mallory',
+        },
+      ],
+      loading: false,
+      error: null,
+    })
+
+    await act(async () => {
+      result.current[1].rmPeople()
+    })
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: 99,
+        hasNext: true,
+        hasPrev: true,
+        next: { page: 3 },
+        prev: { page: 1 },
+        numPages: 10,
+        current: { page: 2 },
+      },
+      list: [],
+      loading: false,
+      error: null,
+    })
+  })
+
+  it("should don't touch pagination in removeItem when specified", async () => {
+    const maRjState = rj(
+      rjList({
+        pageSize: 10,
+        pagination: nextPreviousPaginationAdapter,
+        deleteItemTouchPagination: false,
+      }),
+      {
+        mutations: {
+          rmPeople: {
+            effect: () =>
+              Promise.resolve({
+                name: 'Gio Va',
+                id: '9',
+              }),
+            updater: 'deleteItem',
+          },
+        },
+        computed: {
+          pagination: 'getPagination',
+          list: 'getList',
+          loading: 'isLoading',
+          error: 'getError',
+        },
+        effect: () =>
+          Promise.resolve({
+            next: '/my-api?page=3',
+            previous: '/my-api?page=1',
+            count: 100,
+            results: [
+              {
+                id: '9',
+                name: 'Mallory',
+              },
+            ],
+          }),
+      }
+    )
+
+    const { result } = renderHook(() => useRj(maRjState))
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: null,
+        hasNext: false,
+        hasPrev: false,
+        next: null,
+        prev: null,
+        numPages: null,
+        current: null,
+      },
+      list: null,
+      loading: false,
+      error: null,
+    })
+
+    await act(async () => {
+      result.current[1].run()
+    })
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: 100,
+        hasNext: true,
+        hasPrev: true,
+        next: { page: 3 },
+        prev: { page: 1 },
+        numPages: 10,
+        current: { page: 2 },
+      },
+      list: [
+        {
+          id: '9',
+          name: 'Mallory',
+        },
+      ],
+      loading: false,
+      error: null,
+    })
+
+    await act(async () => {
+      result.current[1].rmPeople()
+    })
+
+    expect(result.current[0]).toEqual({
+      pagination: {
+        count: 100,
+        hasNext: true,
+        hasPrev: true,
+        next: { page: 3 },
+        prev: { page: 1 },
+        numPages: 10,
+        current: { page: 2 },
+      },
+      list: [],
       loading: false,
       error: null,
     })

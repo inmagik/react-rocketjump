@@ -3,7 +3,7 @@ import { get } from '../../core/utils'
 import { set } from 'object-path-immutable'
 import { Action } from '../../core/types'
 
-const TYPE = 'RJ_LIST_UPDATE'
+export const TYPE = 'RJ_LIST_UPDATE'
 
 const defaultIdentity = (action: Action, listItem: any) =>
   action.item.id === listItem.id

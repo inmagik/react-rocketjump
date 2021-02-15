@@ -1,6 +1,8 @@
 import { rjPlugin, SUCCESS } from '../../index'
 import { get, getOrSelect } from '../../core/utils'
-import rjListInsert from '../listInsert/index'
+import rjListInsert, { TYPE as INSERT_TYPE } from '../listInsert/index'
+import rjListUpdate from '../listUpdate/index'
+import rjListDelete, { TYPE as DELETE_TYPE } from '../listDelete/index'
 import { PaginationAdapter } from './pagination'
 import {
   RjStateRootShape,
@@ -11,8 +13,6 @@ import {
   RjPlugin,
   MakeRjPlugin,
 } from '../../core/types'
-import rjListUpdate from '../listUpdate/index'
-import rjListDelete from '../listDelete/index'
 
 type ListReducer<L extends any[] = any[]> = Reducer<L>
 
@@ -81,7 +81,7 @@ function makeListDataReducer(
     prevState,
     { payload: { data, params } }
   ) => ({
-    count: getOrSelect(data, paginationAdapter.count),
+    count: +getOrSelect(data, paginationAdapter.count),
     current: getOrSelect(data, paginationAdapter.current),
     next: getOrSelect(data, paginationAdapter.next),
     previous: getOrSelect(data, paginationAdapter.previous),
@@ -248,6 +248,8 @@ interface RjPluginListConfig<
   pageSize?: number
   customListReducer?: LR
   customPaginationReducer?: PR
+  insertItemTouchPagination?: boolean
+  deleteItemTouchPagination?: boolean
 }
 
 // RJ List
@@ -277,9 +279,9 @@ function rjList(
     config.customPaginationReducer
   )
   return rjPlugin(
-    rjListInsert({ path: 'data.list' }),
+    rjListInsert({ path: 'data.list', warnPagination: false }),
     rjListUpdate({ path: 'data.list' }),
-    rjListDelete({ path: 'data.list' }),
+    rjListDelete({ path: 'data.list', warnPagination: false }),
     {
       selectors: ({ getData }) =>
         makeListSelectors(getData as ListGetData, config.pageSize),
@@ -293,6 +295,44 @@ function rjList(
             pending: false,
             data: dataReducer((state as RootListStateShape).data, action),
           } as RootListStateShape
+        } else if (
+          action.type === INSERT_TYPE &&
+          config.insertItemTouchPagination !== false
+        ) {
+          const nextState = oldReducer(state, action) as RootListStateShape
+          const count = nextState.data?.pagination?.count
+          if (typeof count === 'number' && !isNaN(count)) {
+            return {
+              ...nextState,
+              data: {
+                ...nextState.data,
+                pagination: {
+                  ...nextState.data?.pagination,
+                  count: count + 1,
+                },
+              },
+            } as RootListStateShape
+          }
+          return nextState
+        } else if (
+          action.type === DELETE_TYPE &&
+          config.deleteItemTouchPagination !== false
+        ) {
+          const nextState = oldReducer(state, action) as RootListStateShape
+          const count = nextState.data?.pagination?.count
+          if (typeof count === 'number' && !isNaN(count)) {
+            return {
+              ...nextState,
+              data: {
+                ...nextState.data,
+                pagination: {
+                  ...nextState.data?.pagination,
+                  count: count - 1,
+                },
+              },
+            } as RootListStateShape
+          }
+          return nextState
         } else {
           return oldReducer(state, action)
         }
