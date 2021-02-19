@@ -804,11 +804,14 @@ export type ExtraPluginsAndReducerState<
 export type AllRjCurriedState<
   Plugins extends RjPlugin[],
   ReducersMapCombine extends ReducersMap,
-  ConfigReducer extends Reducer | undefined
+  ConfigReducer extends Reducer | undefined,
+  ComposedState = unknown
 > = MakeCombinedState<
   MergeReducersMap<MergePluginsCombineReducers<Plugins>, ReducersMapCombine>
 > & {
-  root: ExtraPluginsAndReducerState<Plugins, ConfigReducer>
+  root: unknown extends ComposedState
+    ? ExtraPluginsAndReducerState<Plugins, ConfigReducer>
+    : ComposedState
 }
 
 type ExtractCombinedState<S> = S extends ReducersMap<infer U> ? U : unknown

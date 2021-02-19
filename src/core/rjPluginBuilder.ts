@@ -19,6 +19,8 @@ import {
   RjBaseSelectors,
   MergePluginsSelectors,
   SelectorsEnhancer,
+  ComposableReducer,
+  ExtraPluginsAndReducerState,
 } from './types'
 
 type ExtractConfigReducer<
@@ -42,6 +44,10 @@ type ExtractConfigActionCreators<
 > = Config extends RjBaseConfig<any, any, any, any, any, any, infer H>
   ? H
   : never
+
+type ExtractConfigComposedState<
+  Config extends RjBaseConfig
+> = ExtractConfigComposeReducer<Config> extends Reducer<infer S> ? S : unknown
 
 interface RjPluginBuilder<
   PluginConfig extends RjBaseConfig = RjBaseConfig,
@@ -69,6 +75,25 @@ interface RjPluginBuilder<
     Plugins
   >
 
+  composeReducer<ComposedState>(
+    combineReducers: ComposableReducer<
+      ExtraPluginsAndReducerState<Plugins, ExtractConfigReducer<PluginConfig>>,
+      ComposedState
+    >
+  ): RjPluginBuilder<
+    RjBaseConfig<
+      Reducer,
+      ExtractConfigReducer<PluginConfig>,
+      RjBaseSelectors,
+      ExtractConfigSelectors<PluginConfig>,
+      ExtractConfigReducersMap<PluginConfig>,
+      Reducer<ComposedState>,
+      RjBaseActionCreators,
+      ExtractConfigActionCreators<PluginConfig>
+    >,
+    Plugins
+  >
+
   combineReducers<ReducersMapCombine extends ReducersMap>(
     combineReducers: ReducersMapCombine
   ): RjPluginBuilder<
@@ -90,7 +115,8 @@ interface RjPluginBuilder<
       AllRjCurriedState<
         Plugins,
         ExtractConfigReducersMap<PluginConfig>,
-        ExtractConfigReducer<PluginConfig>
+        ExtractConfigReducer<PluginConfig>,
+        ExtractConfigComposedState<PluginConfig>
       >
     >
   >(
@@ -116,7 +142,8 @@ interface RjPluginBuilder<
     Plugins,
     ExtractConfigReducer<PluginConfig>,
     ExtractConfigSelectors<PluginConfig>,
-    ExtractConfigReducersMap<PluginConfig>
+    ExtractConfigReducersMap<PluginConfig>,
+    ExtractConfigComposedState<PluginConfig>
   >
 }
 
@@ -177,13 +204,18 @@ const p2 = rjPlugin({
 const xyz = rjPluginBuilder()
   .plugins(p1, p2)
   .reducer((r) => () => new Date())
+  // .composeReducer((state) => {
+  //   return 23
+  // })
   .combineReducers({
     albi: () => ({ name: 'Albi' }),
   })
   // xyz.combineReducers
   .selectors((se) => ({
     draghi: (state) => state.fumello.blink(),
-    bu: (state) => state.root.getHours(),
+    bu: (state) => {
+      state.root.getFullYear()
+    },
     xx23: (state) => state.gang.getMinutes(),
   }))
   .build()
@@ -218,8 +250,9 @@ const { reducer } = rj()
 // .effect(() => Promise.resolve(23))
 
 const state = reducer(undefined, { type: 'X' })
-state.albi.
-state.gang.getFullYear()
+state.root
+// state.root.
+// state.albi.state.gang.getFullYear()
 
 // // state.
 // // state.root.sort()
