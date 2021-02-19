@@ -69,6 +69,22 @@ interface RjPluginBuilder<
     Plugins
   >
 
+  combineReducers<ReducersMapCombine extends ReducersMap>(
+    combineReducers: ReducersMapCombine
+  ): RjPluginBuilder<
+    RjBaseConfig<
+      Reducer,
+      ExtractConfigReducer<PluginConfig>,
+      RjBaseSelectors,
+      ExtractConfigSelectors<PluginConfig>,
+      ReducersMapCombine,
+      ExtractConfigComposeReducer<PluginConfig>,
+      RjBaseActionCreators,
+      ExtractConfigActionCreators<PluginConfig>
+    >,
+    Plugins
+  >
+
   selectors<
     PluginSelectors extends Selectors<
       AllRjCurriedState<
@@ -99,7 +115,8 @@ interface RjPluginBuilder<
   build(): MakeRjPlugin<
     Plugins,
     ExtractConfigReducer<PluginConfig>,
-    ExtractConfigSelectors<PluginConfig>
+    ExtractConfigSelectors<PluginConfig>,
+    ExtractConfigReducersMap<PluginConfig>
   >
 }
 
@@ -148,9 +165,22 @@ const p2 = rjPlugin({
   // },
 })
 
+// const p26 = rjPlugin(
+//   p2,
+//   {
+//     reducer: r => {
+
+//     }
+//   }
+// )
+
 const xyz = rjPluginBuilder()
-  .reducer((r) => () => new Date())
   .plugins(p1, p2)
+  .reducer((r) => () => new Date())
+  .combineReducers({
+    albi: () => ({ name: 'Albi' }),
+  })
+  // xyz.combineReducers
   .selectors((se) => ({
     draghi: (state) => state.fumello.blink(),
     bu: (state) => state.root.getHours(),
@@ -188,6 +218,7 @@ const { reducer } = rj()
 // .effect(() => Promise.resolve(23))
 
 const state = reducer(undefined, { type: 'X' })
+state.albi.
 state.gang.getFullYear()
 
 // // state.
