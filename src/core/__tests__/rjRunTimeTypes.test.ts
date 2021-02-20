@@ -36,7 +36,10 @@ describe('Rj Run Time Types', () => {
         reducer: () => 99,
       })
     ).toBe(false)
-    expect(isPluginRj(rjPlugin())).toBe(true)
+    expect(isPluginRj(rjPlugin().build())).toBe(true)
+    expect(isPluginRj(rjPlugin({
+      takeEffect: 'every',
+    }))).toBe(true)
     expect(
       isPluginRj(
         rj({
