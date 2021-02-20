@@ -153,9 +153,28 @@ export function finalizeRjObject(
     ) ?? configRootReducer
 
   // Rj Reducers with others map and mutations map + other future vendors maps
+
+  if (process.env.NODE_ENV !== 'production') {
+    if (combineReducersMap.root) {
+      console.warn(
+        `[react-rocketjump] You try to override the [root] key that is a reserverd key ` +
+          'please use reducer or composeReducer config option to override root reducer.'
+      )
+    }
+    Object.keys(withMutations?.reducersToCombine ?? {}).forEach(
+      (mutationKey) => {
+        if (combineReducersMap[mutationKey]) {
+          console.warn(
+            `[react-rocketjump] You try to override a mutation reserved key [${mutationKey}] ` +
+              'this has no effect.'
+          )
+        }
+      }
+    )
+  }
+
   const rjReducer = combineReducers({
     ...combineReducersMap,
-    // TODO: Warn about overrided keys in DEV
     ...withMutations?.reducersToCombine,
     root: rjRootReducer,
   })

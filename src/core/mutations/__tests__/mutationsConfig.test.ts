@@ -1,10 +1,11 @@
+import { INIT } from '../../actions/actionTypes'
 import rj from '../../rj'
 
 const ORIGINAL_ENV = { ...process.env }
 
 beforeEach(() => {
   jest.resetModules()
-  process.env = ORIGINAL_ENV
+  process.env = { ...ORIGINAL_ENV }
 })
 
 describe('RJ mutations config', () => {
@@ -206,5 +207,60 @@ describe('RJ mutations config', () => {
         effect: () => Promise.resolve(1312),
       })
     }).toThrowError('[react-rocketjump] @mutations error.')
+  })
+
+  it('should warn when try to override mutations key', () => {
+    const spy = jest.fn()
+
+    console.warn = spy
+
+    const obj = rj({
+      mutations: {
+        kill: {
+          effect: () => Promise.reject(),
+          updater: (s) => s,
+          reducer: () => 99,
+        },
+      },
+      combineReducers: {
+        mutations: () => 'hack',
+      },
+      effect: () => Promise.resolve(23),
+    })
+
+    const state = obj.reducer(undefined, { type: INIT })
+    expect(state.root).not.toBe('hack')
+
+    expect(spy.mock.calls[0][0]).toMatch(
+      /\[react-rocketjump\] ([a-z ]*) \[mutations\]/i
+    )
+  })
+
+  it('should warn when try to override optimisticMutations key', () => {
+    const spy = jest.fn()
+
+    console.warn = spy
+
+    const obj = rj({
+      mutations: {
+        kill: {
+          effect: () => Promise.reject(),
+          updater: (s) => s,
+          optimisticResult: (a) => a,
+          reducer: () => 99,
+        },
+      },
+      combineReducers: {
+        optimisticMutations: () => 'hack',
+      },
+      effect: () => Promise.resolve(23),
+    })
+
+    const state = obj.reducer(undefined, { type: INIT })
+    expect(state.root).not.toBe('hack')
+
+    expect(spy.mock.calls[0][0]).toMatch(
+      /\[react-rocketjump\] ([a-z ]*) \[optimisticMutations\]/i
+    )
   })
 })

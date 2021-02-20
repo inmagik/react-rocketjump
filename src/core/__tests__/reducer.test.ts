@@ -381,4 +381,24 @@ describe('Rocketjump reducer', () => {
       babu: 'babu',
     })
   })
+
+  it('should warn when try to override root key', () => {
+    const spy = jest.fn()
+
+    console.warn = spy
+
+    const obj = rj({
+      combineReducers: {
+        root: () => 'hack',
+      },
+      effect: () => Promise.resolve(23),
+    })
+
+    const state = obj.reducer(undefined, { type: INIT })
+    expect(state.root).not.toBe('hack')
+
+    expect(spy.mock.calls[0][0]).toMatch(
+      /\[react-rocketjump\] ([a-z ]*) \[root\]/i
+    )
+  })
 })
