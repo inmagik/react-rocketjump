@@ -23,6 +23,7 @@ import {
   ExtraPluginsAndReducerState,
   ActionCreatorsEnhancer,
   MergePluginsActionCreators,
+  RjSideEffectConfig,
 } from './types'
 
 type ExtractConfigReducer<
@@ -51,19 +52,80 @@ type ExtractConfigComposedState<
   Config extends RjBaseConfig
 > = ExtractConfigComposeReducer<Config> extends Reducer<infer S> ? S : unknown
 
-interface RjPluginBuilder<
+interface RjPluginEndBuilder<
   PluginConfig extends RjBaseConfig = RjBaseConfig,
   Plugins extends RjPlugin[] = RjPlugin[]
 > {
-  plugins<Plugins extends RjPlugin[]>(
-    ...plugins: Plugins
-  ): RjPluginBuilder<PluginConfig, Plugins>
+  build(): MakeRjPlugin<
+    Plugins,
+    ExtractConfigReducer<PluginConfig>,
+    ExtractConfigSelectors<PluginConfig>,
+    ExtractConfigReducersMap<PluginConfig>,
+    ExtractConfigComposedState<PluginConfig>,
+    ExtractConfigActionCreators<PluginConfig>
+  >
+}
 
-  plugins(...plugins: RjPlugin[]): RjPluginBuilder
+interface RjPluginEffectConfigBuilder<
+  PluginConfig extends RjBaseConfig = RjBaseConfig,
+  Plugins extends RjPlugin[] = RjPlugin[]
+> extends RjPluginEndBuilder<PluginConfig, Plugins> {
+  effect(
+    effectConfig: RjSideEffectConfig
+  ): RjPluginEndBuilder<
+    RjBaseConfig<
+      Reducer,
+      ExtractConfigReducer<PluginConfig>,
+      RjBaseSelectors,
+      ExtractConfigSelectors<PluginConfig>,
+      ExtractConfigReducersMap<PluginConfig>,
+      ExtractConfigComposeReducer<PluginConfig>,
+      RjBaseActionCreators,
+      ExtractConfigActionCreators<PluginConfig>
+    >,
+    Plugins
+  >
+}
+interface RjPluginSelectorsConfigBuilder<
+  PluginConfig extends RjBaseConfig = RjBaseConfig,
+  Plugins extends RjPlugin[] = RjPlugin[]
+> extends RjPluginEffectConfigBuilder<PluginConfig, Plugins> {
+  selectors<
+    PluginSelectors extends Selectors<
+      AllRjCurriedState<
+        Plugins,
+        ExtractConfigReducersMap<PluginConfig>,
+        ExtractConfigReducer<PluginConfig>,
+        ExtractConfigComposedState<PluginConfig>
+      >
+    >
+  >(
+    selectors: SelectorsEnhancer<
+      RjBaseSelectors & MergePluginsSelectors<Plugins>,
+      PluginSelectors
+    >
+  ): RjPluginEffectConfigBuilder<
+    RjBaseConfig<
+      Reducer,
+      ExtractConfigReducer<PluginConfig>,
+      RjBaseSelectors,
+      PluginSelectors,
+      ExtractConfigReducersMap<PluginConfig>,
+      ExtractConfigComposeReducer<PluginConfig>,
+      RjBaseActionCreators,
+      ExtractConfigActionCreators<PluginConfig>
+    >,
+    Plugins
+  >
+}
 
+interface RjPluginReducerActionsConfigBuilder<
+  PluginConfig extends RjBaseConfig = RjBaseConfig,
+  Plugins extends RjPlugin[] = RjPlugin[]
+> extends RjPluginSelectorsConfigBuilder<PluginConfig, Plugins> {
   reducer<PluginReducer extends Reducer>(
     reducer: ReducerEnhancer<MergePluginsReducers<Plugins>, PluginReducer>
-  ): RjPluginBuilder<
+  ): RjPluginReducerActionsConfigBuilder<
     RjBaseConfig<
       Reducer,
       PluginReducer,
@@ -82,7 +144,7 @@ interface RjPluginBuilder<
       ExtraPluginsAndReducerState<Plugins, ExtractConfigReducer<PluginConfig>>,
       ComposedState
     >
-  ): RjPluginBuilder<
+  ): RjPluginReducerActionsConfigBuilder<
     RjBaseConfig<
       Reducer,
       ExtractConfigReducer<PluginConfig>,
@@ -98,7 +160,7 @@ interface RjPluginBuilder<
 
   combineReducers<ReducersMapCombine extends ReducersMap>(
     combineReducers: ReducersMapCombine
-  ): RjPluginBuilder<
+  ): RjPluginReducerActionsConfigBuilder<
     RjBaseConfig<
       Reducer,
       ExtractConfigReducer<PluginConfig>,
@@ -112,40 +174,12 @@ interface RjPluginBuilder<
     Plugins
   >
 
-  selectors<
-    PluginSelectors extends Selectors<
-      AllRjCurriedState<
-        Plugins,
-        ExtractConfigReducersMap<PluginConfig>,
-        ExtractConfigReducer<PluginConfig>,
-        ExtractConfigComposedState<PluginConfig>
-      >
-    >
-  >(
-    selectors: SelectorsEnhancer<
-      RjBaseSelectors & MergePluginsSelectors<Plugins>,
-      PluginSelectors
-    >
-  ): RjPluginBuilder<
-    RjBaseConfig<
-      Reducer,
-      ExtractConfigReducer<PluginConfig>,
-      RjBaseSelectors,
-      PluginSelectors,
-      ExtractConfigReducersMap<PluginConfig>,
-      ExtractConfigComposeReducer<PluginConfig>,
-      RjBaseActionCreators,
-      ExtractConfigActionCreators<PluginConfig>
-    >,
-    Plugins
-  >
-
   actions<PluginActionCreators extends ActionCreators>(
     actions: ActionCreatorsEnhancer<
       RjBaseActionCreators & MergePluginsActionCreators<Plugins>,
       PluginActionCreators
     >
-  ): RjPluginBuilder<
+  ): RjPluginReducerActionsConfigBuilder<
     RjBaseConfig<
       Reducer,
       ExtractConfigReducer<PluginConfig>,
@@ -158,16 +192,37 @@ interface RjPluginBuilder<
     >,
     Plugins
   >
-
-  build(): MakeRjPlugin<
-    Plugins,
-    ExtractConfigReducer<PluginConfig>,
-    ExtractConfigSelectors<PluginConfig>,
-    ExtractConfigReducersMap<PluginConfig>,
-    ExtractConfigComposedState<PluginConfig>,
-    ExtractConfigActionCreators<PluginConfig>
-  >
 }
+
+interface RjPluginBuilder<
+  PluginConfig extends RjBaseConfig = RjBaseConfig,
+  Plugins extends RjPlugin[] = RjPlugin[]
+> extends RjPluginReducerActionsConfigBuilder<PluginConfig, Plugins> {
+  plugins<Plugins extends RjPlugin[]>(
+    ...plugins: Plugins
+  ): RjPluginReducerActionsConfigBuilder<PluginConfig, Plugins>
+
+  plugins(...plugins: RjPlugin[]): RjPluginReducerActionsConfigBuilder
+}
+
+function rjPluginBuilder(): RjPluginBuilder<{}, []> {
+  throw new Error()
+}
+
+// rjPluginBuilder()
+//   // .reducer((r) => () => 99)
+//   // .composeReducer(state => state.)
+//   .combineReducers({
+//     drago: () => [{ at: new Date() }],
+//   })
+//   .selectors((s) => ({}))
+//   .effect({})
+//   .build()
+
+// .effect({})
+// .build()
+
+// .plugins()
 
 // function rjConfgiPluginBuilder(
 //   config: RjBaseConfig,
@@ -190,12 +245,12 @@ interface RjPluginBuilder<
 //   }
 // }
 
-function rjPluginBuilder(): RjPluginBuilder<{}, []> {
-  throw new Error()
-  // const config: RjBaseConfig = {}
-  // const plugins: RjPlugin[] = []
-  // return rjConfgiPluginBuilder(config, plugins)
-}
+// function rjPluginBuilder(): RjPluginBuilder<{}, []> {
+//   throw new Error()
+//   // const config: RjBaseConfig = {}
+//   // const plugins: RjPlugin[] = []
+//   // return rjConfgiPluginBuilder(config, plugins)
+// }
 
 const p1 = rjPlugin({
   actions: () => ({
@@ -232,6 +287,9 @@ const p2 = rjPlugin({
 const xyz = rjPluginBuilder()
   .plugins(p1, p2)
   .reducer((r) => () => new Date())
+  .effect({
+    takeEffect: 'latest',
+  })
 
   .actions((a) => ({
     x: () => ({ type: 'Bugu' }),
@@ -275,9 +333,10 @@ const { reducer, actionCreators } = rj()
   //   // bu: (state) => state.root.getHours(),
   //   // xx23: (state) => state.gang.getMinutes(),
   // }))
-  .computed({
-    dho: 'draghi2',
-  })
+  // .computed({
+  //   dho: 'draghi2',
+  // })
+  .actions((a) => ({}))
   .effect({
     effectCaller: 'configured',
     effect: () => Promise.resolve(99),
@@ -285,6 +344,7 @@ const { reducer, actionCreators } = rj()
 // .effect(() => Promise.resolve(23))
 
 const state = reducer(undefined, { type: 'X' })
+// state.root.
 // state.
 // actionCreators.x().type
 // state.root.
