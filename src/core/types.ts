@@ -255,7 +255,7 @@ export type RjBaseActionCreators = {
 export type ActionCreatorsEnhancer<
   InputActionCreators extends RjBaseActionCreators = RjBaseActionCreators,
   OutputActionCreators extends ActionCreators = ActionCreators
-> = (selectors: InputActionCreators) => OutputActionCreators
+> = (actions: InputActionCreators) => OutputActionCreators
 
 // Computed
 export type Computed<RjSelectors = any, S = any> = {

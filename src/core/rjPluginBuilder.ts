@@ -21,6 +21,8 @@ import {
   SelectorsEnhancer,
   ComposableReducer,
   ExtraPluginsAndReducerState,
+  ActionCreatorsEnhancer,
+  MergePluginsActionCreators,
 } from './types'
 
 type ExtractConfigReducer<
@@ -41,7 +43,7 @@ type ExtractConfigComposeReducer<
 
 type ExtractConfigActionCreators<
   Config extends RjBaseConfig
-> = Config extends RjBaseConfig<any, any, any, any, any, any, infer H>
+> = Config extends RjBaseConfig<any, any, any, any, any, any, any, infer H>
   ? H
   : never
 
@@ -138,12 +140,32 @@ interface RjPluginBuilder<
     Plugins
   >
 
+  actions<PluginActionCreators extends ActionCreators>(
+    actions: ActionCreatorsEnhancer<
+      RjBaseActionCreators & MergePluginsActionCreators<Plugins>,
+      PluginActionCreators
+    >
+  ): RjPluginBuilder<
+    RjBaseConfig<
+      Reducer,
+      ExtractConfigReducer<PluginConfig>,
+      RjBaseSelectors,
+      ExtractConfigSelectors<PluginConfig>,
+      ExtractConfigReducersMap<PluginConfig>,
+      ExtractConfigComposeReducer<PluginConfig>,
+      RjBaseActionCreators,
+      PluginActionCreators
+    >,
+    Plugins
+  >
+
   build(): MakeRjPlugin<
     Plugins,
     ExtractConfigReducer<PluginConfig>,
     ExtractConfigSelectors<PluginConfig>,
     ExtractConfigReducersMap<PluginConfig>,
-    ExtractConfigComposedState<PluginConfig>
+    ExtractConfigComposedState<PluginConfig>,
+    ExtractConfigActionCreators<PluginConfig>
   >
 }
 
@@ -176,6 +198,9 @@ function rjPluginBuilder(): RjPluginBuilder<{}, []> {
 }
 
 const p1 = rjPlugin({
+  actions: () => ({
+    dollar: () => ({ type: '$' }),
+  }),
   reducer: (r) => () => 99,
   combineReducers: {
     gang: () => new Date(),
@@ -184,6 +209,9 @@ const p1 = rjPlugin({
 
 const p2 = rjPlugin({
   reducer: (r) => () => ['X'],
+  // actions: (a) => ({
+  //   dollar: () => ({ type: '$' })
+  // }),
   combineReducers: {
     fumello: () => 'BASELINE',
   },
@@ -204,22 +232,29 @@ const p2 = rjPlugin({
 const xyz = rjPluginBuilder()
   .plugins(p1, p2)
   .reducer((r) => () => new Date())
+
+  .actions((a) => ({
+    x: () => ({ type: 'Bugu' }),
+  }))
   // .composeReducer((state) => {
   //   return 23
   // })
-  .combineReducers({
-    albi: () => ({ name: 'Albi' }),
-  })
-  // xyz.combineReducers
-  .selectors((se) => ({
-    draghi: (state) => state.fumello.blink(),
-    bu: (state) => {
-      state.root.getFullYear()
-    },
-    xx23: (state) => state.gang.getMinutes(),
-  }))
+  // .combineReducers({
+  //   albi: () => ({ name: 'Albi' }),
+  // })
+  // // xyz.combineReducers
+  // .selectors((se) => ({
+  //   draghi: (state) => state.fumello.blink(),
+  //   bu: (state) => {
+  //     state.root.getFullYear()
+  //   },
+  //   xx23: (state) => state.gang.getMinutes(),
+  // }))
   .build()
 
+// xyz.actions(null)
+
+// xyz
 // declare function babu<C extends RjBaseConfig>(c: C): RjPluginBuilder<C>
 
 // let c = babu2().plugin()
@@ -233,13 +268,13 @@ const xyz = rjPluginBuilder()
 //   reducer: (r) => (state: number | undefined, action) => 22,
 // })
 
-const { reducer } = rj()
+const { reducer, actionCreators } = rj()
   .plugins(xyz)
-  .selectors((se) => ({
-    draghi2: (state) => se.draghi(state),
-    // bu: (state) => state.root.getHours(),
-    // xx23: (state) => state.gang.getMinutes(),
-  }))
+  // .selectors((se) => ({
+  //   draghi2: (state) => se.draghi(state),
+  //   // bu: (state) => state.root.getHours(),
+  //   // xx23: (state) => state.gang.getMinutes(),
+  // }))
   .computed({
     dho: 'draghi2',
   })
@@ -250,7 +285,8 @@ const { reducer } = rj()
 // .effect(() => Promise.resolve(23))
 
 const state = reducer(undefined, { type: 'X' })
-state.root
+// state.
+// actionCreators.x().type
 // state.root.
 // state.albi.state.gang.getFullYear()
 
