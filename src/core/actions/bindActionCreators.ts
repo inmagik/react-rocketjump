@@ -212,7 +212,9 @@ class Builder {
         this.dispatch(action)
       } else {
         this.dispatch(action)
-        resolve()
+        // NOTE: Non effect action has no sense to be called asPromise
+        // undefined here is to let TS quiete
+        resolve(undefined)
       }
     })
   }

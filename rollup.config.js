@@ -35,6 +35,7 @@ export default ['esm', 'cjs'].map((format) => ({
     {
       dir: 'lib',
       entryFileNames: '[name].[format].js',
+      chunkFileNames: '[name].[format].js',
       exports: 'named',
       format,
     },
@@ -51,6 +52,9 @@ export default ['esm', 'cjs'].map((format) => ({
           '@babel/plugin-transform-runtime',
           {
             useESModules: format === 'esm',
+            // NOTE: Sometimes js world is a pain
+            // see: https://github.com/babel/babel/issues/10261
+            version: pkg['dependencies']['@babel/runtime'],
           },
         ],
       ],
