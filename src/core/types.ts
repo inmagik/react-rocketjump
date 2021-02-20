@@ -1072,3 +1072,31 @@ export type ExtractRjObjectSelectors<O extends RjObject> = O extends RjObject<
 >
   ? SE
   : never
+
+// Extract x Plugin Builder from RjBaseConfig
+
+export type ExtractConfigReducer<
+  Config extends RjBaseConfig
+> = Config extends RjBaseConfig<any, infer H> ? H : never
+
+export type ExtractConfigSelectors<
+  Config extends RjBaseConfig
+> = Config extends RjBaseConfig<any, any, any, infer H> ? H : never
+
+export type ExtractConfigReducersMap<
+  Config extends RjBaseConfig
+> = Config extends RjBaseConfig<any, any, any, any, infer H> ? H : never
+
+export type ExtractConfigComposeReducer<
+  Config extends RjBaseConfig
+> = Config extends RjBaseConfig<any, any, any, any, any, infer H> ? H : never
+
+export type ExtractConfigActionCreators<
+  Config extends RjBaseConfig
+> = Config extends RjBaseConfig<any, any, any, any, any, any, any, infer H>
+  ? H
+  : never
+
+export type ExtractConfigComposedState<
+  Config extends RjBaseConfig
+> = ExtractConfigComposeReducer<Config> extends Reducer<infer S> ? S : unknown

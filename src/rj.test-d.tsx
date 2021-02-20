@@ -444,7 +444,69 @@ function effectCallerEasyString() {
 
 function oldEffectCallerDeprecated() {
   const obj = rj({
-    effectCaller: 'configured',
+    effectCaller: rj.configured(),
     effect: () => Promise.resolve(3),
   })
+}
+
+function rjPluginBuilderRootRedcuer() {
+  const p = rjPlugin()
+    .reducer(() => () => new Date())
+    .build()
+
+  const obj = rj().plugins(p).effect(() => Promise.reject())
+
+  let date: Date
+  date = obj.reducer(undefined, { type: INIT }).root
+}
+
+function rjPluginBuilderRootRedcuerWithOldReducer() {
+  const p1 = rjPlugin()
+    .reducer(() => (state: number | undefined, action) => 99)
+    .build()
+
+  const p = rjPlugin()
+    .plugins(p1)
+    .reducer((r) => (state: any, action) => ({
+      n: r(state, action).toFixed(2),
+      d: new Date()
+    }))
+    .build()
+
+  const obj = rj().plugins(p).effect(() => Promise.reject())
+
+  const state = obj.reducer(undefined, { type: INIT })
+
+  const date: Date = state.root.d
+  const n : string = state.root.n
+}
+
+function rjPluginBuilderSelectorsWithState() {
+  const p1 = rjPlugin()
+    .combineReducers({
+      drago: () => 99,
+      now: () => new Date()
+    })
+    .build()
+
+  const p = rjPlugin()
+    .plugins(p1)
+    .combineReducers({
+      miao: () => ({ name: 'Gio Va' })
+    })
+    .selectors(s => ({
+      j3: (state) => state.drago,
+      ju: (state) => state.now,
+      jj: (state) => state.miao.name,
+    }))
+    .build()
+
+  const obj = rj().plugins(p).effect(() => Promise.reject())
+  const state = obj.reducer(undefined, { type: INIT })
+
+  const sel = obj.makeSelectors()
+
+  const d: Date = sel.ju(state)
+  const n: number = sel.j3(state)
+  const s: string = sel.jj(state)
 }

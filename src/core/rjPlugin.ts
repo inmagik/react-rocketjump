@@ -1,4 +1,3 @@
-import { mergeRjObject } from './rjObject'
 import {
   ActionCreators,
   MakeRjPlugin,
@@ -6,11 +5,13 @@ import {
   Reducer,
   ReducersMap,
   RjBaseConfig,
-  RjMergeableObject,
   RjPlugin,
   Selectors,
 } from './types'
-import { RJ_PLUGIN } from './internals'
+import craftRjPlugin from './craftRjPlugin'
+import rjPluginBuilder, { RjPluginBuilder } from './rjPluginBuilder'
+
+function rjPlugin(): RjPluginBuilder<{}, []>
 
 function rjPlugin<
   PluginReducer extends Reducer | undefined,
@@ -48,19 +49,14 @@ function rjPlugin<
 
 function rjPlugin<Plugins extends RjPlugin[]>(
   ...configAndPlugins: [...Plugins, RjBaseConfig]
-): RjPlugin {
+): RjPlugin | RjPluginBuilder {
+  if (configAndPlugins.length === 0) {
+    return rjPluginBuilder()
+  }
+
   const [config]: RjBaseConfig[] = configAndPlugins.slice(-1) as RjBaseConfig[]
   const plugins: Plugins = configAndPlugins.slice(0, -1) as Plugins
-
-  const plugIn = (givenObj: RjMergeableObject) => {
-    const wihtCurriedPluginObj = plugins.reduce(
-      (mergeObj, plugin) => plugin(mergeObj),
-      givenObj
-    )
-    return mergeRjObject(config, wihtCurriedPluginObj)
-  }
-  Object.defineProperty(plugIn, '__rjtype', { value: RJ_PLUGIN })
-  return plugIn
+  return craftRjPlugin(config, plugins)
 }
 
 export default rjPlugin

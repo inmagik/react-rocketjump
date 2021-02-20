@@ -1,5 +1,4 @@
-import { RJ_PLUGIN } from './internals'
-import { mergeRjObject } from './rjObject'
+import craftRjPlugin from './craftRjPlugin'
 import {
   AllRjCurriedState,
   RjBaseActionCreators,
@@ -10,7 +9,6 @@ import {
   ActionCreators,
   ReducersMap,
   Selectors,
-  RjMergeableObject,
   ReducerEnhancer,
   MergePluginsReducers,
   RjBaseSelectors,
@@ -21,35 +19,15 @@ import {
   ActionCreatorsEnhancer,
   MergePluginsActionCreators,
   RjSideEffectConfig,
+  ExtractConfigReducer,
+  ExtractConfigSelectors,
+  ExtractConfigReducersMap,
+  ExtractConfigComposeReducer,
+  ExtractConfigActionCreators,
+  ExtractConfigComposedState,
 } from './types'
 
-type ExtractConfigReducer<
-  Config extends RjBaseConfig
-> = Config extends RjBaseConfig<any, infer H> ? H : never
-
-type ExtractConfigSelectors<
-  Config extends RjBaseConfig
-> = Config extends RjBaseConfig<any, any, any, infer H> ? H : never
-
-type ExtractConfigReducersMap<
-  Config extends RjBaseConfig
-> = Config extends RjBaseConfig<any, any, any, any, infer H> ? H : never
-
-type ExtractConfigComposeReducer<
-  Config extends RjBaseConfig
-> = Config extends RjBaseConfig<any, any, any, any, any, infer H> ? H : never
-
-type ExtractConfigActionCreators<
-  Config extends RjBaseConfig
-> = Config extends RjBaseConfig<any, any, any, any, any, any, any, infer H>
-  ? H
-  : never
-
-type ExtractConfigComposedState<
-  Config extends RjBaseConfig
-> = ExtractConfigComposeReducer<Config> extends Reducer<infer S> ? S : unknown
-
-interface RjPluginEndBuilder<
+export interface RjPluginEndBuilder<
   PluginConfig extends RjBaseConfig = RjBaseConfig,
   Plugins extends RjPlugin[] = RjPlugin[]
 > {
@@ -63,7 +41,7 @@ interface RjPluginEndBuilder<
   >
 }
 
-interface RjPluginEffectConfigBuilder<
+export interface RjPluginEffectConfigBuilder<
   PluginConfig extends RjBaseConfig = RjBaseConfig,
   Plugins extends RjPlugin[] = RjPlugin[]
 > extends RjPluginEndBuilder<PluginConfig, Plugins> {
@@ -83,7 +61,7 @@ interface RjPluginEffectConfigBuilder<
     Plugins
   >
 }
-interface RjPluginSelectorsConfigBuilder<
+export interface RjPluginSelectorsConfigBuilder<
   PluginConfig extends RjBaseConfig = RjBaseConfig,
   Plugins extends RjPlugin[] = RjPlugin[]
 > extends RjPluginEffectConfigBuilder<PluginConfig, Plugins> {
@@ -118,7 +96,7 @@ interface RjPluginSelectorsConfigBuilder<
   selectors(selectors: SelectorsEnhancer): RjPluginEffectConfigBuilder
 }
 
-interface RjPluginReducerActionsConfigBuilder<
+export interface RjPluginReducerActionsConfigBuilder<
   PluginConfig extends RjBaseConfig = RjBaseConfig,
   Plugins extends RjPlugin[] = RjPlugin[]
 > extends RjPluginSelectorsConfigBuilder<PluginConfig, Plugins> {
@@ -199,7 +177,7 @@ interface RjPluginReducerActionsConfigBuilder<
   actions(actions: ActionCreatorsEnhancer): RjPluginReducerActionsConfigBuilder
 }
 
-interface RjPluginBuilder<
+export interface RjPluginBuilder<
   PluginConfig extends RjBaseConfig = RjBaseConfig,
   Plugins extends RjPlugin[] = RjPlugin[]
 > extends RjPluginReducerActionsConfigBuilder<PluginConfig, Plugins> {
@@ -216,17 +194,7 @@ function rjPluginEndBuilder(
 ): RjPluginEndBuilder {
   return {
     // Finally craft plugin
-    build: () => {
-      const plugIn = (givenObj: RjMergeableObject) => {
-        const wihtCurriedPluginObj = plugins.reduce(
-          (mergeObj, plugin) => plugin(mergeObj),
-          givenObj
-        )
-        return mergeRjObject(config, wihtCurriedPluginObj)
-      }
-      Object.defineProperty(plugIn, '__rjtype', { value: RJ_PLUGIN })
-      return plugIn
-    },
+    build: () => craftRjPlugin(config, plugins),
   }
 }
 
