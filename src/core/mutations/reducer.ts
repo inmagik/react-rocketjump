@@ -6,8 +6,10 @@ import {
   Mutations,
   Reducer,
   Action,
-  MutationMetaAction,
   MutationReducer,
+  OptimisticMutationsStateShape,
+  OptimisticAction,
+  OptimisticActionLog,
 } from '../types'
 
 type StateUpdater = (...params: any[]) => any
@@ -179,17 +181,6 @@ export function makeMutationsReducer(mutations: Mutations) {
   return combineReducers(mutationsReducers)
 }
 
-interface OptimisticAction extends Action {
-  meta: MutationMetaAction
-}
-interface ActionLog {
-  action: Action | OptimisticAction
-  committed: boolean
-}
-interface OptimisticMutationsStateShape {
-  snapshot: any
-  actions: ActionLog[]
-}
 interface OptmisticState {
   root: any
   optimisticMutations: OptimisticMutationsStateShape
@@ -245,7 +236,7 @@ function applyActionsOnSnapshot(
   return actions.reduce((snap, action) => reducer(snap, action), state).root
 }
 
-function getFirstNonCommittedIndex(actions: ActionLog[]) {
+function getFirstNonCommittedIndex(actions: OptimisticActionLog[]) {
   for (let i = 0; i < actions.length; i++) {
     if (!actions[i].committed) {
       return i

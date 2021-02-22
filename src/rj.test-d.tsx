@@ -454,7 +454,9 @@ function rjPluginBuilderRootRedcuer() {
     .reducer(() => () => new Date())
     .build()
 
-  const obj = rj().plugins(p).effect(() => Promise.reject())
+  const obj = rj()
+    .plugins(p)
+    .effect(() => Promise.reject())
 
   let date: Date
   date = obj.reducer(undefined, { type: INIT }).root
@@ -469,39 +471,43 @@ function rjPluginBuilderRootRedcuerWithOldReducer() {
     .plugins(p1)
     .reducer((r) => (state: any, action) => ({
       n: r(state, action).toFixed(2),
-      d: new Date()
+      d: new Date(),
     }))
     .build()
 
-  const obj = rj().plugins(p).effect(() => Promise.reject())
+  const obj = rj()
+    .plugins(p)
+    .effect(() => Promise.reject())
 
   const state = obj.reducer(undefined, { type: INIT })
 
   const date: Date = state.root.d
-  const n : string = state.root.n
+  const n: string = state.root.n
 }
 
 function rjPluginBuilderSelectorsWithState() {
   const p1 = rjPlugin()
     .combineReducers({
       drago: () => 99,
-      now: () => new Date()
+      now: () => new Date(),
     })
     .build()
 
   const p = rjPlugin()
     .plugins(p1)
     .combineReducers({
-      miao: () => ({ name: 'Gio Va' })
+      miao: () => ({ name: 'Gio Va' }),
     })
-    .selectors(s => ({
+    .selectors((s) => ({
       j3: (state) => state.drago,
       ju: (state) => state.now,
       jj: (state) => state.miao.name,
     }))
     .build()
 
-  const obj = rj().plugins(p).effect(() => Promise.reject())
+  const obj = rj()
+    .plugins(p)
+    .effect(() => Promise.reject())
   const state = obj.reducer(undefined, { type: INIT })
 
   const sel = obj.makeSelectors()
@@ -509,4 +515,39 @@ function rjPluginBuilderSelectorsWithState() {
   const d: Date = sel.ju(state)
   const n: number = sel.j3(state)
   const s: string = sel.jj(state)
+}
+
+function optMutationsStateBuilder() {
+  const obj = rj()
+    .mutations({
+      drago: {
+        effect: () => Promise.reject(),
+        updater: 'updateData',
+      },
+      fuma: {
+        effect: () => Promise.reject(),
+        updater: 'updateData',
+      },
+    })
+    .effect(() => Promise.reject())
+
+  const state = obj.reducer(undefined, { type: INIT })
+  let x : undefined = state.optimisticMutations
+
+  const objOpt = rj()
+    .mutations({
+      drago: {
+        effect: () => Promise.reject(),
+        updater: 'updateData',
+        optimisticResult: (a) => a,
+      },
+      fuma: {
+        effect: () => Promise.reject(),
+        updater: 'updateData',
+      },
+    })
+    .effect(() => Promise.reject())
+
+  const stateO = objOpt.reducer(undefined, { type: INIT })
+  const logs  = stateO.optimisticMutations.actions
 }

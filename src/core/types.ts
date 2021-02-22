@@ -569,6 +569,18 @@ export interface Mutations<
   [k: string]: Mutation<R, S, A>
 }
 
+export interface OptimisticAction extends Action {
+  meta: MutationMetaAction
+}
+export interface OptimisticActionLog {
+  action: Action | OptimisticAction
+  committed: boolean
+}
+export interface OptimisticMutationsStateShape {
+  snapshot: any
+  actions: OptimisticActionLog[]
+}
+
 export interface RjNameConfig {
   /**
    * Display name of RocketJump Object used in logger.
@@ -836,6 +848,35 @@ export type MakeFinalRjPluginReducer<
     : PluginReducer
   : never
 
+// NOTE: Warkound boolean or nerver in perfetto equilibrio
+// the real good implementation
+// should be
+// type Mutation = MutationBase | OptimisticMutation
+// ... so but at the moment this break big part of code inference
+// of optimisticUpdater
+// For now we detect at least one optimisticResult
+// to infer the opt shape ... so far the real implementation in JS
+// is this ahaha so for now is ok
+interface IsOptimisticMutation {
+  optimisticResult: (...params: any[]) => any
+}
+
+type FilterOptMutations<MyMutations extends Mutations> = {
+  [k in keyof MyMutations]: MyMutations[k] extends IsOptimisticMutation
+    ? boolean
+    : never
+}[keyof MyMutations]
+
+type InferOptMutationsReducersMap<A> = boolean extends A
+  ? {
+      optimisticMutations: Reducer<OptimisticMutationsStateShape>
+    }
+  : ReducersMap<{}>
+
+export type MakeOptMutationsReducersMap<
+  MyMutations extends Mutations
+> = InferOptMutationsReducersMap<FilterOptMutations<MyMutations>>
+
 // Pick only the mutations with reducer defined!
 type ExtractMutationsReducersKeys<MyMutations extends Mutations> = {
   [K in keyof MyMutations]: MyMutations[K] extends Mutation<infer H>
@@ -867,9 +908,14 @@ type CombineMutationsReducerMerge<M extends Mutations> = {} extends M
       mutations: CombineReducers<ExtractMutationsReducersMap<M>>
     }
 
-export type MakeMutationsReducersMap<
+export type MakeBaseMutationsReducersMap<
   MyMutations extends Mutations
 > = CombineMutationsReducerMerge<FiltersMutationsForReducer<MyMutations>>
+
+export type MakeMutationsReducersMap<
+  MyMutations extends Mutations
+> = MakeBaseMutationsReducersMap<MyMutations> &
+  MakeOptMutationsReducersMap<MyMutations>
 
 export type MakeFinalRjReducer<
   ConfigReducer extends Reducer | undefined,
