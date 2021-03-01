@@ -160,11 +160,11 @@ rj({
   mutations: {
     addToCart: rj.mutation.single({
       /** **/
-    })
+    }),
   },
   computed: {
     addingToCart: '@mutation.addToCart.pending',
-  }
+  },
 })
 ```
 
@@ -175,17 +175,18 @@ rj({
   mutations: {
     addToCart: rj.mutation.single({
       /** **/
-    })
+    }),
   },
   computed: {
-    addingToCart: state => state.mutations.addToCart.pending,
-  }
+    addingToCart: (state) => state.mutations.addToCart.pending,
+  },
 })
 ```
 
 #### Selectors and actions enhancers
 
 We drop the support for:
+
 ```js
 rj({
   selectors: {
@@ -198,6 +199,7 @@ rj({
 ```
 
 We only support this syntax:
+
 ```js
 rj({
   selectors: (prevSelectors) => ({
@@ -211,6 +213,52 @@ rj({
 
 #### Compose reducer init
 
+In previous version the `composeReducer` ins't a simple composition utility, but it
+merge the inital values of provided composed function, since v3 `composeReducer` simply
+compose reducers.
+
+In v2:
+
+```js
+const { reducer } = rj({
+  composeReducer: (state = { foo: 23 }) => state,
+})
+// Root State Shape:
+{
+  pending: false,
+  error: null,
+  data: null,
+  foo: 23,
+}
+```
+
+In v3:
+
+```js
+const { reducer } = rj({
+  composeReducer: (state = { foo: 23 }) => state,
+})
+// Root State Shape:
+{
+  pending: false,
+  error: null,
+  data: null,
+}
+```
+
+You can obtain the same result by doing:
+
+```js
+const { reducer } = rj({
+  composeReducer: (state, action) => {
+    if (action.type === INIT) {
+      return { ...state, foo: 23 }
+    }
+    return state
+  },
+})
+```
+
 #### Side effect
 
 _TODO_
@@ -219,11 +267,33 @@ _TODO_
 - SideEffects handle only standard effect actions, new rj option addSideEffect to add an Observable to hanlde custom effect actions
 - New signature for custom `takeEffect`
 
+### :warning: Deprecation
+
+#### Configured effect caller
+
 ### :zap: New features
 
 #### New config option `combineReducers`
 
-_TODO_
+A new option `combineReducers` can be used in `rj()` and `rjPlugin()`.
+It can be used to provide more reducers along with `root` and `mutations` reducers.
+Is useful to store meta information without touching the root reducer shape:
+
+```js
+rj({
+  combineReducers: {
+    successCount: (count = 0, action) => {
+      if (action.type === SUCCESS) {
+        return count + 1
+      }
+      return count
+    },
+  },
+  computed: {
+    successCount: (s) => s.successCount,
+  },
+})
+```
 
 #### New config option `addSideEffect`
 
@@ -240,6 +310,8 @@ _TODO_
 #### New helper `mapRunActionToObservable`
 
 _TODO_
+
+#### Builder mode
 
 ## 2.6.2
 
