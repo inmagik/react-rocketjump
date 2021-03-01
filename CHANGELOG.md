@@ -10,7 +10,7 @@ it also was rewritten in Typescript and merged back in the codebase.
 The philosophy of the library remains the same:
 Do much with less code.
 
-But we cut some *tricky* features to take the maxium advantage from Typescript
+But we cut some _tricky_ features to take the maxium advantage from Typescript
 and modern era editors like vscode.
 
 This is a stepping stone relase to future awesome implementation,
@@ -63,10 +63,10 @@ rj(
 
 #### Default state shape
 
-In previous version the shape of Rocketjump state could be change based on the
+In previous version the shape of Rocketjump state could change based on the
 mutations configuration.
-When the confguration included some mutations state the state passes from a simply
-plain shape from given reducer configuration to this:
+When the confguration included some mutations state the state shape passes
+from the one inherit from reducer to:
 
 ```js
 {
@@ -77,18 +77,139 @@ plain shape from given reducer configuration to this:
 ```
 
 From v3 we always compose the state using `root` key.
+Furthermore the state in ALWAYS context is supposed to have this shape.
 This means that this don't work anymore:
 
 ```js
 rj({
   selectors: () => ({
-    total: state => state.data.reduce(item => item.price + acc, 0)
+    total: (state) => (state.data ?? []).reduce((item) => item.price + acc, 0),
+  }),
+})
+```
+
+... But this stil works:
+
+```js
+rj({
+  selectors: ({ getData }) => ({
+    total: (state) =>
+      (getData(state) ?? []).reduce((item) => item.price + acc, 0),
+  }),
+})
+```
+
+#### Computed
+
+In previous version computed were ONLY **strings** and were merged in ambitious way.
+
+In v2 you can write:
+
+```js
+rj(
+  rj({
+    computed: {
+      baz: 'getData',
+      fuzzy: 'isPending',
+    },
+  }),
+  {
+    computed: {
+      foo: 'getData',
+    },
+  }
+)
+```
+
+... And computed state was:
+
+```ts
+{
+  foo: any,
+  fuzzy: boolean
+}
+```
+
+In v3 you can specify computed **ONLY** in `rj()` so you can't provide computed
+to your plugins.
+
+Sadly this breaks all the default computed in:
+
+- `plugins/list`
+- `plugins/plainList`
+- `plugins/map`
+
+_WHY?_
+
+You will be thinking why a breaking changes so destructive was introduced?
+Beacause in v3 the result state type is mostly infered by Typescript
+compiler and infering this type of ambitious merging is quite impossible, so we
+decided to drop it.
+
+#### Mutations computed
+
+In previous version we provide a special `'@mutation'` prefix in computed
+to select mutation state.
+Since v3 we support function as computed so we can simply access the state
+related to mutation using a function:
+
+In v2:
+
+```js
+rj({
+  mutations: {
+    addToCart: rj.mutation.single({
+      /** **/
+    })
+  },
+  computed: {
+    addingToCart: '@mutation.addToCart.pending',
+  }
+})
+```
+
+In v3:
+
+```js
+rj({
+  mutations: {
+    addToCart: rj.mutation.single({
+      /** **/
+    })
+  },
+  computed: {
+    addingToCart: state => state.mutations.addToCart.pending,
+  }
+})
+```
+
+#### Selectors and actions enhancers
+
+We drop the support for:
+```js
+rj({
+  selectors: {
+    newSelectors: prevSelectors => state => /** **/,
+  },
+  actions: {
+    newAction: prevActions => (...args) => /** **/,
+  }
+})
+```
+
+We only support this syntax:
+```js
+rj({
+  selectors: (prevSelectors) => ({
+    newSelectors: state => /** **/,
+  }),
+  actions: (prevActions) => ({
+    newAction: (...args) => /** **/,
   })
 })
 ```
 
-_TODO_
-Always state has **root** ...
+#### Compose reducer init
 
 #### Side effect
 
