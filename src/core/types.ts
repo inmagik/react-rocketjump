@@ -1055,7 +1055,7 @@ export type ExtractMergeObjReducer<
 export type ExtractMergeObjReducersMap<
   R extends RjMergeableObject
 > = R extends RjMergeableObject<any, any, infer ReducersMapCombine>
-  ? ReducersMapCombine
+  ? {} extends ReducersMapCombine ? {} : ReducersMapCombine
   : never
 
 export type ExtractMergeObjRootState<

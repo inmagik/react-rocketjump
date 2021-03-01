@@ -2,7 +2,7 @@
 import React from 'react'
 import { FunctionComponent } from 'react'
 import { rj, rjPlugin, connectRj, INIT } from '.'
-import { RjBaseActionCreators, Reducer, Action } from './core/types'
+import { RjBaseActionCreators, Action, OptimisticActionLog } from './core/types'
 import rjPlainList from './plugins/plainList'
 import rjList, { nextPreviousPaginationAdapter } from './plugins/list'
 import { BoundActionCreatorsWithBuilder } from './core/actions/bindActionCreators'
@@ -532,7 +532,7 @@ function optMutationsStateBuilder() {
     .effect(() => Promise.reject())
 
   const state = obj.reducer(undefined, { type: INIT })
-  let x : undefined = state.optimisticMutations
+  // let x : undefined = state.optimisticMutations
 
   const objOpt = rj()
     .mutations({
@@ -549,5 +549,5 @@ function optMutationsStateBuilder() {
     .effect(() => Promise.reject())
 
   const stateO = objOpt.reducer(undefined, { type: INIT })
-  const logs  = stateO.optimisticMutations.actions
+  const logs: OptimisticActionLog[] = stateO.optimisticMutations.actions
 }
