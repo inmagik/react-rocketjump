@@ -877,9 +877,18 @@ export type MakeOptMutationsReducersMap<
   MyMutations extends Mutations
 > = InferOptMutationsReducersMap<FilterOptMutations<MyMutations>>
 
+// TODO: Not really sure if defined a "duck" type only for
+// perform TS "if" is a shit or is ok but this is the only
+// solution i found to filter mutation with reducer defined.
+interface IsMutationWithReducer<R extends MutationReducer> {
+  reducer: R
+}
+
 // Pick only the mutations with reducer defined!
 type ExtractMutationsReducersKeys<MyMutations extends Mutations> = {
-  [K in keyof MyMutations]: MyMutations[K] extends Mutation<infer H>
+  [K in keyof MyMutations]: MyMutations[K] extends IsMutationWithReducer<
+    infer H
+  >
     ? H extends MutationReducer
       ? K
       : never
@@ -1055,7 +1064,9 @@ export type ExtractMergeObjReducer<
 export type ExtractMergeObjReducersMap<
   R extends RjMergeableObject
 > = R extends RjMergeableObject<any, any, infer ReducersMapCombine>
-  ? {} extends ReducersMapCombine ? {} : ReducersMapCombine
+  ? {} extends ReducersMapCombine
+    ? {}
+    : ReducersMapCombine
   : never
 
 export type ExtractMergeObjRootState<

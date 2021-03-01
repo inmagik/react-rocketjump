@@ -2,7 +2,12 @@
 import React from 'react'
 import { FunctionComponent } from 'react'
 import { rj, rjPlugin, connectRj, INIT } from '.'
-import { RjBaseActionCreators, Action, OptimisticActionLog } from './core/types'
+import {
+  RjBaseActionCreators,
+  Action,
+  OptimisticActionLog,
+  RjStateRootShape,
+} from './core/types'
 import rjPlainList from './plugins/plainList'
 import rjList, { nextPreviousPaginationAdapter } from './plugins/list'
 import { BoundActionCreatorsWithBuilder } from './core/actions/bindActionCreators'
@@ -532,7 +537,11 @@ function optMutationsStateBuilder() {
     .effect(() => Promise.reject())
 
   const state = obj.reducer(undefined, { type: INIT })
-  // let x : undefined = state.optimisticMutations
+  let x: {
+    root: RjStateRootShape
+  } = state
+  // This raise an error i can't found a way to test it lol
+  // state.optimisticMutations
 
   const objOpt = rj()
     .mutations({
