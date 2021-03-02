@@ -246,7 +246,7 @@ const { reducer } = rj({
 }*/
 ```
 
-You can obtain the same result by doing:
+You can achieve the same result by doing:
 
 ```js
 const { reducer } = rj({
@@ -395,15 +395,71 @@ To see how to use it see the [standar take effects implementation](https://githu
 
 #### Builder mode
 
+The main point of v3 is the ability to inferring the type of `RjObject` by your
+configuration and plugins.
+
+When using the standard rj constructor `rj(...plugins, config)` some stuff can be
+infered Es.. (the type of state in selectors) to avoid bad types in some situation
+we give up and we fallback to `any`.
+
+We expected that in future version of Typescript we can improve the types experience.
+
+If your are interessed there is an open [issue](https://github.com/microsoft/TypeScript/issues/41396).
+
+Here at InMagik Labs we follow this mantra:
+> Mater artium necessitas
+
+So to have the maxium from Typescript we introduce the Buider Mode!
+
+When you invoke `rj()` or `rjPlugin()` you enter the builder mode.
+
+Instead of providing big object of options you chain the same option as builder
+and when your are done call `.effect({ ... })` on `rj()` to build an `RjObject` or
+`.build()` on `rjPlugin()` to build a plugin.
+Es:.
+
+```js
+const p1 = rjPlugin()
+  .reducer(oldReducer => (state, action) => { /**  **/ })
+  .actions(() => ({
+    hello: () => ({ type: 'Hello' })
+  }))
+  .combineReducers({
+    plus: () => 88,
+  })
+  .build()
+
+const obj = rj()
+  .plugins(p1)
+  .selectors(() => ({
+    getPlus: s => s.plus,
+  }))
+  .effect({
+    effect: myEffect,
+  })
+```
+
 #### Expose mutations types helpers `makeMutationType` `matchMutationType`
 
 The `makeMutationType` create a mutation action type.
 
 The `matchMutationType` match a mutation action type using a flexible syntax.
 
-For more detail to how they wors see the: [tests](https://github.com/inmagik/react-rocketjump/blob/v3/src/core/mutations/__tests__/mutationsActionTypes.test.ts)
+For more detail to how they works see the: [tests](https://github.com/inmagik/react-rocketjump/blob/v3/src/core/mutations/__tests__/mutationsActionTypes.test.ts)
 
 #### Fix warning for plugin `plugins/list`
+
+In previous version using the list plugin and calling `insertItem` or `deleteItem`
+will trigger this warning:
+
+> It seems you are using this plugin on a paginated list. Remember that this plugin is agnostic wrt pagination, and will break it. To suppress this warning, set warnPagination: false in the config object
+
+Since v3 we remove this warning in list plugin and we fix the pagination issue for you by simpy by
+incrementing / decrementing the count.
+You can disable this behaviour by passing this new options:
+
+- `insertItemTouchPagination`: When `false` don't touch pagination on `insertItem`
+- `deleteItemTouchPagination`: When `false` don't touch pagination on `deleteItem`
 
 #### New plugin `plugins/mutationsPending`
 
