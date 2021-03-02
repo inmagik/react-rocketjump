@@ -409,7 +409,7 @@ If your are interessed there is an open [issue](https://github.com/microsoft/Typ
 Here at InMagik Labs we follow this mantra:
 > Mater artium necessitas
 
-So to have the maxium from Typescript we introduce the Buider Mode!
+So to have the maxium from Typescript we introduce the Builder Mode!
 
 When you invoke `rj()` or `rjPlugin()` you enter the builder mode.
 
