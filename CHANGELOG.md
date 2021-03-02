@@ -71,7 +71,7 @@ from the one inherit from reducer to:
 ```js
 {
   root: /* state from reducer config */,
-  mutations: /* state from mutations */
+  mutations: /* state from mutations */,
   optimisticMutations /* state from optimistic mutation */
 }
 ```
@@ -224,12 +224,12 @@ const { reducer } = rj({
   composeReducer: (state = { foo: 23 }) => state,
 })
 // Root State Shape:
-{
+/*{
   pending: false,
   error: null,
   data: null,
   foo: 23,
-}
+}*/
 ```
 
 In v3:
@@ -239,11 +239,11 @@ const { reducer } = rj({
   composeReducer: (state = { foo: 23 }) => state,
 })
 // Root State Shape:
-{
+/*{
   pending: false,
   error: null,
   data: null,
-}
+}*/
 ```
 
 You can obtain the same result by doing:
@@ -259,17 +259,79 @@ const { reducer } = rj({
 })
 ```
 
+#### Rename `makeAction` to `makeEffectAction`
+
+The `makeAction` name was too generic and confusing the only reason you have to
+use this helper is works with side effect we renamed it to `makeEffectAction`.
+
 #### Side effect
 
-_TODO_
+We improve the `rxjs` Side Effect model to make it super powerful.
 
-- Configured effect caller from `action`
-- SideEffects handle only standard effect actions, new rj option addSideEffect to add an Observable to hanlde custom effect actions
-- New signature for custom `takeEffect`
+In previous version all custom _effect action_ are always dispatched to reducer.
+Es:.
+
+```js
+import { rj, makeEffectAction } from 'react-rocketjump'
+
+rj({
+  actions: () => ({
+    bu: () => makeEffectAction('BU'),
+  }),
+})
+```
+
+In v2 calling `actions.bu()` was supposed to be dispatched in `reducer`.
+Since v3 you have to manually handle how `'BU'` type side effect is handled.
+To simple dispatch it on reducer the code should be something like:
+
+```js
+import { rj, makeEffectAction } from 'react-rocketjump'
+import { filter } from 'rxjs/operators'
+
+rj({
+  actions: () => ({
+    bu: () => makeEffectAction('BU'),
+  }),
+  addSideEffect: (actionObservable) =>
+    actionObservable.pipe(filter((action) => action.type === 'BU')),
+})
+```
+
+We also change the custom `takeEffect` signature to `TakeEffectHanlder`:
+
+```ts
+export interface TakeEffectBag {
+  effect: EffectFn
+  getEffectCaller: GetEffectCallerFn
+  prefix: string
+}
+
+export interface StateObservable<S = any> extends Observable<S> {
+  value: S
+}
+
+export type TakeEffectHanlder = (
+  actionsObservable: Observable<EffectAction>,
+  stateObservable: StateObservable,
+  effectBag: TakeEffectBag,
+  ...extraArgs: any[]
+) => Observable<Action>
+```
+
+Another different implementation detail from v2 is that the `configured` effect caller
+value is no more hold on `makeObservable` result instance but is hold directly in a ref
+on current dispatched action.
+This is an implemntation detail, you shouldn't care if you don't play with rj internals.
+This is unlock future implementation when you can use the same `makeObservable` value
+with different run time effect callers.
 
 ### :warning: Deprecation
 
 #### Configured effect caller
+
+We deprectated the ~~`rj.configured()`~~ syntax in favor of simply `'configured'` string
+when setting the `effectCaller` option.
 
 ### :zap: New features
 
@@ -297,21 +359,100 @@ rj({
 
 #### New config option `addSideEffect`
 
-_TODO_
+You can add a side effect in form of `Obsevable<Action>` using new
+`addSideEffect` with the same signature of `takeEffect`.
+
+For a real world usage see the [WebSocket Example](https://github.com/inmagik/react-rocketjump/blob/v3/example/pages/WebSocket/localstate.js)
+
+#### New standard take effects: `concatLatest` and `groupByConcatLatest`
+
+The standard take effect y excute one task at time but is you `RUN`
+a task while another task is excuted it buffer the **LAST** effect and then excute it.
+This is useful in auto save scenarios when a task is spawned very often but you need
+to send at server only one task at time to avoid write inconsistences but at the same
+time you need ensure last data is sended.
+
+The `groupByConcatLatest` is the version with grouping capabilites:
+```js
+['groupByConcatLatest', action => /* group action */]
+```
+
+#### New helper `actionMap`
+
+This new helper make more simple to build a custom side effect with the
+same behaviour of standard effects (run effect with caller dispatch `SUCCESS` or `FAILURE`).
+
+```ts
+function actionMap(
+  action: EffectAction,
+  effectCall: EffectFn,
+  getEffectCaller: GetEffectCallerFn,
+  prefix: string
+) : Observable<Action>
+```
+
+To see how to use it see the [standar take effects implementation](https://github.com/inmagik/react-rocketjump/blob/v3/src/core/effect/takeEffectsHandlers.ts).
+
+#### Builder mode
 
 #### Expose mutations types helpers `makeMutationType` `matchMutationType`
 
-_TODO_
+The `makeMutationType` create a mutation action type.
+
+The `matchMutationType` match a mutation action type using a flexible syntax.
+
+For more detail to how they wors see the: [tests](https://github.com/inmagik/react-rocketjump/blob/v3/src/core/mutations/__tests__/mutationsActionTypes.test.ts)
+
+#### Fix warning for plugin `plugins/list`
 
 #### New plugin `plugins/mutationsPending`
 
-_TODO_
+This new plugin keep track of multiple mutations peding state.
+Expose a selector called `anyMutationPending` to grab the related state.
 
-#### New helper `mapRunActionToObservable`
+If called without argument track **ALL** mutations:
 
-_TODO_
+```js
+import rjMutationsPending from 'react-rocketjump/plugins/mutationsPending'
 
-#### Builder mode
+const maRjState = rj(rjMutationsPending(), {
+  mutations: {
+    /** **/
+  },
+  computed: {
+    busy: 'anyMutationPending',
+  },
+})
+```
+
+Accept a configuration object with `track` key to specify which mutations
+tracks:
+
+```js
+const maRjState = rj(
+  rjMutationsPending({
+    track: ['one', 'two'],
+  }),
+  {
+    mutations: {
+      one: {
+        /** **/
+      },
+      two: {
+        /** **/
+      },
+      three: {
+        /** **/
+      },
+    },
+    computed: {
+      busy: 'anyMutationPending',
+    },
+  }
+)
+```
+
+The `three` mutation is excluded by tracking.
 
 ## 2.6.2
 
