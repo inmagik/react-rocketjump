@@ -13,12 +13,15 @@ module.exports = {
       title: 'React RocketJump',
       items: [
         {
+          type: 'docsVersionDropdown',
+          position: 'left'
+        },
+        {
           to: 'docs/',
           activeBasePath: 'docs',
           label: 'Docs',
-          position: 'left',
+          position: 'right',
         },
-        { to: 'blog', label: 'Blog', position: 'left' },
         {
           href: 'https://github.com/inmagik/react-rocketjump',
           label: 'GitHub',
@@ -87,16 +90,22 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
+          lastVersion: 'current',
+          versions: {
+            'current': {
+              label: '3.x',
+              path: '',
+            },
+            '2.x': {
+              label: '2.x',
+              path: '2.x',
+            },
+          },
           // Please change this to your repo.
           editUrl:
             'https://github.com/facebook/docusaurus/edit/master/website/',
         },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/blog/',
-        },
+        blog: false,
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },

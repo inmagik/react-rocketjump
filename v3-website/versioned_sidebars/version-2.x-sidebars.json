@@ -1,0 +1,160 @@
+{
+  "version-2.x/someSidebar": [
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "Why React-RocketJump?",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-2.x/motivation"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "Getting Started",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-2.x/installation"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/quickstart"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/concepts"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "API | Defining",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-2.x/api_rj"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/api_configure"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/api_composition"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/api_mutations"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "API | Connecting",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-2.x/connect_generalities"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/connect_userj"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/connect_userunrj"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/connect_connectrj"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "API | Using",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-2.x/usage_state"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/usage_actions"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "API | Plugins",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-2.x/plugin_all"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/plugin_list"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/plugin_plain_list"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/plugin_list_insert"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/plugin_list_update"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/plugin_list_delete"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/plugin_map"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/plugin_debounce"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.x/plugin_writing"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "API | Debug",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-2.x/debug_logger"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "Tips & Tricks",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-2.x/tips_and_tricks"
+        }
+      ]
+    }
+  ]
+}
