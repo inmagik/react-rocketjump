@@ -1,4 +1,5 @@
 import bindActionCreators from '../bindActionCreators'
+import { deps } from '../deps'
 import { makeEffectAction } from '../effectAction'
 
 const fakeDispatcher = () => {
@@ -49,6 +50,44 @@ describe('rocketjump action builder', () => {
       },
       meta: {
         n: 23,
+      },
+      callbacks: {
+        onSuccess: undefined,
+        onFailure: undefined,
+      },
+    })
+  })
+
+  it('should support deps', () => {
+    const dispatch = fakeDispatcher()
+    const hello = jest.fn((...args) => makeEffectAction('Hello', args))
+
+    const actions = bindActionCreators(
+      {
+        hello,
+      },
+      dispatch
+    )
+
+    actions.hello.onSuccess(() => {}).run('Giova', deps.maybe(false))
+
+    expect(hello).not.toHaveBeenCalled()
+
+    actions.hello(
+      'Giova',
+      deps.withAlwaysMeta({ n: 23 }),
+      deps.withMeta(false, { giu: 23 }),
+      deps.withMetaOnMount({ dre: 99 }),
+      deps.maybeGet({ giova: 23 }, 'giova')
+    )
+    expect(dispatch).toHaveBeenLastCalledWith({
+      type: 'Hello',
+      payload: {
+        params: ['Giova', false, 23],
+      },
+      meta: {
+        n: 23,
+        giu: 23,
       },
       callbacks: {
         onSuccess: undefined,

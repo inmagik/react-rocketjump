@@ -1,6 +1,12 @@
 import { INIT } from '../actions/actionTypes'
 import rj from '../rj'
 
+const ORIGINAL_ENV = { ...process.env }
+
+beforeEach(() => {
+  process.env = { ...ORIGINAL_ENV }
+})
+
 describe('React-RocketJump computeState', () => {
   it('should compute root state default', () => {
     const obj = rj({
@@ -99,6 +105,27 @@ describe('React-RocketJump computeState', () => {
       const state = obj.reducer(undefined, { type: INIT })
       const selectors = obj.makeSelectors()
       obj.computeState(state, selectors)
-    }).toThrow(/\[react-rocketjump\]/)
+    }).toThrow(/^\[react-rocketjump\].+\[FFFxxxxxGANG!\]/)
+  })
+
+  it('should get angry (shortly in production) when misconfigured computed', async () => {
+    process.env.NODE_ENV = 'production'
+    expect(() => {
+      const obj = rj({
+        mutations: {
+          socio: {
+            effect: () => Promise.resolve(23),
+            updater: (s) => s,
+          },
+        },
+        effect: () => Promise.resolve('U.u'),
+        computed: {
+          skinny: 'frodo',
+        },
+      })
+      const state = obj.reducer(undefined, { type: INIT })
+      const selectors = obj.makeSelectors()
+      obj.computeState(state, selectors)
+    }).toThrow(/^\[react-rocketjump\] @computed error.$/)
   })
 })

@@ -2193,19 +2193,16 @@ describe('RJ side effect model', () => {
 
       callerA.mock.results[0].value.then(() => {
         expect(mockCallback).toBeCalledTimes(3)
-
         expect(mockCallback).nthCalledWith(1, {
           type: RUN,
           payload: { params: [] },
           meta: {},
           callbacks: {},
         })
-
         expect(mockCallback).nthCalledWith(2, {
           type: PENDING,
           meta: {},
         })
-
         expect(mockCallback).nthCalledWith(3, {
           type: SUCCESS,
           meta: {},
@@ -2214,7 +2211,70 @@ describe('RJ side effect model', () => {
             data: ['GioVa', 'Vegas', 'Albi', 'Skaffo'],
           },
         })
+        done()
+      })
+    })
 
+    it('should still support old rj.configured() syntax', (done) => {
+      const mockApi = jest.fn().mockResolvedValueOnce(['GioVa'])
+      const mockCallback = jest.fn()
+
+      const callerA = jest.fn((fn, ...args) => {
+        return (fn(...args) as Promise<any>).then((a) => a.concat('Skaffo'))
+      })
+      const callerB: EffectCallerFn = (fn, ...args) => {
+        return (fn(...args) as Promise<any>).then((a) => a.concat('Albi'))
+      }
+      const callerC: EffectCallerFn = (fn, ...args) => {
+        return (fn(...args) as Promise<any>).then((a) => a.concat('Vegas'))
+      }
+
+      const RjObject = rj(
+        rjPlugin({ effectCaller: callerA }),
+        rjPlugin({ effectCaller: rj.configured() }),
+        rjPlugin({ effectCaller: callerC }),
+        {
+          effect: mockApi,
+        }
+      )
+
+      const subject = createTestRJSubscription(RjObject, mockCallback)
+
+      const action: HookEffectAction = {
+        type: RUN,
+        payload: { params: [] },
+        meta: {},
+        callbacks: {},
+      }
+      Object.defineProperty(action, '__rjEffectRef', {
+        value: {
+          current: {
+            effectCaller: callerB,
+          },
+        },
+      })
+      subject.next(action)
+
+      callerA.mock.results[0].value.then(() => {
+        expect(mockCallback).toBeCalledTimes(3)
+        expect(mockCallback).nthCalledWith(1, {
+          type: RUN,
+          payload: { params: [] },
+          meta: {},
+          callbacks: {},
+        })
+        expect(mockCallback).nthCalledWith(2, {
+          type: PENDING,
+          meta: {},
+        })
+        expect(mockCallback).nthCalledWith(3, {
+          type: SUCCESS,
+          meta: {},
+          payload: {
+            params: [],
+            data: ['GioVa', 'Vegas', 'Albi', 'Skaffo'],
+          },
+        })
         done()
       })
     })
