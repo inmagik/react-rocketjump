@@ -1,14 +1,23 @@
 module.exports = {
   someSidebar: {
-    Concepts: [
+    'Getting Started': [
       'overview',
+      'installation',
+      'quick_start',
+    ],
+    Concepts: [
       'rj_object',
       'reducer',
       'computed_state_selectors',
       'action_creators',
       'side_effects',
+      'consume_rj_objects',
+      'effect_caller',
+      'mutations',
     ],
-    Docusaurus: ['doc1', 'doc2', 'doc3'],
-    Features: ['mdx'],
+    Api: [
+      'reference_rj',
+      'reference_use_rj',
+    ],
   },
 }

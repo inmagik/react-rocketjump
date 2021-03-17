@@ -2,7 +2,7 @@
 id: computed_state_selectors
 title: Computed state and selectors
 sidebar_label: Computed state and selectors
-slug: /computedStateAndSelectors
+slug: /computed-state-and-selectors
 ---
 
 ## Default selectors

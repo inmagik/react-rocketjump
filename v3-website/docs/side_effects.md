@@ -2,12 +2,8 @@
 id: side_effects
 title: Side Effects
 sidebar_label: Side Effects
-slug: /sideEffects
+slug: /side-effects
 ---
-
-<!-- Action are divided in two types *plain actions* and *effect actions*.
-When a plain action dispatch is requested the plain action is simply dispatched on your reducer.
-When an effect action dispatch is requested, the effect action is emitted on action obervable `Observable<Action>` . -->
 
 ## Architecture overview
 

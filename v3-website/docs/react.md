@@ -1,2 +1,0 @@
-
-## Concept: React integration

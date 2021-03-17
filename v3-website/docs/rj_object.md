@@ -2,7 +2,7 @@
 id: rj_object
 title: RjObject
 sidebar_label: RjObject
-slug: /RjObject
+slug: /rj-object
 ---
 
 RjObject is the base concept of RocketJump it's the **container** that represent a piece

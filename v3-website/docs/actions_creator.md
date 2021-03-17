@@ -2,7 +2,7 @@
 id: action_creators
 title: Action Creators
 sidebar_label: Action Creators
-slug: /actionCreators
+slug: /action-creators
 ---
 
 ## Plain and effect action creators
