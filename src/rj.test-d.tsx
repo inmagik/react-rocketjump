@@ -13,6 +13,7 @@ import rjList, { nextPreviousPaginationAdapter } from './plugins/list'
 import { BoundActionCreatorsWithBuilder } from './core/actions/bindActionCreators'
 import { map, withLatestFrom } from 'rxjs/operators'
 import { useRj, useRunRj } from './react'
+import { makeEffectAction } from './core'
 
 function stateShape() {
   const ObjA = rj({
@@ -520,6 +521,39 @@ function rjPluginBuilderSelectorsWithState() {
   const d: Date = sel.ju(state)
   const n: number = sel.j3(state)
   const s: string = sel.jj(state)
+}
+
+function rjPluginBuilderActions() {
+  const p1 = rjPlugin()
+    .actions(() => ({
+      killHumans: () => makeEffectAction('KILL'),
+    }))
+    .build()
+
+  const p2 = rjPlugin()
+    .actions(() => ({
+      hello: (d: Date) => ({ type: 'H', d })
+    }))
+    .build()
+
+  const p = rjPlugin()
+    .plugins(p1, p2)
+    .actions((actions) => ({
+      helloNow: () => actions.hello(new Date()),
+      killHumans: () => actions.killHumans().withMeta({
+        giova: 23
+      })
+    }))
+    .build()
+
+  const obj = rj()
+    .plugins(p)
+    .effect(() => Promise.reject())
+
+  obj.actionCreators.killHumans().withMeta({ x: 2 })
+  let m: number = obj.actionCreators.helloNow().d.getMinutes()
+  let mm: number = obj.actionCreators.hello(new Date()).d.getMinutes()
+  // obj.actionCreators.notFound
 }
 
 function optMutationsStateBuilder() {
