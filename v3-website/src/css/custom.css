@@ -23,3 +23,20 @@
   margin: 0 calc(-1 * var(--ifm-pre-padding));
   padding: 0 var(--ifm-pre-padding);
 }
+
+@keyframes razor {
+  0% {
+    transform: translate(8px, -8px);
+  }
+  50% {
+    transform: translate(16px, -16px);
+  }
+  100% {
+    transform: translate(8px, -8px);
+  }
+}
+
+.rj-logo img {
+  height: 150px;
+  animation: razor infinite linear 2.7s;
+}
