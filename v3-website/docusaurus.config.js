@@ -41,12 +41,8 @@ module.exports = {
           title: 'Docs',
           items: [
             {
-              label: 'Style Guide',
+              label: 'Getting Started',
               to: 'docs/',
-            },
-            {
-              label: 'Second Doc',
-              to: 'docs/doc2/',
             },
           ],
         },
@@ -54,16 +50,8 @@ module.exports = {
           title: 'Community',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-            },
-            {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
               label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
+              href: 'https://twitter.com/inmagiklabs',
             },
           ],
         },
@@ -72,7 +60,7 @@ module.exports = {
           items: [
             {
               label: 'Blog',
-              to: 'blog',
+              href: 'https://inmagik.com/blog',
             },
             {
               label: 'GitHub',
