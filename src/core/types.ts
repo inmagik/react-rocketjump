@@ -515,7 +515,7 @@ export type RjPlugin<
 > = (
   mergeObj: RjMergeableObject
 ) => RjMergeableObject<
-  Reducer<ReturnType<OutputReducer>>,
+  OutputReducer,
   RjBaseSelectors & OutputSelectors,
   OutputReducersMap,
   RjBaseActionCreators & OutputActionCreators
@@ -737,23 +737,38 @@ export type ToIntersection<A extends readonly any[]> = UnNest<
   Flatten<ToConsList<A>>
 >
 
+// NOTE: Ternary condition on empty plugins [] is a fixed for TS 4.2
 // Take a list of plugins and get an intersection of all selectors
-export type MergePluginsSelectors<Plugins extends RjPlugin[]> = ToIntersection<
-  {
-    [k in keyof Plugins]: Plugins[k] extends RjPlugin<any, infer U> ? U : never
-  }
->
+export type MergePluginsSelectors<Plugins extends RjPlugin[]> = [
 
+] extends Plugins
+  ? {}
+  : ToIntersection<
+      {
+        [k in keyof Plugins]: Plugins[k] extends RjPlugin<any, infer U>
+          ? U
+          : never
+      }
+    >
+
+// NOTE: Ternary condition on empty plugins [] is a fixed for TS 4.2
 // Take a list of plugins and get an intersection of all action creators
-export type MergePluginsActionCreators<
-  Plugins extends RjPlugin[]
-> = ToIntersection<
-  {
-    [k in keyof Plugins]: Plugins[k] extends RjPlugin<any, any, any, infer U>
-      ? U
-      : never
-  }
->
+export type MergePluginsActionCreators<Plugins extends RjPlugin[]> = [
+
+] extends Plugins
+  ? {}
+  : ToIntersection<
+      {
+        [k in keyof Plugins]: Plugins[k] extends RjPlugin<
+          any,
+          any,
+          any,
+          infer U
+        >
+          ? U
+          : never
+      }
+    >
 
 export type IntersectPluginsCombineReducers<
   Plugins extends RjPlugin[]
@@ -785,10 +800,12 @@ type LastPluginsReducer<Plugins extends RjPlugin[]> = Last<
 
 type ReducerOrDefault<T> = T extends Reducer ? T : Reducer<RjStateRootShape>
 
-// Extract last valid reducer from plugins or default reducer
-export type MergePluginsReducers<Plugins extends RjPlugin[]> = ReducerOrDefault<
-  LastPluginsReducer<Plugins>
->
+// NOTE: Ternary condition on empty plugins [] is a fixed for TS 4.2
+export type MergePluginsReducers<Plugins extends RjPlugin[]> = [
+
+] extends Plugins
+  ? Reducer<RjStateRootShape>
+  : ReducerOrDefault<LastPluginsReducer<Plugins>>
 
 export type MakeCombinedState<ReducersToCombine extends ReducersMap> = {
   [k in keyof ReducersToCombine]: ReducersToCombine[k] extends Reducer<infer U>

@@ -27,6 +27,7 @@ function rj(): RjBuilder<RjMergeableObject<Reducer<RjStateRootShape>>>
 function rj<
   Plugins extends RjPlugin[],
   ConfigReducer extends Reducer | undefined,
+  // prettier-ignore
   ConfigSelectors extends Selectors<
     // NOTE: Cause of this issue:
     // see: https://github.com/microsoft/TypeScript/issues/41396
@@ -55,6 +56,7 @@ function rj<
   >,
   ReducersMapCombine extends ReducersMap,
   ComposedState,
+  // prettier-ignore
   ConfigComputed extends Computed<
     // For the same reason of above we infer any for now
     any

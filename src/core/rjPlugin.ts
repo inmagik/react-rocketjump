@@ -18,6 +18,7 @@ function rjPlugin<
   ComposedState = unknown,
   ReducersMapCombine extends ReducersMap = ReducersMap,
   PluginActionCreators extends ActionCreators = ActionCreators,
+  // prettier-ignore
   PluginSelectors extends Selectors<
     // NOTE: Missing infer actual composed state cause is always unknown ...
     // see: https://github.com/microsoft/TypeScript/issues/41396
@@ -49,7 +50,7 @@ function rjPlugin<
 
 function rjPlugin<Plugins extends RjPlugin[]>(
   ...configAndPlugins: [...Plugins, RjBaseConfig]
-): RjPlugin | RjPluginBuilder {
+): RjPlugin | RjPluginBuilder<{}, []> {
   if (configAndPlugins.length === 0) {
     return rjPluginBuilder()
   }

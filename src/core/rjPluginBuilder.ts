@@ -222,6 +222,14 @@ function rjPluginSelecotrsConfigBuilder(
   }
 }
 
+function rjPluginReducerAtionsConfigBuilder<
+  PluginConfig extends RjBaseConfig = RjBaseConfig,
+  Plugins extends RjPlugin[] = RjPlugin[]
+>(
+  config: PluginConfig,
+  plugins: Plugins
+): RjPluginReducerActionsConfigBuilder<RjBaseConfig, Plugins>
+
 function rjPluginReducerAtionsConfigBuilder(
   config: RjBaseConfig,
   plugins: RjPlugin[]
@@ -250,12 +258,9 @@ function rjPluginReducerAtionsConfigBuilder(
 }
 
 export default function rjPluginBuilder(): RjPluginBuilder<{}, []> {
-  const config: RjBaseConfig = {}
-  const plugins: RjPlugin[] = []
-
   return {
-    ...rjPluginReducerAtionsConfigBuilder(config, plugins),
+    ...rjPluginReducerAtionsConfigBuilder({}, []),
     plugins: (...plugins: RjPlugin[]) =>
-      rjPluginReducerAtionsConfigBuilder(config, plugins),
+      rjPluginReducerAtionsConfigBuilder({}, plugins),
   }
 }
