@@ -301,17 +301,17 @@ rj({
 We also change the custom `takeEffect` signature to `TakeEffectHanlder`:
 
 ```ts
-export interface TakeEffectBag {
+interface TakeEffectBag {
   effect: EffectFn
   getEffectCaller: GetEffectCallerFn
   prefix: string
 }
 
-export interface StateObservable<S = any> extends Observable<S> {
+interface StateObservable<S = any> extends Observable<S> {
   value: S
 }
 
-export type TakeEffectHanlder = (
+type TakeEffectHanlder = (
   actionsObservable: Observable<EffectAction>,
   stateObservable: StateObservable,
   effectBag: TakeEffectBag,
@@ -366,7 +366,7 @@ For a real world usage see the [WebSocket Example](https://github.com/inmagik/re
 
 #### New standard take effects: `concatLatest` and `groupByConcatLatest`
 
-The standard take effect y excute one task at time but is you `RUN`
+This standard take effect execute one task at time but if you `RUN`
 a task while another task is excuted it buffer the **LAST** effect and then excute it.
 This is useful in auto save scenarios when a task is spawned very often but you need
 to send at server only one task at time to avoid write inconsistences but at the same
