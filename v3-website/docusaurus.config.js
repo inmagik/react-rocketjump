@@ -1,8 +1,8 @@
 module.exports = {
   title: 'React RocketJump',
   tagline: 'Manage state and side effects like a breeze',
-  url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
+  url: 'https://inmagik.github.io',
+  baseUrl: '/react-rocketjump/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
