@@ -2,7 +2,7 @@
 id: side_effects
 title: Side Effects
 sidebar_label: Side Effects
-slug: /side-effects
+slug: /sideEffects
 ---
 
 <!-- Action are divided in two types *plain actions* and *effect actions*.

@@ -2,6 +2,7 @@ module.exports = {
   someSidebar: {
     Concepts: [
       'overview',
+      'rj_object',
       'reducer',
       'computed_state_selectors',
       'action_creators',

@@ -2,7 +2,7 @@
 id: computed_state_selectors
 title: Computed state and selectors
 sidebar_label: Computed state and selectors
-slug: /computed-state-selectors
+slug: /computedStateAndSelectors
 ---
 
 ## Default selectors
@@ -12,6 +12,7 @@ Default selectors are designed to work with default state shape and are:
 
 - **getRoot** select the root state.
 - **isPending**: select pending state from root state.
+- **isLoading**: alias for isPending
 - **getError**: select error state from root state.
 - **getData**: select data state from root state.
 
@@ -64,6 +65,12 @@ const selectors = obj.makeSelectors()
 const computedState = obj.computeState(state, selectors)
 ```
 
+When you use consumers such `useRj` this is done for you:
+
+```js
+const [computedState, actions] = useRj(obj)
+```
+
 The default computeState implementation simply slice the root state.
 
 You can change the value returned from computeState using **computed** option, an object that map out property with internal RocketJump state.
@@ -86,12 +93,12 @@ const state = obj.reducer(undefined, { type: 'INIT' })
 const computedState = obj.computeState(state, obj.makeSelectors())
 ```
 
-The `computedState` value is:
+The `computedState` has this shape:
 
-```js
+```ts
 {
-  name: 'NONAME',
-  counter: 0,
-  loading: false,
+  name: string | null,
+  counter: number,
+  loading: boolean,
 }
 ```

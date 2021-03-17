@@ -7,7 +7,7 @@ slug: /reducer
 
 ### Default reducer
 
-If you don't specify anything the default reducer crafted when creating a RjObject has this shape:
+If you don't specify anything the default reducer crafted when creating a RjObject has this state shape:
 
 ```ts
 {
@@ -18,6 +18,10 @@ If you don't specify anything the default reducer crafted when creating a RjObje
   }
 }
 ```
+
+:::info
+When consuming an RjObject the default computed state is the state under **root** key.
+:::
 
 RocketJump use _redux style actions_:
 
@@ -72,11 +76,31 @@ interface FailureAction {
 the `payload` key on action contains the error data.
 Default root reducer implementation make *pending* `false` and fill the `error` key with payload from action.
 
+- **UPDATE_DATA**
+
+```ts
+interface UpdateDataAction {
+  type: 'UPDATE_DATA'
+  payload: any
+}
+```
+
+**UPDATE_DATA** action is dispatched from default action creator `updateData`.
+Default root reducer implementation set the `payload` as new data.
+
+
 In addition when your RjObject is initialized the **INIT** action is also dispatched.
 ```ts
 interface InitAction {
   type: 'INIT'
 }
+```
+
+**INIT**, **PENDING**, **SUCCESS**, **FAILURE**, **UPDATE_DATA** are exported from
+`'react-rocketjump'` module:
+
+```js
+import { INIT, PENDING, SUCCESS, FAILURE, UPDATE_DATA } from 'react-rocketjump'
 ```
 
 We call the reducer under the `root` key the **root reducer**, you can extend the root reducer or add others reducers under specific keys.

@@ -2,7 +2,7 @@
 id: overview
 title: Overview
 sidebar_label: Overview
-slug: /overview
+slug: /
 ---
 
 React RocketJump (**rj** for friends) is a library to help you manage state and side effects in React applications.
