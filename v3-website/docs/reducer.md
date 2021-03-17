@@ -59,7 +59,7 @@ interface SuccessAction {
 ```
 
 **SUCCESS** action is dispatched when your **effect** *resolves / complete*
-the `data` key on `payload` contains the result data.
+the `data` key on `payload` contains the effectresult.
 Default root reducer implementation make *pending* `false` and fill the `data` key with `payload.data` from action.
 
 - **FAILURE**
@@ -73,7 +73,7 @@ interface FailureAction {
 ```
 
 **FAILURE** action is dispatched when your **effect** *rejects / error*
-the `payload` key on action contains the error data.
+the `payload` key on action contains the error generated from effect.
 Default root reducer implementation make *pending* `false` and fill the `error` key with payload from action.
 
 - **UPDATE_DATA**
@@ -88,19 +88,76 @@ interface UpdateDataAction {
 **UPDATE_DATA** action is dispatched from default action creator `updateData`.
 Default root reducer implementation set the `payload` as new data.
 
+- **CANCEL**
+
+```ts
+interface CancelAction {
+  type: 'CANCEL'
+  payload: any
+}
+```
+
+**CANCEL** action is dispatched from default action creator `cancel`.
+Default root reducer implementation set the `pending` to `false`.
+
+- **CLEAN**
+
+```ts
+interface CancelAction {
+  type: 'CLEAN'
+  payload: any
+}
+```
+
+**CLEAN** action is dispatched from default action creator `clean`.
+Default root reducer implementation set reset `pending`, `data` and `error` to
+default state:
+```js
+{
+  pending: false,
+  data: null,
+  error: null,
+}
+```
+
 
 In addition when your RjObject is initialized the **INIT** action is also dispatched.
+
 ```ts
 interface InitAction {
   type: 'INIT'
 }
 ```
 
-**INIT**, **PENDING**, **SUCCESS**, **FAILURE**, **UPDATE_DATA** are exported from
-`'react-rocketjump'` module:
+Finally the last RocketJump core action is the `RUN` action.
+Dispathed when the **effect** is triggered.
+
+```ts
+interface RunAction {
+  type: 'RUN',
+  payload: {
+    params: any[]
+  },
+  meta: Record<string, any>
+}
+```
+Default root reducer implementation doesn't listen to this action.
+
+
+**INIT**, **RUN**, **CANCEL**, **CLEAN**, **PENDING**, **SUCCESS**, **FAILURE**
+and **UPDATE_DATA** action types are all export from `'react-rocketjump'` module:
 
 ```js
-import { INIT, PENDING, SUCCESS, FAILURE, UPDATE_DATA } from 'react-rocketjump'
+import {
+  INIT,
+  RUN,
+  CANCEL,
+  CLEAN,
+  PENDING,
+  SUCCESS,
+  FAILURE,
+  UPDATE_DATA
+} from 'react-rocketjump'
 ```
 
 We call the reducer under the `root` key the **root reducer**, you can extend the root reducer or add others reducers under specific keys.

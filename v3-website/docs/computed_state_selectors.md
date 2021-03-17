@@ -49,8 +49,6 @@ const CoolState = rj({
 })
 ```
 
-> A note about memoization
-
 The final `CoolState` RjObject has default selectors plus `getCounter` and `getName`.
 
 ## Compute state

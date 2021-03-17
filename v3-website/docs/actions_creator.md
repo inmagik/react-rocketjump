@@ -17,7 +17,7 @@ dispatched on the reducer.
 ### Effect action creators
 
 Effect action creators returns special actions that are passed as input
-to side effect the side effect will emit action dispatched on the reducer.
+to side effect the side effect will emit plain action dispatched on the reducer.
 
 You can find action creators under `actionCreators` property in your RjObject.
 
@@ -50,7 +50,7 @@ The `actions` method should be a function with this signature:
 Next actions are merged to final actions.
 :::
 
-So combining the concept learned in previous chapter let's build a counter using
+So combining the concept learned in the previous chapters let's build a counter using
 RocketJump!
 
 ```jsx
@@ -91,7 +91,13 @@ function Counter() {
 ## Adding effect actions
 
 To create an effect action you can use an helper from RocketJump called
-`makeEffectAction` that has this signature:
+`makeEffectAction`:
+
+```js
+import { makeEffectAction } from 'react-rocketjump'
+```
+
+The signature of makeEffectAction is:
 
 ```ts
 <T extends string>(type: T, params?: any[], meta?: Record<string, any>) =>
@@ -110,28 +116,40 @@ When your EffectAction is emitted to your side effect the shape you can expect i
 }
 ```
 
-The default `run()` action creator will create an effect action `EffectAction<'RUN'>`
-In the default side effect model the `RUN` effect action will emit a **PENDING** action,
-then invoke the **effect** function using `params` as inputs.
+The default `run()` effect action creator will create an effect action `EffectAction<'RUN'>`.
 
-:::note
-The meta passed to your `makeEffectAction` are injected in all related
-effect action.
-:::
+Side effects dispatch the `RUN` action immediately:
 
 ```ts
 {
- type: PENDING,
+  type: 'RUN',
+  payload: {
+    params: any[],
+  },
+  meta: Record<string, any>
+}
+```
+
+:::note
+The meta passed to your `makeEffectAction` are injected in all emitted action.
+:::
+
+Then depending of your side effect configuration when the **effect** is executed,
+using `params` as input, the **PENDING** action is dispatched:
+
+```ts
+{
+ type: 'PENDING',
  meta: Record<string, any>
 }
 ```
 
-If the effect *resolves* / *complete* a **SUCCESS** action will emitted.
+If the effect _resolves_ / _complete_ a **SUCCESS** action will emitted.
 The `payload.data` contains the result of **effect**.
 
 ```ts
 {
- type: SUCCESS,
+ type: 'SUCCESS',
  payload: {
    params: any[],
    data: any
@@ -140,35 +158,71 @@ The `payload.data` contains the result of **effect**.
 }
 ```
 
-If the effect *rejects* / *errors* a **ERROR** action will emitted.
+If the effect _rejects_ / _errors_ a **ERROR** action will emitted.
 The `payload` contains the error generated from **effect**.
 
 ```ts
 {
- type: FAILURE,
+ type: 'FAILURE',
  payload: any,
  meta: Record<string, any>
 }
 ```
 
 When creating new effect action creators using the **rj** constructor you can
-add *meta* to current actions using the special `withMeta` method.
+add _meta_ to current actions using the special `withMeta` method.
 
-In this exaple with use the *meta* `append` to append to our data instead
-of replace them:
+In this exaple we use the _meta_ `append` to append to our data instead
+of replace them.
 
-```js
+From this example our immaginary REST API `/api/products` will return a JSON
+with the following shape:
+
+```ts
+{
+  results: any[],
+  nextPage: number | null
+}
+```
+
+```jsx
 import { rj, useRj, SUCCESS } from 'react-rocketjump'
 
 const InfiniteListState = rj({
-  effect: (page = 1) => fetch(`/api/products?=${page}`).then(r => r.json()),
+  effect: (page = 1) => fetch(`/api/products?=${page}`).then((r) => r.json()),
   actions: ({ run }) => ({
-    fetchMore: (...args) => run(...args).withMeta({ append: true })
+    fetchMore: (...args) => run(...args).withMeta({ append: true }),
   }),
   reducer: (oldReducer) => (state, action) => {
-    if (action.type === SUCCESS) {
-
+    // Append effect result to our data
+    if (action.type === SUCCESS && action.meta.append === true) {
+      return {
+        ...state,
+        data: (state.data?.results ?? []).concat(action.payload.data),
+      }
     }
-  }
+    // Use default reducer implementation
+    return oldReducer(state, action)
+  },
 })
+
+function MyList() {
+  // Starts with default page: 1
+  const [{ data }, { fetchMore }] = useRunRj(InfiniteListState)
+
+  return (
+    <div>
+      {/** ... render your data ... **/}
+      <button
+        disabled={!data?.nextPage}
+        onClick={() => {
+          // Fetch next page
+          fechMore(data.nextPage + 1)
+        }}
+      >
+        More
+      </button>
+    </div>
+  )
+}
 ```
