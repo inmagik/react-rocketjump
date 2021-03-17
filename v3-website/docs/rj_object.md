@@ -5,7 +5,7 @@ sidebar_label: RjObject
 slug: /rj-object
 ---
 
-RjObject is the base concept of RocketJump it's the **container** that represent a piece
+RjObject is the base type of RocketJump it's the **container** that represent a piece
 of your "data source logic".
 
 Concretely an RjObject contains:

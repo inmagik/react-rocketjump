@@ -78,20 +78,20 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          lastVersion: 'current',
-          versions: {
-            'current': {
-              label: '3.x',
-              path: '',
-            },
-            '2.x': {
-              label: '2.x',
-              path: '2.x',
-            },
-          },
-          // Please change this to your repo.
+          // TODO: uncomment this when v3 is relased!
+          // lastVersion: 'current',
+          // versions: {
+          //   'current': {
+          //     label: '3.x',
+          //     path: '',
+          //   },
+          //   '2.x': {
+          //     label: '2.x',
+          //     path: '2.x',
+          //   },
+          // },
           editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/',
+            'https://github.com/inmagik/react-rocketjump/edit/master/v3-website/',
         },
         blog: false,
         theme: {
