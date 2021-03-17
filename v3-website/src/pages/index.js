@@ -1,46 +1,51 @@
-import React from 'react';
-import clsx from 'clsx';
-import Layout from '@theme/Layout';
-import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import useBaseUrl from '@docusaurus/useBaseUrl';
-import styles from './styles.module.css';
+import React from 'react'
+import clsx from 'clsx'
+import Layout from '@theme/Layout'
+import Link from '@docusaurus/Link'
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
+import useBaseUrl from '@docusaurus/useBaseUrl'
+import styles from './styles.module.css'
 
 const features = [
   {
-    title: 'Easy to Use',
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    title: 'Flexible',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Since it works locally, inside components, you can add it to your app
+        without any compatibility issue, and you can use it just where you need
+        it.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    title: 'Reusable',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        React Rocketjump is built around the concept of composition in order to
+        let you build a reusable api. RjObjects are reusable blueprints so you
+        can easily insert them in different components without worries.
+        <br />
+        Plus React Rocketjump comes with some handy <a href="/doc/plugins">plugins</a>{' '}
+        to achieve most common task with less code possible.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    title: 'Powered by RxJS',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        React Rocketjump handle your side effect using{' '}
+        <a href="https://rxjs.dev">rxjs</a>. Out of the box you don't need to
+        write any rxjs code at all. But you can tune your configuration to handle
+        complex scenarios such websocket, timers and anything you can done with
+        rx!
       </>
     ),
   },
-];
+]
 
-function Feature({imageUrl, title, description}) {
-  const imgUrl = useBaseUrl(imageUrl);
+function Feature({ imageUrl, title, description }) {
+  const imgUrl = useBaseUrl(imageUrl)
   return (
     <div className={clsx('col col--4', styles.feature)}>
       {imgUrl && (
@@ -51,20 +56,21 @@ function Feature({imageUrl, title, description}) {
       <h3>{title}</h3>
       <p>{description}</p>
     </div>
-  );
+  )
 }
 
 function Home() {
-  const context = useDocusaurusContext();
-  const {siteConfig = {}} = context;
+  const context = useDocusaurusContext()
+  const { siteConfig = {} } = context
   return (
     <Layout
       title={`Manage state and side effects like a breeze`}
-      description="Description will go into a meta tag in <head />">
+      description="Description will go into a meta tag in <head />"
+    >
       <header className={clsx('hero hero--primary', styles.heroBanner)}>
         <div className="container">
-          <div className='rj-logo'>
-            <img alt='rj logo' src='img/rj.svg' />
+          <div className="rj-logo">
+            <img alt="rj logo" src="img/rj.svg" />
           </div>
           <h1 className="hero__title">{siteConfig.title}</h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
@@ -72,9 +78,10 @@ function Home() {
             <Link
               className={clsx(
                 'button button--outline button--secondary button--lg',
-                styles.getStarted,
+                styles.getStarted
               )}
-              to={useBaseUrl('docs/')}>
+              to={useBaseUrl('docs/')}
+            >
               Get Started
             </Link>
           </div>
@@ -94,7 +101,7 @@ function Home() {
         )}
       </main>
     </Layout>
-  );
+  )
 }
 
-export default Home;
+export default Home

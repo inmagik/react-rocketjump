@@ -5,7 +5,7 @@ module.exports = {
       'installation',
       'quick_start',
     ],
-    Concepts: [
+    Recipes: [
       'rj_object',
       'reducer',
       'computed_state_selectors',
