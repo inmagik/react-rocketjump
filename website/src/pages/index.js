@@ -87,7 +87,7 @@ function Home() {
       <header className={clsx('hero hero--primary', styles.heroBanner)}>
         <div className="container">
           <div className="rj-logo">
-            <img alt="rj logo" src="img/rj.svg" />
+            <img alt="rj logo" src="img/rj_logo.svg" />
           </div>
           <h1 className="hero__title">
             <NoWrapTitle>{siteConfig.title}</NoWrapTitle>

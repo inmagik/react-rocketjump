@@ -5,7 +5,9 @@ sidebar_label: Reducer
 slug: /reducer
 ---
 
-Every RjObject has it's own internal state described by a reducer
+Every RjObject has its own reducer that describe its internal state and how this
+state changes in response of actions.
+
 ### Default reducer
 
 If you don't specify anything the default reducer crafted when creating a RjObject has this state shape:

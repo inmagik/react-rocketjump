@@ -1,6 +1,10 @@
-# React-RocketJump
+<p align='center'>
+  <img alt='rj logo' src='./assets/rj_logo.svg' height='150' />
+</p>
 
-Rocketjump your react! Manage state and side effects like a breeze
+# React RocketJump
+
+Manage state and side effects like a breeze
 
 [![Build Status](https://travis-ci.com/inmagik/react-rocketjump.svg?branch=master)](https://travis-ci.com/inmagik/react-rocketjump)
 [![npm version](https://badge.fury.io/js/react-rocketjump.svg)](https://badge.fury.io/js/react-rocketjump)
