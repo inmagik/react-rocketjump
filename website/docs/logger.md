@@ -1,8 +1,8 @@
 ---
-id: debug_logger
+id: logger
 title: Logger
 sidebar_label: Logger
-slug: /debug-logger
+slug: /logger
 ---
 As React RocketJump powered applications grow up in size, it becomes very difficult to track and debug all the effect runs and corresponding (concurrent) state updates.
 

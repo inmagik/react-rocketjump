@@ -15,7 +15,7 @@ From action observable a **dispatch observable** is created according to `takeEf
 
 The actions emitted from dispatch observable are dispatched on reducer.
 
-![img](../static/img/RjSideEffectModel.png)
+![img](./assets/RjSideEffectModel.png)
 
 ## Take effect
 

@@ -14,6 +14,7 @@ module.exports = {
       'consume_rj_objects',
       'effect_caller',
       'mutations',
+      'logger',
     ],
     Api: [
       'reference_rj',
