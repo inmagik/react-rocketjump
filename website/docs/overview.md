@@ -13,7 +13,7 @@ Side effects are handled using [rxjs](https://rxjs.dev)
 
 React RocketJump create reusable state containers called **RjObject**, you can consume them from React using hooks or HOCs.
 
-RjObject are local they live and dead in the context of your React Component, you can still share them using [React Context API](https://reactjs.org/docs/context.html).
+RjObject are local they live and dead in the context of your React Components, you can still share them using [React Context API](https://reactjs.org/docs/context.html).
 
 RocketJump tries and get the best from [flux](https://facebook.github.io/flux)
 architecture but without all the pain and boilerplate.
