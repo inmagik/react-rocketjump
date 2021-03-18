@@ -1,10 +1,36 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import clsx from 'clsx'
 import Layout from '@theme/Layout'
 import Link from '@docusaurus/Link'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import useBaseUrl from '@docusaurus/useBaseUrl'
 import styles from './styles.module.css'
+
+function DescriptionForReusable() {
+  return (
+    <>
+      React Rocketjump is built around the concept of composition in order to
+      let you build a reusable api. RjObjects are reusable blueprints so you can
+      easily insert them in different components without worries.
+      <br />
+      Plus React Rocketjump comes with some handy{' '}
+      <Link to={useBaseUrl('/docs/plugins')}>plugins</Link> to achieve most
+      common task with less code possible.
+    </>
+  )
+}
+
+function NoWrapTitle({ children }) {
+  const pieces = children.split(' ')
+  return pieces.map((world, i) => (
+    <Fragment key={i}>
+      <span className="no-wrap">
+        {world}
+      </span>
+      {i !== pieces.length - 1 ? ' ' : null}
+    </Fragment>
+  ))
+}
 
 const features = [
   {
@@ -19,16 +45,7 @@ const features = [
   },
   {
     title: 'Reusable',
-    description: (
-      <>
-        React Rocketjump is built around the concept of composition in order to
-        let you build a reusable api. RjObjects are reusable blueprints so you
-        can easily insert them in different components without worries.
-        <br />
-        Plus React Rocketjump comes with some handy <a href="/doc/plugins">plugins</a>{' '}
-        to achieve most common task with less code possible.
-      </>
-    ),
+    description: <DescriptionForReusable />,
   },
   {
     title: 'Powered by RxJS',
@@ -36,9 +53,9 @@ const features = [
       <>
         React Rocketjump handle your side effect using{' '}
         <a href="https://rxjs.dev">rxjs</a>. Out of the box you don't need to
-        write any rxjs code at all. But you can tune your configuration to handle
-        complex scenarios such websocket, timers and anything you can done with
-        rx!
+        write any rxjs code at all. But you can tune your configuration to
+        handle complex scenarios such websocket, timers and anything you can
+        done with rx!
       </>
     ),
   },
@@ -72,7 +89,9 @@ function Home() {
           <div className="rj-logo">
             <img alt="rj logo" src="img/rj.svg" />
           </div>
-          <h1 className="hero__title">{siteConfig.title}</h1>
+          <h1 className="hero__title">
+            <NoWrapTitle>{siteConfig.title}</NoWrapTitle>
+          </h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
           <div className={styles.buttons}>
             <Link

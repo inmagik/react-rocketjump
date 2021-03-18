@@ -40,3 +40,7 @@
   height: 150px;
   animation: razor infinite linear 2.7s;
 }
+
+.no-wrap {
+  white-space: nowrap;
+}
