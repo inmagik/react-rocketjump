@@ -11,16 +11,16 @@ State managment is inspired by [redux](https://redux.js.org), from redux RocketJ
 
 Side effects are handled using [rxjs](https://rxjs.dev)
 
-React RocketJump create reutilizable containers called **RjObject**, you can consume them from React using hooks or HOCs.
+React RocketJump create reusable state containers called **RjObject**, you can consume them from React using hooks or HOCs.
 
 RjObject are local they live and dead in the context of your React Component, you can still share them using [React Context API](https://reactjs.org/docs/context.html).
 
-RocketJump try to getting the best from [flux](https://facebook.github.io/flux)
+RocketJump tries and get the best from [flux](https://facebook.github.io/flux)
 architecture but without all the pain and boilerplate.
-RocketJump use convention over configuration, so common problems are quick to achieve and require very little code to write but on the other hand
-let you customize everything to help you fight real world complex scenarios and edge cases.
+RocketJump uses convention over configuration, common use cases are quick to achieve and require very little code to write, but on the other hand
+let you customize everything to help you solve real world complex scenarios and edge cases.
 
-The smallest RocketJump example looks like this:
+The smallest RocketJump example looks like:
 
 ```jsx
 import { rj, useRunRj } from 'react-rocketjump'
