@@ -1,5 +1,8 @@
 <p align='center'>
-  <img alt='rj logo' src='./assets/rj_logo.svg' height='150' />
+  <a href='https://inmagik.github.io/react-rocketjump/'>
+     <img alt='rj logo' src='./assets/rj_logo.svg' height='150' />
+  </a>
+ 
 </p>
 
 # React RocketJump
