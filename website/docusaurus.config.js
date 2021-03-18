@@ -91,7 +91,7 @@ module.exports = {
           //   },
           // },
           editUrl:
-            'https://github.com/inmagik/react-rocketjump/edit/master/v3-website/',
+            'https://github.com/inmagik/react-rocketjump/edit/master/website/',
         },
         blog: false,
         theme: {
