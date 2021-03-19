@@ -5,19 +5,23 @@ sidebar_label: Action Creators
 slug: /action-creators
 ---
 
+Every RjObject has its own action creators: a collection functions that trigger
+state updates and/or side effects.
+
 ## Plain and effect action creators
 
 In RocketJump there is two type of action creators:
 
-### Plain action creators
+#### Plain action creators
 
 Plain action creators returns plain actions and theese actions are
 dispatched on the reducer.
 
-### Effect action creators
+#### Effect action creators
 
-Effect action creators returns special actions that are passed as input
-to side effect the side effect will emit plain action dispatched on the reducer.
+Effect action creators returns special actions.
+This actions becomes a **stream**, side effects take this stream as inputs
+and emit plain actions dispatched on the reducer.
 
 You can find action creators under `actionCreators` property in your RjObject.
 
@@ -34,6 +38,20 @@ const obj = rj(() => Promise.resolve('Hello'))
 const [state, bindActionsCreators] = useRj(obj)
 ```
 
+## Default action creators
+
+When you crafting a new RjObject default action creators are generated.
+Default action creators are designed to work with default state shape and side effects, and are:
+
+- `updateData(data: any): { type: 'UPDATE_DATA' }`:
+A plain action creator that update your data state.
+- `run(...args: any[]): EffectAction<'RUN'>`:
+An effect action creator that run your effect.
+- `cancel(): EffectAction<'CANCEL'>`:
+An effect action creator that cancel your effect.
+- `clean(): EffectAction<'CLEAN'>`:
+An effect action creator that cancel your effect and reset your root state.
+
 ## Adding plain actions
 
 To adding plain actions you can use the `actions` property in **rj** constructor
@@ -46,9 +64,7 @@ The `actions` method should be a function with this signature:
 (currentActions) => nextActions
 ```
 
-:::note
-Next actions are merged to final actions.
-:::
+`nextActions` are merged to `currentActions`.
 
 So combining the concept learned in the previous chapters let's build a counter using
 RocketJump!
@@ -175,7 +191,7 @@ add _meta_ to current actions using the special `withMeta` method.
 In this exaple we use the _meta_ `append` to append to our data instead
 of replace them.
 
-From this example our immaginary REST API `/api/products` will return a JSON
+For this example our immaginary REST API `/api/products` will return a JSON
 with the following shape:
 
 ```ts

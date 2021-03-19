@@ -270,14 +270,14 @@ export type EffectFn = (
 /**
  * Placeholder for configured effect caller
  */
-export type RjConfguredCaller = typeof RJ_CONFIGURED_EFFECT_CALLER
+export type RjConfiguredCaller = typeof RJ_CONFIGURED_EFFECT_CALLER
 
 export type EffectCallerFn = (
   effect: EffectFn,
   ...params: any[]
 ) => Promise<any> | Observable<any> | EffectFn
 
-export type RjEffectCaller = EffectCallerFn | RjConfguredCaller
+export type RjEffectCaller = EffectCallerFn | RjConfiguredCaller
 
 export type GetEffectCallerFn = (action: EffectAction) => EffectCallerFn
 
@@ -349,13 +349,13 @@ export interface RjSideEffectConfig {
    * `[takeEffect, (action: Action) => any]`
    * the second argument the groupBy function is used to group by your side effect.
    *
-   * - `'latest'` Take latest effect, cancel previous effect
-   * - `['groupBy', groupByFn]` Take latest effect but group by
-   * - `'every'` Take every effect
-   * - `'exhaust'` Take an effect, ignore effect until last effect complete.
-   * - `['groupByExhaust', groupByFn]` Take exhaust effect but group by
-   * - `concatLatest` Take an effect, if another effect arrive enqueue the latest
-   * - `['groupByConcatLatest', groupByFn]` Take concat latest effect but group by
+   * - `'latest'`: Take latest effect, cancel previous effect.
+   * - `['groupBy', groupByFn]`: Take latest effect but group by.
+   * - `'every'`: Take every effect.
+   * - `'exhaust'`: Take an effect, ignore effect until last effect complete.
+   * - `['groupByExhaust', groupByFn]`: Take exhaust effect but group by.
+   * - `'concatLatest'`: Take an effect, if another effect arrive buffer the latest.
+   * - `['groupByConcatLatest', groupByFn]`: Take concat latest effect but group by.
    */
   readonly takeEffect?: TakeEffects
 

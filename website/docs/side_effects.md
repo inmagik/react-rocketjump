@@ -19,24 +19,24 @@ The actions emitted from dispatch observable are dispatched on reducer.
 
 ## Take effect
 
-Take effect abstraction describe how your effect actions stream are handled by RocketJump.
+Take effect abstraction describe how your effect actions stream is handled by RocketJump.
 You can configured them using the `takeEffect` property in **rj** constructor.
 You can write your own take effect function using [rxjs](https://rxjs.dev) or you can use
 the standard take effects provided by RocketJump passing it a _string_.
-Standard take effects are designed to works with standard effect action:
+Standard take effects are designed to works with standard effect action types:
 
-- `RUN` created by `run(...params)` trigger the effect function using `params` as input.
-- `CANCEL` created by `cancel()` stop onging effect.
-- `CELAN` created by `clean()` also stop onging effect.
+- `'RUN'`: created by `run(...params)` trigger the effect function using `params` as input.
+- `'CANCEL'`: created by `cancel()` stop onging effect.
+- `'CELAN'`: created by `clean()` also stop onging effect.
 
 Standard take effects are:
 
-- `latest`: **(the default one)** take only the last effect you run, cancel all previous pending effect.
-- `every`: take all effects you run, the dispatched _FAILURE_ / _SUCCESS_ follow the **completation order**
+- `'latest'`: **(the default one)** take only the last effect you run, cancel all previous pending effect.
+- `'every'`: take all effects you run, the dispatched _FAILURE_ / _SUCCESS_ follow the **completation order**
   of your effect (don't use the if order matter). If a _CANCEL_ or _CLEAN_ are emitted **ALL** ongoing effects
   are canceled.
-- `exhaust`: execute one run at time if an effect is pending and you emit a run it's ignored.
-- `concatLatest`: execute one run at time if an effect is pending and you emit a run the **LAST** run is buffered
+- `'exhaust'`: execute one run at time if an effect is pending and you emit a run it's ignored.
+- `'concatLatest'`: execute one run at time if an effect is pending and you emit a run the **LAST** run is buffered
   and then executed. This useful in "auto save" scenarios you spawn run very often but you want
   to avoid concurrent save but, on the other hand, you want your data update with last version.
 
@@ -54,20 +54,28 @@ that extracts the key for each effect action.
 
 Standard take effects group by are:
 
-- `groupBy` the group by version of `latest`
-- `groupByExhaust` the group by version of `latest`
-- `groupByConcatLatest` the group by version of `concatLatest`
+- `'groupBy'`: the group by version of `latest`.
+- `'groupByExhaust'`: the group by version of `latest`.
+- `'groupByConcatLatest'`: the group by version of `concatLatest`.
 
 ## Write custom take effects
 
 As mentioned before you can write custom take effects.
 To write custom take effect you should have a basic understening of how rxjs works.
-As expiration you can checkout how standard take effects are implemented
-TODO: Link master [here](https://github.com/inmagik/react-rocketjump/blob/v3/src/core/effect/takeEffectsHandlers.ts).
+As expiration you can checkout how standard take effects are implemented [here](https://github.com/inmagik/react-rocketjump/blob/master/src/core/effect/takeEffectsHandlers.ts).
 
 The take effect handler has this signature:
 
 ```ts
+type EffectCallerFn = (
+  effect: EffectFn,
+  ...params: any[]
+) => Promise<any> | Observable<any> | EffectFn
+
+type RjEffectCaller = EffectCallerFn | RjConfiguredCaller
+
+type GetEffectCallerFn = (action: EffectAction) => EffectCallerFn
+
 interface TakeEffectBag {
   effect: EffectFn
   getEffectCaller: GetEffectCallerFn
@@ -86,13 +94,14 @@ type TakeEffectHanlder = (
 ) => Observable<Action>
 ```
 
-One important note to understand is that (in order to make RockeJump works)
-is that at first instance you need to **FILTER** which effect actions you want to handle.
+One important note to understand is that (in order to make RockeJump works) at first
+instance you need to **FILTER** which effect actions you want to handle.
 This because multiple effects can live in a single RjObject so you have to handle only
-you part.
+your part.
 
-Ok try to write a real example. Take the counter RjObject from previous example
-and make it inc or dec the counter after a given ammount of time.
+Ok try to write a real example. Take the counter RjObject from the previous example
+and transform the increment / decrement action to effect action so we can execute
+theme after a given amount of time.
 
 ```jsx
 import { rj, useRj } from 'react-rocketjump'
@@ -102,7 +111,7 @@ import { of } from 'rxjs'
 export const CounterState = rj({
   // NOTE: In this example we ignore effect
   effect: () => Promise.reject(),
-  // Add inc() and dec() effect action creators
+  // Make inc() and dec() effect action creators
   actions: (currentActions) => ({
     dec: (quantity, wait = 0) =>
       makeEffectAction('DEC', [quantity], {
@@ -170,3 +179,59 @@ When using `takeEffect` option the default take effect is replaced.
 If instead you want to add another side effect and keep the take effect working
 use `addSideEffect` option, the signature and the behavior are identical to
 a custom take effect.
+
+## The `actionMap` helper
+
+In order to make your life easier RocketJump provide you a useful helper
+to emit standard RocketJump actions (**PENDING**, **FAILURE**, **SUCCESS**)
+from a **RUN**.
+
+This function is used inside standard RocketJump take effects.
+
+You can use this function to implement a custom take effects with the same
+contract of standard ones.
+
+The `actionMap` helper has this signature:
+
+```ts
+function actionMap(
+  action: EffectAction,
+  effectCall: EffectFn,
+  getEffectCaller: GetEffectCallerFn,
+  prefix: string
+): Observable<Action>
+```
+
+This helper call the **effect** using the [effect caller](effect_caller.md)
+and emit standard actions with given prefix.
+
+For example if we want to implement a take effect that use the `concatMap` operator
+we can write:
+
+```js
+import { rj, actionMap, RUN } from 'react-rocketjump'
+import { concatMap, filter } from 'rxjs/operators'
+import { concat, of } from 'rxjs'
+
+rj({
+  // ...
+  takeEffect: (actionObserable, stateObservable, takeEffectBag) => {
+    return actionObserable.pipe(
+      // NOTE: In a real world scenario
+      // we also have to handle CANCEL and CLEAN types
+      filter((action) => action.type === RUN),
+      concatMap((action) =>
+        concat(
+          of(action),
+          actionMap(
+            action,
+            takeEffectBag.effect,
+            takeEffectBag.getEffectCaller,
+            takeEffectBag.prefix
+          )
+        )
+      )
+    )
+  },
+})
+```

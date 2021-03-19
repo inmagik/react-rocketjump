@@ -35,7 +35,7 @@ const MyObj = rj({
 ## Consuming
 
 When consuming an RjObject from React hooks or HOCs you receive from them
-some **state** and **actions**.
+some **state** and **action creators**.
 
 ```js
 import { useRj } from 'react-rocketjump'
@@ -43,7 +43,7 @@ import { useRj } from 'react-rocketjump'
 const [state, actions] = useRj(MyObj)
 ```
 
-## Default State
+## Default state
 
 The `rj()` defaults are designed to store the last effect results
 along with some meta information and give to consumers a state with this shape:
@@ -60,9 +60,9 @@ along with some meta information and give to consumers a state with this shape:
 - `pending`: A flag that indicates if your effect is in flying.
 - `error`: The eventually effect error, `null` on start.
 
-## Default Actions
+## Default action creators
 
-The `rj()` defaults actions are designed to work with the default state and
+The `rj()` defaults action creators are designed to work with the default state and
 given effect and are:
 
 - `run(...args: any[])`: trigger effect, `...args` are passed as effect inputs,

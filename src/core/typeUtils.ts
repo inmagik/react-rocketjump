@@ -1,7 +1,7 @@
 import { RJ_CONFIGURED_EFFECT_CALLER, RJ_OBJECT, RJ_PLUGIN } from './internals'
-import { RjConfguredCaller, RjObject, RjPlugin } from './types'
+import { RjConfiguredCaller, RjObject, RjPlugin } from './types'
 
-export function isRjConfiguredCaller(a: any): a is RjConfguredCaller {
+export function isRjConfiguredCaller(a: any): a is RjConfiguredCaller {
   return a === RJ_CONFIGURED_EFFECT_CALLER
 }
 

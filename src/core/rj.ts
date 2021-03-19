@@ -8,7 +8,7 @@ import {
   Mutations,
   Reducer,
   ReducersMap,
-  RjConfguredCaller,
+  RjConfiguredCaller,
   RjConfig,
   RjMergeableObject,
   RjObject,
@@ -146,7 +146,7 @@ interface RjWithHelpers extends RjFn {
    *
    * Set your effectCaller a configured caller from `<ConfigureRj />`.
    */
-  configured(): RjConfguredCaller
+  configured(): RjConfiguredCaller
 
   /**
    * Standard factory RJ mutations for you!
