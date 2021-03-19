@@ -110,3 +110,46 @@ The `computedState` has this shape:
   loading: boolean,
 }
 ```
+
+## Memoizing selectors
+
+:::caution
+In most of apps you dont' need to memoize RocketJump selectors.
+You can simply rely on React's `useMemo` inside your components.
+:::
+
+RocketJump selectors are created per instance when you consume your RjObject.
+So you can create per instance memoizing version of your selectors:
+
+```js
+import { rj } from 'react-rocketjump'
+import memoize from 'memoize-one'
+
+const TodosState = rj({
+  // ...
+  selectors: (prevSelectors) => {
+    // filterDoneTodos is created per instance
+    const filterDoneTodos = memoize((todos) =>
+      todos ? todos.filter((todo) => todo.done) : []
+    )
+    return {
+      // memoize "per todos"
+      // (filterDoneTodos is re-executed only when data actually changes)
+      getDoneTodos: (state) => filterDoneTodos(prevSelectors.getData(state)),
+    }
+  },
+  computed: {
+    doneTodos: 'getDoneTodos',
+    // ..
+  }
+})
+
+function Todos() {
+  const [{
+    // doneTodos is memoized
+    doneTodos,
+  }] = useRj(TodosState)
+
+  // ...
+}
+```

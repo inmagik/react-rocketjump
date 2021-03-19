@@ -235,3 +235,5 @@ rj({
   },
 })
 ```
+
+## Effect pipeline
