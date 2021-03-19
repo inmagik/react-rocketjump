@@ -62,7 +62,7 @@ interface SuccessAction {
 ```
 
 **SUCCESS** action is dispatched when your **effect** *resolves / complete*
-the `data` key on `payload` contains the effectresult.
+the `data` key on `payload` contains the effect result.
 Default root reducer implementation make *pending* `false` and fill the `data` key with `payload.data` from action.
 
 - **FAILURE**
@@ -176,7 +176,7 @@ const state = obj.reducer(undefined, { type: 'INIT' })
 
 Your can extend the root reducer using the `reducer` property in **rj** constructor or the `reducer` mehtod when using **Builder** syntax, [learn more about builder invocation vs function invocation](/).
 
-This option is passed the base root reducer and it is expected to return the new reducer.
+This option should be a function with the old reducer as input and the new reducer as output.
 
 ```js {12}
 function counterReducer(state = { counter: 0 }, action) {
@@ -196,9 +196,9 @@ rj({
 
 Tipically the `reducer` option is used when you want overwrite the default reducer or your want to change default behaviour.
 
-If your only need is to add a new action handled by default reducer you can use the `composeReducer` option.
+If your only needs is to add a new action handled by default reducer you can use the `composeReducer` option.
 
-Thi option must be a reducer with the same shape of default reducer and is used to *compose* your reducer.
+This option should be a reducer with the same shape of default reducer and it's used to *compose* your reducer.
 
 ```js {3-11}
 rj({

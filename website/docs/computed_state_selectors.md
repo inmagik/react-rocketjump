@@ -5,16 +5,20 @@ sidebar_label: Computed state and selectors
 slug: /computed-state-and-selectors
 ---
 
+Every RjObject has its own selectors: a collection functions used to select a piece of
+internal state. In addition the RjObject olds a function to compute the state
+given to its consumers.
+
 ## Default selectors
 
 When you crafting a new RjObject default selectors are generated.
 Default selectors are designed to work with default state shape and are:
 
-- **getRoot** select the root state.
-- **isPending**: select pending state from root state.
+- **getRoot**: select the root state.
+- **isPending**: select the pending state from root state.
 - **isLoading**: alias for isPending
-- **getError**: select error state from root state.
-- **getData**: select data state from root state.
+- **getError**: select the error state from root state.
+- **getData**: select the data state from root state.
 
 You can access selectors using the **makeSelectors** function on RjObject.
 
@@ -69,22 +73,28 @@ When you use consumers such `useRj` this is done for you:
 const [computedState, actions] = useRj(obj)
 ```
 
-The default computeState implementation simply slice the root state.
+The default computeState implementation simply select the root state.
 
 You can change the value returned from computeState using **computed** option, an object that map out property with internal RocketJump state.
-Computed values can be inline selectors or _string_ that refernces selectors names.
+Computed values can be inline selectors or _strings_ that refernces selectors names.
 
 Using configuration from previous example.
 
-```js {3-7}
+```js {10-14}
 const CoolState = rj({
-  // ...
+  effect: () => Promise.resolve({ name: 'Gio Va' }),
+  combineReducers: {
+    counter: counterReducer,
+  },
+  selectors: (defaultSelectors) => ({
+    getCounter: (state) => state.counter,
+    getName: (state) => defaultSelectors.getData(state)?.name ?? 'NONAME',
+  }),
   computed: {
     name: 'getName',
     counter: 'getCounter',
     loading: (state) => state.root.pending,
   },
-  effect: () => Promise.resolve({ name: 'Gio Va' }),
 })
 
 const state = obj.reducer(undefined, { type: 'INIT' })
