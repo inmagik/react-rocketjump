@@ -68,7 +68,7 @@ given effect and are:
 - `run(...args: any[])`: trigger effect, `...args` are passed as effect inputs,
   set `pending` to `true` and `error` to `null`,
 - `cancel()`: cancel effect execution, set `pending` to `false`.
-- `clean()`: cancel effect execution, set `pending` to `false` and `data` to `null`.
+- `clean()`: cancel effect execution, set `pending` to `false`, `data` and `error`  to `null`.
 - `updateData(newData)`: set the `data` value to `newData`.
 
 ## React example
