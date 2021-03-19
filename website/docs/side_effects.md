@@ -237,3 +237,21 @@ rj({
 ```
 
 ## Effect pipeline
+
+Sometimes you need to apply a transfromation to effect action streams before
+it is consume from take effects.
+To do this you can use the `effectPipeline` option on **rj** constructor.
+
+For example you need to debounce your effect before execute them:
+
+```js
+import { rj } from 'react-rocketjump'
+import { debounceTime } from 'rxjs/operators'
+
+rj({
+  // ..
+  // Debounced ALL effect action by 250 ms
+  effectPipeline: (actionObservable, stateObservable) =>
+    actionObservable.pipe(debounceTime(250)),
+})
+```
