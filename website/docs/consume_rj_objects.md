@@ -162,6 +162,10 @@ const Component = (props) => {
 }
 ```
 
+## connectRj
+
+TODO
+
 ## useRunRj
 
 The `useRunRj` hook, just like `useRj`, allows to instantiate a RjObject in the definition of a React Component. Unlike `useRj`, this hook automatically schedules the `run` call of the RjObject when there is a change in its arguments. To stress the concept that the control point of the effect are its arguments, we will also refer to them as _dependencies_, but this is only a different point of view: the _dependencies_ argument of the `useRunRj` hook is used to understand when the effect should be run, and the items of the _dependencies_ array is spread as arguments on the `run` call.

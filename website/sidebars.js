@@ -11,9 +11,11 @@ module.exports = {
       'computed_state_selectors',
       'action_creators',
       'side_effects',
-      'consume_rj_objects',
       'effect_caller',
+      'consume_rj_objects',
+      'plugin_system',
       'mutations',
+      'builder_mode',
       'logger',
     ],
     Api: [
