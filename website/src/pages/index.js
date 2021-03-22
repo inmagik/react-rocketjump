@@ -38,7 +38,7 @@ const features = [
     description: (
       <>
         Since it works locally, inside components, you can add it to your app
-        without any compatibility issue, and you can use it just where you need
+        without any compatibility issue and you can use it just where you need
         it.
       </>
     ),
