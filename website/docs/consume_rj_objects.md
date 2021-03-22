@@ -128,7 +128,7 @@ builder
 
 `useRj` is a React Hook that allows the instantiation of one RjObject
 which is then made available to the component.<br />
-It's accept an RjObject as input and return its [computed state](computed_state_selectors.md)
+It accept an RjObject as input and return its [computed state](computed_state_selectors.md)
 and [action creators](action_creators.md).
 
 ```js
@@ -164,7 +164,109 @@ const Component = (props) => {
 
 ## connectRj
 
-TODO
+The `connectRj` function give you the exact contract of `useRj` but in form of
+higher-order component (HOC).<br />
+It accept an RjObject and give you the **computed state** and **action creators**
+as props:
+
+```js
+import { rj, connectRj } from 'react-rocketjump'
+
+const TodosState = rj(() => fetch('/api/todos').then((r) => r.json()))
+
+function Todos({
+  // computed state props
+  data,
+  pending,
+  error,
+  // action creators props
+  run,
+  clean,
+  cancel,
+}) {
+  // ...
+}
+
+export default connectRj(TodosState)(Todos)
+```
+
+You can change the mapping between your RjObject and your React Component using
+two optional paramters provided by connectRj. <br />
+The `mapStateToProps` argument:
+
+<!-- prettier-ignore -->
+```js
+(internalState, memoizedSelectors, props, computedState) => outStateProps
+```
+
+And the `mapActionsToProps` argument:
+
+<!-- prettier-ignore -->
+```js
+(actionCreators) => outActionsProps
+```
+
+Let's an example:
+
+```js
+function Todos({
+  // computed state props
+  todos,
+  loadingTodos,
+  errorOnTodos,
+  // action creators props
+  fetchTodos,
+}) {
+  // ...
+}
+
+function mapStateToProps(
+  internalState,
+  memoizedSelectors,
+  props,
+  computedState
+) {
+  return {
+    todos: memoizedSelectors.getData(internalState),
+    loadingTodos: memoizedSelectors.isPending(internalState),
+    errorOnTodos: memoizedSelectors.getError(internalState),
+  }
+}
+
+function mapActionsToProps(actionCreators) {
+  return {
+    fetchTodos: actionCretors.run,
+  }
+}
+
+export default connectRj(TodosState, mapStateToProps, mapActionsToProps)(Todos)
+```
+
+Finally RocketJump provide you a functional helper to compose togheter multiple
+`connectRj` instance.
+
+Instead of writing this:
+
+```js
+import { connectRj } from 'react-rocketjump'
+
+const ConnectedComponent = connectRj(
+  rjObjectA,
+  mapStateAToProps,
+  mapActionsAToProps
+)(connectRj(rjObjectB, mapStateBToProps, mapActionsBToProps)(Component))
+```
+
+You can use the `compose` helper and write:
+
+```js
+import { connectRj, compose } from 'react-rocketjump'
+
+const ConnectedComponent = compose(
+  connectRj(rjObjectA, mapStateAToProps, mapActionsAToProps),
+  connectRj(rjObjectB, mapStateBToProps, mapActionsBToProps)
+)(Component)
+```
 
 ## useRunRj
 
