@@ -242,6 +242,8 @@ function mapActionsToProps(actionCreators) {
 export default connectRj(TodosState, mapStateToProps, mapActionsToProps)(Todos)
 ```
 
+### The compose helper
+
 Finally RocketJump provide you a functional helper to compose togheter multiple
 `connectRj` instance.
 
