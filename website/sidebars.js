@@ -5,7 +5,7 @@ module.exports = {
       'installation',
       'quick_start',
     ],
-    Recipes: [
+    Concepts: [
       'rj_object',
       'reducer',
       'computed_state_selectors',
@@ -13,8 +13,8 @@ module.exports = {
       'side_effects',
       'effect_caller',
       'consume_rj_objects',
-      'plugin_system',
       'mutations',
+      'plugin_system',
       'builder_mode',
       'logger',
     ],

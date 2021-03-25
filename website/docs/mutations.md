@@ -336,7 +336,7 @@ const TodosState = rj({
             headers: {
               'Content-Type': 'application/json',
             },
-            body: { done: !todo.done },
+            body: JSON.stringify({ done: !todo.done }),
           }).then((r) => r.json()),
         updater: (state, updatedTodo) => ({
           ...state,
