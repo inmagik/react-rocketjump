@@ -95,6 +95,75 @@ Triggering an alert when an action completes
 builder.onFailure((data) => alert(data[0].name))
 ```
 
+### curry
+
+`builder.curry(...args)`
+
+This method return a **new builder instance** with `args` curried.
+The previous `onSuccess`, `onFailure` and `withMeta` are also copied to the
+new builder instance.
+
+Cause the curry method return a new instance of builder is prefered to wrap it
+in `React.useMemo`.
+
+The curry pattern can be useful if you need to pass to a child component
+a callback with the capabilities of builder with wrapped logic:
+
+**Example**
+
+```jsx
+const ProductState = rj({
+  mutations: {
+    updateProduct: {
+      effect: (catgory, updateData) => updateProductApi(catgory, updateData),
+      updater: 'updateData',
+    },
+  },
+  // ...
+})
+
+function ProductForm({ product, onProductUpdate }) {
+  // NOTE: This is for example purpose only in real word
+  // you may use library such Formik
+  const [formState, setFormState] = useState(product)
+  return (
+    <form
+      onSubmit={() => {
+        onProductUpdate
+          .onSuccess(() => {
+            // ... do form stuff
+          })
+          // NOTE: the category is curried so we need to pass only
+          // the second effect argument!
+          .run(formState)
+      }}
+    >
+      {/* ... */}
+    </form>
+  )
+}
+
+function EditProduct({ category }) {
+  const [{ product }, { updateProduct }] = useRunRj(ProductState, [category])
+
+  const onProductUpdate = useMemo(
+    () =>
+      updateProduct
+        .onSuccess(() => {
+          // ... do stuff
+        })
+        .curry(category),
+    [updateProduct, category]
+  )
+
+  return (
+    <>
+      <ProductForm product={product} onProductUpdate={onProductUpdate} />
+    </>
+  )
+}
+```
+
 ### run
 
 `builder.run(...args)`
