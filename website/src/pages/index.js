@@ -9,13 +9,13 @@ import styles from './styles.module.css'
 function DescriptionForReusable() {
   return (
     <>
-      React Rocketjump is built around the concept of composition in order to
+      React Rocketjump is built around the concept of composition, in order to
       let you build a reusable api. RjObjects are reusable blueprints so you can
       easily insert them in different components without worries.
       <br />
-      Plus React Rocketjump comes with some handy{' '}
+      React Rocketjump also comes with some handy{' '}
       <Link to={useBaseUrl('/docs/plugins')}>plugins</Link> to achieve most
-      common task with less code possible.
+      common tasks with less code possible.
     </>
   )
 }
@@ -37,9 +37,8 @@ const features = [
     title: 'Flexible',
     description: (
       <>
-        Since it works locally, inside components, you can add it to your app
-        without any compatibility issue and you can use it just where you need
-        it.
+        Since React Rocketjump manages state locally, you can add it to any react app
+        without any compatibility issue and you can use it just where you need.
       </>
     ),
   },
@@ -51,11 +50,11 @@ const features = [
     title: 'Powered by RxJS',
     description: (
       <>
-        React Rocketjump handle your side effect using{' '}
+        React Rocketjump handles your side effects using{' '}
         <a href="https://rxjs.dev">rxjs</a>. Out of the box you don't need to
-        write any rxjs code at all. But you can tune your configuration to
-        handle complex scenarios such websocket, timers and anything you can
-        done with rx!
+        write any rxjs code at all, but you can tune your configuration to
+        handle complex scenarios such as websockets, timers and anything you can
+        do with rx!
       </>
     ),
   },
