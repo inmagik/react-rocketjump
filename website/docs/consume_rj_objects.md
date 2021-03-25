@@ -142,7 +142,7 @@ function Todos() {
 }
 ```
 
-useRj acept a second optional parameter `mapStateToProps`:
+useRj acept a second optional parameter `selectState`:
 
 <!-- prettier-ignore -->
 ```js

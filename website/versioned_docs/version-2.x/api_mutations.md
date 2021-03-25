@@ -159,7 +159,7 @@ React RocketJump provides some utilities to setup sensible defaults on *takeEffe
 ### Single mutation
 This options set is thought for mutations that have no overlapping or concurrent runs. A common use case, for instance, is a form submission.
 
-This preset sets *effectCaller* to *exhaust* and configures the reducer to mantain a state with the following shape:
+This preset sets *takeEffect* to *exhaust* and configures the reducer to mantain a state with the following shape:
 ```js
 {
     pending: bool,  // is the mutation running?
@@ -189,7 +189,7 @@ This option set is designed for mutations that have multiple concurrent runs. Fu
 
 The application of this preset requires the user to define a key derivation function, that is a function that computes a key from the params fed into the mutation call. Runs with the same key are inserted in the same group, with the logic stated above.
 
-This preset sets *effectCaller* to *groupByExhaust*, and the reducer is configured to mantain a state with the following shape:
+This preset sets *takeEffect* to *groupByExhaust*, and the reducer is configured to mantain a state with the following shape:
 ```ts
 {
   pendings: {

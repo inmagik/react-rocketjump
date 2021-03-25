@@ -301,7 +301,7 @@ function handleOptSuccess(
     nextSnapshot = null
     nextActions = []
   } else {
-    // Save a new snapshot appling actions unitl first non committed
+    // Save a new snapshot appling actions until first non committed
     nextSnapshot = applyActionsOnSnapshot(
       snapshot,
       nextActions.slice(0, firstNonCommitIndex).map((a) => a.action),

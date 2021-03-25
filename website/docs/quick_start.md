@@ -16,6 +16,7 @@ export const TodosState = rj({
   mutations: {
     addTodo: {
       effect: (todo) =>
+        method: 'POST',
         fetch('api/todos', {
           headers: {
             'Content-Type': 'application/json',
