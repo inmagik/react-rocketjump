@@ -398,7 +398,7 @@ To see how to use it see the [standar take effects implementation](https://githu
 The main point of v3 is the ability to inferring the type of `RjObject` by your
 configuration and plugins.
 
-When using the standard rj constructor `rj(...plugins, config)` some stuff can be
+When using the standard rj constructor `rj(...plugins, config)` some stuff can't be
 infered Es.. (the type of state in selectors) to avoid bad types in some situation
 we give up and we fallback to `any`.
 
