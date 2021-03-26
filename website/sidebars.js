@@ -1,10 +1,6 @@
 module.exports = {
   someSidebar: {
-    'Getting Started': [
-      'overview',
-      'installation',
-      'quick_start',
-    ],
+    'Getting Started': ['overview', 'installation', 'quick_start'],
     Concepts: [
       'rj_object',
       'reducer',
@@ -18,9 +14,7 @@ module.exports = {
       'builder_mode',
       'logger',
     ],
-    Api: [
-      'reference_rj',
-      'reference_use_rj',
-    ],
+    Api: ['reference_rj', 'reference_use_rj'],
+    Migrations: ['migration_from_2_to_3'],
   },
 }
