@@ -15,9 +15,9 @@ The base state shape is
 
 ```js
 {
-    loading: false,
-    data: { /* some data */ },
-    error: null
+  loading: false,
+  data: { /* some data */ },
+  error: null
 }
 ```
 
@@ -25,17 +25,17 @@ This shape is replicated for each key to be stored, and the indexed replicas are
 
 ```js
 {
-    key1: {
-        loading: false,
-        data: { /* some data */ },
-        error: null
-    },
-    key2: {
-        loading: false,
-        data: { /* some data */ },
-        error: null
-    },
-    /* and so on... */
+  key1: {
+    loading: false,
+    data: { /* some data */ },
+    error: null
+  },
+  key2: {
+    loading: false,
+    data: { /* some data */ },
+    error: null
+  },
+  /* and so on... */
 }
 ```
 

@@ -1,2 +1,0 @@
-
-## Concept: Plugins and composition

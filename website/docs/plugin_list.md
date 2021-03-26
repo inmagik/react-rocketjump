@@ -65,21 +65,6 @@ This plugin injects in the `selectors` bag the following selectors:
 - **getPrev**: returns the information that is necessary to inject as params in the `run` call to load the previous page. The content of this key depends on the pagination adapter (see later)
 - **getCurrent**: returns the information that was injected in the `run` call to load the current page. The content of this key depends on the pagination adapter (see later)
 
-## Computed properties
-
-> This plugin uses [computed properties](api_rj.md)
-
-Properties exposed on the shadow state
-
-```js
-{
-    error: 'getError',
-    loading: 'isLoading',
-    list: 'getList',
-    pagination: 'getPagination',
-}
-```
-
 ## Pagination Adapters
 
 A pagination adapter is simply a JavaScript object that describes how to extract pagination information from the output of a task (the response of the REST API, usually). Each property can either be a property path or a function that is called with the output of the task as a parameter (except for the `current` property, which is passed the pagination information the user injected in the `run` call corresponding to the response)
@@ -107,4 +92,4 @@ The library already provides some pagination adapters, which are designed to wor
 
 ## Provided plugins
 
-This plugin already embeds List Insert Plugin, List Update Plugin and List Delete Plugin, so you don't have to add them manually unless you need to perform some customization on them
+This plugin already embeds List Insert Plugin, List Update Plugin and List Delete Plugin, so you don't have to add them manually unless you need to perform some customization on them.

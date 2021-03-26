@@ -2,7 +2,7 @@
 id: plugin_plain_list
 title: PlainList Plugin
 sidebar_label: PlainList Plugin
-slug: /plugin-plainlist
+slug: /plugins/plainList
 ---
 ## Use cases
 
