@@ -267,6 +267,86 @@ function ProductDetail() {
 }
 ```
 
+## Mutations helpers
+
+State and updater are handled for you by RocketJumo as you can see, but mutations
+are still implemented on top or RocketJump ecosystem, so the action dispacthed
+on reducer still available to all reducers.<br />
+Most of the time you are good with `reducer` and `updater` config on mutation
+but if you need you can intercept the action dispatched by mutations and do what you want.
+
+To help with this cases RocketJump expose two helpers:
+
+The `makeMutationType` function to make an action type for give mutation name:
+
+<!-- prettier-ignore -->
+```ts
+(mutationName: string, subType?: string) => string
+```
+
+Usage:
+
+```js
+import { makeMutationType, SUCCESS } from 'react-rocketjump'
+
+const type = makeMutationType('updateUser', SUCCESS)
+```
+
+The `subType` is usally one of RocketJump core action types such
+**SUCCESS**, **FAILURE**, **PENDING** etc..
+
+And the `matchMutationType` function:
+
+<!-- prettier-ignore -->
+```ts
+(
+  type: string,
+  matchName?: string | string[],
+  matchSubType?: string | string[]
+) => [string, string] | null
+```
+
+Usage:
+
+```js
+import { matchMutationType, SUCCESS } from 'react-rocketjump'
+
+function reducer(state, action) {
+  const match = matchMutationType(action.type)
+  // for example if the type came from
+  // makeMutationType('updateUser', SUCCESS)
+  // the match will be
+  // ['updateUser', 'SUCCESS']
+
+  if (matchMutationType(action.type)) {
+    // Match all mutations
+  }
+
+  if (matchMutationType(action.type, 'updateUser')) {
+    // Match all "updateUser" mutations
+  }
+
+  if (matchMutationType(action.type, 'updateUser', SUCCESS)) {
+    // Match all "updateUser" SUCCESS mutations
+  }
+
+  if (matchMutationType(action.type, '*', SUCCESS)) {
+    // Match all SUCCESS mutations
+  }
+
+  if (
+    matchMutationType(
+      action.type,
+      ['updateUser', 'resetStore'],
+      [SUCCESS, FAILURE]
+    )
+  ) {
+    // Match SUCCESS or FAILURE of mutations updateUser or resetStore
+  }
+}
+const type = makeMutationType('updateUser', SUCCESS)
+```
+
 ## Standard mutations
 
 RocketJump provides some utilities to setup sensible defaults on _takeEffect_ and _reducer_ for the most common cases.
