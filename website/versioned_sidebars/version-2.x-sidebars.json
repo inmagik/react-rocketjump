@@ -130,6 +130,10 @@
         },
         {
           "type": "doc",
+          "id": "version-2.x/plugin_cache"
+        },
+        {
+          "type": "doc",
           "id": "version-2.x/plugin_writing"
         }
       ]
