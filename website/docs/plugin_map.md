@@ -43,8 +43,9 @@ In order to get this working, you need to configure a keyMakerFunction, that is,
 
 The default keyMakerFunction is the following
 
+<!-- prettier-ignore -->
 ```js
-;(action) => (action.meta ? action.meta.id : null)
+(action) => (action.meta ? action.meta.id : null)
 ```
 
 The map plugin provides you ad-hoc actions and selectors to interact with the state shape described beforehand

@@ -24,6 +24,7 @@ module.exports = {
       'plugin_map',
       'plugin_debounce',
       'plugin_cache',
+      'plugin_mutations_pending',
     ],
     // Api: ['reference_rj', 'reference_use_rj'],
     Migrations: ['migration_from_2_to_3'],

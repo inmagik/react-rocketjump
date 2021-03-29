@@ -14,14 +14,10 @@ function makeMutationsPendingReducer(trackTypes: string | string[]) {
   }
 }
 
-interface RjPluginMutationsPendingConfig {
-  track?: string | string[]
-}
-
-const rjMutationsPending = (config: RjPluginMutationsPendingConfig = {}) =>
+const rjMutationsPending = (track?: string | string[]) =>
   rjPlugin({
     combineReducers: {
-      mutationsPending: makeMutationsPendingReducer(config.track ?? '*'),
+      mutationsPending: makeMutationsPendingReducer(track ?? '*'),
     },
     selectors: () => ({
       anyMutationPending: (state) => state.mutationsPending > 0,

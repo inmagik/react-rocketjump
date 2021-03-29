@@ -3,10 +3,13 @@ import { renderHook, act } from '@testing-library/react-hooks'
 import rjMutationsPending from '../index'
 
 type TestResoleCb = (a?: any) => void
-type HackMutationsType = Record<string, {
-  resolves: TestResoleCb[]
-  rejects: TestResoleCb[]
-}>
+type HackMutationsType = Record<
+  string,
+  {
+    resolves: TestResoleCb[]
+    rejects: TestResoleCb[]
+  }
+>
 
 describe('mutationsPending Plugin', () => {
   it('should track ALL mutations pending state', async () => {
@@ -160,7 +163,7 @@ describe('mutationsPending Plugin', () => {
   it('should track given mutations pending state when track option is given', async () => {
     const mockEffect = jest.fn().mockResolvedValue(99)
 
-    const hackMutations : HackMutationsType = {}
+    const hackMutations: HackMutationsType = {}
 
     const mockOneEffect = jest.fn(
       () =>
@@ -190,34 +193,29 @@ describe('mutationsPending Plugin', () => {
         })
     )
 
-    const maRjState = rj(
-      rjMutationsPending({
-        track: ['one', 'two'],
-      }),
-      {
-        mutations: {
-          one: {
-            effect: mockOneEffect,
-            updater: (s) => s,
-          },
-          two: {
-            effect: mockTwoEffect,
-            updater: (s) => s,
-          },
-          three: {
-            effect: mockThreeEffect,
-            updater: (s) => s,
-          },
+    const maRjState = rj(rjMutationsPending(['one', 'two']), {
+      mutations: {
+        one: {
+          effect: mockOneEffect,
+          updater: (s) => s,
         },
-        effect: mockEffect,
-        computed: {
-          data: 'getData',
-          pending: 'isPending',
-          error: 'getError',
-          busy: 'anyMutationPending',
+        two: {
+          effect: mockTwoEffect,
+          updater: (s) => s,
         },
-      }
-    )
+        three: {
+          effect: mockThreeEffect,
+          updater: (s) => s,
+        },
+      },
+      effect: mockEffect,
+      computed: {
+        data: 'getData',
+        pending: 'isPending',
+        error: 'getError',
+        busy: 'anyMutationPending',
+      },
+    })
 
     const { result } = renderHook(() => useRj(maRjState))
 
