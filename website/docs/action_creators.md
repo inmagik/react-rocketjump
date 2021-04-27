@@ -5,7 +5,7 @@ sidebar_label: Action Creators
 slug: /action-creators
 ---
 
-Every RjObject has its own action creators: a collection functions that trigger
+Every RjObject has its own action creators: a collection of functions that trigger
 state updates and/or side effects.
 
 ## Plain and effect action creators
