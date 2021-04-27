@@ -58,4 +58,4 @@ function Todos() {
 }
 ```
 
-In the next sections of the documention we cover all the concepts you see this example.
+In the next sections of the documention we'll cover all the concepts in this example.
