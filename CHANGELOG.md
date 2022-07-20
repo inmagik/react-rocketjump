@@ -1,6 +1,6 @@
 ## 3.0.0
 
-##### _???_
+##### _July 20th, 2022_
 
 This is a very big release for the Rocketjump library, there are a lot of breaking
 changes.
