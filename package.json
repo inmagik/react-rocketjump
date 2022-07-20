@@ -1,6 +1,6 @@
 {
   "name": "react-rocketjump",
-  "version": "3.0.0-rc16",
+  "version": "3.0.0",
   "description": "Rocketjump your react! Manage state and side effects like a breeze",
   "main": "lib/index.cjs.js",
   "module": "lib/index.es.js",
@@ -45,7 +45,7 @@
     "rocketjump"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.12.18",
+    "@babel/runtime": "^7.18.9",
     "hoist-non-react-statics": "^3.3.0",
     "object-path-immutable": "^4.1.0",
     "query-string": "^6.7.0",
@@ -103,7 +103,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "peerDependencies": {
-    "react": "^16.8.0 || ^17.0.0"
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
   },
   "husky": {
     "hooks": {
